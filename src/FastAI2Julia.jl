@@ -25,7 +25,7 @@ export AbstractCallback
 export TrainEvalCallback
 export Learner
 
-include("callback/callback.jl")
 include("learner/learner.jl")
+include("callback/callback.jl")
 
 end

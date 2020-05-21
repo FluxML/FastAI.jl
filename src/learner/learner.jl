@@ -103,7 +103,6 @@ _cbs_after_loss(learner::Learner) =  for c in learner.cbs cb.after_loss(c,learne
 _cbs_after_backward(learner::Learner) =  for c in learner.cbs cb.after_backward(c,learner) end
 _cbs_after_step(learner::Learner) =  for c in learner.cbs cb.after_step(c,learner) end
 _cbs_after_cancel_batch(learner::Learner) =  for c in learner.cbs cb.after_cancel_batch(c,learner) end
-_cbs_after_batch(learner::Learner) =  for c in learner.cbs cb.after_batch(c,learner) end
 
 function _do_begin_fit(learner::Learner, n_epoch)
     learner.n_epoch = n_epoch
