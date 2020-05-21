@@ -17,8 +17,6 @@ The main purpose of this code is to see if the team likes the method
 of defining an interface and implementations in Julia
 =#
 
-
-
 "called before doing anything, ideal for initial setup."
 function begin_fit(cb::AbstractCallback,lrn::Learner) end
 "called at the end of training, for final clean-up."
