@@ -3,6 +3,9 @@ uuid = "5d0beca9-ade8-49ae-ad0b-a3cf890e669f"
 authors = ["Peter Wolf", "Julia Community"]
 version = "0.1.0"
 
+[deps]
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+
 [compat]
 julia = "1"
 
