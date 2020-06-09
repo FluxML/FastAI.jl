@@ -69,8 +69,9 @@ end
 
 
 """
-Concatenate multiple MapDatasets.  Given ds1, ds2... dsn are the same kind of 
-dataset ds1 ++ ds2 ++ ... ++ dsn will be a combined dataset of that sort
+Concatenate multiple MapDatasets.  If ds1, ds2... dsn are the same kind of 
+dataset, then ds1 ++ ds2 ++ ... ++ dsn will be a combined dataset of that sort.
+If Iterable and Map datasets are combined, the result will be an IterableDataset.
 
 This is useful to assemble different existing dataset streams.
 The chainning operation is done on-the-fly, so concatenating large-scale
