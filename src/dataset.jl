@@ -27,8 +27,9 @@ All MapDatasets are also IterableDatasets
     
 Required functions:
 
-    (md<:MapDataset)(idx::Int) a MapDataset is a callable type that maps an integer id 
-    to a sample.  Legal IDs are between 1 and the length of this dataset.
+    getindex(md<:MapDataset,idx::Int) a MapDataset is a indexable type that 
+    maps an integer id to a sample.  Legal IDs are between 1 and the length 
+    of this dataset.
 
     length(md<:MapDataset) returns the number of samples in this MapDataset.  Used
     by many `Sampler` implementations and the default options of `DataLoader`.
@@ -42,6 +43,8 @@ dataset with non-integral indices/keys, a custom sampler must be provided.
 
 abstract type IterableDataset end
 abstract type MapDataset <: IterableDataset end
+Base.firstindex(md::T) where T <: MapDataset = 1
+Base.lastindex(md::T) where T <: MapDataset = length(md)
 
 struct ConcatDataset <: MapDataset
     ds1:: MapDataset
@@ -49,8 +52,7 @@ struct ConcatDataset <: MapDataset
 end
 
 Base.length(cd::ConcatDataset) = length(cd.ds1) + length(cd.ds2)
- 
-(cd::ConcatDataset)(idx::Int) = idx > length(cd.ds1) ? cd.ds2(idx-length(cd.ds1)) : cd.ds1(idx)
+Base.getindex(cd::ConcatDataset,idx::Int) = idx > length(cd.ds1) ? cd.ds2[idx-length(cd.ds1)] : cd.ds1[idx]
 
 struct ChainDataset <: IterableDataset
     ds1:: IterableDataset
@@ -82,17 +84,15 @@ IterableDatasets with this class will be efficient.
 ++(ds1:: IterableDataset,ds2:: IterableDataset, ds3...) = foldl(++, (ds2 , ds3...), init=a)
 
 struct SubsetDataset <: MapDataset
-    ds:: MapDataset
+    ds :: T where T <: MapDataset
     idxs:: Array{Int}
 end
 
 iterate(sd::SubsetDataset) = length(sd)>0 ? (sd.dataset(sd.idxs[1],2)) : nothing	    
-
 iterate(sd::SubsetDataset, state) = state[2] <= length(sd) ? (sd(sd.idxs[state[2]]), state[2]+1) : nothing	
 
-Base.length(sd::SubsetDataset) = length(sd.indices)
- 
-(sd::SubsetDataset)(idx::Int) = sd.ds(sd.idxs[idx])
+Base.length(sd::SubsetDataset) = length(sd.idxs)
+Base.getindex(sd::SubsetDataset,idx::Int) = sd.ds[sd.idxs[idx]]
 
 """
 Subset of a MapDataset at specified indices.
