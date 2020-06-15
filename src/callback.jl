@@ -1,9 +1,9 @@
 #=
-Callback.jl:
+callback.jl:
 
 Author: Peter Wolf (opus111@gmail.com)
 
-A first cut at a port of the FastAI V2 Callback API to Julia
+Port of the FastAI V2 Callback API to Julia
 
 The original source is here
 

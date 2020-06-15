@@ -1,11 +1,11 @@
 #=
-Learner.jl:
+learner.jl:
 
 Author: Peter Wolf (opus111@gmail.com)
 
-A first cut at a port of the FastAI V2 Learner API to Julia
+Port of the FastAI V2 Learner API to Julia
 
-Basic class for handling the training loop
+Methods for handling the training loop
 
 The original source is here
 
