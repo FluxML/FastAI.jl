@@ -1,6 +1,8 @@
-using FastAI2Julia
+using FastAI2
 using Test
 
-@testset "FastAI2Julia.jl" begin
+include("test_metric.jl")
+
+@testset "FastAI2.jl" begin
     # Write your tests here.
 end

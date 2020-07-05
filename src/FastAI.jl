@@ -17,7 +17,7 @@ The main purpose of this code is to see if the team likes the method
 of defining an interface and implementations in Julia
 =#
 
-module FastAI2Julia
+module FastAI2
 
 export fit
 export add_cb
@@ -27,6 +27,8 @@ export Learner
 
 
 include("dataset.jl")
+include("metric.jl")
+include("recorder.jl")
 include("learner.jl")
 include("callback.jl")
 

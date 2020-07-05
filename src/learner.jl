@@ -18,6 +18,17 @@ https://github.com/fastai/fastai2/blob/master/docs/learner.html
 The main purpose of this code is to see if the team likes the method
 of defining an interface and implementations in Julia
 =#
+"""
+Types representing the concept `Learner`.  
+
+In Julia duck typing, implementing an interface just requires 
+implementing a set of required fuctions. 
+
+For a type T to be a Learner, the required functions are:
+
+current_batch(learner:: T)  Returns the predictions and targets (y) for the current batch
+"""
+module Learner
 
 """
 Basic class handling tweaks of the training loop by changing a [Learner](@ref) in various events
@@ -189,4 +200,6 @@ function fit(learner::Learner, n_epoch, lr=nothing, wd=nothing, cbs=nothing, res
         _cbs_after_fit(learner)
         _end_cleanup(learner)
     end
+end
+
 end

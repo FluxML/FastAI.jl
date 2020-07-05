@@ -1,3 +1,4 @@
+module Dataset
 using Random: randperm
 
 """
@@ -219,3 +220,4 @@ Example 2: splitting workload across all workers using :attr:`worker_init_fn`::
     >>> print(list(torch.utils.data.DataLoader(ds, num_workers=20, worker_init_fn=worker_init_fn)))
     [3, 4, 5, 6]
 """
+end
