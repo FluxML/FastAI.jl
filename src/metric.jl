@@ -27,17 +27,22 @@ For a type T to be a Metric, the required functions are:
 
 reset(metric:: T)                   Reset inner state to prepare for new computation
 accumulate(metric:: T, learner)     Use learner to update the state with new results
-value(metric:: T, input, target)    The value of the metric
+value(metric:: T)                   The value of the metric
 name(metric:: T)                    Name of the Metric, camel-cased and with Metric removed
 """
-module Metric
+function implements_metric(T::DataType)
+    return hasmethod(reset,(T,)) &&
+        hasmethod(accumulate,(T,Any)) &&
+        hasmethod(value,(T,)) &&
+        hasmethod(name,(T,))
+end
 
 """
 AvgMetric
 
 Average the values of func taking into account potential different batch sizes
 """
-mutable struct AvgMetric
+struct AvgMetric
     func
     total:: Float64
     count:: Int
@@ -58,10 +63,11 @@ function accumulate(metric:: AvgMetric, learner)
     metric.count += bs
 end
 
-value(metric:: AvgMetric) = if metric.count > 0 metric.total/metric.count else nothing
+value(metric:: AvgMetric) = if metric.count > 0 metric.total/metric.count else nothing end
 
 name(metric:: AvgMetric) = "Avg$(metric.func)"
 
+@assert implements_metric(AvgMetric)
 
 """
 class AvgLoss[source]
@@ -181,10 +187,9 @@ AccumMetric(
     thresh=nothing, 
     flatten=true) = AccumMetric(func, dim_argmax, activation, thresh, flatten)
 
-function value(metric::AccumMetric, input, target)
-end
+value(m::AccumMetric) = 0
 
-"""
+#=
 Compute accuracy with targ when pred is bs * n_classes
 
 Example
@@ -201,11 +206,9 @@ Example
     test_eq(accuracy(x.unsqueeze(1).expand(4,2,5), torch.stack([y,y1], dim=1)), 0.75)
     error_rate[source]
     error_rate(inp, targ, axis=-1)
-"""
+
 accuracy(m::AccumMetric, inp, targ, axis=-1) = nothing
 
-
-"""
 1 - accuracy
 
 Example
@@ -215,11 +218,9 @@ Example
     y1 = change_targ(y, 2, 5)
     test_eq(error_rate(x,y1), 0.5)
     test_eq(error_rate(x.unsqueeze(1).expand(4,2,5), torch.stack([y,y1], dim=1)), 0.25)
-"""
+
 error_rate(m::AccumMetric, inp, targ, axis=-1) = nothing
 
-
-"""
 Computes the Top-k accuracy (targ is in the top k predictions of inp)
 
 Example
@@ -227,8 +228,9 @@ Example
     y = torch.arange(0,6)
     test_eq(top_k_accuracy(x[:5],y[:5]), 1)
     test_eq(top_k_accuracy(x, y), 5/6)
-"""
+
 top_k_accuracy(m::AccumMetric, inp, targ, k=5, axis=-1) = nothing
+=#
 
 """
 APScoreBinary
@@ -237,14 +239,14 @@ Average Precision for single-label binary classification problems
 
 See the scikit-learn documentation for more details.
 """
-struct APScoreBinary <: Metric
+struct APScoreBinary
     axis::Int
     average::Symbol
     pos_label::Int 
     sample_weight
 end
 
-APScoreBinary(axis=-1 average=:macro, pos_label=1, sample_weight=None) = APScoreBinary(axis, average=, pos_label, sample_weight)
+APScoreBinary(axis=-1, average=:macro, pos_label=1, sample_weight=nothing) = APScoreBinary(axis, average, pos_label, sample_weight)
 
 """
 BalancedAccuracy
@@ -253,7 +255,7 @@ Balanced Accuracy for single-label binary classification problems
 
 See the scikit-learn documentation for more details.
 """
-struct BalancedAccuracy <: Metric
+struct BalancedAccuracy
     axis::Int
     sample_weight
     adjusted::Bool
@@ -261,7 +263,7 @@ end
 
 BalancedAccuracy(axis, sample_weight, adjusted) = BalancedAccuracy(axis=-1, sample_weight=nothing, adjusted=false)
 
-"""
+#=
 BrierScore[source]
 BrierScore(axis=-1, sample_weight=None, pos_label=None)
 
@@ -347,6 +349,4 @@ for i in range(3):
     learn.loss = F.cross_entropy(x1[vals[i]:vals[i+1]],x2[vals[i]:vals[i+1]])
     tst.accumulate(learn)
 test_close(tst.value, torch.exp(F.cross_entropy(x1,x2)))
-"""
-
-end
+=#

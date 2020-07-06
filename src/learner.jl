@@ -28,7 +28,9 @@ For a type T to be a Learner, the required functions are:
 
 current_batch(learner:: T)  Returns the predictions and targets (y) for the current batch
 """
-module Learner
+function implements_learner(T::DataType)
+    return hasmethod(current_batch,(T,))
+end
 
 """
 Basic class handling tweaks of the training loop by changing a [Learner](@ref) in various events
@@ -202,4 +204,3 @@ function fit(learner::Learner, n_epoch, lr=nothing, wd=nothing, cbs=nothing, res
     end
 end
 
-end

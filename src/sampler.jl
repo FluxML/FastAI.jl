@@ -18,7 +18,7 @@ https://pytorch.org/docs/stable/data.html
 The main purpose of this code is to see if the team likes the method
 of defining an interface and implementations in Julia
 =#
-module Sampler
+
 using Random
 using StatsBase
 
@@ -219,4 +219,4 @@ Base.length(s::BatchSampler) =
     else 
         (length(s.sampler) + s.batch_size - 1) ÷ s.batch_size 
     end
-end
+

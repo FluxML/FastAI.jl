@@ -1,4 +1,4 @@
-using FastAI2.Metric
+using FastAI
 using Test
 
 @testset "Metric" begin

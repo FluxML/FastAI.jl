@@ -1,12 +1,12 @@
 ```@meta
-CurrentModule = FastAI2Julia
+CurrentModule = FastAI
 ```
 
-# FastAI2Julia
+# FastAI
 
 ```@index
 ```
 
 ```@autodocs
-Modules = [FastAI2Julia]
+Modules = [FastAI]
 ```

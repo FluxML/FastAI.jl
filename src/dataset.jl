@@ -1,4 +1,4 @@
-module Dataset
+
 using Random: randperm
 
 """
@@ -124,7 +124,7 @@ function random_split(dataset:: MapDataset, lengths:: Array{Int})
     return s
 end
 
-"""
+#=
 TODO later...
 
 When a subclass is used with :class:`~torch.utils.data.DataLoader`, each
@@ -219,5 +219,4 @@ Example 2: splitting workload across all workers using :attr:`worker_init_fn`::
     >>> # With even more workers
     >>> print(list(torch.utils.data.DataLoader(ds, num_workers=20, worker_init_fn=worker_init_fn)))
     [3, 4, 5, 6]
-"""
-end
+=#

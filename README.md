@@ -1,4 +1,4 @@
-# FastAI2
+# FastAI
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://opus111.github.io/FastAI.jl/stable)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://opus111.github.io/FastAI.jl/dev)
