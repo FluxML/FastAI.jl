@@ -18,6 +18,7 @@ https://dev.fast.ai/metrics
 The main purpose of this code is to see if the team likes the method
 of defining an interface and implementations in Julia
 =#
+using Statistics
 
 """
 Types representing the concept `Matric`.  In Julia duck typing, implementing an
@@ -42,7 +43,7 @@ AvgMetric
 
 Average the values of func taking into account potential different batch sizes
 """
-struct AvgMetric
+mutable struct AvgMetric
     func
     total:: Float64
     count:: Int
@@ -70,25 +71,73 @@ name(metric:: AvgMetric) = "Avg$(metric.func)"
 @assert implements_metric(AvgMetric)
 
 """
-class AvgLoss[source]
-AvgLoss() :: Metric
+AvgLoss()
 
 Average the losses taking into account potential different batch sizes
 
+class AvgLoss(Metric):
+    "Average the losses taking into account potential different batch sizes"
+    def reset(self):           self.total,self.count = 0.,0
+    def accumulate(self, learn):
+        bs = find_bs(learn.yb)
+        self.total += to_detach(learn.loss.mean())*bs
+        self.count += bs
+    @property
+    def value(self): return self.total/self.count if self.count != 0 else None
+    @property
+    def name(self):  return "loss"
+"""
+mutable struct AvgLoss
+    total:: Real
+    count:: Int
+end
+
+AvgLoss() = AvgLoss(0.0,0)
+
+reset(al::AvgLoss) = al.total,al.count = 0.0,0
+    
+function accumulate(al::AvgLoss, learn)
+    al.total += batch_size(learn)*mean(loss(learn))
+    al.count += batch_size(learn)
+end 
+
+value(al::AvgLoss) = if al.count>0 al.total/al.count else nothing end
+
+name(al::AvgLoss) = "loss"
+
+"""
 class AvgSmoothLoss[source]
 AvgSmoothLoss(beta=0.98) :: Metric
 
-Smooth average of the losses (exponentially weighted with beta)
+Exponential smooth average of the losses (exponentially weighted with alpha)
+"""
+mutable struct AvgSmoothLoss
+    alpha:: Real
+    val:: Real
+    first:: Bool
+end
 
-tst = AvgSmoothLoss()
-t = torch.randn(100)
-tst.reset()
-val = tensor(0.)
-for i in range(4): 
-    learn.loss = t[i*25:(i+1)*25].mean()
-    tst.accumulate(learn)
-    val = val*0.98 + t[i*25:(i+1)*25].mean()*(1-0.98)
-    test_close(val/(1-0.98**(i+1)), tst.value)
+AvgSmoothLoss(alpha=0.98) = AvgSmoothLoss(alpha,0.0,true)
+
+reset(asl::AvgSmoothLoss) = asl.first=true
+    
+function accumulate(asl::AvgSmoothLoss, learn)
+    v = mean(loss(learn))
+    if asl.first
+        asl.first = false
+        asl.val = v
+    else
+        asl.val = asl.alpha*asl.val+(1-asl.alpha)*v
+    end
+end 
+
+value(asl::AvgSmoothLoss) = asl.val
+
+name(asl::AvgSmoothLoss) = "AvgSmoothLoss"
+
+@assert implements_metric(AvgSmoothLoss)
+
+"""
 class ValueMetric[source]
 ValueMetric(func, metric_name=None) :: Metric
 
@@ -102,9 +151,11 @@ test_eq(vm.name, 'custom_value_metric')
 
 vm = ValueMetric(metric_value_fn)
 test_eq(vm.name, 'metric_value_fn')
-
 """
-
+struct ValueMetric
+    metric_value_fn
+    metric_name::String
+end
 
 """
 AccumMetric

@@ -1,62 +1,89 @@
 using FastAI
+using Statistics
 using Test
+using Infiltrator
 
 @testset "Metric" begin
 
-mutable struct TstLearner
+mutable struct TestLearner
     pb
     yb
+    loss
 end
 
-TstLearner() = TstLearner([],[])
-current_batch(l:: TstLearner) = (ps,ys)
+TestLearner() = TestLearner([],[],0.0)
+FastAI.batch_size(l::TestLearner) = length(l.yb)
+FastAI.current_batch(l:: TestLearner) = (l.pb,l.yb)
+FastAI.loss(l::TestLearner) = l.loss
+
+using FastAI: AvgMetric, reset, accumulate, value, name, current_batch
 
 _l2_mean(x,y) = float.(x)-float.(y) |> pow(2) |> mean
 
 function compute_val(met, x1, x2)
     reset(met)
     vals = [0,6,15,20]
-    learn = TstLearner()
+    lrn = TestLearner()
     for i in range(3) 
-        learn.ps,learn.ys = x1[vals[i]:vals[i+1]],x2[vals[i]:vals[i+1]]
-        met.accumulate(met,learn)
+        lrn.ps,lrn.ys = x1[vals[i]:vals[i+1]],x2[vals[i]:vals[i+1]]
+        accumulate(met,lrn)
     end
     return value(met)
 end
 
-
+function is_close(a,b,eps=1e-5)
+    return (a-b)^2 < eps^2
+end
 
 @testset "AvgMetric" begin
-
-    lrn = TstLearner()
-    met = AvgMetric(x,y -> mean(abs(x-y)))
-    met.reset()
-    ps,ys = randn(100),randn(100)
-    for i in 1:100 
-        lrn.pb,lrn.yb = ps[i:i+25],ys[i:i+25]
+    lrn = TestLearner()
+    met = AvgMetric((x,y) -> mean(abs.(x-y)))
+    reset(met)
+    ps = randn(100)
+    ys = randn(100)
+    n = 25
+    for i in 1:n:100
+        lrn.pb = ps[i:i+n-1]
+        lrn.yb = ys[i:i+n-1]
         accumulate(met,lrn)
     end
-    @test value(met) ≈ mean(abs(ps-ys)) 
+    @test is_close(value(met), mean(abs.(ps-ys))) 
+end
 
+@testset "AvgSmoothLoss" begin
+    lrn = TestLearner()
+    met = AvgSmoothLoss()
+    reset(met)
+    t = randn(100)
+    val = 0.0
+    n = 25
+    for i in 1:n:100
+        lrn.loss = mean(t[i:i+n-1])
+        val = if i==1 lrn.loss else val*0.98 + lrn.loss*(1-0.98) end
+        accumulate(met,lrn)
+    end
+    @test is_close(value(met), val)
 end
 
 @testset "AvgLoss" begin
-#=
-tst = AvgLoss()
-t = torch.randn(100)
-tst.reset()
-for i in range(0,100,25): 
-    learn.yb,learn.loss = t[i:i+25],t[i:i+25].mean()
-    tst.accumulate(learn)
-test_close(tst.value, t.mean())
-=#
+    lrn = TestLearner()
+    met = AvgLoss()
+    reset(met)
+    t = randn(100)
+    n = 25
+    for i in 1:n:100
+        lrn.yb,lrn.loss = t[i:i+n-1],mean(t[i:i+n-1])
+        accumulate(met,lrn)
+    end
+    @test is_close(value(met), mean(t))
 end
+
 
 """
 @testset "AccumMetric" begin
     #Go through a fake cycle with various batch sizes and computes the value of met
     x1,x2 = randn(20,5),torch.randn(20,5)
-    tst = AccumMetric(_l2_mean)
+    Test = AccumMetric(_l2_mean)
     @test compute_val(tst, x1, x2) ≈ _l2_mean(x1, x2)
     @test tst.preds == x1.view(-1)
     @test tst.targs == x2.view(-1)

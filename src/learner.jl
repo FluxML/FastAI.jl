@@ -19,20 +19,6 @@ The main purpose of this code is to see if the team likes the method
 of defining an interface and implementations in Julia
 =#
 """
-Types representing the concept `Learner`.  
-
-In Julia duck typing, implementing an interface just requires 
-implementing a set of required fuctions. 
-
-For a type T to be a Learner, the required functions are:
-
-current_batch(learner:: T)  Returns the predictions and targets (y) for the current batch
-"""
-function implements_learner(T::DataType)
-    return hasmethod(current_batch,(T,))
-end
-
-"""
 Basic class handling tweaks of the training loop by changing a [Learner](@ref) in various events
 
 The training loop is defined in [Learner](@ref) a bit below and consists in a minimal set of instructions: looping through the data we:
@@ -70,6 +56,8 @@ By default handling of these events do nothing.  Special behavior is implemented
 abstract type AbstractCallback end
 
 """
+Types representing the concept `Learner`.  
+
 Group together a model, some dls and a loss_func to handle training
 
 opt_func will be used to create an optimizer when Learner.fit is called, with lr as a default learning rate. splitter is a function that takes learner.model and returns a list of parameter groups (or just one parameter group if there are no different parameter groups). The default is trainable_params, which returns all trainable parameters of the model.
@@ -83,6 +71,14 @@ path and model_dir are used to save and/or load models. Often path will be infer
 wd is the default weight decay used when training the model; moms, the default momentums used in Learner.fit_one_cycle. wd_bn_bias controls if weight decay is applied to BatchNorm layers and bias.
 
 Lastly, train_bn controls if BatchNorm layers are trained even when they are supposed to be frozen according to the splitter. Our empirical experiments have shown that it's the best behavior for those layers in transfer learning.
+
+In Julia duck typing, implementing an interface just requires 
+implementing a set of required fuctions. 
+
+For a type T to be a Learner, the required functions are:
+
+current_batch(learner:: T)  Returns the predictions and targets (y) for the current batch
+loss(learner:: T) Returns losses for current batch 
 """
 mutable struct Learner
     cbs:: Array{AbstractCallback}
@@ -90,8 +86,19 @@ mutable struct Learner
     wd
     n_epoch
     loss
+    smooth_loss
     dls
+    xb
+    yb
 end
+
+loss(l::Learner) = l.loss
+smooth_loss(l::Learner) = l.smooth_loss
+smooth_loss!(l::Learner,sl::Real) = l.smooth_loss=sl
+pb(l::Learner) = l.pb
+xb(l::Learner) = l.xb
+yb(l::Learner) = l.yb
+batch_size(l::Learner) = length(l.yb)
 
 """
 add_cb(learner::Learner,cb::AbstractCallback cb)
@@ -153,6 +160,10 @@ function _end_cleanup(learner::Learner)
     learner.dl,learner.xb,learner.yb,learner.pred,learner.loss = nothing,(nothing,),(nothing,),nothing,nothing
 end
 
+function current_batch(learner::Learner) 
+    throw(ErrorException("Not Implemented"))
+end
+
 """
     fit(learner::Learner, n_epoch, lr=nothing, wd=nothing, cbs=nothing, reset_opt=false)
 
@@ -204,3 +215,16 @@ function fit(learner::Learner, n_epoch, lr=nothing, wd=nothing, cbs=nothing, res
     end
 end
 
+function implements_learner(T::DataType)
+    return hasmethod(lr,(T,)) &&
+        hasmethod(loss,(T,)) &&
+        hasmethod(smooth_loss,(T,)) &&
+        hasmethod(smooth_loss!,(T,Real)) &&
+        hasmethod(batch_size,(T,)) &&
+        hasmethod(xb,(T,)) &&
+        hasmethod(yb,(T,)) &&
+        hasmethod(pb,(T,)) &&
+        hasmethod(add_cb,(T,AbstractCallback))
+end
+
+#@assert implements_learner(Learner)

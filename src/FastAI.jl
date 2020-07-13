@@ -19,18 +19,32 @@ of defining an interface and implementations in Julia
 
 module FastAI
 
-#=
+include("dataset.jl")
+
+include("learner.jl")
+include("callback.jl")
+
+include("metric.jl")
+include("recorder.jl")
+
 export fit
 export add_cb
 export AbstractCallback
 export TrainEvalCallback
-export Learner
-=#
 
-include("dataset.jl")
-include("metric.jl")
-include("recorder.jl")
-include("learner.jl")
-include("callback.jl")
+export Learner
+export current_batch
+export batch_size
+export loss
+
+export AvgMetric
+export AvgLoss
+export AvgSmoothLoss
+export reset
+export accumulate
+export value
+export name
+
+
 
 end
