@@ -33,7 +33,7 @@ name(metric:: T)                    Name of the Metric, camel-cased and with Met
 """
 function implements_metric(T::DataType)
     return hasmethod(reset,(T,)) &&
-        hasmethod(accumulate,(T,Any)) &&
+        hasmethod(accumulate,(T,AbstractLearner)) &&
         hasmethod(value,(T,)) &&
         hasmethod(name,(T,))
 end
@@ -56,11 +56,12 @@ function reset(metric:: AvgMetric)
     metric.count = 0
 end
 
-function accumulate(metric:: AvgMetric, learner)
-    pb,yb = current_batch(learner)
-    @assert length(pb)==length(yb)
-    bs = length(pb)
-    metric.total += metric.func(pb, yb)*bs
+function accumulate(metric:: AvgMetric, learner::AbstractLearner)
+    p = pb(learner)
+    y = yb(learner)
+    @assert length(p)==length(y)
+    bs = length(p)
+    metric.total += metric.func(p, y)*bs
     metric.count += bs
 end
 
@@ -95,9 +96,9 @@ end
 AvgLoss() = AvgLoss(0.0,0)
 
 reset(al::AvgLoss) = al.total,al.count = 0.0,0
-    
-function accumulate(al::AvgLoss, learn)
-    al.total += batch_size(learn)*mean(loss(learn))
+
+function accumulate(al::AvgLoss, learn::AbstractLearner)
+   al.total += batch_size(learn)*mean(loss(learn))
     al.count += batch_size(learn)
 end 
 
@@ -121,7 +122,7 @@ AvgSmoothLoss(alpha=0.98) = AvgSmoothLoss(alpha,0.0,true)
 
 reset(asl::AvgSmoothLoss) = asl.first=true
     
-function accumulate(asl::AvgSmoothLoss, learn)
+function accumulate(asl::AvgSmoothLoss, learn::AbstractLearner)
     v = mean(loss(learn))
     if asl.first
         asl.first = false
@@ -136,7 +137,7 @@ value(asl::AvgSmoothLoss) = asl.val
 name(asl::AvgSmoothLoss) = "AvgSmoothLoss"
 
 @assert implements_metric(AvgSmoothLoss)
-
+#=
 """
 class ValueMetric[source]
 ValueMetric(func, metric_name=None) :: Metric
@@ -240,7 +241,6 @@ AccumMetric(
 
 value(m::AccumMetric) = 0
 
-#=
 Compute accuracy with targ when pred is bs * n_classes
 
 Example
@@ -281,7 +281,6 @@ Example
     test_eq(top_k_accuracy(x, y), 5/6)
 
 top_k_accuracy(m::AccumMetric, inp, targ, k=5, axis=-1) = nothing
-=#
 
 """
 APScoreBinary
@@ -314,7 +313,6 @@ end
 
 BalancedAccuracy(axis, sample_weight, adjusted) = BalancedAccuracy(axis=-1, sample_weight=nothing, adjusted=false)
 
-#=
 BrierScore[source]
 BrierScore(axis=-1, sample_weight=None, pos_label=None)
 

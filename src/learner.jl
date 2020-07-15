@@ -80,17 +80,30 @@ For a type T to be a Learner, the required functions are:
 current_batch(learner:: T)  Returns the predictions and targets (y) for the current batch
 loss(learner:: T) Returns losses for current batch 
 """
-mutable struct Learner
+abstract type AbstractLearner end
+
+mutable struct Learner <: AbstractLearner
     cbs:: Array{AbstractCallback}
-    opt
-    wd
-    n_epoch
-    loss
-    smooth_loss
+
     dls
+    model
+    opt
+    lr::Real
+    loss_func
+
+    wd::Int
+    n_epoch::Int
+    loss::Real
+    smooth_loss::Real
+    
+    pb
     xb
     yb
 end
+
+using Flux: ADAM, mse
+
+Learner(dls, model; opt=ADAM, lr=0.01, loss_func=mse) = Learner([],dls,model,opt,lr,loss_func, 0,0,0.0,0.0, [],[],[])
 
 loss(l::Learner) = l.loss
 smooth_loss(l::Learner) = l.smooth_loss

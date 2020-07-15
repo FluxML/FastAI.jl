@@ -5,7 +5,7 @@ using Infiltrator
 
 @testset "Metric" begin
 
-mutable struct TestLearner
+mutable struct TestLearner <: AbstractLearner
     pb
     yb
     loss
@@ -13,7 +13,8 @@ end
 
 TestLearner() = TestLearner([],[],0.0)
 FastAI.batch_size(l::TestLearner) = length(l.yb)
-FastAI.current_batch(l:: TestLearner) = (l.pb,l.yb)
+FastAI.pb(l:: TestLearner) = l.pb
+FastAI.yb(l:: TestLearner) = l.yb
 FastAI.loss(l::TestLearner) = l.loss
 
 using FastAI: AvgMetric, reset, accumulate, value, name, current_batch

@@ -1,5 +1,6 @@
 
 using Random: randperm
+using Base: length, getindex
 
 """
 Types representing the concept `Dataset`.  In Julia duck typing, implementing an
@@ -28,11 +29,11 @@ All MapDatasets are also IterableDatasets
     
 Required functions:
 
-    getindex(md<:MapDataset,idx::Int) a MapDataset is a indexable type that 
+    Base.getindex(md<:MapDataset,idx::Int) a MapDataset is a indexable type that 
     maps an integer id to a sample.  Legal IDs are between 1 and the length 
     of this dataset.
 
-    length(md<:MapDataset) returns the number of samples in this MapDataset.  Used
+    Base.length(md<:MapDataset) returns the number of samples in this MapDataset.  Used
     by many `Sampler` implementations and the default options of `DataLoader`.
 
 TODO later...
