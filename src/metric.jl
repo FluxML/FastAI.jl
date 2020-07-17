@@ -31,6 +31,8 @@ accumulate(metric:: T, learner)     Use learner to update the state with new res
 value(metric:: T)                   The value of the metric
 name(metric:: T)                    Name of the Metric, camel-cased and with Metric removed
 """
+abstract type AbstractMetric end
+
 function implements_metric(T::DataType)
     return hasmethod(reset,(T,)) &&
         hasmethod(accumulate,(T,AbstractLearner)) &&
@@ -43,7 +45,7 @@ AvgMetric
 
 Average the values of func taking into account potential different batch sizes
 """
-mutable struct AvgMetric
+mutable struct AvgMetric <: AbstractMetric
     func
     total:: Float64
     count:: Int
@@ -88,7 +90,7 @@ class AvgLoss(Metric):
     @property
     def name(self):  return "loss"
 """
-mutable struct AvgLoss
+mutable struct AvgLoss <: AbstractMetric
     total:: Real
     count:: Int
 end
@@ -112,7 +114,7 @@ AvgSmoothLoss(beta=0.98) :: Metric
 
 Exponential smooth average of the losses (exponentially weighted with alpha)
 """
-mutable struct AvgSmoothLoss
+mutable struct AvgSmoothLoss <: AbstractMetric
     alpha:: Real
     val:: Real
     first:: Bool

@@ -21,31 +21,40 @@ module FastAI
 
 include("dataset.jl")
 include("dataloader.jl")
+include("databunch.jl")
 include("learner.jl")
 include("callback.jl")
 
 include("metric.jl")
 include("recorder.jl")
 
+export AbstractLearner
+export AbstractCallback
+export AbstractMetric
 export IterableDataset
 export MapDataset
+
 export DataLoader
-export DataLoaders
+export DataBunch
 export getindex
 export length
+export train
+export valid
+export one_batch
 
-export fit
-export add_cb
-export AbstractCallback
 export TrainEvalCallback
 
-export AbstractLearner
 export Learner
+export model
+export loss_func
 export pb
 export xb
 export yb
 export batch_size
+export data_bunch
 export loss
+export fit!
+export add_cb!
 
 export AvgMetric
 export AvgLoss

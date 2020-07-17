@@ -14,8 +14,6 @@ Base.getindex(dl::DataLoader,idx::Int) = getindex(dl.ds,idx)
 
 Base.length(dl::DataLoader) = length(dl.ds) 
 
-struct DataLoaders
-    train::DataLoader
-    valid::DataLoader
-end
+one_batch(dl::DataLoader) = dl.ds[1:dl.bs]
+
 

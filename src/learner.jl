@@ -85,7 +85,7 @@ abstract type AbstractLearner end
 mutable struct Learner <: AbstractLearner
     cbs:: Array{AbstractCallback}
 
-    dls
+    db::DataBunch
     model
     opt
     lr::Real
@@ -105,6 +105,8 @@ using Flux: ADAM, mse
 
 Learner(dls, model; opt=ADAM, lr=0.01, loss_func=mse) = Learner([],dls,model,opt,lr,loss_func, 0,0,0.0,0.0, [],[],[])
 
+model(l::Learner) = l.model
+loss_func(l::Learner) = l.loss_func
 loss(l::Learner) = l.loss
 smooth_loss(l::Learner) = l.smooth_loss
 smooth_loss!(l::Learner,sl::Real) = l.smooth_loss=sl
@@ -112,13 +114,16 @@ pb(l::Learner) = l.pb
 xb(l::Learner) = l.xb
 yb(l::Learner) = l.yb
 batch_size(l::Learner) = length(l.yb)
+data_bunch(l::Learner) = l.db
+loss(l::Learner,xb,yb) = 0.0
+fit!(l::Learner;epoch_count=1) = nothing
 
 """
 add_cb(learner::Learner,cb::AbstractCallback cb)
 
 Add a new Callback [AbstractCallback](@ref) to this Learner [Learner](@ref)
 """
-add_cb(learner::Learner,cb::AbstractCallback) = push!(learner.cbs,cb)
+add_cb!(learner::Learner,cb::AbstractCallback) = push!(learner.cbs,cb)
 
 # pass event to all callbacks
 _cbs_begin_fit(learner::Learner) =  for c in learner.cbs cb.begin_fit(c,learner) end
