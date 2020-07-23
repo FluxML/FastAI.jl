@@ -1,5 +1,6 @@
 
 using Random: randperm
+using Base: length, getindex
 
 """
 Types representing the concept `Dataset`.  In Julia duck typing, implementing an
@@ -28,11 +29,14 @@ All MapDatasets are also IterableDatasets
     
 Required functions:
 
-    getindex(md<:MapDataset,idx::Int) a MapDataset is a indexable type that 
+    Base.getindex(md<:MapDataset,idx::Int) a MapDataset is a indexable type that 
     maps an integer id to a sample.  Legal IDs are between 1 and the length 
     of this dataset.
 
-    length(md<:MapDataset) returns the number of samples in this MapDataset.  Used
+    Base.getindex(md<:Dataset,rng::UnitRange) returns a contiguous subset of the
+    items in this dataset
+
+    Base.length(md<:MapDataset) returns the number of samples in this MapDataset.  Used
     by many `Sampler` implementations and the default options of `DataLoader`.
 
 TODO later...
@@ -54,7 +58,18 @@ end
 
 Base.length(cd::ConcatDataset) = length(cd.ds1) + length(cd.ds2)
 Base.getindex(cd::ConcatDataset,idx::Int) = idx > length(cd.ds1) ? cd.ds2[idx-length(cd.ds1)] : cd.ds1[idx]
-
+function Base.getindex(cd::ConcatDataset,rng::UnitRange)
+    if rng.start <= length(cd.ds1)
+        if rng.end <= length(cd.ds1)
+            return cd.ds1[rng]
+        else
+            return cd.ds1[rng.start:end] + cd.ds1[1:rng.end-length(cd.ds1)]
+        end
+    else
+        return cd.ds2[rng.start-length(cd.ds1):rng.end-length(cd.ds1)]
+    end
+end
+  
 struct ChainDataset <: IterableDataset
     ds1:: IterableDataset
     ds2:: IterableDataset
@@ -94,7 +109,7 @@ iterate(sd::SubsetDataset, state) = state[2] <= length(sd) ? (sd(sd.idxs[state[2
 
 Base.length(sd::SubsetDataset) = length(sd.idxs)
 Base.getindex(sd::SubsetDataset,idx::Int) = sd.ds[sd.idxs[idx]]
-
+Base.getindex(sd::SubsetDataset,rng::UnitRange) = [cd[i] for i in sd.idxs[rng]]
 """
 Subset of a MapDataset at specified indices.
 

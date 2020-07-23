@@ -45,7 +45,7 @@ mutable struct Recorder <: AbstractCallback
     values:: Array
 end
 
-Recorder(add_time=true, train_metrics=false, valid_metrics=true, beta=0.98) =
+Recorder(add_time=true, train_metrics=false, valid_metrics=true, alpha=0.98) =
     Recorder(
         true,
         #TrainEvalCallback,
@@ -53,7 +53,7 @@ Recorder(add_time=true, train_metrics=false, valid_metrics=true, beta=0.98) =
         train_metrics,
         valid_metrics,
         AvgLoss(),
-        AvgSmoothLoss(beta=beta),
+        AvgSmoothLoss(alpha),
         [],[],[],[])
 
 "Prepare state for training"
@@ -78,21 +78,46 @@ function begin_fit(rec::Recorder)
     reset(rec.smooth_loss)
 end
 
+begin_train(rec::Recorder) = map(reset,rec.train_metrics)
+begin_validate(rec::Recorder) = map(reset,rec.validate_metrics)
+after_train(rec::Recorder) = log(rec,map(maybe_item,rec.train_metrics))
+after_validate(rec::Recorder) = log(rec,map(maybe_item,rec.valididate_metrics))
+after_cancel_train(rec::Recorder) = rec.cancel_train = true
+after_cancel_validate(rec::Recorder) = rec.cancel_valid = true
+
+function train_metrics(rec::Recorder)
+    if rec.cancel_train
+        return []
+    elseif rec.train_metrics
+        return [rec.smooth_loss] + rec.metrics
+    else
+        return [rec.smooth_loss]
+    end
+end
+
+function valid_metrics(rec::Recorder)
+    if rec.cancel_valid
+        return []
+    elseif rec.valid_metrics
+        return [rec.loss] + rec.metrics
+    else
+        return [rec.loss]
+    end
+end
+
 "Update all metrics and records lr and smooth loss in training"
 function after_batch(rec::Recorder)
-    if length(current_batch(rec)) == 0
-        return
+    if batch_size(rec) > 0
+        mets = if rec.is_training train_metics(rec) else valid_metrics(rec) end
+        for met in mets
+            accumulate(met,rec.learn)
+        end
+        if rec.is_training     
+            push!(rec.lrs.append(lr(rec.learn)))
+            push!(rec.losses,value(rec.smooth_loss))
+            smooth_loss!(rec.learn,value(rec.smooth_loss))
+        end
     end
-    mets = if rec.training rec._train_mets else rec._valid_mets end
-    for met in mets
-        accumulate(met,rec.learn)
-    end
-    if !rec.training
-        return
-    end
-    push!(rec.lrs.append(lr(rec.learn)))
-    push!(rec.losses,value(rec.smooth_loss))
-    smooth_loss!(rec.learn,value(rec.smooth_loss))
 end
 #=
 "Set timer if `rec.add_time=true`"
@@ -104,30 +129,16 @@ function begin_epoch(rec::Recorder)
     rec.log = L(getattr(self, 'epoch', 0))
 end
 
-    def begin_train   (self): self._train_mets[1:].map(Self.reset())
-    def begin_validate(self): self._valid_mets.map(Self.reset())
-    def after_train   (self): self.log += self._train_mets.map(_maybe_item)
-    def after_validate(self): self.log += self._valid_mets.map(_maybe_item)
-    def after_cancel_train(self):    self.cancel_train = True
-    def after_cancel_validate(self): self.cancel_valid = True
-
-    def after_epoch(self):
-        "Store and log the loss/metric values"
-        self.learn.final_record = self.log[1:].copy()
-        self.values.append(self.learn.final_record)
-        if self.add_time: self.log.append(format_time(time.time() - self.start_epoch))
-        self.logger(self.log)
-        self.iters.append(self.smooth_loss.count)
-
-    @property
-    def _train_mets(self):
-        if getattr(self, 'cancel_train', False): return L()
-        return L(self.smooth_loss) + (self.metrics if self.train_metrics else L())
-
-    @property
-    def _valid_mets(self):
-        if getattr(self, 'cancel_valid', False): return L()
-        return (L(self.loss) + self.metrics if self.valid_metrics else L())
+"Store and log the loss/metric values"
+function after_epoch(rec::Recorder)
+    rec.learn.final_record = self.log[1:].copy()
+    push!(rec.values,rec.learn.final_record)
+    if rec.add_time
+        push!(rec.log,format_time(time.time() - rec.start_epoch))
+        logger(rec,rec.log)
+        push!(rec.iters,count(rec.smooth_loss))
+    end
+end
 
     def plot_loss(self, skip_start=5, with_valid=True):
         plt.plot(list(range(skip_start, len(self.losses))), self.losses[skip_start:], label='train')

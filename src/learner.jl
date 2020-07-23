@@ -18,6 +18,8 @@ https://github.com/fastai/fastai2/blob/master/docs/learner.html
 The main purpose of this code is to see if the team likes the method
 of defining an interface and implementations in Julia
 =#
+using Flux
+using Infiltrator
 """
 Basic class handling tweaks of the training loop by changing a [Learner](@ref) in various events
 
@@ -80,18 +82,37 @@ For a type T to be a Learner, the required functions are:
 current_batch(learner:: T)  Returns the predictions and targets (y) for the current batch
 loss(learner:: T) Returns losses for current batch 
 """
-mutable struct Learner
+abstract type AbstractLearner end
+
+mutable struct Learner <: AbstractLearner
     cbs:: Array{AbstractCallback}
+
+    db::DataBunch
+    model
     opt
-    wd
-    n_epoch
-    loss
+    lr::Real
+    loss_func
+
+
+    wd::Int
+    n_epoch::Int
+
     smooth_loss
-    dls
+    
+    # current batch
+    epoch
+    loss
+    dl
+    pb
     xb
     yb
 end
 
+Learner(db, model; opt=Flux.ADAM(), lr=0.01, loss_func=Flux.mse) = Learner([],db,model,opt,lr,loss_func, 0,0,nothing,nothing,nothing,nothing,[],[],[])
+
+model(l::Learner) = l.model
+lr(l::Learner) = l.lr
+loss_func(l::Learner) = l.loss_func
 loss(l::Learner) = l.loss
 smooth_loss(l::Learner) = l.smooth_loss
 smooth_loss!(l::Learner,sl::Real) = l.smooth_loss=sl
@@ -99,42 +120,56 @@ pb(l::Learner) = l.pb
 xb(l::Learner) = l.xb
 yb(l::Learner) = l.yb
 batch_size(l::Learner) = length(l.yb)
+data_bunch(l::Learner) = l.db
+loss(l::Learner,xb,yb) = l.loss
+
 
 """
 add_cb(learner::Learner,cb::AbstractCallback cb)
 
 Add a new Callback [AbstractCallback](@ref) to this Learner [Learner](@ref)
 """
-add_cb(learner::Learner,cb::AbstractCallback) = push!(learner.cbs,cb)
+add_cb!(learner::Learner,cb::AbstractCallback) = push!(learner.cbs,cb)
 
 # pass event to all callbacks
-_cbs_begin_fit(learner::Learner) =  for c in learner.cbs cb.begin_fit(c,learner) end
-_cbs_after_fit(learner::Learner) =  for c in learner.cbs cb.after_fit(c,learner) end
-_cbs_begin_train(learner::Learner) =  for c in learner.cbs cb.begin_train(c,learner) end
-_cbs_after_train(learner::Learner) =  for c in learner.cbs cb.after_train(c,learner) end
-_cbs_begin_epoch(learner::Learner) =  for c in learner.cbs cb.begin_epoch(c,learner) end
-_cbs_after_epoch(learner::Learner) =  for c in learner.cbs cb.after_epoch(c,learner) end
-_cbs_begin_batch(learner::Learner) =  for c in learner.cbs cb.begin_batch(c,learner) end
-_cbs_after_batch(learner::Learner) =  for c in learner.cbs cb.after_batch(c,learner) end
-_cbs_begin_validate(learner::Learner) =  for c in learner.cbs cb.begin_validate(c,learner) end
-_cbs_after_validate(learner::Learner) =  for c in learner.cbs cb.after_validate(c,learner) end
-_cbs_after_pred(learner::Learner) =  for c in learner.cbs cb.after_pred(c,learner) end
-_cbs_after_loss(learner::Learner) =  for c in learner.cbs cb.after_loss(c,learner) end
-_cbs_after_backward(learner::Learner) =  for c in learner.cbs cb.after_backward(c,learner) end
-_cbs_after_step(learner::Learner) =  for c in learner.cbs cb.after_step(c,learner) end
-_cbs_after_cancel_batch(learner::Learner) =  for c in learner.cbs cb.after_cancel_batch(c,learner) end
+_cbs_begin_fit(learner::Learner) =  for cb in learner.cbs begin_fit(cb,learner) end
+_cbs_after_fit(learner::Learner) =  for cb in learner.cbs after_fit(cb,learner) end
+_cbs_after_cancel_fit(learner::Learner) =  for cb in learner.cbs after_cancel_fit(cb,learner) end
+_cbs_begin_train(learner::Learner) =  for cb in learner.cbs begin_train(cb,learner) end
+_cbs_after_train(learner::Learner) =  for cb in learner.cbs after_train(cb,learner) end
+_cbs_after_cancel_train(learner::Learner) =  for cb in learner.cbs after_cancel_train(cb,learner) end
+_cbs_begin_epoch(learner::Learner) =  for cb in learner.cbs begin_epoch(cb,learner) end
+_cbs_after_epoch(learner::Learner) =  for cb in learner.cbs after_epoch(cb,learner) end
+_cbs_after_cancel_epoch(learner::Learner) =  for cb in learner.cbs after_cancel_epoch(cb,learner) end
+_cbs_begin_batch(learner::Learner) =  for cb in learner.cbs begin_batch(cb,learner) end
+_cbs_after_batch(learner::Learner) =  for cb in learner.cbs after_batch(cb,learner) end
+_cbs_begin_validate(learner::Learner) =  for cb in learner.cbs begin_validate(cb,learner) end
+_cbs_after_validate(learner::Learner) =  for cb in learner.cbs after_validate(cb,learner) end
+_cbs_after_pred(learner::Learner) =  for cb in learner.cbs after_pred(cb,learner) end
+_cbs_after_loss(learner::Learner) =  for cb in learner.cbs after_loss(cb,learner) end
+_cbs_after_backward(learner::Learner) =  for cb in learner.cbs after_backward(cb,learner) end
+_cbs_after_step(learner::Learner) =  for cb in learner.cbs after_step(cb,learner) end
+_cbs_after_cancel_batch(learner::Learner) =  for cb in learner.cbs after_cancel_batch(cb,learner) end
 
-function _do_begin_fit(learner::Learner, n_epoch)
-    learner.n_epoch = n_epoch
-    learner.loss = 0.0
-    _cbs_begin_fit(learner)
+function _do_batch_fit(learner::Learner, batch, ps)
+
+    _loss(xy) = learner.loss_func(learner.model(xy[1]),xy[2])
+    _cbs_begin_batch(learner)
+    gs = gradient(ps) do
+        sum(_loss.(batch))
+    end
+    update!(learner.opt, ps, gs)
+    _cbs_after_batch(learner)
 end
 
 function _do_epoch_train(learner::Learner)
     try
-        learner.dl = learner.dls.train
+        learner.dl = learner|> data_bunch |> train
+        ps = params(learner.model)
         _cbs_begin_train(learner)
-        all_batches(learner)
+        for batch in learner.dl
+            _do_batch_fit(learner,batch,ps)
+        end 
     catch CancelTrainException
         _cbs_after_cancel_train(learner)
     finally
@@ -143,7 +178,7 @@ function _do_epoch_train(learner::Learner)
 end
 
 function _do_epoch_validate(learner::Learner, ds_idx=1, dl=nothing)
-    dl = isnothing(dl) ? learner.dls[ds_idx] : dl
+    dl = isnothing(dl) ? learner.db[ds_idx] : dl
     try
         learner.dl = dl
         _cbs_begin_validate(learner)
@@ -154,14 +189,6 @@ function _do_epoch_validate(learner::Learner, ds_idx=1, dl=nothing)
     finally
         _cbs_after_validate(learner)
     end
-end
-
-function _end_cleanup(learner::Learner)
-    learner.dl,learner.xb,learner.yb,learner.pred,learner.loss = nothing,(nothing,),(nothing,),nothing,nothing
-end
-
-function current_batch(learner::Learner) 
-    throw(ErrorException("Not Implemented"))
 end
 
 """
@@ -183,7 +210,8 @@ fit(learn, 6)
 @assert learn.loss < init_loss
 ```
 """
-function fit(learner::Learner, n_epoch, lr=nothing, wd=nothing, cbs=nothing, reset_opt=false)
+function fit!(learner::Learner, n_epoch, lr=nothing, wd=nothing, cbs=nothing, reset_opt=false)
+    #=
     if reset_opt || isnothing(learner.opt)
         create_opt(learner)
     end
@@ -192,10 +220,12 @@ function fit(learner::Learner, n_epoch, lr=nothing, wd=nothing, cbs=nothing, res
         set_hypers(learner.opt,wd=wd)
     end
     set_hypers(learner.opt, lr= isnothing(lr) ? learner.lr : lr)
-
+    =#
     try
-        _do_begin_fit(learner,n_epoch)
-        for epoch in range(n_epoch)
+        learner.n_epoch = n_epoch
+        learner.loss = 0.0
+        _cbs_begin_fit(learner)
+        for epoch in 1:n_epoch
             try
                 learner.epoch=epoch
                 _cbs_begin_epoch(learner)
@@ -211,7 +241,7 @@ function fit(learner::Learner, n_epoch, lr=nothing, wd=nothing, cbs=nothing, res
         _cbs_after_cancel_fit(learner)
     finally
         _cbs_after_fit(learner)
-        _end_cleanup(learner)
+        learner.dl,learner.xb,learner.yb,learner.pb,learner.loss = nothing,(nothing,),(nothing,),nothing,nothing
     end
 end
 
@@ -224,7 +254,7 @@ function implements_learner(T::DataType)
         hasmethod(xb,(T,)) &&
         hasmethod(yb,(T,)) &&
         hasmethod(pb,(T,)) &&
-        hasmethod(add_cb,(T,AbstractCallback))
+        hasmethod(add_cb!,(T,AbstractCallback))
 end
 
 #@assert implements_learner(Learner)
