@@ -1,15 +1,21 @@
-name = "FastAI2Julia"
+name = "FastAI"
 uuid = "5d0beca9-ade8-49ae-ad0b-a3cf890e669f"
 authors = ["Peter Wolf", "Julia Community"]
 version = "0.1.0"
 
 [deps]
+Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
+Infiltrator = "5903a43b-9cc3-4c30-8d17-598619ec4e9b"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
+Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
+Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
 [compat]
 StatsBase = "0.33"
+Infiltrator = "0.3"
+Flux = "0.11"
 julia = "1"
 
 [extras]
