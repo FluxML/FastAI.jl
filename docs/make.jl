@@ -1,14 +1,14 @@
-using FastAI2Julia
+using FastAI
 using Documenter
 
 makedocs(;
-    modules=[FastAI2Julia],
+    modules=[FastAI],
     authors="Peter Wolf, Julia Community",
-    repo="https://github.com/opus111/FastAI2Julia.jl/blob/{commit}{path}#L{line}",
-    sitename="FastAI2Julia.jl",
+    repo="https://github.com/opus111/FastAI.jl/blob/{commit}{path}#L{line}",
+    sitename="FastAI.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://opus111.github.io/FastAI2Julia.jl",
+        canonical="https://opus111.github.io/FastAI.jl",
         assets=String[],
     ),
     pages=[
@@ -17,5 +17,5 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/opus111/FastAI2Julia.jl",
+    repo="github.com/opus111/FastAI.jl",
 )
