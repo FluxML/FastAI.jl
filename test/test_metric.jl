@@ -17,7 +17,7 @@ FastAI.pb(l:: TestLearner) = l.pb
 FastAI.yb(l:: TestLearner) = l.yb
 FastAI.loss(l::TestLearner) = l.loss
 
-using FastAI: AvgMetric, reset, accumulate, value, name, current_batch
+using FastAI: AvgMetric, reset, accumulate, value, name
 
 _l2_mean(x,y) = float.(x)-float.(y) |> pow(2) |> mean
 
@@ -53,7 +53,7 @@ end
 
 @testset "AvgSmoothLoss" begin
     lrn = TestLearner()
-    met = AvgSmoothLoss()
+    met = AvgSmoothLoss(0.98)
     reset(met)
     t = randn(100)
     val = 0.0

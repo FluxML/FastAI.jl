@@ -21,16 +21,22 @@ of defining an interface and implementations in Julia
 function begin_fit(cb::AbstractCallback,lrn::AbstractLearner) end
 "called at the end of training, for final clean-up."
 function after_fit(cb::AbstractCallback,lrn::AbstractLearner) end
+"called after cancelling training, for final clean-up."
+function after_cancel_fit(cb::AbstractCallback,lrn::AbstractLearner) end
 
 "called at the beginning of the training part of an epoch."
 function begin_train(cb::AbstractCallback,lrn::AbstractLearner) end
 "called at the end of the training phase of an epoch."
 function after_train(cb::AbstractCallback,lrn::AbstractLearner) end
+"called after cancelling the training phase of an epoch."
+function after_cancel_train(cb::AbstractCallback,lrn::AbstractLearner) end
 
 "called at the beginning of each epoch, useful for any behavior you need to reset at each epoch."
 function begin_epoch(cb::AbstractCallback,lrn::AbstractLearner) end
 "called at the end of an epoch, for any clean-up before the next one."
 function after_epoch(cb::AbstractCallback,lrn::AbstractLearner) end
+"called after cancelling an epoch, for any clean-up before the next one."
+function after_cancel_epoch(cb::AbstractCallback,lrn::AbstractLearner) end
 
 "called at the beginning of each batch, just after drawing said batch. It can be used to do any setup necessary for the batch (like hyper-parameter scheduling) or to change the input/target before it goes in the model (change of the input with techniques like mixup for instance)."
 function begin_batch(cb::AbstractCallback,lrn::AbstractLearner) end

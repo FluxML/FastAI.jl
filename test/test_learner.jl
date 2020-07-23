@@ -1,55 +1,63 @@
 using FastAI
-using Flux: mse
+using Flux: mse, @functor, Dense, Descent, train!, Params, gradient, update!
+using Flux.Data: DataLoader
 using Base: length, getindex
-
 
 struct SynthDataset <: MapDataset
     x
     y
 end
 
-Base.getindex(md::SynthDataset,idx::Int) = (md.x[idx],md.y[idx])
-Base.getindex(sd::SynthDataset,rng::UnitRange) = [sd[i] for i in rng]
-Base.length(md::SynthDataset) = length(x)
+Base.getindex(md::SynthDataset,idx::Int) = (md.x[1,1,idx],md.y[1,1,idx])
+Base.getindex(md::SynthDataset,rng::UnitRange) = (md.x[1,1,rng],md.y[1,1,rng])
+Base.length(md::SynthDataset) = length(md.x)
 
-"A simple dataset where `x` is random and `y = a*x + b` plus some noise."
+"A simple DataBunch where `x` is random and `y = a*x + b` plus some noise."
 function synth_dbunch(a=2, b=3, bs=16, n_train=10, n_valid=2)
 
     function get_data(n)
-        x = randn(bs*n)
-        return SynthDataset(x, a*x .+ b + 0.1*randn(bs*n))
+        xy = [] 
+        for i in 1:bs*n  
+            x = rand()
+            y = a*x .+ b + 0.1*rand()
+            push!(xy,([x],[y]))
+        end
+        return DataLoader(xy, batchsize=bs, shuffle=true) 
     end
 
-    train_ds = get_data(n_train)
-    valid_ds = get_data(n_valid)
-    train_dl = DataLoader(train_ds) #, bs=bs, shuffle=true, num_workers=0)
-    valid_dl = DataLoader(valid_ds) #, bs=bs, num_workers=0)
+    train_dl = get_data(n_train)
+    valid_dl = get_data(n_valid)
     return DataBunch(train_dl, valid_dl)
 end
 
-"A r"
-mutable struct RegModel
-    a
-    b
-end
-
-RegModel() = RegModel(rand(),rand()) 
-
-(m::RegModel)(x) = x*m.a .+ m.b
-
 function synth_learner(n_train=10, n_valid=2, cuda=false, lr=0.01)
     data = synth_dbunch() #n_train=n_train,n_valid=n_valid)
-    return Learner(data, RegModel(), loss_func=mse, lr=lr)
+    return Learner(data, Dense(1,1), loss_func=mse, lr=lr, opt=Descent(0.001))
 end
 
-split(xy) = [x for (x,_) in xy],[y for (_,y) in xy]
+function one_batch(dl::DataLoader)
+    for d in dl
+        return d
+    end
+end
 
 @testset "Learner" begin
     learn = synth_learner()
-    xb,yb = learn |> data_bunch |> train |> one_batch |> split
-    pb = model(learn)(xb)
-    init_loss = loss_func(learn)(xb, yb)
-    fit!(learn,epoch_count=6)
-    final_loss = loss(learn)
-    @assert final_loss < init_loss
+    add_cb!(learn,Recorder())
+    
+    xys = learn |> data_bunch |> train |> one_batch
+    lf = loss_func(learn)
+    mf = model(learn)
+
+    function lff(xy)
+        x = xy[1]
+        p = mf(x)[1]
+        y = xy[2]
+        return lf(p,y)
+    end
+    
+    init_loss = sum(lff.(xys))
+    fit!(learn,16)
+    final_loss = sum(lff.(xys))
+    @test final_loss < init_loss
 end

@@ -1,3 +1,5 @@
+using Flux.Data: DataLoader
+
 struct DataBunch
     train::DataLoader
     valid::DataLoader

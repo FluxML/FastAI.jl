@@ -120,7 +120,7 @@ mutable struct AvgSmoothLoss <: AbstractMetric
     first:: Bool
 end
 
-AvgSmoothLoss(alpha=0.98) = AvgSmoothLoss(alpha,0.0,true)
+AvgSmoothLoss(alpha) = AvgSmoothLoss(alpha,0.0,true)
 
 reset(asl::AvgSmoothLoss) = asl.first=true
     

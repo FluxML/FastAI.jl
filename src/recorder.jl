@@ -45,7 +45,7 @@ mutable struct Recorder <: AbstractCallback
     values:: Array
 end
 
-Recorder(add_time=true, train_metrics=false, valid_metrics=true, beta=0.98) =
+Recorder(add_time=true, train_metrics=false, valid_metrics=true, alpha=0.98) =
     Recorder(
         true,
         #TrainEvalCallback,
@@ -53,7 +53,7 @@ Recorder(add_time=true, train_metrics=false, valid_metrics=true, beta=0.98) =
         train_metrics,
         valid_metrics,
         AvgLoss(),
-        AvgSmoothLoss(beta=beta),
+        AvgSmoothLoss(alpha),
         [],[],[],[])
 
 "Prepare state for training"
