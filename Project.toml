@@ -13,10 +13,11 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
 [compat]
+Flux = "0.11"
+Infiltrator = "0.3"
 Revise = "2.7"
 StatsBase = "0.33"
-Infiltrator = "0.3"
-Flux = "0.11"
+Zygote = "0.5"
 julia = "1"
 
 [extras]
