@@ -33,7 +33,8 @@ export train
 export valid
 export one_batch
 
-export TrainEvalCallback
+export DummyCallback
+export ProgressCallback
 export Recorder
 
 export Learner

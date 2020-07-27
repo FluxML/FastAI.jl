@@ -32,7 +32,7 @@ end
 
 function synth_learner(n_train=10, n_valid=2, cuda=false, lr=0.01)
     data = synth_dbunch() #n_train=n_train,n_valid=n_valid)
-    return Learner(data, Dense(1,1), loss_func=mse, lr=lr, opt=Descent(0.001))
+    return Learner(data, Dense(1,1), loss=mse, opt=Descent(0.001))
 end
 
 function one_batch(dl::DataLoader)
@@ -43,10 +43,10 @@ end
 
 @testset "Learner" begin
     learn = synth_learner()
-    add_cb!(learn,Recorder())
+    add_cb!(learn,DummyCallback())
     
     xys = learn |> data_bunch |> train |> one_batch
-    lf = loss_func(learn)
+    lf = loss(learn)
     mf = model(learn)
 
     function lff(xy)
