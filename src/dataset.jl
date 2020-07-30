@@ -1,7 +1,4 @@
 
-using Random: randperm
-using Base: length, getindex
-
 """
 Types representing the concept `Dataset`.  In Julia duck typing, implementing an
 interface just requires implementing a set of required fuctions. 

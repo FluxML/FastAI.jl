@@ -1,8 +1,7 @@
-using Flux.Data: DataLoader
 
 struct DataBunch
-    train::DataLoader
-    valid::DataLoader
+    train::Flux.Data.DataLoader
+    valid::Flux.Data.DataLoader
 end
 
 train(db::DataBunch) = db.train

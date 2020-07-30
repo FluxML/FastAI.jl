@@ -13,68 +13,53 @@ end
 
 TestLearner() = TestLearner([],[],0.0)
 FastAI.batch_size(l::TestLearner) = length(l.yb)
-FastAI.pb(l:: TestLearner) = l.pb
-FastAI.yb(l:: TestLearner) = l.yb
-FastAI.loss(l::TestLearner) = l.loss
 
 using FastAI: AvgMetric, reset, accumulate, value, name
-
-_l2_mean(x,y) = float.(x)-float.(y) |> pow(2) |> mean
-
-function compute_val(met, x1, x2)
-    reset(met)
-    vals = [0,6,15,20]
-    lrn = TestLearner()
-    for i in range(3) 
-        lrn.ps,lrn.ys = x1[vals[i]:vals[i+1]],x2[vals[i]:vals[i+1]]
-        accumulate(met,lrn)
-    end
-    return value(met)
-end
 
 function is_close(a,b,eps=1e-5)
     return (a-b)^2 < eps^2
 end
 
 @testset "AvgMetric" begin
-    lrn = TestLearner()
-    met = AvgMetric((x,y) -> mean(abs.(x-y)))
+
+    abs_diff(v) = abs(v[1]-v[2])
+    mean_abs(vs) = mean(abs_diff.(vs)) 
+    met = AvgMetric(mean_abs)    
     reset(met)
     ps = randn(100)
     ys = randn(100)
     n = 25
     for i in 1:n:100
-        lrn.pb = ps[i:i+n-1]
-        lrn.yb = ys[i:i+n-1]
-        accumulate(met,lrn)
+        batch = [(ps[j],ys[j]) for j in i:i+n-1]
+        accumulate(met,batch)
     end
     @test is_close(value(met), mean(abs.(ps-ys))) 
 end
 
 @testset "AvgSmoothLoss" begin
-    lrn = TestLearner()
     met = AvgSmoothLoss(0.98)
     reset(met)
     t = randn(100)
     val = 0.0
     n = 25
     for i in 1:n:100
-        lrn.loss = mean(t[i:i+n-1])
-        val = if i==1 lrn.loss else val*0.98 + lrn.loss*(1-0.98) end
-        accumulate(met,lrn)
+        batch = t[i:i+n-1]
+        loss = mean(batch)
+        val = if i==1 loss else val*0.98 + loss*(1-0.98) end
+        accumulate(met,loss,length(batch))
     end
     @test is_close(value(met), val)
 end
 
 @testset "AvgLoss" begin
-    lrn = TestLearner()
     met = AvgLoss()
     reset(met)
     t = randn(100)
     n = 25
     for i in 1:n:100
-        lrn.yb,lrn.loss = t[i:i+n-1],mean(t[i:i+n-1])
-        accumulate(met,lrn)
+        batch = t[i:i+n-1]
+        loss = mean(batch)
+        accumulate(met,loss,length(batch))
     end
     @test is_close(value(met), mean(t))
 end

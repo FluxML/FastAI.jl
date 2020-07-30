@@ -18,7 +18,6 @@ https://dev.fast.ai/metrics
 The main purpose of this code is to see if the team likes the method
 of defining an interface and implementations in Julia
 =#
-using Statistics
 
 """
 Types representing the concept `Matric`.  In Julia duck typing, implementing an
@@ -27,7 +26,7 @@ interface just requires implementing a set of required fuctions.
 For a type T to be a Metric, the required functions are:
 
 reset(metric:: T)                   Reset inner state to prepare for new computation
-accumulate(metric:: T, learner)     Use learner to update the state with new results
+accumulate(metric:: T, values)      Update the state with new results
 value(metric:: T)                   The value of the metric
 name(metric:: T)                    Name of the Metric, camel-cased and with Metric removed
 """
@@ -35,7 +34,7 @@ abstract type AbstractMetric end
 
 function implements_metric(T::DataType)
     return hasmethod(reset,(T,)) &&
-        hasmethod(accumulate,(T,AbstractLearner)) &&
+        hasmethod(accumulate,(T,Any)) &&
         hasmethod(value,(T,)) &&
         hasmethod(name,(T,))
 end
@@ -58,12 +57,9 @@ function reset(metric:: AvgMetric)
     metric.count = 0
 end
 
-function accumulate(metric:: AvgMetric, learner::AbstractLearner)
-    p = pb(learner)
-    y = yb(learner)
-    @assert length(p)==length(y)
-    bs = length(p)
-    metric.total += metric.func(p, y)*bs
+function accumulate(metric:: AvgMetric, values)
+    bs = length(values)
+    metric.total += metric.func(values)*bs
     metric.count += bs
 end
 
@@ -99,9 +95,10 @@ AvgLoss() = AvgLoss(0.0,0)
 
 reset(al::AvgLoss) = al.total,al.count = 0.0,0
 
-function accumulate(al::AvgLoss, learn::AbstractLearner)
-   al.total += batch_size(learn)*mean(loss(learn))
-    al.count += batch_size(learn)
+function accumulate(al::AvgLoss, values...)
+    batch_loss, batch_size = values 
+    al.total += batch_loss
+    al.count += batch_size
 end 
 
 value(al::AvgLoss) = if al.count>0 al.total/al.count else nothing end
@@ -124,8 +121,9 @@ AvgSmoothLoss(alpha) = AvgSmoothLoss(alpha,0.0,true)
 
 reset(asl::AvgSmoothLoss) = asl.first=true
     
-function accumulate(asl::AvgSmoothLoss, learn::AbstractLearner)
-    v = mean(loss(learn))
+function accumulate(asl::AvgSmoothLoss, values...)
+    batch_loss,batch_size = values
+    v = batch_loss / batch_size
     if asl.first
         asl.first = false
         asl.val = v

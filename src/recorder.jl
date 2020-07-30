@@ -57,7 +57,7 @@ Recorder(add_time=true, train_metrics=false, valid_metrics=true, alpha=0.98) =
         [],[],[],[])
 
 "Prepare state for training"
-function begin_fit(rec::Recorder)
+function begin_fit(rec::Recorder,lrn::Learner)
     rec.lrs,rec.iters,rec.losses,rec.values = [],[],[],[]
     #=
     names = rec.metrics.attrgot('name')

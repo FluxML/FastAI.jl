@@ -19,9 +19,6 @@ The main purpose of this code is to see if the team likes the method
 of defining an interface and implementations in Julia
 =#
 
-using Random
-using StatsBase
-
 """
 Abstract type for all Samplers.
 

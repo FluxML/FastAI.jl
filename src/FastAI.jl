@@ -19,19 +19,24 @@ of defining an interface and implementations in Julia
 
 module FastAI
 
+using Random
+using StatsBase
+using Statistics
+using Flux
+using Flux: update!
+using Flux.Data
+using Base: length, getindex
+using Random: randperm
+
 export AbstractLearner
 export AbstractCallback
 export AbstractMetric
 export IterableDataset
 export MapDataset
 
-export DataLoader
 export DataBunch
-export getindex
-export length
 export train
 export valid
-export one_batch
 
 export DummyCallback
 export ProgressCallback
@@ -39,13 +44,11 @@ export Recorder
 
 export Learner
 export model
-export loss_func
-export pb
-export xb
-export yb
-export batch_size
 export data_bunch
 export loss
+export loss!
+export opt
+export opt!
 export fit!
 export add_cb!
 
@@ -57,10 +60,7 @@ export accumulate
 export value
 export name
 
-export exercise
-
 include("dataset.jl")
-include("dataloader.jl")
 include("databunch.jl")
 include("learner.jl")
 include("callback.jl")
