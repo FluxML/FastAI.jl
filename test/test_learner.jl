@@ -1,7 +1,7 @@
 
 @testset "Learner" begin
-    learn = synth_learner()
-    add_cb!(learn,DummyCallback())
+    learn = test_learner()
+    add_cb!(learn,TestCallback())
     
     xys = learn |> data_bunch |> train |> one_batch
     lf = loss(learn)

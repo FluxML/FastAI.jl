@@ -1,19 +1,9 @@
 using FastAI
 using Flux: mse, @functor, Dense, Descent, train!, Params, gradient, update!
 using Flux.Data: DataLoader
-using Base: length, getindex
-
-struct SynthDataset <: MapDataset
-    x
-    y
-end
-
-Base.getindex(md::SynthDataset,idx::Int) = (md.x[1,1,idx],md.y[1,1,idx])
-Base.getindex(md::SynthDataset,rng::UnitRange) = (md.x[1,1,rng],md.y[1,1,rng])
-Base.length(md::SynthDataset) = length(md.x)
 
 "A simple DataBunch where `x` is random and `y = a*x + b` plus some noise."
-function synth_dbunch(a=2, b=3, bs=16, n_train=10, n_valid=2)
+function test_dbunch(a=2, b=3, bs=16, n_train=10, n_valid=2)
 
     function get_data(n)
         xy = [] 
@@ -30,8 +20,10 @@ function synth_dbunch(a=2, b=3, bs=16, n_train=10, n_valid=2)
     return DataBunch(train_dl, valid_dl)
 end
 
-function synth_learner(n_train=10, n_valid=2, cuda=false, lr=0.01)
-    data = synth_dbunch() #n_train=n_train,n_valid=n_valid)
+struct TestCallback <: AbstractCallback end
+
+function test_learner(n_train=10, n_valid=2, cuda=false, lr=0.01)
+    data = test_dbunch() #n_train=n_train,n_valid=n_valid)
     return Learner(data, Dense(1,1), loss=mse, opt=Descent(0.001))
 end
 
@@ -40,3 +32,10 @@ function one_batch(dl::DataLoader)
         return d
     end
 end
+
+function is_close(a,b;eps=1e-5)
+    #@show a
+    #@show b
+    return (a-b)^2 < eps^2
+end
+

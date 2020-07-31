@@ -121,14 +121,12 @@ AvgSmoothLoss(alpha) = AvgSmoothLoss(alpha,0.0,true)
 
 reset(asl::AvgSmoothLoss) = asl.first=true
     
-function accumulate(asl::AvgSmoothLoss, values...)
-    batch_loss,batch_size = values
-    v = batch_loss / batch_size
+function accumulate(asl::AvgSmoothLoss, value)
     if asl.first
         asl.first = false
-        asl.val = v
+        asl.val = value
     else
-        asl.val = asl.alpha*asl.val+(1-asl.alpha)*v
+        asl.val = asl.alpha*asl.val+(1-asl.alpha)*value
     end
 end 
 

@@ -16,10 +16,6 @@ FastAI.batch_size(l::TestLearner) = length(l.yb)
 
 using FastAI: AvgMetric, reset, accumulate, value, name
 
-function is_close(a,b,eps=1e-5)
-    return (a-b)^2 < eps^2
-end
-
 @testset "AvgMetric" begin
 
     abs_diff(v) = abs(v[1]-v[2])
@@ -46,7 +42,7 @@ end
         batch = t[i:i+n-1]
         loss = mean(batch)
         val = if i==1 loss else val*0.98 + loss*(1-0.98) end
-        accumulate(met,loss,length(batch))
+        accumulate(met,loss)
     end
     @test is_close(value(met), val)
 end
@@ -56,12 +52,16 @@ end
     reset(met)
     t = randn(100)
     n = 25
+    val = 0.0
+    cnt = 0
     for i in 1:n:100
         batch = t[i:i+n-1]
         loss = mean(batch)
+        val += loss
+        cnt += length(batch)
         accumulate(met,loss,length(batch))
     end
-    @test is_close(value(met), mean(t))
+    @test is_close(value(met), val/cnt)
 end
 
 
