@@ -7,6 +7,8 @@ Port of the FastAI Metric API to Julia
 
 Definition of the metrics that can be used in training models
 
+This code is inspired by FastAI, but differs from it in important ways
+
 The original source is here
 
 https://github.com/fastai/fastai2/blob/master/fastai2/metrics.py
@@ -14,9 +16,6 @@ https://github.com/fastai/fastai2/blob/master/fastai2/metrics.py
 The documentation is copied from here
 
 https://dev.fast.ai/metrics
-
-The main purpose of this code is to see if the team likes the method
-of defining an interface and implementations in Julia
 =#
 
 """
@@ -25,49 +24,49 @@ interface just requires implementing a set of required fuctions.
 
 For a type T to be a Metric, the required functions are:
 
-reset(metric:: T)                   Reset inner state to prepare for new computation
-accumulate(metric:: T, values)      Update the state with new results
+reset!(metric:: T)                   Reset inner state to prepare for new computation
+accumulate!(metric:: T, values)      Update the state with new results
 value(metric:: T)                   The value of the metric
 name(metric:: T)                    Name of the Metric, camel-cased and with Metric removed
 """
 abstract type AbstractMetric end
 
 function implements_metric(T::DataType)
-    return hasmethod(reset,(T,)) &&
-        hasmethod(accumulate,(T,Any)) &&
+    return hasmethod(reset!,(T,)) &&
+        hasmethod(accumulate!,(T,Any)) &&
         hasmethod(value,(T,)) &&
         hasmethod(name,(T,))
 end
 
 """
-AvgMetric
+AverageFunctionMetric
 
 Average the values of func taking into account potential different batch sizes
 """
-mutable struct AvgMetric <: AbstractMetric
+mutable struct AverageFunctionMetric <: AbstractMetric
     func
     total:: Float64
     count:: Int
 end
 
-AvgMetric(func) = AvgMetric(func,0.0,0)
+AverageFunctionMetric(func) = AverageFunctionMetric(func,0.0,0)
 
-function reset(metric:: AvgMetric)
+function reset!(metric:: AverageFunctionMetric)
     metric.total = 0.0
     metric.count = 0
 end
 
-function accumulate(metric:: AvgMetric, values)
+function accumulate!(metric:: AverageFunctionMetric, values)
     bs = length(values)
     metric.total += metric.func(values)*bs
     metric.count += bs
 end
 
-value(metric:: AvgMetric) = if metric.count > 0 metric.total/metric.count else nothing end
+value(metric:: AverageFunctionMetric) = if metric.count > 0 metric.total/metric.count else nothing end
 
-name(metric:: AvgMetric) = "Avg$(metric.func)"
+name(metric:: AverageFunctionMetric) = "Avg$(metric.func)"
 
-@assert implements_metric(AvgMetric)
+@assert implements_metric(AverageFunctionMetric)
 
 """
 AvgLoss()
@@ -86,42 +85,44 @@ class AvgLoss(Metric):
     @property
     def name(self):  return "loss"
 """
-mutable struct AvgLoss <: AbstractMetric
+mutable struct AverageMetric <: AbstractMetric
     total:: Real
     count:: Int
 end
 
-AvgLoss() = AvgLoss(0.0,0)
+AverageMetric() = AverageMetric(0.0,0)
 
-reset(al::AvgLoss) = al.total,al.count = 0.0,0
+reset!(al::AverageMetric) = al.total,al.count = 0.0,0
 
-function accumulate(al::AvgLoss, values...)
+function accumulate!(al::AverageMetric, values...)
     batch_loss, batch_size = values 
     al.total += batch_loss
     al.count += batch_size
 end 
 
-value(al::AvgLoss) = if al.count>0 al.total/al.count else nothing end
+value(al::AverageMetric) = if al.count>0 al.total/al.count else nothing end
 
-name(al::AvgLoss) = "loss"
+name(al::AverageMetric) = "Average"
+
+@assert implements_metric(AverageMetric)
 
 """
-class AvgSmoothLoss[source]
-AvgSmoothLoss(beta=0.98) :: Metric
-
-Exponential smooth average of the losses (exponentially weighted with alpha)
+AvgSmoothMetric
+Exponential smoothing of values
 """
-mutable struct AvgSmoothLoss <: AbstractMetric
+mutable struct SmoothMetric <: AbstractMetric
     alpha:: Real
     val:: Real
     first:: Bool
 end
 
-AvgSmoothLoss(alpha) = AvgSmoothLoss(alpha,0.0,true)
+SmoothMetric(alpha) = SmoothMetric(alpha,0.0,true)
 
-reset(asl::AvgSmoothLoss) = asl.first=true
+SmoothMetric() = SmoothMetric(0.98)
+
+reset!(asl::SmoothMetric) = asl.first=true
     
-function accumulate(asl::AvgSmoothLoss, value)
+function accumulate!(asl::SmoothMetric, value)
     if asl.first
         asl.first = false
         asl.val = value
@@ -130,11 +131,11 @@ function accumulate(asl::AvgSmoothLoss, value)
     end
 end 
 
-value(asl::AvgSmoothLoss) = asl.val
+value(asl::SmoothMetric) = asl.val
 
-name(asl::AvgSmoothLoss) = "AvgSmoothLoss"
+name(asl::SmoothMetric) = "SmoothMetric"
 
-@assert implements_metric(AvgSmoothLoss)
+@assert implements_metric(SmoothMetric)
 #=
 """
 class ValueMetric[source]
@@ -382,7 +383,7 @@ Area Under the Receiver Operating Characteristic Curve for single-label binary c
 See the scikit-learn documentation for more details.
 
 class Perplexity[source]
-Perplexity() :: AvgLoss
+Perplexity() :: AverageMetric
 
 Perplexity (exponential of cross-entropy loss) for Language Models
 

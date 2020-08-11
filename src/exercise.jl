@@ -1,14 +1,5 @@
 using Flux: @functor,mse
 
-struct SynthDataset <: MapDataset
-    x
-    y
-end
-
-Base.getindex(md::SynthDataset,idx::Int) = (md.x[1,1,idx],md.y[1,1,idx])
-Base.getindex(md::SynthDataset,rng::UnitRange) = (md.x[1,1,rng],md.y[1,1,rng])
-Base.length(md::SynthDataset) = length(md.x)
-
 "A simple DataBunch where `x` is random and `y = a*x + b` plus some noise."
 function synth_dbunch(;a=2, b=3, bs=16, n_train=10, n_valid=2)
 
@@ -28,18 +19,6 @@ function synth_dbunch(;a=2, b=3, bs=16, n_train=10, n_valid=2)
     valid_dl = get_data(n_valid)
     return DataBunch(train_dl, valid_dl)
 end
-
-"A r"
-mutable struct RegModel
-    a::Array{Float32}
-    b::Array{Float32}
-end
-
-RegModel() = RegModel([rand()],[rand()]) 
-
-(m::RegModel)(x) = x*m.a[1] .+ m.b[1]
-
-@functor RegModel
 
 function synth_learner(n_train=10, n_valid=2)
     data = synth_dbunch(n_train=n_train,n_valid=n_valid)
@@ -95,7 +74,7 @@ end
 function exercise()
     #println("Yow")
     learn = synth_learner()
-    add_cb!(learn,DummyCallback())
+    add_cb!(learn,Recorder(add_time=true, train_metrics=false, valid_metrics=true, alpha=0.98))
     
     xys = learn |> data_bunch |> train |> one_batch
     lf = loss(learn)

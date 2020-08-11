@@ -5,63 +5,18 @@ using Infiltrator
 
 @testset "Metric" begin
 
-mutable struct TestLearner <: AbstractLearner
-    pb
-    yb
-    loss
-end
+using FastAI: SmoothMetric, reset!, accumulate!, value, name
 
-TestLearner() = TestLearner([],[],0.0)
-FastAI.batch_size(l::TestLearner) = length(l.yb)
-
-using FastAI: AvgMetric, reset, accumulate, value, name
-
-@testset "AvgMetric" begin
-
-    abs_diff(v) = abs(v[1]-v[2])
-    mean_abs(vs) = mean(abs_diff.(vs)) 
-    met = AvgMetric(mean_abs)    
-    reset(met)
-    ps = randn(100)
-    ys = randn(100)
-    n = 25
-    for i in 1:n:100
-        batch = [(ps[j],ys[j]) for j in i:i+n-1]
-        accumulate(met,batch)
-    end
-    @test is_close(value(met), mean(abs.(ps-ys))) 
-end
-
-@testset "AvgSmoothLoss" begin
-    met = AvgSmoothLoss(0.98)
-    reset(met)
+@testset "SmoothMetric" begin
+    met = SmoothMetric(0.98)
+    reset!(met)
     t = randn(100)
     val = 0.0
-    n = 25
-    for i in 1:n:100
-        batch = t[i:i+n-1]
-        loss = mean(batch)
-        val = if i==1 loss else val*0.98 + loss*(1-0.98) end
-        accumulate(met,loss)
+    for (i,v) in enumerate(t)
+        val = if i==1 v else val*0.98 + v*(1-0.98) end
+        accumulate!(met,v)
     end
     @test is_close(value(met), val)
-end
-
-@testset "AvgLoss" begin
-    met = AvgLoss()
-    reset(met)
-    t = randn(100)
-    n = 25
-    val = 0.0
-    cnt = 0
-    for i in 1:n:100
-        batch = t[i:i+n-1]
-        loss = mean(batch)
-        val += loss
-        cnt += length(batch)
-        accumulate(met,loss,length(batch))
-    end
-    @test is_close(value(met), val/cnt)
 end
 
 
