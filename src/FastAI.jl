@@ -2,25 +2,6 @@
 FastAI.jl:
 
 Author: Peter Wolf (opus111@gmail.com)
-
-A first cut at a port of the FastAI V2 API to Julia
-
-This code is inspired by FastAI, but differs in implementation
-in several ways.  Most importantly, the original Python code
-makes heavy use of side-effects where the Learner holds different
-state variables, and other objects access and modify them.
-
-This has been replaced by a more functional design.  The state
-is now transmitted via arguments to Callbacks which may then pass them
-on to Metrics
-
-The original source is here
-
-https://github.com/fastai/fastai2/blob/master/fastai2/
-
-The documentation is copied from here
-
-https://github.com/fastai/fastai2/blob/master/docs/
 =#
 
 module FastAI
