@@ -2,6 +2,8 @@
 
 A first cut at a port of the FastAI V2 API to Julia
 
+![Logo](https://raw.githubusercontent.com/opus111/FastAI.jl/master/fastai-julia-logo.png)
+
 This code is inspired by FastAI, but differs in implementation
 in several ways.  Most importantly, the original Python code
 makes heavy use of side-effects where the Learner holds different
