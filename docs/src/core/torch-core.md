@@ -14,15 +14,15 @@ MapDataset
 There are also several dataset types that represent combinations of datasets. If `ds1`, `ds2`, ..., `dsn` are the same kind of dataset, then `ds1 ++ ds2 ++ ... ++ dsn` will be a combined dataset of that sort. If [`IterableDataset`](@ref)s and [`MapDataset`](@ref)s are combined, the result will be an `IterableDataset`. This is useful to assemble different existing dataset streams. The chainning operation is done on-the-fly, so concatenating large-scale [`IterableDataset`](@ref)s with this type will be efficient.
 
 ```@docs
-ConcatDataset
-ChainDataset
-++
+FastAI.ConcatDataset
+FastAI.ChainDataset
+FastAI.++
 ```
 
 Lastly, we can also take random and fixed subsets of a [`MapDataset`](@ref).
 
 ```@docs
-SubsetDataset
-subset
-random_split
+FastAI.SubsetDataset
+FastAI.subset
+FastAI.random_split
 ```

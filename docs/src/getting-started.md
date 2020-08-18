@@ -6,7 +6,7 @@ If you are familiar with fastai in Python, then this package should be familiar 
 
 This package is currently unregistered, since it is still in development and unstable. To install it, run the following in the Julia REPL (note pressing `]` enters Pkg-mode):
 ```
->] add https://github.com/FluxML/FastAI.jl
+] add https://github.com/FluxML/FastAI.jl
 ```
 
 ## Troubleshooting
