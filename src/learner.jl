@@ -16,9 +16,7 @@ The documentation is copied from here
 https://github.com/fastai/fastai2/blob/master/docs/learner.html
 
 =#
-using Flux
-using Zygote
-using Infiltrator
+
 """
 Basic class handling tweaks of the training loop by changing a [Learner](@ref) in various events
 
@@ -71,33 +69,35 @@ struct CancelEpochValidateException <: Exception end
 struct CancelBatchValidateException <: Exception end
 
 """
-Learner
+    AbstractLearner
 
-Group together a model, train and validate data, optimizer, loss function and callbacks.
+An `AbstractLearner` groups together a model, train and validate data,
+  optimizer, loss function and callbacks.
 
-Callbacks are used for every tweak of the training loop. Callbacks receive epoch, batch and loss
-information which they may pass on to Metrics
+[Callbacks](@ref) are used for every tweak of the training loop.
+Callbacks receive epoch, batch and loss information which they may pass on to [Metrics](@ref).
 
-In Julia duck typing, implementing an interface just requires 
-implementing a set of required fuctions. 
-
-For a type T to be a Learner, the required functions are:
-
-data_bunch(l::Learner)
-data_bunch!(l::Learner,data_bunch)
-model(l::Learner)
-model!(l::Learner,model)
-loss(l::Learner)
-loss!(l::Learner,loss)
-opt(l::Learner)
-opt!(l::Learner,opt)
-add_cb!(learner::Learner,cb::AbstractCallback)
-cbs(learner::Learner)
-fit!(learner::Learner, epoch_count)
-
+# Require interface
+- `data_bunch(l::AbstractLearner)`
+- `data_bunch!(l::AbstractLearner, data_bunch)`
+- `model(l::AbstractLearner)`
+- `model!(l::AbstractLearner, model)`
+- `loss(l::AbstractLearner)`
+- `loss!(l::AbstractLearner, loss)`
+- `opt(l::AbstractLearner)`
+- `opt!(l::AbstractLearner, opt)`
+- `add_cb!(learner::AbstractLearner, cb::AbstractCallback)`
+- `cbs(learner::AbstractLearner)`
+- `fit!(learner::AbstractLearner, epoch_count)`
 """
 abstract type AbstractLearner end
 
+"""
+    Learner <: AbstractLearner
+    Learner(data_bunch, model; opt = Flux.ADAM(), loss = Flux.mse)
+
+A `Learner` is the standard grouping of a data bunch, model, optimizer, and loss.
+"""
 mutable struct Learner <: AbstractLearner
     cbs:: Array{AbstractCallback}
     db::DataBunch
@@ -105,17 +105,71 @@ mutable struct Learner <: AbstractLearner
     opt
     loss
 end
-
 Learner(data_bunch, model; opt=Flux.ADAM(), loss=Flux.mse) = Learner([],data_bunch,model,opt,loss)
+
+"""
+    data_bunch(l::Learner)
+
+Get the data bunch for `l`.
+"""
 data_bunch(l::Learner) = l.db
-data_bunch!(l::Learner,data_bunch) = l.db = data_bunch
+"""
+    data_bunch!(l::Learner, data_bunch)
+
+Set the data bunch for `l` to `data_bunch`.
+"""
+data_bunch!(l::Learner, data_bunch) = l.db = data_bunch
+
+"""
+    model(l::Learner)
+
+Get the model for `l`.
+"""
 model(l::Learner) = l.model
-model!(l::Learner,model) = l.model=model
+"""
+    model!(l::Learner, model)
+
+Set the model for `l` to `model`.
+"""
+model!(l::Learner, model) = l.model = model
+
+"""
+    loss(l::Learner)
+
+Get the loss for `l`.
+"""
 loss(l::Learner) = l.loss
-loss!(l::Learner,loss) = l.loss=loss
+"""
+    loss!(l::Learner, loss)
+
+Set the loss for `l` to `loss`.
+"""
+loss!(l::Learner,loss) = l.loss = loss
+
+"""
+    opt(l::Learner)
+
+Get the optimizer for `l`.
+"""
 opt(l::Learner) = l.opt
+"""
+    opt!(l::Learner, opt)
+
+Set the optimizer for `l` to `opt`.
+"""
 opt!(l::Learner,opt) = l.opt=opt
+
+"""
+    add_cb!(learner::Learner, cb::AbstractCallback)
+
+Add `cb` to the list of callbacks for `learner`.
+"""
 add_cb!(learner::Learner,cb::AbstractCallback) = push!(learner.cbs,cb)
+"""
+    cbs(learner::Learner)
+
+Get the list of callbacks for `learner`.
+"""
 cbs(learner::Learner) = learner.cbs
 
 # pass event to all callbacks
@@ -207,7 +261,7 @@ end
 """
     fit(learner::Learner, epoch_count)
 
-Fit learner.model for epoch_count using callbacks
+Fit [`model(learner)`](@ref model(::Learner)) for `epoch_count` epochs invoking callbacks for `learner`.
 """
 function fit!(learner::Learner, epoch_count)
     try
@@ -233,7 +287,11 @@ function fit!(learner::Learner, epoch_count)
     end
 end
 
-"Utility function to test if a class implements the Learner interface"
+"""
+    implements_learner(T::DataType)
+
+Test if a type implements the [`AbstractLearner`](@ref) interface.
+"""
 function implements_learner(T::DataType)
     return hasmethod(model,(T,)) &&
         hasmethod(model!,(T,Any)) &&

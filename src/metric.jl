@@ -19,18 +19,23 @@ https://dev.fast.ai/metrics
 =#
 
 """
-Types representing the concept `Matric`.  In Julia duck typing, implementing an
-interface just requires implementing a set of required fuctions. 
+    AbstractMetric
 
-For a type T to be a Metric, the required functions are:
+An abstract metric.
 
-reset!(metric:: T)                   Reset inner state to prepare for new computation
-accumulate!(metric:: T, values)      Update the state with new results
-value(metric:: T)                   The value of the metric
-name(metric:: T)                    Name of the Metric, camel-cased and with Metric removed
+# Required interface
+- `reset!(metric::T)`: Reset inner state to prepare for new computation
+- `accumulate!(metric::T, values)`: Update the state with new results
+- `value(metric::T)`: The value of the metric
+- `name(metric::T)`: Name of the metric, camel-cased and with "Metric" removed
 """
 abstract type AbstractMetric end
 
+"""
+    implements_metric(T::DataType)
+
+Test if `T` implements the [`AbstractMetric`](@ref) interface.
+"""
 function implements_metric(T::DataType)
     return hasmethod(reset!,(T,)) &&
         hasmethod(accumulate!,(T,Any)) &&
@@ -39,60 +44,48 @@ function implements_metric(T::DataType)
 end
 
 """
-AverageFunctionMetric
+    AverageFunctionMetric <: AbstractMetric
+    AverageFunctionMetric(func)
 
-Average the values of func taking into account potential different batch sizes
+Average the values of `func` taking into account potentially different batch sizes.
 """
 mutable struct AverageFunctionMetric <: AbstractMetric
     func
-    total:: Float64
-    count:: Int
+    total::Float64
+    count::Int
 end
+AverageFunctionMetric(func) = AverageFunctionMetric(func, 0.0, 0)
 
-AverageFunctionMetric(func) = AverageFunctionMetric(func,0.0,0)
-
-function reset!(metric:: AverageFunctionMetric)
+function reset!(metric::AverageFunctionMetric)
     metric.total = 0.0
     metric.count = 0
 end
 
-function accumulate!(metric:: AverageFunctionMetric, values)
+function accumulate!(metric::AverageFunctionMetric, values)
     bs = length(values)
     metric.total += metric.func(values)*bs
     metric.count += bs
 end
 
-value(metric:: AverageFunctionMetric) = if metric.count > 0 metric.total/metric.count else nothing end
+value(metric::AverageFunctionMetric) = if metric.count > 0 metric.total/metric.count else nothing end
 
-name(metric:: AverageFunctionMetric) = "Avg$(metric.func)"
+name(metric::AverageFunctionMetric) = "Avg$(metric.func)"
 
 @assert implements_metric(AverageFunctionMetric)
 
 """
-AvgLoss()
+    AvgLoss <: AbstractMetric
+    AvgLoss()
 
-Average the losses taking into account potential different batch sizes
-
-class AvgLoss(Metric):
-    "Average the losses taking into account potential different batch sizes"
-    def reset(self):           self.total,self.count = 0.,0
-    def accumulate(self, learn):
-        bs = find_bs(learn.yb)
-        self.total += to_detach(learn.loss.mean())*bs
-        self.count += bs
-    @property
-    def value(self): return self.total/self.count if self.count != 0 else None
-    @property
-    def name(self):  return "loss"
+Average the losses taking into account potentiall different batch sizes.
 """
 mutable struct AverageMetric <: AbstractMetric
     total:: Real
     count:: Int
 end
+AverageMetric() = AverageMetric(0.0, 0)
 
-AverageMetric() = AverageMetric(0.0,0)
-
-reset!(al::AverageMetric) = al.total,al.count = 0.0,0
+reset!(al::AverageMetric) = al.total, al.count = 0.0, 0
 
 function accumulate!(al::AverageMetric, values...)
     batch_loss, batch_size = values 
@@ -107,18 +100,17 @@ name(al::AverageMetric) = "Average"
 @assert implements_metric(AverageMetric)
 
 """
-AvgSmoothMetric
-Exponential smoothing of values
+    SmoothMetric <: AbstractMetric
+    SmoothMetric(alpha = 0.98)
+
+`alpha`-exponential smoothing of values.
 """
 mutable struct SmoothMetric <: AbstractMetric
-    alpha:: Real
-    val:: Real
-    first:: Bool
+    alpha::Real
+    val::Real
+    first::Bool
 end
-
-SmoothMetric(alpha) = SmoothMetric(alpha,0.0,true)
-
-SmoothMetric() = SmoothMetric(0.98)
+SmoothMetric(alpha = 0.98) = SmoothMetric(alpha, 0.0, true)
 
 reset!(asl::SmoothMetric) = asl.first=true
     

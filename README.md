@@ -1,29 +1,14 @@
 # FastAI
-
-A first cut at a port of the FastAI V2 API to Julia
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://FluxML.github.io/FastAI.jl/stable)
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://FluxML.github.io/FastAI.jl/dev)
+[![Build Status](https://github.com/FluxML/FastAI.jl/workflows/CI/badge.svg)](https://github.com/FluxML/FastAI.jl/actions)
 
 ![Logo](https://raw.githubusercontent.com/opus111/FastAI.jl/master/fastai-julia-logo.png)
 
-This code is inspired by FastAI, but differs in implementation
-in several ways.  Most importantly, the original Python code
-makes heavy use of side-effects where the Learner holds different
-state variables, and other objects access and modify them.
+This code is inspired by [fastai](https://github.com/fastai/fastai/blob/master/fastai/), but differs in implementation in several ways. Most importantly, the original Python code makes heavy use of side-effects where the `Learner` holds different state variables, and other objects access and modify them.
 
-This has been replaced by a more functional design.  The state
-is now transmitted via arguments to Callbacks which may then pass them
-on to Metrics
+This has been replaced by a more functional design. The state is now transmitted via arguments to `Callbacks` which may then pass them on to `Metrics`.
 
-Much of the documentation has been copied from the original Python,
-and modified where appropriate
+*Note*: this is a package in-development. Expect breaking changes for the foreseeable future, but we want you to test out the package by following the documentation. Any contributions are welcome via PRs/issues.
 
-The original source is here
-
-https://github.com/fastai/fastai2/blob/master/fastai2/
-
-The documentation is copied from here
-
-https://github.com/fastai/fastai2/blob/master/docs/
-
-[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://opus111.github.io/FastAI.jl/stable)
-[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://opus111.github.io/FastAI.jl/dev)
-[![Build Status](https://travis-ci.com/opus111/FastAI.jl.svg?branch=master)](https://travis-ci.com/opus111/FastAI.jl)
+Much of the documentation has been copied from the original Python, and modified where appropriate.

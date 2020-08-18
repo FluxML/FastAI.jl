@@ -12,6 +12,8 @@ using Statistics
 using Flux
 using Flux: update!
 using Flux.Data
+using Zygote
+using Infiltrator
 using Base: length, getindex
 using Random: randperm
 

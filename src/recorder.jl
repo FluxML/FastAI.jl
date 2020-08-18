@@ -27,28 +27,30 @@ The documentation is copied from here
 
 https://dev.fast.ai/learner#Recorder
 =#
+
 """
-Container for Learner statistics (e.g. lr, loss and metrics) during training
+    Recorder
+    Recorder(learn::Learner; train_loss = true, train_smooth_loss = true,
+                             validate_loss = true, validate_smooth_loss = true)
 
-Statistics are indexed by name, epoch and batch.  For example to get the smoothed training loss for epoch 2, batch 3, one would call
-
-recorder["TrainSmoothLoss",2,3]
-
+Container for [`Learner`](@ref) statistics (e.g. lr, loss and metrics) during training.
+Statistics are indexed by name, epoch and batch.
+For example to get the smoothed training loss for epoch 2, batch 3, we would call
+```julia
+recorder["TrainSmoothLoss", 2, 3]
+```
 To get the entire history of smooth training loss, one would call
-
-recorder["TrainSmoothLoss",:,:]
-
-To add a new history to record
-
-add!(recorder,"MyCustomMetric")
+```julia
+recorder["TrainSmoothLoss", :, :]
+```
 """
 struct Recorder
     learn::Learner
     logs::Dict{String,Array{Any,2}}
 end
-
-function Recorder(learn::Learner; train_loss=true, train_smooth_loss=true, validate_loss=true, validate_smooth_loss=true)
-    rec = Recorder(learn,Dict{String,Array}())
+function Recorder(learn::Learner; train_loss = true, train_smooth_loss = true,
+                                  validate_loss = true, validate_smooth_loss = true)
+    rec = Recorder(learn, Dict{String,Array}())
     if train_loss
         add_cb!(learn,TrainLossRecorder(rec))
     end
@@ -64,11 +66,21 @@ function Recorder(learn::Learner; train_loss=true, train_smooth_loss=true, valid
     return rec
 end
 
-add!(rec::Recorder,name, epoch_count, batch_size) = rec.logs[name]=fill(nothing,epoch_count,batch_size)
+"""
+    add!(rec::Recorder, name, epoch_count, batch_size)
 
-function log!(rec::Recorder,name::String, epoch::Int, batch::Int, value)
+Add `name` to `rec` to be tracked.
+"""
+add!(rec::Recorder, name, epoch_count, batch_size) = rec.logs[name] = fill(nothing,epoch_count,batch_size)
+
+"""
+    log!(rec::Recorder, name::String, epoch::Int, batch::Int, value)
+
+Log `value` to `rec[name, epoch, batch]`.
+"""
+function log!(rec::Recorder, name::String, epoch::Int, batch::Int, value)
 #    println("$name,$epoch,$batch,$value")
-    rec.logs[name][epoch,batch]=value
+    rec.logs[name][epoch,batch] = value
 end
 
 Base.getindex(rec::Recorder,idx...) = rec.logs[idx[1]][idx[2],idx[3]]
@@ -93,16 +105,16 @@ struct TrainSmoothLossRecorder <: AbstractCallback
     smooth::SmoothMetric
 end
 
-TrainSmoothLossRecorder(rec) = TrainSmoothLossRecorder(rec,SmoothMetric())
+TrainSmoothLossRecorder(rec) = TrainSmoothLossRecorder(rec, SmoothMetric())
 
-function before_fit(lr::TrainSmoothLossRecorder,lrn::Learner, epoch_count, batch_size)
+function before_fit(lr::TrainSmoothLossRecorder, lrn::Learner, epoch_count, batch_size)
     reset!(lr.smooth)
     add!(lr.rec,"TrainSmoothLoss", epoch_count, batch_size)
 end
 
-function batch_train_loss(lr::TrainSmoothLossRecorder,lrn::AbstractLearner, epoch, batch, loss)
-    accumulate!(lr.smooth,loss)
-    log!(lr.rec,"TrainSmoothLoss",epoch,batch,value(lr.smooth))
+function batch_train_loss(lr::TrainSmoothLossRecorder, lrn::AbstractLearner, epoch, batch, loss)
+    accumulate!(lr.smooth, loss)
+    log!(lr.rec,"TrainSmoothLoss", epoch, batch, value(lr.smooth))
 end
 
 struct ValidateSmoothLossRecorder <: AbstractCallback
