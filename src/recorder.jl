@@ -49,16 +49,16 @@ Base.getindex(lr::ValidateLossRecorder,idx...) = lr.log[idx]
 """
 Utility type for smoothing a series of values
 """
-mutable struct Smooth
+mutable struct Smoother
     alpha::Real
     val::Real
     first::Bool
 end
-Smooth(alpha) = Smooth(alpha, 0.0, true)
+Smoother(alpha) = Smoother(alpha, 0.0, true)
 
-reset!(asl::Smooth) = asl.first=true
+reset!(asl::Smoother) = asl.first=true
     
-function accumulate!(asl::Smooth, value)
+function accumulate!(asl::Smoother, value)
     if asl.first
         asl.first = false
         asl.val = value
@@ -69,47 +69,47 @@ function accumulate!(asl::Smooth, value)
 end 
 
 """
-    TrainSomoothLossRecorder
+    TrainSmoothLossRecorder
 
 Record a smoothed log of training loss
 """
 struct TrainSmoothLossRecorder <: AbstractCallback
     log::Array{Real,2}    
-    smooth::Smoother
+    smoother::Smoother
 end
 
 TrainSmoothLossRecorder(alpha=0.98) = TrainSmoothLossRecorder(Nothing, Smooth(alpha))
 
 function before_fit(lr::TrainSmoothLossRecorder, lrn::Learner, epoch_count, batch_size)
-    reset!(lr.smooth)
+    reset!(lr.smoother)
     zeros((epoch_count,batch_size))    
 end
 
 function batch_train_loss(lr::TrainSmoothLossRecorder, lrn::AbstractLearner, epoch, batch, loss)
-    lr.log[epoch,batch] = accumulate!(lr.smooth, loss)
+    lr.log[epoch,batch] = accumulate!(lr.smoother, loss)
 end
 
 Base.getindex(lr::TrainSmoothLossRecorder,idx...) = lr.log[idx]
 
 """
-    TrainSomoothLossRecorder
+    TrainSmoothLossRecorder
 
 Record a smoothed log of validation loss
 """
 struct Validate SmoothLossRecorder <: AbstractCallback
     log::Array{Real,2}    
-    smooth::Smooth
+    smoother::Smoother
 end
 
 ValidateSmoothLossRecorder(alpha=0.98) = ValidateSmoothLossRecorder(Nothing, Smooth(alpha))
 
 function before_fit(lr::ValidateSmoothLossRecorder, lrn::Learner, epoch_count, batch_size)
-    reset!(lr.smooth)
+    reset!(lr.smoother)
     zeros((epoch_count,batch_size))    
 end
 
 function batch_validate_loss(lr::ValidateSmoothLossRecorder, lrn::AbstractLearner, epoch, batch, loss)
-    lr.log[epoch,batch] = accumulate!(lr.smooth, loss)
+    lr.log[epoch,batch] = accumulate!(lr.smoother, loss)
 end
 
 Base.getindex(lr::ValidateSmoothLossRecorder,idx...) = lr.log[idx]
