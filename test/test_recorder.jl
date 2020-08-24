@@ -1,5 +1,5 @@
 
-@testset "Learner" begin
+@testset "Recorder" begin
     learner = test_learner()
     tlr = TrainLossRecorder()
     vlr = ValidateLossRecorder()

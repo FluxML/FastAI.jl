@@ -28,7 +28,7 @@ Record a log of training loss
 struct TrainLossRecorder <: AbstractCallback
     log::Array{Real,2}    
 end
-
+TrainLossRecorder()=TrainLossRecorder([])
 before_fit(lr::TrainLossRecorder,lrn::Learner, epoch_count, batch_size) = lr.log = zeros((epoch_count,batch_size))
 batch_train_loss(lr::TrainLossRecorder,lrn::AbstractLearner, epoch, batch, loss) = lr.log[epoch,batch] = loss
 Base.getindex(lr::TrainLossRecorder,idx...) = lr.log[idx]
@@ -41,7 +41,7 @@ Record a log of validation loss
 struct ValidateLossRecorder <: AbstractCallback
     log::Array{Real,2}
 end
-
+ValidateLossRecorder()=ValidateLossRecorder([])
 before_fit(lr::ValidateLossRecorder,lrn::Learner, epoch_count, batch_size) = lr.log = zeros((epoch_count,batch_size))
 batch_validate_loss(lr::ValidateLossRecorder,lrn::AbstractLearner, epoch, batch, loss) = lr.log[epoch,batch] = loss
 Base.getindex(lr::ValidateLossRecorder,idx...) = lr.log[idx]
@@ -78,7 +78,7 @@ struct TrainSmoothLossRecorder <: AbstractCallback
     smoother::Smoother
 end
 
-TrainSmoothLossRecorder(alpha=0.98) = TrainSmoothLossRecorder(Nothing, Smooth(alpha))
+TrainSmoothLossRecorder(alpha=0.98) = TrainSmoothLossRecorder([], Smooth(alpha))
 
 function before_fit(lr::TrainSmoothLossRecorder, lrn::Learner, epoch_count, batch_size)
     reset!(lr.smoother)
@@ -101,7 +101,7 @@ struct ValidateSmoothLossRecorder <: AbstractCallback
     smoother::Smoother
 end
 
-ValidateSmoothLossRecorder(alpha=0.98) = ValidateSmoothLossRecorder(Nothing, Smooth(alpha))
+ValidateSmoothLossRecorder(alpha=0.98) = ValidateSmoothLossRecorder([], Smooth(alpha))
 
 function before_fit(lr::ValidateSmoothLossRecorder, lrn::Learner, epoch_count, batch_size)
     reset!(lr.smoother)
