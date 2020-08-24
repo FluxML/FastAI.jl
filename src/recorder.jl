@@ -42,8 +42,8 @@ struct ValidateLossRecorder <: AbstractCallback
     log::Array{Real,2}
 end
 
-before_fit(lr::TrainLossRecorder,lrn::Learner, epoch_count, batch_size) = lr.log = zeros((epoch_count,batch_size))
-batch_validate_loss(lr::TrainLossRecorder,lrn::AbstractLearner, epoch, batch, loss) = lr.log[epoch,batch] = loss
+before_fit(lr::ValidateLossRecorder,lrn::Learner, epoch_count, batch_size) = lr.log = zeros((epoch_count,batch_size))
+batch_validate_loss(lr::ValidateLossRecorder,lrn::AbstractLearner, epoch, batch, loss) = lr.log[epoch,batch] = loss
 Base.getindex(lr::ValidateLossRecorder,idx...) = lr.log[idx]
 
 """
