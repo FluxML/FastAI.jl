@@ -1,64 +1,59 @@
-
-using Random: randperm
-using Base: length, getindex
+#=
+TODO later...
+`DataLoader` by default constructs a index sampler that yields integral indices.
+To make it work with a map-style dataset with non-integral indices/keys,
+  a custom sampler must be provided.
+=#
 
 """
-Types representing the concept `Dataset`.  In Julia duck typing, implementing an
-interface just requires implementing a set of required fuctions. 
+    IterableDataset
 
-There are two kinds of Dataset: IterableDataset and MapDataset
+Every dataset is an `IterableDataset` representing an iterable of data samples.
+`IterableDataset` is particularly useful when data come from a stream.
 
-IterableDataset
-
-Every Dataset is an IterableDataset and is a iterable of data samples.
-IterableDataset is particularly useful when data come from a stream.
-
-Required functions are:
-
-iterate(it<:IterableDataset)		    Returns either a tuple of the first item and initial state or nothing if empty
-iterate(it<:IterableDataset, state)		Returns either a tuple of the next item and next state or nothing if no items remain
+# Required interface
+- `iterate(it<:IterableDataset)`:
+    Returns either a tuple of the first item and initial state or nothing if empty
+- `iterate(it<:IterableDataset, state)`:
+    Returns either a tuple of the next item and next state or nothing if no items remain
 
 See Julia iteration documentation for more information
-
-    https://docs.julialang.org/en/v1/manual/interfaces/
-
-
-
-Some Datasets are also MapDataset that map integer ids to data samples.  
-All MapDatasets are also IterableDatasets  
-    
-Required functions:
-
-    Base.getindex(md<:MapDataset,idx::Int) a MapDataset is a indexable type that 
-    maps an integer id to a sample.  Legal IDs are between 1 and the length 
-    of this dataset.
-
-    Base.getindex(md<:Dataset,rng::UnitRange) returns a contiguous subset of the
-    items in this dataset
-
-    Base.length(md<:MapDataset) returns the number of samples in this MapDataset.  Used
-    by many `Sampler` implementations and the default options of `DataLoader`.
-
-TODO later...
-`DataLoader` by default constructs a index
-sampler that yields integral indices.  To make it work with a map-style
-dataset with non-integral indices/keys, a custom sampler must be provided.
+(https://docs.julialang.org/en/v1/manual/interfaces/)
+"""
+abstract type IterableDataset end
 
 """
+    MapDataset <: IterableDataset
 
-abstract type IterableDataset end
+Some datasets are also `MapDataset`s that map integer ids to data samples.
+All `MapDatasets` are also [`IterableDatasets`](@ref).
+
+# Required interface
+- `Base.getindex(md<:MapDataset, idx::Int)`:
+    a MapDataset is a indexable type that maps an integer id to a sample.
+    Legal IDs are between 1 and the length of this dataset.
+- `Base.getindex(md<:Dataset, rng::UnitRange)`: returns a contiguous subset of the items in this dataset
+- `Base.length(md<:MapDataset)`: returns the number of samples in this `MapDataset`.
+    Used by many `Sampler` implementations and the default options of `DataLoader`.
+"""
 abstract type MapDataset <: IterableDataset end
 Base.firstindex(md::T) where T <: MapDataset = 1
 Base.lastindex(md::T) where T <: MapDataset = length(md)
 
+"""
+    ConcatDataset <: MapDataset
+    ConcatDataset(ds1::MapDataset, ds2::MapDataset)
+
+Two [`MapDataset`](@ref)s concatenated together.
+"""
 struct ConcatDataset <: MapDataset
-    ds1:: MapDataset
-    ds2:: MapDataset
+    ds1::MapDataset
+    ds2::MapDataset
 end
 
 Base.length(cd::ConcatDataset) = length(cd.ds1) + length(cd.ds2)
-Base.getindex(cd::ConcatDataset,idx::Int) = idx > length(cd.ds1) ? cd.ds2[idx-length(cd.ds1)] : cd.ds1[idx]
-function Base.getindex(cd::ConcatDataset,rng::UnitRange)
+Base.getindex(cd::ConcatDataset, idx::Int) = idx > length(cd.ds1) ? cd.ds2[idx-length(cd.ds1)] : cd.ds1[idx]
+function Base.getindex(cd::ConcatDataset, rng::UnitRange)
     if rng.start <= length(cd.ds1)
         if rng.end <= length(cd.ds1)
             return cd.ds1[rng]
@@ -69,65 +64,75 @@ function Base.getindex(cd::ConcatDataset,rng::UnitRange)
         return cd.ds2[rng.start-length(cd.ds1):rng.end-length(cd.ds1)]
     end
 end
-  
+
+"""
+    ChainDataset <: IterableDataset
+    ChainDataset(ds1::IterableDataset, ds2::IterableDataset)
+
+A sequence of [`IterableDataset`](@ref)s.
+"""
 struct ChainDataset <: IterableDataset
-    ds1:: IterableDataset
-    ds2:: IterableDataset
+    ds1::IterableDataset
+    ds2::IterableDataset
 end
 
 function iterate(cd::ChainDataset)
     it = iterate(cd.ds1)
     return isnothing(it) ? iterate(cd.ds2) : it
-end		    
-
-function iterate(cd::ChainDataset, state)	
-    it = iterate(cd.ds1,state)	
-    return isnothing(it) ? iterate(cd.ds2,state) : it
-end	
-
-
-"""
-Concatenate multiple MapDatasets.  If ds1, ds2... dsn are the same kind of 
-dataset, then ds1 ++ ds2 ++ ... ++ dsn will be a combined dataset of that sort.
-If Iterable and Map datasets are combined, the result will be an IterableDataset.
-
-This is useful to assemble different existing dataset streams.
-The chainning operation is done on-the-fly, so concatenating large-scale
-IterableDatasets with this class will be efficient.
-"""
-++(ds1:: MapDataset,ds2:: MapDataset) = ConcatDataset(ds1,ds2)
-++(ds1:: IterableDataset,ds2:: IterableDataset) = ChainDataset(ds1,ds2)
-++(ds1:: IterableDataset,ds2:: IterableDataset, ds3...) = foldl(++, (ds2 , ds3...), init=a)
-
-struct SubsetDataset <: MapDataset
-    ds :: T where T <: MapDataset
-    idxs:: Array{Int}
 end
 
-iterate(sd::SubsetDataset) = length(sd)>0 ? (sd.dataset(sd.idxs[1],2)) : nothing	    
-iterate(sd::SubsetDataset, state) = state[2] <= length(sd) ? (sd(sd.idxs[state[2]]), state[2]+1) : nothing	
+function iterate(cd::ChainDataset, state)
+    it = iterate(cd.ds1,state)
+    return isnothing(it) ? iterate(cd.ds2,state) : it
+end
+
+
+"""
+    ++(ds1::MapDataset, ds2::MapDataset)
+
+Concatenate two [`MapDataset`](@ref)s into a [`ConcatDataset`](@ref).
+"""
+++(ds1::MapDataset, ds2:: MapDataset) = ConcatDataset(ds1,ds2)
+"""
+    ++(ds1::IterableDataset, ds2::IterableDataset)
+
+Combine two or more [`IterableDataset`](@ref)s into [`ChainDataset`](@ref).
+*Note*: if all the datasets are [`MapDataset`](@ref)s, then the result is a [`ConcatDataset`](@ref),
+  but any other combination will result in a [`ChainDataset`](@ref).
+"""
+++(ds1::IterableDataset, ds2::IterableDataset) = ChainDataset(ds1,ds2)
+++(ds1::IterableDataset, ds2::IterableDataset, ds3...) = foldl(++, (ds2 , ds3...), init=ds1)
+
+"""
+    SubsetDataset <: MapDataset
+
+A subset of a [`MapDataset`](@ref).
+"""
+struct SubsetDataset <: MapDataset
+    ds::T where T <: MapDataset
+    idxs::Array{Int}
+end
+
+iterate(sd::SubsetDataset) = length(sd) > 0 ? (sd.dataset(sd.idxs[1],2)) : nothing
+iterate(sd::SubsetDataset, state) = state[2] <= length(sd) ? (sd(sd.idxs[state[2]]), state[2]+1) : nothing
 
 Base.length(sd::SubsetDataset) = length(sd.idxs)
-Base.getindex(sd::SubsetDataset,idx::Int) = sd.ds[sd.idxs[idx]]
-Base.getindex(sd::SubsetDataset,rng::UnitRange) = [cd[i] for i in sd.idxs[rng]]
+Base.getindex(sd::SubsetDataset, idx::Int) = sd.ds[sd.idxs[idx]]
+Base.getindex(sd::SubsetDataset, rng::UnitRange) = [sd[i] for i in sd.idxs[rng]]
 """
-Subset of a MapDataset at specified indices.
+    subset(dataset::MapDataset, indices::Array{Int})
 
-Arguments:
-    dataset: The whole Dataset
-    indices: Indices in the whole set selected for subset
+A [`SubsetDataset`](@ref) of `dataset` at `indices`.
 """
-subset(dataset:: MapDataset, indices:: Array{Int}) = SubsetDataset(dataset,indices)
+subset(dataset::MapDataset, indices::Array{Int}) = SubsetDataset(dataset,indices)
 
 
 """
-Randomly split a dataset into non-overlapping new datasets of given lengths.
+    random_split(dataset::MapDataset, lengths::Array{Int})
 
-Arguments:
-    dataset: Dataset to be split
-    lengths: lengths of splits to be produced
+Randomly split `dataset` into non-overlapping new [`SubsetDataset`](@ref)s of given `lengths`.
 """
-function random_split(dataset:: MapDataset, lengths:: Array{Int})
+function random_split(dataset::MapDataset, lengths::Array{Int})
     @assert sum(lengths) > length(dataset), "Sum of split lengths may not be greater than the length of the input dataset!"
     indices = randperm(sum(lengths))
     start = 1
