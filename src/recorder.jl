@@ -92,11 +92,11 @@ end
 Base.getindex(lr::TrainSmoothLossRecorder,idx...) = lr.log[idx]
 
 """
-    TrainSmoothLossRecorder
+    ValidateSmoothLossRecorder
 
 Record a smoothed log of validation loss
 """
-struct Validate SmoothLossRecorder <: AbstractCallback
+struct ValidateSmoothLossRecorder <: AbstractCallback
     log::Array{Real,2}    
     smoother::Smoother
 end
