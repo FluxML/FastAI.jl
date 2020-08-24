@@ -19,7 +19,6 @@ using Random: randperm
 
 export AbstractLearner
 export AbstractCallback
-export AbstractMetric
 export IterableDataset
 export MapDataset
 
@@ -29,7 +28,11 @@ export valid
 
 export DummyCallback
 export ProgressCallback
-export Recorder
+
+export TrainLossRecorder
+export ValidateLossRecorder
+export TrainSmoothLossRecorder
+export ValidateSmoothLossRecorder
 
 export Learner
 export model
@@ -41,21 +44,10 @@ export opt!
 export fit!
 export add_cb!
 
-export AvgMetric
-export AvgLoss
-export AvgSmoothLoss
-export reset
-export accumulate
-export value
-export name
-
 include("dataset.jl")
 include("databunch.jl")
 include("learner.jl")
 include("callback.jl")
-
-include("metric.jl")
 include("recorder.jl")
-include("exercise.jl")
 
 end
