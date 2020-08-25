@@ -6,8 +6,6 @@ To make it work with a map-style dataset with non-integral indices/keys,
 =#
 
 """
-    IterableDataset
-
 Every dataset is an `IterableDataset` representing an iterable of data samples.
 `IterableDataset` is particularly useful when data come from a stream.
 
@@ -23,8 +21,6 @@ See Julia iteration documentation for more information
 abstract type IterableDataset end
 
 """
-    MapDataset <: IterableDataset
-
 Some datasets are also `MapDataset`s that map integer ids to data samples.
 All `MapDatasets` are also [`IterableDatasets`](@ref).
 
@@ -41,7 +37,6 @@ Base.firstindex(md::T) where T <: MapDataset = 1
 Base.lastindex(md::T) where T <: MapDataset = length(md)
 
 """
-    ConcatDataset <: MapDataset
     ConcatDataset(ds1::MapDataset, ds2::MapDataset)
 
 Two [`MapDataset`](@ref)s concatenated together.
@@ -66,7 +61,6 @@ function Base.getindex(cd::ConcatDataset, rng::UnitRange)
 end
 
 """
-    ChainDataset <: IterableDataset
     ChainDataset(ds1::IterableDataset, ds2::IterableDataset)
 
 A sequence of [`IterableDataset`](@ref)s.
@@ -88,14 +82,10 @@ end
 
 
 """
-    ++(ds1::MapDataset, ds2::MapDataset)
-
 Concatenate two [`MapDataset`](@ref)s into a [`ConcatDataset`](@ref).
 """
 ++(ds1::MapDataset, ds2:: MapDataset) = ConcatDataset(ds1,ds2)
 """
-    ++(ds1::IterableDataset, ds2::IterableDataset)
-
 Combine two or more [`IterableDataset`](@ref)s into [`ChainDataset`](@ref).
 *Note*: if all the datasets are [`MapDataset`](@ref)s, then the result is a [`ConcatDataset`](@ref),
   but any other combination will result in a [`ChainDataset`](@ref).
@@ -104,8 +94,6 @@ Combine two or more [`IterableDataset`](@ref)s into [`ChainDataset`](@ref).
 ++(ds1::IterableDataset, ds2::IterableDataset, ds3...) = foldl(++, (ds2 , ds3...), init=ds1)
 
 """
-    SubsetDataset <: MapDataset
-
 A subset of a [`MapDataset`](@ref).
 """
 struct SubsetDataset <: MapDataset
@@ -120,16 +108,12 @@ Base.length(sd::SubsetDataset) = length(sd.idxs)
 Base.getindex(sd::SubsetDataset, idx::Int) = sd.ds[sd.idxs[idx]]
 Base.getindex(sd::SubsetDataset, rng::UnitRange) = [sd[i] for i in sd.idxs[rng]]
 """
-    subset(dataset::MapDataset, indices::Array{Int})
-
 A [`SubsetDataset`](@ref) of `dataset` at `indices`.
 """
 subset(dataset::MapDataset, indices::Array{Int}) = SubsetDataset(dataset,indices)
 
 
 """
-    random_split(dataset::MapDataset, lengths::Array{Int})
-
 Randomly split `dataset` into non-overlapping new [`SubsetDataset`](@ref)s of given `lengths`.
 """
 function random_split(dataset::MapDataset, lengths::Array{Int})

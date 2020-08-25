@@ -29,7 +29,6 @@ https://dev.fast.ai/learner#Recorder
 =#
 
 """
-    Recorder
     Recorder(learn::Learner; train_loss = true, train_smooth_loss = true,
                              validate_loss = true, validate_smooth_loss = true)
 
@@ -67,15 +66,11 @@ function Recorder(learn::Learner; train_loss = true, train_smooth_loss = true,
 end
 
 """
-    add!(rec::Recorder, name, epoch_count, batch_size)
-
 Add `name` to `rec` to be tracked.
 """
 add!(rec::Recorder, name, epoch_count, batch_size) = rec.logs[name] = fill(nothing,epoch_count,batch_size)
 
 """
-    log!(rec::Recorder, name::String, epoch::Int, batch::Int, value)
-
 Log `value` to `rec[name, epoch, batch]`.
 """
 function log!(rec::Recorder, name::String, epoch::Int, batch::Int, value)
