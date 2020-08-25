@@ -1,10 +1,10 @@
 
 @testset "Recorder" begin
     learner = test_learner()
-    tlr = TrainLossRecorder()
-    vlr = ValidateLossRecorder()
-    tslr = TrainSmoothLossRecorder()
-    vslr = ValidateSmoothLossRecorder()
+    tlr = TrainLoss()
+    vlr = ValidateLoss()
+    tslr = TrainSmoothLoss()
+    vslr = ValidateSmoothLoss()
     learner.add_cb!(learner,tlr)
     learner.add_cb!(learner,vlr)
     learner.add_cb!(learner,tslr)

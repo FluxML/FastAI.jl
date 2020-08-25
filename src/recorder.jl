@@ -19,32 +19,37 @@ The documentation is copied from here
 
 https://dev.fast.ai/learner#Recorder
 =#
+module recorder
 
 """
-    TrainLossRecorder
+Recorder is shared code
+"""
+abstract type Recorder <: AbstractCallback end
+before_fit(lr::Recorder,lrn::Learner, epoch_count, batch_size) = lr.log = zeros((epoch_count,batch_size))
+Base.getindex(lr::Recorder,idx...) = lr.log[idx]
+
+
+"""
+    TrainLoss
 
 Record a log of training loss
 """
-struct TrainLossRecorder <: AbstractCallback
-    log::Array{Real,2}    
+struct TrainLoss <: Recorder
+    log::Array{Real,2}     
 end
-TrainLossRecorder()=TrainLossRecorder([])
-before_fit(lr::TrainLossRecorder,lrn::Learner, epoch_count, batch_size) = lr.log = zeros((epoch_count,batch_size))
-batch_train_loss(lr::TrainLossRecorder,lrn::AbstractLearner, epoch, batch, loss) = lr.log[epoch,batch] = loss
-Base.getindex(lr::TrainLossRecorder,idx...) = lr.log[idx]
+TrainLoss()=TrainLoss([])
+batch_train_loss(lr::TraninLoss,lrn::AbstractLearner, epoch, batch, loss) = lr.log[epoch,batch] = loss
 
 """
-    ValidateLossRecorder
+    ValidateLoss
 
 Record a log of validation loss
 """
-struct ValidateLossRecorder <: AbstractCallback
-    log::Array{Real,2}
+struct ValidateLoss <: AbstractCallback
+    log::Log
 end
-ValidateLossRecorder()=ValidateLossRecorder([])
-before_fit(lr::ValidateLossRecorder,lrn::Learner, epoch_count, batch_size) = lr.log = zeros((epoch_count,batch_size))
-batch_validate_loss(lr::ValidateLossRecorder,lrn::AbstractLearner, epoch, batch, loss) = lr.log[epoch,batch] = loss
-Base.getindex(lr::ValidateLossRecorder,idx...) = lr.log[idx]
+ValidateLoss()=ValidateLoss([])
+batch_validate_loss(lr::ValidateLoss,lrn::AbstractLearner, epoch, batch, loss) = lr.log[epoch,batch] = loss
 
 """
 Utility type for smoothing a series of values
@@ -68,52 +73,44 @@ function accumulate!(asl::Smoother, value)
     return asl.val
 end 
 
+abstract type SmoothRecorder <: Recorder end
+
+function before_fit(lr::SmoothRecorder, lrn::Learner, epoch_count, batch_size)
+    reset!(lr.smoother)
+    lr.log = zeros((epoch_count,batch_size))    
+end
+
 """
-    TrainSmoothLossRecorder
+    TrainSmoothLoss
 
 Record a smoothed log of training loss
 """
-struct TrainSmoothLossRecorder <: AbstractCallback
+struct TrainSmoothLoss <: SmoothRecorder
     log::Array{Real,2}    
     smoother::Smoother
 end
 
-TrainSmoothLossRecorder(alpha=0.98) = TrainSmoothLossRecorder([], Smooth(alpha))
+TrainSmoothLoss(alpha=0.98) = TrainSmoothLoss([], Smooth(alpha))
 
-function before_fit(lr::TrainSmoothLossRecorder, lrn::Learner, epoch_count, batch_size)
-    reset!(lr.smoother)
-    zeros((epoch_count,batch_size))    
-end
-
-function batch_train_loss(lr::TrainSmoothLossRecorder, lrn::AbstractLearner, epoch, batch, loss)
+function batch_train_loss(lr::TrainSmoothLoss, lrn::AbstractLearner, epoch, batch, loss)
     lr.log[epoch,batch] = accumulate!(lr.smoother, loss)
 end
 
-Base.getindex(lr::TrainSmoothLossRecorder,idx...) = lr.log[idx]
-
 """
-    ValidateSmoothLossRecorder
+    ValidateSmoothLoss
 
 Record a smoothed log of validation loss
 """
-struct ValidateSmoothLossRecorder <: AbstractCallback
+struct ValidateSmoothLoss <: SmoothRecorder
     log::Array{Real,2}    
     smoother::Smoother
 end
 
-ValidateSmoothLossRecorder(alpha=0.98) = ValidateSmoothLossRecorder([], Smooth(alpha))
+ValidateSmoothLoss(alpha=0.98) = ValidateSmoothLoss([], Smooth(alpha))
 
-function before_fit(lr::ValidateSmoothLossRecorder, lrn::Learner, epoch_count, batch_size)
-    reset!(lr.smoother)
-    zeros((epoch_count,batch_size))    
-end
-
-function batch_validate_loss(lr::ValidateSmoothLossRecorder, lrn::AbstractLearner, epoch, batch, loss)
+function batch_validate_loss(lr::ValidateSmoothLoss, lrn::AbstractLearner, epoch, batch, loss)
     lr.log[epoch,batch] = accumulate!(lr.smoother, loss)
 end
-
-Base.getindex(lr::ValidateSmoothLossRecorder,idx...) = lr.log[idx]
-
 
 #=
 Recorder(add_time=true, train_metrics=false, valid_metrics=true, alpha=0.98) =
@@ -231,3 +228,5 @@ add_docs(Recorder,
 if not hasattr(defaults, 'callbacks'): defaults.callbacks = [ValidateEvalCallback, Recorder]
 elif Recorder not in defaults.callbacks: defaults.callbacks.append(Recorder)
 =#
+
+end
