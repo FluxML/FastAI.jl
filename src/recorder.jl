@@ -24,7 +24,19 @@ using FastAI
 using FastAI: AbstractCallback,AbstractLearner
 using Infiltrator
 """
-Utility type for smoothing a series of values
+    Recorder(learn::Learner; train_loss = true, train_smooth_loss = true,
+                             validate_loss = true, validate_smooth_loss = true)
+
+Container for [`Learner`](@ref) statistics (e.g. lr, loss and metrics) during training.
+Statistics are indexed by name, epoch and batch.
+For example to get the smoothed training loss for epoch 2, batch 3, we would call
+```julia
+recorder["TrainSmoothLoss", 2, 3]
+```
+To get the entire history of smooth training loss, one would call
+```julia
+recorder["TrainSmoothLoss", :, :]
+```
 """
 mutable struct Smoother
     alpha::Real

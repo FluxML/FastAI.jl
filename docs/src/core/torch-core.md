@@ -16,7 +16,7 @@ There are also several dataset types that represent combinations of datasets. If
 ```@docs
 FastAI.ConcatDataset
 FastAI.ChainDataset
-FastAI.++
+FastAI.:++
 ```
 
 Lastly, we can also take random and fixed subsets of a [`MapDataset`](@ref).
