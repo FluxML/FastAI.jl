@@ -29,11 +29,6 @@ export valid
 export DummyCallback
 export ProgressCallback
 
-export TrainLossRecorder
-export ValidateLossRecorder
-export TrainSmoothLossRecorder
-export ValidateSmoothLossRecorder
-
 export Learner
 export model
 export data_bunch
@@ -43,6 +38,8 @@ export opt
 export opt!
 export fit!
 export add_cb!
+
+export Recorder
 
 include("dataset.jl")
 include("databunch.jl")

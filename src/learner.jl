@@ -267,7 +267,7 @@ function fit!(learner::Learner, epoch_count)
     try
         batch_size = train(data_bunch(learner)).batchsize
         ps = params(learner.model)
-
+        #@infiltrate
         _cbs_before_fit(learner,epoch_count,batch_size)
         for epoch in 1:epoch_count
             try

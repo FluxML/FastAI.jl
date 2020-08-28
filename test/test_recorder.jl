@@ -1,14 +1,17 @@
 
 @testset "Recorder" begin
     learner = test_learner()
-    tlr = TrainLoss()
-    vlr = ValidateLoss()
-    tslr = TrainSmoothLoss()
-    vslr = ValidateSmoothLoss()
-    learner.add_cb!(learner,tlr)
-    learner.add_cb!(learner,vlr)
-    learner.add_cb!(learner,tslr)
-    learner.add_cb!(learner,vslr)
+
+    tlr = Recorder.TrainLoss()
+    vlr = Recorder.ValidateLoss()
+    tslr = Recorder.SmoothTrainLoss()
+    vslr = Recorder.SmoothValidateLoss()
+
+    add_cb!(learner,tlr)
+    add_cb!(learner,vlr)
+    add_cb!(learner,tslr)
+    add_cb!(learner,vslr)
+
     run_learner(learner)
 
     @test tlr[1,1] > tlr[16,1]      

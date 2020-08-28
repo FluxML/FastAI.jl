@@ -1,5 +1,4 @@
 using FastAI
-using FastAI.recorder
 using Test
 
 @testset "FastAI.jl" begin
