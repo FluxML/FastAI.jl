@@ -1,4 +1,4 @@
-#=
+#= 
 FastAI.jl:
 
 Author: Peter Wolf (opus111@gmail.com)
@@ -16,6 +16,7 @@ using Zygote
 using Infiltrator
 using Base: length, getindex
 using Random: randperm
+using DocStringExtensions
 
 export AbstractLearner
 export AbstractCallback
@@ -48,6 +49,18 @@ export reset
 export accumulate
 export value
 export name
+
+@template (FUNCTIONS, METHODS) = 
+    """
+    $(TYPEDSIGNATURES)
+    $(DOCSTRING)
+    """
+
+@template (TYPES) =
+    """
+    $(TYPEDEF)
+    $(DOCSTRING)
+    """
 
 include("dataset.jl")
 include("databunch.jl")
