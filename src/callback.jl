@@ -17,7 +17,7 @@ https://github.com/fastai/fastai2/blob/master/docs/callback.core.html
 =#
 
 "called before train and validate, ideal for initial setup."
-function before_fit(cb::AbstractCallback,lrn::AbstractLearner, n_epoch, batch_size) end
+function before_fit(cb::AbstractCallback,lrn::AbstractLearner, epoch_count, batch_size) end
 "called at the after train and validate, for final clean-up."
 function after_fit(cb::AbstractCallback,lrn::AbstractLearner) end
 "called after cancelling train and validate."
@@ -64,7 +64,7 @@ function after_cancel_batch_validate(cb::AbstractCallback,lrn::AbstractLearner,e
 
 struct DummyCallback <: AbstractCallback end
 
-function before_fit(cb::DummyCallback,lrn::AbstractLearner, n_epoch) println("Before Fit") end
+function before_fit(cb::DummyCallback,lrn::AbstractLearner, epoch_count, batch_size) println("Before Fit") end
 function after_fit(cb::DummyCallback,lrn::AbstractLearner) println("After Fit") end
 function after_cancel_fit(cb::DummyCallback,lrn::AbstractLearner) println("After Cancel Fit") end
 function before_epoch(cb::DummyCallback,lrn::AbstractLearner, epoch) println("Before Epoch") end

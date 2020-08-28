@@ -1,22 +1,21 @@
 
-@testset "Learner" begin
-    learn = test_learner()
-    rec = Recorder(learn)
-    
-    run_learner(learn)
+@testset "Recorder" begin
+    learner = test_learner()
 
-    #@show rec["TrainLoss",1,1]
-    #@show rec["TrainLoss",16,1]      
-    #@show rec["TrainSmoothLoss",1,1]
-    #@show rec["TrainSmoothLoss",16,1]
-    #@show rec["ValidateLoss",1,1]
-    #@show rec["ValidateLoss",16,1]  
-    #@show rec["ValidateSmoothLoss",1,1]
-    #@show rec["ValidateSmoothLoss",16,1]  
+    tlr = Recorder.TrainLoss()
+    vlr = Recorder.ValidateLoss()
+    tslr = Recorder.SmoothTrainLoss()
+    vslr = Recorder.SmoothValidateLoss()
 
-    @test rec["TrainLoss",1,1] > rec["TrainLoss",16,1]      
-    @test rec["TrainSmoothLoss",1,1] > rec["TrainSmoothLoss",16,1]
-    @test rec["ValidateLoss",1,1] > rec["ValidateLoss",16,1]
-    @test rec["ValidateSmoothLoss",1,1] > rec["ValidateSmoothLoss",16,1]      
+    add_cb!(learner,tlr)
+    add_cb!(learner,vlr)
+    add_cb!(learner,tslr)
+    add_cb!(learner,vslr)
 
+    run_learner(learner)
+
+    @test tlr[1,1] > tlr[16,1]      
+    @test vlr[1,1] > vlr[16,1]
+    @test tslr[1,1] > tslr[16,1]
+    @test vslr[1,1] > vslr[16,1]
 end

@@ -95,4 +95,5 @@ function exercise()
     println(init_loss)
     println(final_loss)
     @assert final_loss < init_loss
+    
 end
