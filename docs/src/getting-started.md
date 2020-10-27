@@ -1,6 +1,6 @@
 # Getting Started
 
-If you are familiar with fastai in Python, then this package should be familiar to you. Otherwise, this documentation should answer most of your questions. If you find a question unanswered, you can use the [Julia Discourse](https://discourse.julialang.org), [Zulip group](https://julialang.zulipchat.com/register/), or [Slack group](http://slackinvite.julialang.org/) to get an answer (the `#machine-learning` channels will be of interest). If appropriate, please file an issue on Github so that we can improve our documentation!
+If you are familiar with fastai in Python, then this package should be familiar to you. Otherwise, this documentation should answer most of your questions. If you find a question unanswered, you can use the [Julia Discourse](https://discourse.julialang.org), [Zulip group](https://julialang.zulipchat.com/register/), or [Slack group](https://julialang.org/slack/) to get an answer (the `#machine-learning` channels will be of interest). If appropriate, please file an issue on Github so that we can improve our documentation!
 
 ## Installation
 
