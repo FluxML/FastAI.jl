@@ -5,7 +5,7 @@
 
 ![Logo](https://raw.githubusercontent.com/opus111/FastAI.jl/master/fastai-julia-logo.png)
 
-FluxAI.jl is inspired by [fastai](https://github.com/fastai/fastai/blob/master/fastai/), and is a repository of best practices for Deep Learning with Flux.  Its goal is enable the development of state-of-the-art models, while freeing the developer from having to implement most of the components.  FastAI allows the design, training and delivery of models that compete with the best in class, using a few lines of code.  
+FastAI.jl is inspired by [fastai](https://github.com/fastai/fastai/blob/master/fastai/), and is a repository of best practices for Deep Learning with Flux. Its goal is to enable creating state-of-the-art models, while freeing the developer from having to implement most of the sub-components. FastAI allows the design, training, and delivery of models that compete with the best in class, using a few lines of code.
 
 FastAI.jl contains thorough documentation, examples and tutorials, but does not contain the source of the core components.  It is an umbrella package combining the functionality specialized packages.  These packages include:
 
@@ -27,4 +27,3 @@ FastAI.jl contains thorough documentation, examples and tutorials, but does not 
 
 
 *Note*: this is a package in-development. It is not ready for use, and one should expect major breaking changes for the foreseeable future. However, we are very interested in meeting the desires of the community, so all comments and contributions are welcome via PRs/issues.
-
