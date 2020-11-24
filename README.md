@@ -11,7 +11,7 @@ FastAI.jl contains thorough documentation, examples and tutorials, but does not 
 
 - Flux.jl: 100% pure-Julia Deep Learning stack. Provides lightweight abstractions on top of Julia's native GPU and AD support.
 
-- FluxTraining.jl: Enables eaily customized training loops, a large library of useful metrics, and many useful utilities
+- FluxTraining.jl: Easily customized training loops, a large library of useful metrics, and many useful utilities (such as logging)
 
 - FluxONNX.jl: Support for reading and writing models in the ONNX file format.  ONNX enables Transfer Learning by enabling the import of very large pretrained models.
 
