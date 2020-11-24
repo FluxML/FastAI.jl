@@ -26,4 +26,4 @@ FastAI.jl contains thorough documentation, examples and tutorials, but does not 
 - Transformers.jl: Implementation of NLP transformer-based models
 
 
-*Note*: this is a package in-development. It is not ready for use, and one should expect major breaking changes for the foreseeable future. However, we are very interested in meeting the desires of the community, so all comments and contributions are welcome via PRs/issues.
+*Note*: this is a package in-development. One should expect major breaking changes for the foreseeable future. But we are very interested in meeting the desires of the community, so all comments and contributions are welcome via PRs/issues.
