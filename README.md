@@ -9,7 +9,7 @@ FastAI.jl is inspired by [fastai](https://github.com/fastai/fastai/blob/master/f
 
 FastAI.jl contains thorough documentation, examples and tutorials, but does not contain the source of the core components.  It is an umbrella package combining the functionality specialized packages.  These packages include:
 
-- Flux.jl: 100% pure-Julia Deep Learning stack. Provides lightweight abstractions on top of Julia's native GPU and AD support.
+- Flux.jl: 100% pure-Julia Deep Learning stack. Provides lightweight abstractions on top of Julia's core GPU and AD support.
 
 - FluxTraining.jl: Easily customized training loops, a large library of useful metrics, and many useful utilities (such as logging)
 
