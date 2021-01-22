@@ -4,11 +4,13 @@ authors = ["Peter Wolf", "Julia Community"]
 version = "0.1.0"
 
 [deps]
+DLDatasets = "eb7515f2-3d1a-4576-a673-d8979fdf546c"
 DLPipelines = "e6530d7c-7faa-4ede-a0d6-9eff9baad396"
 DataAugmentation = "88a5189c-e7ff-4f85-ac6b-e6158070f02e"
 DataLoaders = "2e981812-ef13-4a9c-bfa0-ab13047b12a9"
 Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
 FluxTraining = "7bf95e4d-ca32-48da-9824-f0dc5310474f"
+MLDataPattern = "9920b226-0b2a-5f5f-9153-9aa70a013f8b"
 Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
 [compat]
@@ -18,10 +20,9 @@ julia = "1"
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
-[targets]
-test = ["Test"]
-
-
 [publish]
 theme = "theme"
 title = "FastAI.jl"
+
+[targets]
+test = ["Test"]
