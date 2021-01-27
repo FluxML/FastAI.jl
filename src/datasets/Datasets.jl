@@ -129,6 +129,8 @@ end
 include("containers.jl")
 include("transformations.jl")
 
+include("datasets.jl")
+
 
 export
     # reexports from MLDataPattern
@@ -147,5 +149,9 @@ export
     # utilities
     isimagefile,
     loadfile
+
+    # datasets
+    DATASETS,
+    datasetpath
 
 end  # module

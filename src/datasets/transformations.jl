@@ -50,7 +50,7 @@ nobs(fdata) == 5
 ```
 """
 function filterobs(f, data)
-    return datasubset(data, [f(getobs(data, i)) for i = 1:nobs(data)])
+    return datasubset(data, [i for i = 1:nobs(data) if f(getobs(data, i))])
 end
 
 

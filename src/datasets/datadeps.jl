@@ -1,6 +1,7 @@
 
-# from https://s3.amazonaws.com/fast-ai-imageclas/
 const DATASETS = [
+    # Image classification
+    # from https://s3.amazonaws.com/fast-ai-imageclas/
     "CUB_200_2011",
     "bedroom",
     "caltech_101",
@@ -31,6 +32,7 @@ const DATASETS = [
 
 
 const CHECKSUMS = [
+    # Image classification
     "",
     "",
     "",
@@ -40,6 +42,7 @@ const CHECKSUMS = [
     "",
     "",
     "",
+    "88daccb09b6fce93f45e6c09ddeb269cce705549e6bff322092a2a5a11489863",
     "",
     "",
     "",
@@ -48,12 +51,11 @@ const CHECKSUMS = [
     "",
     "",
     "",
+    "663c22f69c2802d85e2a67103c017e047096702ffddf9149a14011b7002539bf",
     "",
     "",
     "",
-    "",
-    "",
-    "",
+    "8a0f6ca04c2d31810dc08e739c7fa9b612e236383f70dd9fc6e5a62e672e2283",
     "",
     "",
     ""
@@ -61,7 +63,7 @@ const CHECKSUMS = [
 
 
 function init_datadeps()
-    for (datasetname, checksum) in zip(FASTAI_DATASETS, CHECKSUMS)
+    for (datasetname, checksum) in zip(DATASETS, CHECKSUMS)
         DataDeps.register(DataDep(
             "fastai-$datasetname",
             """
@@ -71,6 +73,7 @@ function init_datadeps()
             """,
             "https://s3.amazonaws.com/fast-ai-imageclas/$datasetname.tgz",
             checksum,
+            post_fetch_method = DataDeps.unpack,
         ))
     end
 end
