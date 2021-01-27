@@ -1,43 +1,43 @@
 
-# mapdata
+# mapobs
 
 struct MappedData
     f
     data
 end
 
-Base.show(io::IO, data::MappedData) = print(io, "mapdata($(data.f), $(data.data))")
+Base.show(io::IO, data::MappedData) = print(io, "mapobs($(data.f), $(data.data))")
 LearnBase.nobs(data::MappedData) = nobs(data.data)
 LearnBase.getobs(data::MappedData, idx::Int) = data.f(getobs(data.data, idx))
 LearnBase.getobs(data::MappedData, idxs::AbstractVector) = data.f.(getobs(data.data, idxs))
 
 """
-    mapdata(f, data)
+    mapobs(f, data)
 
 Lazily map `f` over the observations in a data container `data`.
 
 ```julia
 data = 1:10
 getobs(data, 8) == 8
-mdata = mapdata(-, data)
+mdata = mapobs(-, data)
 getobs(mdata, 8) == -8
 ```
 """
-mapdata(f, data) = MappedData(f, data)
+mapobs(f, data) = MappedData(f, data)
 
 
 """
-    mapdata(fs, data)
+    mapobs(fs, data)
 
 Lazily map each function in tuple `fs` over the observations in data container `data`.
 Returns a tuple of transformed data containers.
 """
-mapdata(fs::Tuple, data) = Tuple(mapdata(f, data) for f in fs)
+mapobs(fs::Tuple, data) = Tuple(mapobs(f, data) for f in fs)
 
-# filterdata
+# filterobs
 
 """
-    filterdata(f, data)
+    filterobs(f, data)
 
 Return a subset of data container `data` including all indices `i` for
 which `f(getobs(data, i)) === true`.
@@ -45,30 +45,30 @@ which `f(getobs(data, i)) === true`.
 ```julia
 data = 1:10
 nobs(data) == 10
-fdata = filterdata(>(5), data)
+fdata = filterobs(>(5), data)
 nobs(fdata) == 5
 ```
 """
-function filterdata(f, data)
+function filterobs(f, data)
     return datasubset(data, [f(getobs(data, i)) for i = 1:nobs(data)])
 end
 
 
-# splitdata
+# groupobs
 
 """
-    splitdata(f, data)
+    groupobs(f, data)
 
 Split data container data `data` into different data containers, grouping
 observations by `f(obs)`.
 
 ```julia
 data = -10:10
-datas = splitdata(>(0), data)
+datas = groupobs(>(0), data)
 length(datas) == 2
 ```
 """
-function splitdata(f, data)
+function groupobs(f, data)
     groups = Dict{Any, Vector{Int}}()
     for i in 1:nobs(data)
         group = f(getobs(data, i))
@@ -81,3 +81,36 @@ function splitdata(f, data)
     return Tuple(datasubset(data, groups[group])
         for group in sort(collect(keys(groups))))
 end
+
+# joinobs
+
+struct JoinedData{T, N}
+    datas::NTuple{N, T}
+    ns::NTuple{N, Int}
+end
+
+JoinedData(datas) = JoinedData(datas, nobs.(datas))
+
+LearnBase.nobs(data::JoinedData) = sum(data.ns)
+function LearnBase.getobs(data::JoinedData, idx)
+    for (i, n) in enumerate(data.ns)
+        if idx <= n
+            return getobs(data.datas[i], idx)
+        else
+            idx -= n
+        end
+    end
+end
+
+"""
+    joinobs(datas...)
+
+Concatenate data containers `datas`.
+
+```julia
+data1, data2 = 1:10, 11:20
+jdata = joinobs(data1, data2)
+getobs(jdata, 15) == 15
+```
+"""
+joinobs(datas...) = JoinedData(datas)

@@ -10,7 +10,7 @@ DC<D> is a data container with observations of type D (i.e. `typeof(getobs(::DC<
 
 Transformations:
 
-- `mapdata(f::(D -> E), ::DC<D>)::DC<E>`
+- `mapobs(f::(D -> E), ::DC<D>)::DC<E>`
 
     Map a function (or a tuple of functions) over a data container.
 
@@ -19,13 +19,13 @@ Transformations:
     Combine multiple data containers into a single data container that returns tuples
     of the each's observations.
 
-- `filterdata(f, DC<D>)::DC<D>`
+- `filterobs(f, DC<D>)::DC<D>`
 
     Keep only observations for which `f(obs) === true`.
 
-- `splitdata(f, DC<D>)::(DC1<D>, ..., DCN<D>)` with `N` the unique return values of `f(::D)`
+- `groupobs(f, DC<D>)::(DC1<D>, ..., DCN<D>)` with `N` the unique return values of `f(::D)`
 
-- `joindata(f, DC<D1>, ..., DC<DN>)::DC<D>`
+- `joinobs(f, DC<D1>, ..., DC<DN>)::DC<D>`
 
     Combines N datasets into a single one, "concatenating" them.
 
@@ -63,14 +63,14 @@ same file structure as ImageNette, i.e.:
 ds = FileDataset(DIR; filterfn = file -> extension(file) == "jpg")
 
 # split into train and validation based on grandparent directory
-trainds, valds = splitdata(file -> file.parent.parent.name == "train", ds)
+trainds, valds = groupobs(file -> file.parent.parent.name == "train", ds)
 
 # map (file -> input, file -> label) functions over containers to transform to type DC<(image, label)>
-trainds = mapdata((FileIO.load, file -> file.parent.name), trainds)
+trainds = mapobs((FileIO.load, file -> file.parent.name), trainds)
 # which is shorthand for
 trainds = (
-    mapdata(FileIO.load, trainds),
-    mapdata(file -> file.parent.name, trainds),
+    mapobs(FileIO.load, trainds),
+    mapobs(file -> file.parent.name, trainds),
 )
 ```
 ---
@@ -83,7 +83,7 @@ of batches (xs, ys). This is pretty much all `methoddataset` and `methoddataload
 ds = ...
 method = ImageClassification(...)
 
-xyds = mapdata(ds) do (image, label)
+xyds = mapobs(ds) do (image, label)
     return encode(method, Training(), (image, label))
 end
 
@@ -98,10 +98,10 @@ Loading an image dataset without labels for inference.
 
 ```julia
 # ds contains original size images
-ds = mapdata(FileIO.load(filterdata(file -> extension(file) == "jpg", FileDataset(DIR)))
+ds = mapobs(FileIO.load(filterobs(file -> extension(file) == "jpg", FileDataset(DIR)))
 
 transform = ProjectiveTransforms((128, 128))
-ds = mapdata(ds) do obs
+ds = mapobs(ds) do obs
     run(transform, Validation(), obs)
 end
 # Now each observation is a center-cropped image of size (128, 128)
@@ -109,10 +109,22 @@ end
 """
 module Datasets
 
+
 using ..FastAI
+
+using DataDeps
+using FilePathsBase
+import FileIO
+using FileTrees
 using MLDataPattern
 using MLDataPattern: splitobs
 import LearnBase
+
+include("datadeps.jl")
+
+function __init__()
+    init_datadeps()
+end
 
 include("containers.jl")
 include("transformations.jl")
@@ -123,14 +135,17 @@ export
     splitobs,
 
     # container transformations
-    mapdata,
-    filterdata,
-    splitdata,
-    joindata,
+    mapobs,
+    filterobs,
+    groupobs,
+    joinobs,
 
     # primitive containers
     FileDataset,
-    TableDataset
+    TableDataset,
 
+    # utilities
+    isimagefile,
+    loadfile
 
 end  # module
