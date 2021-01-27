@@ -11,7 +11,6 @@ using Reexport
 using Colors
 using DataAugmentation
 using DataAugmentation: getbounds, makebounds
-using DLDatasets
 using DLPipelines: methoddataset, methodmodel, methodlossfn
 using LearnBase: getobs, nobs
 using FixedPointNumbers
@@ -22,7 +21,6 @@ using MLDataPattern
 using Parameters
 using StaticArrays
 
-const Datasets = DLDatasets
 const Models = FluxModels
 
 # method implementations and helpers
@@ -31,6 +29,9 @@ include("./steps/step.jl")
 include("./steps/spatial.jl")
 include("./steps/imagepreprocessing.jl")
 include("./methods/imageclassification.jl")
+
+# submodules
+include("datasets/Datasets.jl")
 
 # training utilities
 include("./datautils.jl")

@@ -69,6 +69,7 @@ function DLPipelines.encodetarget(
         context,
         category)
     idx = findfirst(isequal(category), method.categories)
+    isnothing(idx) && error("`category` could not be found in `method.categories`.")
     return DataAugmentation.onehot(idx, length(method.categories))
 end
 
