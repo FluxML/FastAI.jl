@@ -5,14 +5,15 @@
 {cell=main style="display:none;" result=false}
 ```julia
 using FastAI
+using FastAI: Datasets
 ```
 
 
 On the [quickstart page](quickstart.ipynb), we showed how to train models on common tasks in a few lines of code:
 
 ```julia
-dataset = loaddataset(Datasets.ImageNette)
-method = ImageClassification(Datasets.metadata(Datasets.ImageNette).labels, (224, 224))
+dataset = Datasets.loaddataset("imagenette2-160")
+method = ImageClassification(Datasets.loadclasses("imagenette2-160"), (224, 224))
 dls = methoddataloaders(dataset, method)
 model = methodmodel(method, Models.xresnet18())
 learner = Learner(model, dls, ADAM(), methodlossfn(method), ToGPU(), Metrics(accuracy))
@@ -25,7 +26,7 @@ Let's unpack each line.
 
 {cell=main}
 ```julia
-dataset = loaddataset(Datasets.ImageNette)
+dataset = Datasets.loaddataset("imagenette2-160")
 ```
 
 This line downloads and loads the [ImageNette]() image classification dataset, a small subset of ImageNet with 10 different classes. `dataset` is a [data container](data_containers.md) that can be used to load individual observations, here of images and the corresponding labels. We can use `getobs(dataset, i)` to load the `i`-th observation and `nobs` to find out how many observations there are.
@@ -52,11 +53,11 @@ To train on a different dataset, you could replace `dataset` with other data con
 
 {cell=main}
 ```julia
-labels = Datasets.metadata(Datasets.ImageNette).labels
-method = ImageClassification(labels, (224, 224))
+classes = Datasets.loadclasses("imagenette2-160")
+method = ImageClassification(classes, (224, 224))
 ```
 
-Here we define [`ImageClassification`](#), which defines how data is processed before being fed to the model and how model outputs are turned into predictions. `labels` is a vector of strings naming each class, and `(224, 224)` the size of the images that are input to the model.
+Here we define [`ImageClassification`](#), which defines how data is processed before being fed to the model and how model outputs are turned into predictions. `classes` is a vector of strings naming each class, and `(224, 224)` the size of the images that are input to the model.
 
 `ImageClassification` is a `LearningMethod`, an abstraction that encapsulates the logic and configuration for training models on a specific learning task. See [learning methods](learning_methods.md) to find out more about how they can be used and how to create custom learning methods.
 

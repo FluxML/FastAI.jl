@@ -39,3 +39,13 @@ function loaddataset(name, split = false)
         )
     end
 end
+
+
+function loadclasses(name)
+    dir = datasetpath(name)
+    data = mapobs(filterobs(isimagefile, FileDataset(dir))) do path
+        return filename(parent(path))
+    end
+    return unique(collect(eachobsparallel(data, useprimary=true)))
+
+end

@@ -32,6 +32,7 @@ include("./methods/imageclassification.jl")
 
 # submodules
 include("datasets/Datasets.jl")
+using .Datasets
 
 # training utilities
 include("./datautils.jl")

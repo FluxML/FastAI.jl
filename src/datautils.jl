@@ -9,10 +9,11 @@ going into the validation split.
 
 Other keyword arguments are passed to `DataLoader`s.
 """
-function methoddataloaders(datas::NTuple{2}, method, batchsize = 16; kwargs...)
+function methoddataloaders(datas::NTuple{2}, method, batchsize = 16; shuffle = true, kwargs...)
+    @show datas
     traindata, validdata = datas
 return (
-    DataLoader(shuffleobs(methoddataset(traindata, method, Training())), batchsize; kwargs...),
+    DataLoader(methoddataset(shuffleobs(traindata), method, Training()), batchsize; kwargs...),
     DataLoader(methoddataset(validdata, method, Validation()), batchsize; kwargs...),
 )
 end
