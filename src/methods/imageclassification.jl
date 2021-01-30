@@ -33,7 +33,7 @@ mutable struct ImageClassification <: DLPipelines.LearningMethod{ImageClassifica
 end
 
 Base.show(io::IO, method::ImageClassification) = print(
-    io, "ImageClassification() with $(length(method.categories)) categories")
+    io, "ImageClassification() with $(length(method.categories)) classes")
 
 function ImageClassification(
         categories::AbstractVector,

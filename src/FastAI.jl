@@ -36,7 +36,11 @@ using .Datasets
 
 # training utilities
 include("./datautils.jl")
-include("training.jl")
+
+include("training/utils.jl")
+include("training/onecycle.jl")
+include("training/finetune.jl")
+include("training/lrfind.jl")
 
 export methodlossfn
 
@@ -65,6 +69,7 @@ export
     # training
     Learner,
     fit!,
+    fitonecycle!,
     finetune!
 
 

@@ -152,6 +152,7 @@ export
 
     # datasets
     DATASETS,
+    loaddataset,
     datasetpath
 
 end  # module

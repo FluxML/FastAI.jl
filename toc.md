@@ -11,6 +11,10 @@
 
 - [Image classification](docs/methods/imageclassification.md)
 
+# Notebooks
+
+- [Finetuning](finetuning.ipynb)
+
 # Reference
 
 - [Glossary](docs/glossary.md)
