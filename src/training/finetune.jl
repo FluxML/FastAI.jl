@@ -14,23 +14,16 @@ function finetune!(
         div = 5,
         pct_start = 0.3,
         kwargs...)
-
-    model = learner.model
-    try
-        # freeze backbone and train head
-        FluxTraining.model!(learner, freeze(model, trainlayers))
+    FluxTraining.initlearner!(learner, [TrainingPhase()])
+    # freeze backbone and train head
+    withfields(learner, model = (FluxTraining.model!, freeze(learner.model, trainlayers))) do
         fitonecycle!(learner, freezeepochs, base_lr, pct_start=0.99; kwargs...)
-
-        # unfreeze
-        FluxTraining.model!(learner, model)
-        base_lr /= 2
-        # TODO: use discriminative learning rates
-        fitonecycle!(
-            learner, nepochs, base_lr;
-            div = div, pct_start = pct_start, kwargs...)
-        return learner
-    catch e
-        FluxTraining.model!(learner, model)
-        rethrow(e)
     end
+
+    base_lr /= 2
+    # TODO: use discriminative learning rates
+    fitonecycle!(
+        learner, nepochs, base_lr;
+        div = div, pct_start = pct_start, kwargs...)
+    return learner
 end

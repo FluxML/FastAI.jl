@@ -8,6 +8,7 @@ using Reexport
 @reexport using DataLoaders
 @reexport using Flux
 
+using Animations
 using Colors
 using DataAugmentation
 using DataAugmentation: getbounds, makebounds
@@ -15,7 +16,8 @@ using DLPipelines: methoddataset, methodmodel, methodlossfn
 using LearnBase: getobs, nobs
 using FixedPointNumbers
 using Flux
-using FluxTraining: Learner
+using FluxTraining: Learner, handle
+using FluxTraining.Events
 using FluxModels
 using MLDataPattern
 using Parameters
