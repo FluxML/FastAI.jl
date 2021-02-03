@@ -9,4 +9,5 @@ include("imports.jl")
     include("methods/imageclassification.jl")
     include("datasets/transformations.jl")
     include("datasets/containers.jl")
+    include("training.jl")
 end

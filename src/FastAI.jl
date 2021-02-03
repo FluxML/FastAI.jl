@@ -12,7 +12,7 @@ using Animations
 using Colors
 using DataAugmentation
 using DataAugmentation: getbounds, makebounds
-using DLPipelines: methoddataset, methodmodel, methodlossfn
+using DLPipelines: methoddataset, methodmodel, methodlossfn, methoddataloaders
 using LearnBase: getobs, nobs
 using FixedPointNumbers
 using Flux
@@ -36,9 +36,7 @@ include("./methods/imageclassification.jl")
 include("datasets/Datasets.jl")
 using .Datasets
 
-# training utilities
-include("./datautils.jl")
-
+# training
 include("training/utils.jl")
 include("training/onecycle.jl")
 include("training/finetune.jl")

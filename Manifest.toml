@@ -173,7 +173,7 @@ uuid = "dc8bdbbb-1ca9-579f-8c36-e416f6a65cce"
 version = "1.0.1"
 
 [[DLPipelines]]
-deps = ["LearnBase", "MLDataPattern", "Parameters", "Test"]
+deps = ["DataLoaders", "LearnBase", "MLDataPattern", "Parameters", "Test"]
 path = "../DLPipelines"
 uuid = "e6530d7c-7faa-4ede-a0d6-9eff9baad396"
 version = "0.1.0"
@@ -340,7 +340,7 @@ version = "0.1.0"
 deps = ["Animations", "BSON", "DataStructures", "Flux", "Glob", "ImageCore", "LightGraphs", "OnlineStats", "Parameters", "PrettyTables", "ProgressMeter", "Statistics", "TensorBoardLogger", "UUIDs", "ValueHistories", "Zygote"]
 path = "../FluxTraining"
 uuid = "7bf95e4d-ca32-48da-9824-f0dc5310474f"
-version = "0.1.1"
+version = "0.1.2"
 
 [[Formatting]]
 deps = ["Printf"]

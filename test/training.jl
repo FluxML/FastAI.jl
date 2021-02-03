@@ -5,6 +5,6 @@ include("imports.jl")
 
     @testset ExtendedTestSet "fitonecycle!" begin
         learner = testlearner(Recorder())
-        fitonecycle!(learner, 5)
+        @test_nowarn fitonecycle!(learner, 5)
     end
 end
