@@ -190,10 +190,10 @@ uuid = "9a962f9c-6df0-11e9-0e5d-c546b8b5ee8a"
 version = "1.4.0"
 
 [[DataAugmentation]]
-deps = ["ColorBlendModes", "CoordinateTransformations", "DocStringExtensions", "ImageDraw", "ImageTransformations", "Images", "Interpolations", "LinearAlgebra", "Parameters", "Rotations", "Setfield", "StaticArrays"]
-git-tree-sha1 = "a12e8e253b56462fdd488d736273adc3f793f125"
-repo-rev = "stochastic"
-repo-url = "../DataAugmentation"
+deps = ["ColorBlendModes", "CoordinateTransformations", "ImageDraw", "ImageTransformations", "Images", "Interpolations", "LinearAlgebra", "Parameters", "Rotations", "Setfield", "StaticArrays", "Statistics"]
+git-tree-sha1 = "91a9f00e8a2ebb08f8ea3dcc4c0ae1cae141742e"
+repo-rev = "master"
+repo-url = "https://github.com/lorenzoh/DataAugmentation.jl"
 uuid = "88a5189c-e7ff-4f85-ac6b-e6158070f02e"
 version = "0.1.0"
 

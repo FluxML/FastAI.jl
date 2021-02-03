@@ -23,8 +23,6 @@ jobs:
           julia --color=yes --project=. -e 'using Pkg; Pkg.instantiate()'
       - name: Build and deploy
         run: |
-          git clone https://github.com/lorenzoh/publish-theme theme
-          rm -rf theme/.git
           cd gh-pages
           julia --color=yes --project=../docs -e "using Pkg; Pkg.instantiate()"
           julia --color=yes --project=../docs -e 'using Pkg; Pkg.develop(path="..")'
