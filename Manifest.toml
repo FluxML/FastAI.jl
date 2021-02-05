@@ -338,7 +338,9 @@ version = "0.1.0"
 
 [[FluxTraining]]
 deps = ["Animations", "BSON", "DataStructures", "Flux", "Glob", "ImageCore", "LightGraphs", "OnlineStats", "Parameters", "PrettyTables", "ProgressMeter", "Statistics", "TensorBoardLogger", "UUIDs", "ValueHistories", "Zygote"]
-path = "../FluxTraining"
+git-tree-sha1 = "7ab2677c17d739a44117a77ab6db9b449e7ff2cf"
+repo-rev = "develop"
+repo-url = "https://github.com/lorenzoh/FluxTraining.jl"
 uuid = "7bf95e4d-ca32-48da-9824-f0dc5310474f"
 version = "0.1.2"
 
