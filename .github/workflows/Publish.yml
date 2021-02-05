@@ -17,7 +17,7 @@ jobs:
           path: gh-pages
       - uses: julia-actions/setup-julia@latest
         with:
-          version: '1.5'
+          version: '1.6'
       - name: Install dependencies
         run: |
           julia --color=yes --project=. -e 'using Pkg; Pkg.instantiate()'
