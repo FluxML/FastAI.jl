@@ -116,3 +116,13 @@ getobs(jdata, 15) == 15
 ```
 """
 joinobs(datas...) = JoinedData(datas)
+
+
+# TODO: NamedTupleData transformation
+#
+# mdata = mapobs(data, (col1 = f1, col2 = f2))
+# getobs(mdata, 1) == (col1 = f1(getobs(data, 1)), col2 = f2(getobs(data, 1)))
+# getobs(mdata.col1, 1) == f1(getobs(data, 1))
+#
+# Useful for datasets where you want to split off the targets, e.g. to avoid loading the
+# images.
