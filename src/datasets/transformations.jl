@@ -49,9 +49,11 @@ fdata = filterobs(>(5), data)
 nobs(fdata) == 5
 ```
 """
-function filterobs(f, data)
-    return datasubset(data, [i for i = 1:nobs(data) if f(getobs(data, i))])
+function filterobs(f, data; iterfn = _iterobs)
+    return datasubset(data, [i for (i, obs) in enumerate(iterfn(data)) if f(obs)])
 end
+
+_iterobs(data) = [getobs(data, i) for i in 1:nobs(data)]
 
 
 # groupobs
