@@ -30,7 +30,13 @@ function ImagePreprocessing(
         ToEltype(C) |> ImageToTensor() |> Normalize(means, stds),
     )
     if buffered
-        tfms = BufferedThreadsafe.(tfms)
+        tfms = (
+            BufferedThreadsafe(tfms[1]),
+            BufferedThreadsafe(tfms[2]),
+            # Inference transform is not buffered since it can have
+            # varying sizes
+            tfms[3]
+        )
     end
 
     return ImagePreprocessing(tfms...)
