@@ -88,12 +88,6 @@ git-tree-sha1 = "a0f80a09780eed9b1d106a1bf62041c2efc995bc"
 uuid = "aafaddc9-749c-510e-ac4f-586e18779b91"
 version = "0.2.2"
 
-[[CategoricalArrays]]
-deps = ["DataAPI", "Future", "JSON", "Missings", "Printf", "Statistics", "StructTypes", "Unicode"]
-git-tree-sha1 = "2ac27f59196a68070e132b25713f9a5bbc5fa0d2"
-uuid = "324d7699-5711-5eae-9e2f-1d82baa6b597"
-version = "0.8.3"
-
 [[ChainRules]]
 deps = ["ChainRulesCore", "Compat", "LinearAlgebra", "Random", "Reexport", "Requires", "Statistics"]
 git-tree-sha1 = "6ba8100fa9356807f1d0df6468ae463c67627c30"
@@ -178,16 +172,8 @@ git-tree-sha1 = "537c988076d001469093945f3bd0b300b8d3a7f3"
 uuid = "dc8bdbbb-1ca9-579f-8c36-e416f6a65cce"
 version = "1.0.1"
 
-[[DLDatasets]]
-deps = ["DataDeps", "FileIO", "FileTrees", "Images", "JSON3", "LearnBase", "Parameters", "StaticArrays", "StructArrays", "Tables"]
-git-tree-sha1 = "4b7772d86a58f4dff1d05321c3b6bee7e50512f6"
-repo-rev = "master"
-repo-url = "https://github.com/lorenzoh/DLDatasets.jl"
-uuid = "eb7515f2-3d1a-4576-a673-d8979fdf546c"
-version = "0.1.0"
-
 [[DLPipelines]]
-deps = ["Colors", "DataAugmentation", "DataLoaders", "FixedPointNumbers", "Flux", "LearnBase", "MLDataPattern", "MLDataUtils", "MosaicViews", "Parameters", "StaticArrays", "Test"]
+deps = ["DataLoaders", "LearnBase", "MLDataPattern", "Parameters", "Test"]
 path = "../DLPipelines"
 uuid = "e6530d7c-7faa-4ede-a0d6-9eff9baad396"
 version = "0.1.0"
@@ -204,8 +190,10 @@ uuid = "9a962f9c-6df0-11e9-0e5d-c546b8b5ee8a"
 version = "1.4.0"
 
 [[DataAugmentation]]
-deps = ["ColorBlendModes", "CoordinateTransformations", "DocStringExtensions", "ImageDraw", "ImageTransformations", "Images", "Interpolations", "LinearAlgebra", "Parameters", "Rotations", "Setfield", "StaticArrays"]
-path = "../DataAugmentation"
+deps = ["ColorBlendModes", "CoordinateTransformations", "ImageDraw", "ImageTransformations", "Images", "Interpolations", "LinearAlgebra", "Parameters", "Rotations", "Setfield", "StaticArrays", "Statistics"]
+git-tree-sha1 = "91a9f00e8a2ebb08f8ea3dcc4c0ae1cae141742e"
+repo-rev = "master"
+repo-url = "https://github.com/lorenzoh/DataAugmentation.jl"
 uuid = "88a5189c-e7ff-4f85-ac6b-e6158070f02e"
 version = "0.1.0"
 
@@ -215,15 +203,11 @@ git-tree-sha1 = "9f69dd052eaf292edd42d4bed999dfbd291927a0"
 uuid = "124859b0-ceae-595e-8997-d05f6a7a8dfe"
 version = "0.7.6"
 
-[[DataFrames]]
-deps = ["CategoricalArrays", "Compat", "DataAPI", "Future", "InvertedIndices", "IteratorInterfaceExtensions", "Missings", "PooledArrays", "Printf", "REPL", "Reexport", "SortingAlgorithms", "Statistics", "TableTraits", "Tables", "Unicode"]
-git-tree-sha1 = "ecd850f3d2b815431104252575e7307256121548"
-uuid = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
-version = "0.21.8"
-
 [[DataLoaders]]
 deps = ["DocStringExtensions", "LearnBase", "MLDataPattern", "Parameters", "Random", "ThreadPools"]
-path = "../DataLoaders"
+git-tree-sha1 = "5ca678562d2cbb0417f56b31ef083b31c654c9ce"
+repo-rev = "master"
+repo-url = "../DataLoaders"
 uuid = "2e981812-ef13-4a9c-bfa0-ab13047b12a9"
 version = "0.1.2"
 
@@ -338,15 +322,27 @@ version = "0.8.4"
 
 [[Flux]]
 deps = ["AbstractTrees", "Adapt", "CUDA", "CodecZlib", "Colors", "DelimitedFiles", "Functors", "Juno", "LinearAlgebra", "MacroTools", "NNlib", "Pkg", "Printf", "Random", "Reexport", "SHA", "Statistics", "StatsBase", "Test", "ZipFile", "Zygote"]
-git-tree-sha1 = "f688d61b40b345aa9f0a4a41d3ca7750ad9cb1f6"
+git-tree-sha1 = "50bbbee2363d5ec85d5a6de2064cbb04fc766449"
+repo-rev = "master"
+repo-url = "https://github.com/FluxML/Flux.jl.git"
 uuid = "587475ba-b771-5e3f-ad9e-33799f191a9c"
-version = "0.11.4"
+version = "0.12.0-dev"
+
+[[FluxModels]]
+deps = ["DocStringExtensions", "Flux", "LinearAlgebra", "ModelUtils", "Parameters"]
+git-tree-sha1 = "bd335977bb6c30eac99dd3179c9a2d1a95327dc7"
+repo-rev = "master"
+repo-url = "https://github.com/lorenzoh/FluxModels.jl"
+uuid = "e26eb721-c8f4-421b-a64f-b383a566ead7"
+version = "0.1.0"
 
 [[FluxTraining]]
 deps = ["Animations", "BSON", "DataStructures", "Flux", "Glob", "ImageCore", "LightGraphs", "OnlineStats", "Parameters", "PrettyTables", "ProgressMeter", "Statistics", "TensorBoardLogger", "UUIDs", "ValueHistories", "Zygote"]
-path = "../FluxTraining"
+git-tree-sha1 = "7ab2677c17d739a44117a77ab6db9b449e7ff2cf"
+repo-rev = "develop"
+repo-url = "https://github.com/lorenzoh/FluxTraining.jl"
 uuid = "7bf95e4d-ca32-48da-9824-f0dc5310474f"
-version = "0.1.1"
+version = "0.1.2"
 
 [[Formatting]]
 deps = ["Printf"]
@@ -521,12 +517,6 @@ git-tree-sha1 = "93a6d78525feb0d3ee2a2ae83a7d04db1db5663f"
 uuid = "8197267c-284f-5f27-9208-e0e47529a953"
 version = "0.5.2"
 
-[[InvertedIndices]]
-deps = ["Test"]
-git-tree-sha1 = "15732c475062348b0165684ffe28e85ea8396afc"
-uuid = "41ab1584-1d38-5bbf-9106-f11c6c58b48f"
-version = "1.0.0"
-
 [[IterTools]]
 git-tree-sha1 = "05110a2ab1fc5f932622ffea2a003221f4782c18"
 uuid = "c8e1da08-722c-5040-9ed9-7db0dc04731e"
@@ -541,18 +531,6 @@ version = "1.0.0"
 git-tree-sha1 = "a431f5f2ca3f4feef3bd7a5e94b8b8d4f2f647a0"
 uuid = "692b3bcd-3c85-4b1f-b108-f13ce0eb3210"
 version = "1.2.0"
-
-[[JSON]]
-deps = ["Dates", "Mmap", "Parsers", "Unicode"]
-git-tree-sha1 = "81690084b6198a2e1da36fcfda16eeca9f9f24e4"
-uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
-version = "0.21.1"
-
-[[JSON3]]
-deps = ["Dates", "Mmap", "Parsers", "StructTypes", "UUIDs"]
-git-tree-sha1 = "961ef1c3e5c8a595d5bec270a9007429ef12ed10"
-uuid = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
-version = "1.5.1"
 
 [[Juno]]
 deps = ["Base64", "Logging", "Media", "Profile"]
@@ -620,12 +598,6 @@ git-tree-sha1 = "e99514e96e8b8129bb333c69e063a56ab6402b5b"
 uuid = "9920b226-0b2a-5f5f-9153-9aa70a013f8b"
 version = "0.5.4"
 
-[[MLDataUtils]]
-deps = ["DataFrames", "DelimitedFiles", "LearnBase", "MLDataPattern", "MLLabelUtils", "Statistics", "StatsBase"]
-git-tree-sha1 = "6c74dba2cba82d441190447f988e5eb48a815f48"
-uuid = "cc2ba9b6-d476-5e6d-8eaf-a92d5412d41d"
-version = "0.5.2"
-
 [[MLLabelUtils]]
 deps = ["LearnBase", "MappedArrays", "StatsBase"]
 git-tree-sha1 = "71d874f2e97bf01dc5c44d562cea30cc7ebb81d1"
@@ -678,6 +650,14 @@ version = "0.4.4"
 
 [[Mmap]]
 uuid = "a63ad114-7e13-5084-954f-fe012c677804"
+
+[[ModelUtils]]
+deps = ["AbstractTrees", "Flux", "Statistics", "Zygote"]
+git-tree-sha1 = "2eda378073e1ccc47d5cff58613d0e3dbbae803a"
+repo-rev = "master"
+repo-url = "https://github.com/lorenzoh/ModelUtils.jl"
+uuid = "fa899593-fe74-450d-a78c-2ae6a880e080"
+version = "0.1.0"
 
 [[MosaicViews]]
 deps = ["MappedArrays", "OffsetArrays", "PaddedViews"]
@@ -739,25 +719,13 @@ version = "0.5.7"
 
 [[Parameters]]
 deps = ["OrderedCollections", "UnPack"]
-git-tree-sha1 = "38b2e970043613c187bd56a995fe2e551821eb4a"
+git-tree-sha1 = "2276ac65f1e236e0a6ea70baff3f62ad4c625345"
 uuid = "d96e819e-fc66-5662-9728-84c9c7592b0a"
-version = "0.12.1"
-
-[[Parsers]]
-deps = ["Dates"]
-git-tree-sha1 = "50c9a9ed8c714945e01cd53a21007ed3865ed714"
-uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
-version = "1.0.15"
+version = "0.12.2"
 
 [[Pkg]]
 deps = ["Artifacts", "Dates", "Downloads", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Serialization", "TOML", "Tar", "UUIDs"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
-
-[[PooledArrays]]
-deps = ["DataAPI"]
-git-tree-sha1 = "b1333d4eced1826e15adbdf01a4ecaccca9d353c"
-uuid = "2dfb63ee-cc39-5dd5-95bd-886bf059d720"
-version = "0.5.3"
 
 [[PrettyTables]]
 deps = ["Crayons", "Formatting", "Markdown", "Reexport", "Tables"]
@@ -889,18 +857,6 @@ git-tree-sha1 = "7bab7d4eb46b225b35179632852b595a3162cb61"
 uuid = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 version = "0.33.2"
 
-[[StructArrays]]
-deps = ["Adapt", "DataAPI", "Tables"]
-git-tree-sha1 = "8099ed9fb90b6e754d6ba8c6ed8670f010eadca0"
-uuid = "09ab397b-f2b6-538f-b94a-2f83cf4a842a"
-version = "0.4.4"
-
-[[StructTypes]]
-deps = ["Dates", "UUIDs"]
-git-tree-sha1 = "d94235fcdc4a09649f263365c5f7e4ed4ba6ed34"
-uuid = "856f2bd8-1eba-4b0a-8007-ebc267875bd4"
-version = "1.2.1"
-
 [[SweepOperator]]
 deps = ["LinearAlgebra"]
 git-tree-sha1 = "20da2784e79fc0bfdd70592d1b47d7a6034e82d1"
@@ -919,9 +875,9 @@ version = "1.0.0"
 
 [[Tables]]
 deps = ["DataAPI", "DataValueInterfaces", "IteratorInterfaceExtensions", "LinearAlgebra", "TableTraits", "Test"]
-git-tree-sha1 = "240d19b8762006ff04b967bdd833269ad642d550"
+git-tree-sha1 = "8dc2bb7d3548e315d890706547b24502ed79504f"
 uuid = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
-version = "1.2.2"
+version = "1.3.1"
 
 [[Tar]]
 deps = ["ArgTools", "SHA"]
