@@ -655,14 +655,6 @@ git-tree-sha1 = "2b1dfcba103de714d31c033b5dacc2e4a12c7caa"
 uuid = "c03570c3-d221-55d1-a50c-7939bbd78826"
 version = "0.4.4"
 
-[[Metalhead]]
-deps = ["BSON", "Flux"]
-git-tree-sha1 = "29b85a8cf316701e6028dda0fd0373d886efea5f"
-repo-rev = "darsnack/vision-refactor"
-repo-url = "https://github.com/darsnack/Metalhead.jl"
-uuid = "dbeba491-748d-5e0e-a39e-b530a07fa0cc"
-version = "0.5.3"
-
 [[Missings]]
 deps = ["DataAPI"]
 git-tree-sha1 = "f8c673ccc215eb50fcadb285f522420e29e69e1c"
