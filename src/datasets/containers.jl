@@ -40,3 +40,6 @@ isimagefile(file::AbstractPath) = isimagefile(string(file))
 isimagefile(file::File) = isimagefile(file.name)
 isimagefile(file::String) = occursin(IMAGEFILE_REGEX, lowercase(file))
 const IMAGEFILE_REGEX = r"\.(gif|jpe?g|tiff?|png|webp|bmp)$"
+
+
+## TODO: TableDataset

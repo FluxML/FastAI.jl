@@ -13,7 +13,8 @@
 
 # Notebooks
 
-- [Finetuning](finetuning.ipynb)
+- [One-cycle schedule](docs/notebooks/fitonecycle.ipynb)
+- [Learning rate finder](docs/notebooks/lrfind.ipynb)
 
 # Reference
 

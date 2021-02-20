@@ -81,7 +81,7 @@ summary.((xs, ys))
 
 ## Model
 
-{cell=main, result=false}
+{cell=main}
 ```julia
 model = methodmodel(method, Models.xresnet18())
 ```
@@ -100,7 +100,7 @@ Finally we bring the model and data loaders together with an optimizer and loss 
 With that setup, training `learner` is dead simple:
 
 ```julia
-fit!(learner, 10)
+fitonecycle!(learner, 5)
 ```
 
 

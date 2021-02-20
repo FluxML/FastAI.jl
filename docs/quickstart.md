@@ -15,5 +15,5 @@ dls = methoddataloaders(dataset, method)
 model = methodmodel(method, Models.xresnet18());
 
 learner = Learner(model, dls, ADAM(), methodlossfn(method), ToGPU(), Metrics(accuracy))
-fit!(learner, 10)
+fitonecycle!(learner, 5)
 ```

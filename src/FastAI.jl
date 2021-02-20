@@ -18,12 +18,9 @@ using FixedPointNumbers
 using Flux
 using FluxTraining: Learner, handle
 using FluxTraining.Events
-using FluxModels
 using MLDataPattern
 using Parameters
 using StaticArrays
-
-const Models = FluxModels
 
 # method implementations and helpers
 include("./steps/utils.jl")
@@ -35,6 +32,9 @@ include("./methods/imageclassification.jl")
 # submodules
 include("datasets/Datasets.jl")
 using .Datasets
+
+include("models/Models.jl")
+using .Models
 
 # training
 include("training/utils.jl")
