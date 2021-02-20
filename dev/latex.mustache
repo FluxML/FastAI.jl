@@ -1,0 +1,207 @@
+%
+% Default Template for Publish.jl LaTeX/PDF output. Expected to be compilable
+% with Tectonic/XeLaTeX without any `--shell-escape` usage.
+%
+\documentclass{${{latex.documentclass}}}
+
+%
+% Required Package Imports.
+%
+
+\usepackage{fontspec}
+\usepackage{microtype}
+\usepackage{unicode-math}
+
+\usepackage[dvipsnames]{xcolor} % For admonitions.
+\usepackage{hyperref} % Internal links to anywhere.
+\usepackage{tcolorbox} % For admonitions.
+\usepackage{longtable} % Multi-page tables.
+\usepackage{tocloft} % Additional table-of types.
+\usepackage[export]{adjustbox} % For resizing images.
+\usepackage{xurl} % Line-breaks in URLs.
+\usepackage{textcomp}
+\usepackage{listings} % Formatted code blocks.
+\usepackage{pdflscape} % Landscape orientation for Table objects.
+\usepackage[a4paper, total={6in, 8in}]{geometry}
+\usepackage{import}
+
+%%% biblatex is loaded later on. %%%
+
+
+%
+% Listings settings.
+%
+
+\lstset{
+    breaklines=true,
+    postbreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\color{red}\hookrightarrow\space}},
+    frame=single,
+    xleftmargin=\parindent,
+    upquote=true,
+    basicstyle=\footnotesize\ttfamily,
+}
+
+%
+% Font Features.
+%
+
+\defaultfontfeatures{Scale=MatchLowercase}
+\defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+
+\setmainfont{DejaVuSerif}[Path=fonts/]
+\setsansfont{DejaVuSans}[Path=fonts/]
+\setmonofont{DejaVuSansMono}[Path=fonts/]
+
+%
+% Admonition Styling.
+%
+
+\newtcolorbox{admonition@info}[2][]{
+    colbacktitle=Aquamarine!60!white, colback=Aquamarine!10!white, coltitle=black,
+    title={#2}, fonttitle=\bfseries, #1
+}
+\newtcolorbox{admonition@tip}[2][]{
+    colbacktitle=ForestGreen!60!white, colback=ForestGreen!10!white, coltitle=black,
+    title={#2}, fonttitle=\bfseries, #1
+}
+\newtcolorbox{admonition@warning}[2][]{
+    colbacktitle=BurntOrange!60!white, colback=BurntOrange!10!white, coltitle=black,
+    title={#2}, fonttitle=\bfseries, #1
+}
+\newtcolorbox{admonition@danger}[2][]{
+    colbacktitle=Red!60!white, colback=Red!10!white, coltitle=black,
+    title={#2}, fonttitle=\bfseries, #1
+}
+\newtcolorbox{admonition@compat}[2][]{
+    colbacktitle=Purple!60!white, colback=Purple!10!white, coltitle=black,
+    title={#2}, fonttitle=\bfseries, #1
+}
+
+
+%
+% Front-matter Variables.
+%
+
+% Add a \subtitle command to \maketitle.
+\makeatletter
+\providecommand{\subtitle}[1]{
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+
+${#title}
+\title{${title}}
+${/title}
+
+${#subtitle}
+\subtitle{${subtitle}}
+${/subtitle}
+
+\author{${#authors}${.}${^.[end]} \and ${/.[end]}${/authors}}
+
+${#date}
+\date{${date}}
+${/date}
+
+
+%
+% User-defined Preamble.
+%
+
+${{latex.preamble}}
+
+
+%
+% Import the given bibliography file. This should be a `.bib` file.
+%
+
+% Only import these when the user has provided a latex.bibliography file.
+${#latex.bibliography}
+\usepackage[backend=biber]{biblatex}
+\bibliography{${.}}
+${/latex.bibliography}
+
+
+%
+% Table and figure counters.
+%
+% At the end of the document we check whether the counters for these two
+% objects have been incremented. If they have, then we update the globals so
+% that on the next run we include the LoF and LoT. Long tables need to be
+% checked as well since they do not get manually wrapped in table environments.
+%
+
+\newif\iffigures
+\newif\iftables
+
+\makeatletter
+\let\OLDfigure\figure
+\def\figure {\figures@in@document\OLDfigure }
+\let\OLDtable\table
+\def\table {\tables@in@document\OLDtable }
+\let\OLDlongtable\longtable
+\def\longtable {\longtables@in@document\OLDlongtable }
+
+\def\figures@in@document {%
+    \immediate\write\@mainaux {\global\string\figurestrue}%
+    \global\let\figures@in@document\empty
+}
+
+\def\tables@in@document {%
+    \immediate\write\@mainaux {\global\string\tablestrue}%
+    \global\let\tables@in@document\empty
+}
+
+\def\longtables@in@document {%
+    \immediate\write\@mainaux {\global\string\tablestrue}%
+    \global\let\longtables@in@document\empty
+}
+\makeatother
+
+
+\begin{document}
+
+%
+% Front-matter display.
+%
+
+${#title}
+\maketitle
+${/title}
+
+${#abstract}
+\begin{abstract}
+${abstract}
+\end{abstract}
+${/abstract}
+
+
+% # Contents Tables
+%
+% Document outline, list of figures, and list of tables. If there are not
+% tables or figures to list, then we don't display those lists.
+
+\tableofcontents
+
+\iffigures
+   \addcontentsline{toc}{section}{List of Figures}
+   \listoffigures
+\fi
+
+\iftables
+   \addcontentsline{toc}{section}{List of Tables}
+   \listoftables
+\fi
+
+
+%
+% Beginning of user content.
+%
+
+${{body}}
+
+${#latex.bibliography}
+\printbibliography
+${/latex.bibliography}
+
+\end{document}

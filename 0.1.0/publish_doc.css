@@ -1,0 +1,112 @@
+:root {
+    --bg: #ffffff;
+    --fg: #333333;
+    --bar-color: #fafafa;
+    --accent-color: #eeeeee;
+    --code-color: #f1f1f1;
+    --link-color: #4183c4;
+    --quote-bg: hsl(197, 37%, 96%);
+    --quote-border: hsl(197, 37%, 91%);
+    --light-gray: #eee;
+    --blue: #0077aaff;
+}
+
+html {
+	scroll-behavior: smooth
+}
+
+.sticky	{
+	position: sticky;
+  	top: 1em;
+}
+
+.anchor {
+    color: var(--light-gray);
+    vertical-align: top;
+}
+.anchor:hover {
+    color: var(--blue);
+    text-decoration: none;
+}
+
+.anchor::before {
+    content: "#";
+    margin: 5px;
+}
+
+pre {
+    padding: 0 !important;
+}
+
+code {
+    color: var(--fg);
+    font-size: 0.8em;
+}
+
+.toc-list {
+    list-style: none;
+}
+
+#main-body {
+    padding-left: 1em;
+    padding-right: 1em;
+    max-width: 960px;
+}
+
+.admonition {
+    display: block;
+
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+
+    background-color: #f5f5f5;
+    border-left: 5px solid #dbdbdb;
+    padding: 1.25em 1.5em;
+}
+.admonition-title {
+    font-weight: bold;
+}
+
+.info {
+    background-color: #b8dffa;
+    border-left: 5px solid #209cee;
+}
+.tip {
+    background-color: #9beeb8;
+    border-left: 5px solid #22c35b;
+}
+.compat {
+    background-color: #99e6f0;
+    border-left: 5px solid #1db5c9;
+}
+.warning {
+    background-color: #fff3c5;
+    border-left: 5px solid #ffdd57;
+}
+.danger {
+    background-color: #ff857e;
+    border-left: 5px solid #da0b00;
+}
+
+.mermaid {
+    border: 1px solid #333;
+}
+
+.figure-object > img {
+    padding-block-start: 1em;
+    padding-block-end: 1em;
+    display: block;
+    margin: 0 auto;
+}
+
+.table-object {
+    padding-block-start: 1em;
+    padding-block-end: 1em;
+    display: block;
+    margin: 0 auto;
+}
+
+p.caption {
+    text-align: center;
+    font-weight: bold;
+}
