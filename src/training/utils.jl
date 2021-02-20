@@ -102,7 +102,7 @@ function withcallbacks(f, learner, callbacks...)
     finally
         for (i, cb) in enumerate(origcallbacks)
             if isnothing(cb)
-                FluxTraining.removecallback!(learner, callbacks[i])
+                FluxTraining.removecallback!(learner, typeof(callbacks[i]))
             else
                 FluxTraining.replacecallback!(learner, cb)
             end
