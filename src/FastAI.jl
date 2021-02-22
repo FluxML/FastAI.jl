@@ -14,6 +14,7 @@ using DataAugmentation
 using DataAugmentation: getbounds, makebounds
 using DLPipelines: methoddataset, methodmodel, methodlossfn, methoddataloaders
 using LearnBase: getobs, nobs
+using FilePathsBase
 using FixedPointNumbers
 using Flux
 using FluxTraining: Learner, handle
@@ -22,12 +23,15 @@ using MLDataPattern
 using Parameters
 using StaticArrays
 
+include("tasks.jl")
+
 # method implementations and helpers
 include("./steps/utils.jl")
 include("./steps/step.jl")
 include("./steps/spatial.jl")
 include("./steps/imagepreprocessing.jl")
 include("./methods/imageclassification.jl")
+include("./methods/imagesegmentation.jl")
 
 # submodules
 include("datasets/Datasets.jl")
@@ -49,7 +53,7 @@ export
     # submodules
     Datasets,
     Models,
-    loaddataset,
+    datasetpath,
 
     # method API
     methodmodel,
@@ -65,8 +69,10 @@ export
 
     # methods
     ImageClassification,
+    ImageSegmentation,
 
     # training
+    methodlearner,
     Learner,
     fit!,
     fitonecycle!,

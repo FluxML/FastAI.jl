@@ -1,5 +1,6 @@
 
 - [README](README.md)
+- [Setup](docs/setup.md)
 - [Quickstart](docs/quickstart.md)
 
 # Tutorials
@@ -7,20 +8,22 @@
 - [Data containers](docs/data_containers.md)
 - [Learning methods](docs/learning_methods.md)
 
-# Methods
+# Learning tasks
 
 - [Image classification](docs/methods/imageclassification.md)
 
-# Notebooks
+# How To
 
-- [One-cycle schedule](docs/notebooks/fitonecycle.ipynb)
-- [Learning rate finder](docs/notebooks/lrfind.ipynb)
+- [Train a model from scratch](docs/notebooks/fitonecycle.ipynb)
+- [Finetune a pretrained model](docs/notebooks/fitonecycle.ipynb)
+- [Find a good learning rate](docs/notebooks/lrfind.ipynb)
 
 # Reference
 
-- [Glossary](docs/glossary.md)
 - [Docstrings](docstrings.md)
+- [Interfaces](docs/interfaces.md)
+- [Glossary](docs/glossary.md)
 
-# Project status
+# Background
 
-- [vs. fastai](docs/status.md)
+- [Performant data pipelines](background/datapipelines.md)

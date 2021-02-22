@@ -67,7 +67,7 @@ function methodmodel(method::ImageClassification, backbone)
         Chain(
             AdaptiveMeanPool((1,1)),
             flatten,
-            Dense(ch, length(method.categories)),
+            Dense(ch, length(method.classes)),
         )
     )
 end

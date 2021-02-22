@@ -1,13 +1,12 @@
 
-abstract type ImageClassificationTask <: DLPipelines.LearningTask end
 
 """
-    ImageClassification(categories, sz[; augmentations, ...]) <: Method{ImageClassificationTask}
+    ImageClassification(classes, sz[; augmentations, ...]) <: Method{ImageClassificationTask}
     ImageClassification(n, ...)
 
 A [`Method`](#) for multi-class image classification using softmax probabilities.
 
-`categories` is a vector of the category labels. Alternatively, you can pass an integer.
+`classes` is a vector of the category labels. Alternatively, you can pass an integer.
 Images are resized to `sz`.
 
 During training, a random crop is used and `augmentations`, a `DataAugmentation.Transform`
@@ -16,7 +15,7 @@ are applied.
 ### Types
 
 - `input::AbstractMatrix{2, <:Colorant}`: an image
-- `target::Int` the category that the image belongs to
+- `target` the class label that the image belongs to
 - `x::AbstractArray{Float32, 3}`: a normalized 3D-array with dimensions *height, width, channels*
 - `y::AbstractVector{Float32}`: one-hot encoding of category
 
@@ -27,16 +26,16 @@ are applied.
 """
 mutable struct ImageClassification <: DLPipelines.LearningMethod{ImageClassificationTask}
     sz::Tuple{Int, Int}
-    categories::AbstractVector
-    spatialtransforms::ProjectiveTransforms
+    classes::AbstractVector
+    projectivetransforms::ProjectiveTransforms
     imagepreprocessing::ImagePreprocessing
 end
 
 Base.show(io::IO, method::ImageClassification) = print(
-    io, "ImageClassification() with $(length(method.categories)) classes")
+    io, "ImageClassification() with $(length(method.classes)) classes")
 
 function ImageClassification(
-        categories::AbstractVector,
+        classes::AbstractVector,
         sz = (224, 224);
         augmentations = Identity(),
         means = IMAGENET_MEANS,
@@ -44,9 +43,9 @@ function ImageClassification(
         C = RGB{N0f8},
         T = Float32
     )
-    spatialtransforms = ProjectiveTransforms(sz, augmentations = augmentations)
+    projetivetransforms = ProjectiveTransforms(sz, augmentations = augmentations)
     imagepreprocessing = ImagePreprocessing(means, stds; C = C, T = T)
-    ImageClassification(sz, categories, spatialtransforms, imagepreprocessing)
+    ImageClassification(sz, classes, projectivetransforms, imagepreprocessing)
 end
 
 ImageClassification(n::Int, args...; kwargs...) = ImageClassification(1:n, args...; kwargs...)
@@ -58,7 +57,7 @@ function DLPipelines.encodeinput(
         method::ImageClassification,
         context,
         image)
-    imagecropped = run(method.spatialtransforms, context, image)
+    imagecropped = run(method.projectivetransforms, context, image)
     x = run(method.imagepreprocessing, context, imagecropped)
     return x
 end
@@ -68,9 +67,9 @@ function DLPipelines.encodetarget(
         method::ImageClassification,
         context,
         category)
-    idx = findfirst(isequal(category), method.categories)
-    isnothing(idx) && error("`category` could not be found in `method.categories`.")
-    return DataAugmentation.onehot(idx, length(method.categories))
+    idx = findfirst(isequal(category), method.classes)
+    isnothing(idx) && error("`category` could not be found in `method.classes`.")
+    return DataAugmentation.onehot(idx, length(method.classes))
 end
 
 
@@ -80,12 +79,12 @@ function DLPipelines.encodetarget!(
         context,
         category) where T
     fill!(y, zero(T))
-    idx = findfirst(isequal(category), method.categories)
+    idx = findfirst(isequal(category), method.classes)
     y[idx] = one(T)
     return y
 end
 
-DLPipelines.decodeŷ(method::ImageClassification, context, ŷ) = method.categories[argmax(ŷ)]
+DLPipelines.decodeŷ(method::ImageClassification, context, ŷ) = method.classes[argmax(ŷ)]
 
 # Interpetration interface
 
@@ -110,7 +109,7 @@ function DLPipelines.methodmodel(method::ImageClassification, backbone)
         Chain(
             AdaptiveMeanPool((1,1)),
             flatten,
-            Dense(ch, length(method.categories)),
+            Dense(ch, length(method.classes)),
         )
     )
 end
@@ -119,17 +118,17 @@ DLPipelines.methodlossfn(::ImageClassification) = Flux.Losses.logitcrossentropy
 
 # Testing interface
 
-function DLPipelines.mockinput(method)
+function DLPipelines.mockinput(method::ImageClassification)
     inputsz = rand.(UnitRange.(method.sz, method.sz .* 2))
     return rand(RGB{N0f8}, inputsz)
 end
 
 
-function DLPipelines.mocktarget(method)
-    rand(1:length(method.categories))
+function DLPipelines.mocktarget(method::ImageClassification)
+    rand(1:length(method.classes))
 end
 
 
-function DLPipelines.mockmodel(method)
-    return xs -> rand(Float32, length(method.categories), size(xs)[end])
+function DLPipelines.mockmodel(method::ImageClassification)
+    return xs -> rand(Float32, length(method.classes), size(xs)[end])
 end
