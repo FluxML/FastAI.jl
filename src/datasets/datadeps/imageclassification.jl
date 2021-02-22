@@ -1,5 +1,5 @@
 
-const DATASETS = [
+const DATASETS_IMAGECLASSIFICATION = [
     # Image classification
     # from https://s3.amazonaws.com/fast-ai-imageclas/
     "CUB_200_2011",
@@ -31,13 +31,13 @@ const DATASETS = [
 ]
 
 
-const CHECKSUMS = [
+const CHECKSUMS_IMAGECLASSIFICATION = [
     # Image classification
     "",
     "",
     "",
-    "",
-    "",
+    "637c5814e11aefcb6ee76d5f59c67ddc8de7f5b5077502a195b0833d1e3e4441",
+    "085ac613ceb0b3659c8072143ae553d5dd146b3c4206c3672a56ed02d0e77d28",
     "",
     "",
     "",
@@ -54,7 +54,7 @@ const CHECKSUMS = [
     "663c22f69c2802d85e2a67103c017e047096702ffddf9149a14011b7002539bf",
     "",
     "",
-    "",
+    "9e18edaa3a08b065d8f80a019ca04329e6d9b3e391363414a9bd1ada30563672",
     "8a0f6ca04c2d31810dc08e739c7fa9b612e236383f70dd9fc6e5a62e672e2283",
     "",
     "",
@@ -62,18 +62,4 @@ const CHECKSUMS = [
 ]
 
 
-function init_datadeps()
-    for (datasetname, checksum) in zip(DATASETS, CHECKSUMS)
-        DataDeps.register(DataDep(
-            "fastai-$datasetname",
-            """
-            $datasetname from the fastai dataset repository
-
-            (https://s3.amazonaws.com/fast-ai-imageclas/)
-            """,
-            "https://s3.amazonaws.com/fast-ai-imageclas/$datasetname.tgz",
-            checksum,
-            post_fetch_method = DataDeps.unpack,
-        ))
-    end
-end
+# TODO: add class names

@@ -11,6 +11,7 @@ LearnBase.nobs(data::MappedData) = nobs(data.data)
 LearnBase.getobs(data::MappedData, idx::Int) = data.f(getobs(data.data, idx))
 LearnBase.getobs(data::MappedData, idxs::AbstractVector) = data.f.(getobs(data.data, idxs))
 
+
 """
     mapobs(f, data)
 
@@ -34,6 +35,45 @@ Returns a tuple of transformed data containers.
 """
 mapobs(fs::Tuple, data) = Tuple(mapobs(f, data) for f in fs)
 
+
+struct NamedTupleData{TData, F}
+    data::TData
+    namedfs::NamedTuple{F}
+end
+
+LearnBase.nobs(data::NamedTupleData) = nobs(data.data)
+
+function LearnBase.getobs(data::NamedTupleData{TData, F}, idx::Int) where {TData, F}
+    obs = getobs(getfield(data, :data), idx)
+    namedfs = getfield(data, :namedfs)
+    return NamedTuple{F}(f(obs) for f in namedfs)
+end
+
+Base.getproperty(data::NamedTupleData, field::Symbol) = mapobs(
+    getproperty(getfield(data, :namedfs), field),
+    getfield(data, :data),
+)
+
+Base.show(io::IO, data::NamedTupleData) = print(io, "mapobs($(getfield(data, :namedfs)), $(getfield(data, :data)))")
+
+"""
+    mapobs(namedfs::NamedTuple, data)
+
+Map a `NamedTuple` of functions over `data`, turning it into a data container
+of `NamedTuple`s. Field syntax can be used to select a column of the resulting
+data container.
+
+```julia
+data = 1:10
+nameddata = mapobs((x = sqrt, y = log), data)
+getobs(nameddata, 10) == (x = sqrt(10), y = log(10))
+getobs(nameddata.x, 10) == sqrt(10)
+```
+"""
+function mapobs(namedfs::NamedTuple, data)
+    return NamedTupleData(data, namedfs)
+end
+
 # filterobs
 
 """
@@ -49,7 +89,7 @@ fdata = filterobs(>(5), data)
 nobs(fdata) == 5
 ```
 """
-function filterobs(f, data; iterfn = _iterobs)
+function filterobs(f, data; iterfn=_iterobs)
     return datasubset(data, [i for (i, obs) in enumerate(iterfn(data)) if f(obs)])
 end
 
@@ -71,7 +111,7 @@ length(datas) == 2
 ```
 """
 function groupobs(f, data)
-    groups = Dict{Any, Vector{Int}}()
+    groups = Dict{Any,Vector{Int}}()
     for i in 1:nobs(data)
         group = f(getobs(data, i))
         if !haskey(groups, group)
@@ -86,9 +126,9 @@ end
 
 # joinobs
 
-struct JoinedData{T, N}
-    datas::NTuple{N, T}
-    ns::NTuple{N, Int}
+struct JoinedData{T,N}
+    datas::NTuple{N,T}
+    ns::NTuple{N,Int}
 end
 
 JoinedData(datas) = JoinedData(datas, nobs.(datas))

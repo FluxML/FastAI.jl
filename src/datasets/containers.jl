@@ -12,6 +12,10 @@ function FileDataset(args...; kwargs...)
     return FileDataset(tree, FileTrees.files(tree))
 end
 
+Base.show(io::IO, data::FileDataset) = print(
+    io,
+    "FileDataset(\"", data.tree.name, "\", ", nobs(data), " observations)")
+
 LearnBase.nobs(ds::FileDataset) = length(ds.nodes)
 LearnBase.getobs(ds::FileDataset, idx::Int) = path(ds.nodes[idx])
 

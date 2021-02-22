@@ -3,6 +3,10 @@
 
 Commonly used datasets and utilities for creating data containers.
 
+ToDos:
+
+- add localization/segmentation datasets
+- add labels for classification datasets
 
 ## Interface
 
@@ -120,7 +124,11 @@ using MLDataPattern
 using MLDataPattern: splitobs
 import LearnBase
 
-include("datadeps.jl")
+include("datadeps/imageclassification.jl")
+include("datadeps/imagelocalization.jl")
+include("datadeps/nlp.jl")
+include("datadeps/sample.jl")
+include("datadeps/init.jl")
 
 function __init__()
     init_datadeps()
@@ -129,7 +137,7 @@ end
 include("containers.jl")
 include("transformations.jl")
 
-include("utils.jl")
+include("load.jl")
 
 
 export
@@ -152,7 +160,7 @@ export
 
     # datasets
     DATASETS,
-    loaddataset,
+    loadtaskdata,
     datasetpath
 
 end  # module
