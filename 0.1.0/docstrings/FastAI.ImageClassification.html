@@ -33,6 +33,7 @@
         </div>
         <div id="toc"><ul>
 <li><a href="../README.html">README</a></li>
+<li><a href="../docs/setup.html">Setup</a></li>
 <li><a href="../docs/quickstart.html">Quickstart</a></li>
 </ul>
 <h1 id="tutorials"><a href="../#tutorials" class="anchor"></a>Tutorials</h1>
@@ -41,40 +42,42 @@
 <li><a href="../docs/data_containers.html">Data containers</a></li>
 <li><a href="../docs/learning_methods.html">Learning methods</a></li>
 </ul>
-<h1 id="methods"><a href="../#methods" class="anchor"></a>Methods</h1>
+<h1 id="learning-tasks"><a href="../#learning-tasks" class="anchor"></a>Learning tasks</h1>
 <ul>
 <li><a href="../docs/methods/imageclassification.html">Image classification</a></li>
 </ul>
-<h1 id="notebooks"><a href="../#notebooks" class="anchor"></a>Notebooks</h1>
+<h1 id="how-to"><a href="../#how-to" class="anchor"></a>How To</h1>
 <ul>
-<li><a href="../docs/notebooks/fitonecycle.html">One-cycle schedule</a></li>
-<li><a href="../docs/notebooks/lrfind.html">Learning rate finder</a></li>
+<li><a href="../docs/notebooks/fitonecycle.html">Train a model from scratch</a></li>
+<li><a href="../docs/notebooks/fitonecycle.html">Finetune a pretrained model</a></li>
+<li><a href="../docs/notebooks/lrfind.html">Find a good learning rate</a></li>
 </ul>
 <h1 id="reference"><a href="../#reference" class="anchor"></a>Reference</h1>
 <ul>
-<li><a href="../docs/glossary.html">Glossary</a></li>
 <li><a href="../docstrings.html">Docstrings</a></li>
+<li><a href="../docs/interfaces.html">Interfaces</a></li>
+<li><a href="../docs/glossary.html">Glossary</a></li>
 </ul>
-<h1 id="project-status"><a href="../#project-status" class="anchor"></a>Project status</h1>
+<h1 id="background"><a href="../#background" class="anchor"></a>Background</h1>
 <ul>
-<li><a href="../docs/status.html">vs. fastai</a></li>
+<li><a href="../background/datapipelines.html">Performant data pipelines</a></li>
 </ul>
 </div>
         <article id="content"><div class='docs' id='ImageClassification'>
 <p><code>public</code> <code>ImageClassification</code> — <code>struct</code></p>
 <div class='doc' id='1'>
-<pre><code>ImageClassification(categories, sz[; augmentations, ...]) &lt;: Method{ImageClassificationTask}
+<pre><code>ImageClassification(classes, sz[; augmentations, ...]) &lt;: Method{ImageClassificationTask}
 ImageClassification(n, ...)
 </code></pre>
 <p>A <a href="Core.Method.html"><code>Method</code></a> for multi-class image classification using softmax probabilities.</p>
-<p><code>categories</code> is a vector of the category labels. Alternatively, you can pass an integer.
+<p><code>classes</code> is a vector of the category labels. Alternatively, you can pass an integer.
 Images are resized to <code>sz</code>.</p>
 <p>During training, a random crop is used and <code>augmentations</code>, a <code>DataAugmentation.Transform</code>
 are applied.</p>
 <h3 id="types"><a href="#types" class="anchor"></a>Types</h3>
 <ul>
 <li><code>input::AbstractMatrix{2, &lt;:Colorant}</code>: an image</li>
-<li><code>target::Int</code> the category that the image belongs to</li>
+<li><code>target</code> the class label that the image belongs to</li>
 <li><code>x::AbstractArray{Float32, 3}</code>: a normalized 3D-array with dimensions <em>height, width, channels</em></li>
 <li><code>y::AbstractVector{Float32}</code>: one-hot encoding of category</li>
 </ul>

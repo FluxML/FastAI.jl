@@ -33,6 +33,7 @@
         </div>
         <div id="toc"><ul>
 <li><a href="../README.html">README</a></li>
+<li><a href="../docs/setup.html">Setup</a></li>
 <li><a href="../docs/quickstart.html">Quickstart</a></li>
 </ul>
 <h1 id="tutorials"><a href="../#tutorials" class="anchor"></a>Tutorials</h1>
@@ -41,23 +42,25 @@
 <li><a href="../docs/data_containers.html">Data containers</a></li>
 <li><a href="../docs/learning_methods.html">Learning methods</a></li>
 </ul>
-<h1 id="methods"><a href="../#methods" class="anchor"></a>Methods</h1>
+<h1 id="learning-tasks"><a href="../#learning-tasks" class="anchor"></a>Learning tasks</h1>
 <ul>
 <li><a href="../docs/methods/imageclassification.html">Image classification</a></li>
 </ul>
-<h1 id="notebooks"><a href="../#notebooks" class="anchor"></a>Notebooks</h1>
+<h1 id="how-to"><a href="../#how-to" class="anchor"></a>How To</h1>
 <ul>
-<li><a href="../docs/notebooks/fitonecycle.html">One-cycle schedule</a></li>
-<li><a href="../docs/notebooks/lrfind.html">Learning rate finder</a></li>
+<li><a href="../docs/notebooks/fitonecycle.html">Train a model from scratch</a></li>
+<li><a href="../docs/notebooks/fitonecycle.html">Finetune a pretrained model</a></li>
+<li><a href="../docs/notebooks/lrfind.html">Find a good learning rate</a></li>
 </ul>
 <h1 id="reference"><a href="../#reference" class="anchor"></a>Reference</h1>
 <ul>
-<li><a href="../docs/glossary.html">Glossary</a></li>
 <li><a href="../docstrings.html">Docstrings</a></li>
+<li><a href="../docs/interfaces.html">Interfaces</a></li>
+<li><a href="../docs/glossary.html">Glossary</a></li>
 </ul>
-<h1 id="project-status"><a href="../#project-status" class="anchor"></a>Project status</h1>
+<h1 id="background"><a href="../#background" class="anchor"></a>Background</h1>
 <ul>
-<li><a href="../docs/status.html">vs. fastai</a></li>
+<li><a href="../background/datapipelines.html">Performant data pipelines</a></li>
 </ul>
 </div>
         <article id="content"><h1 id="introduction"><a href="#introduction" class="anchor"></a>Introduction</h1>
@@ -77,7 +80,7 @@ fit!(learner, 10)
 <h2 id="data-containers"><a href="#data-containers" class="anchor"></a>Data containers</h2>
 <pre><code cell="main" class="language-julia">dataset = Datasets.loaddataset(&quot;imagenette2-160&quot;)
 </code></pre>
-<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, DataDeps.DisabledError(&quot;DataDeps download disabled, as we appear to be in a CI environment, and the environment variable `DATADEPS_ALWAYS_ACCEPT` is not set.\nIf this is indeed running in a headless CI environment, then set the `DATADEPS_ALWAYS_ACCEPT` environment variable to `true` to bypass the accept download prompt (if you do wish to always accept.)\nIf not, then either unset the `CI` environment variable from true, or set `DATADEPS_ALWAYS_ACCEPT` to `false` for the normal prompt behaviour.&quot;))</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, UndefVarError(:loaddataset))</code></pre>
 <p>This line downloads and loads the <a href="">ImageNette</a> image classification dataset, a small subset of ImageNet with 10 different classes. <code>dataset</code> is a <a href="data_containers.html">data container</a> that can be used to load individual observations, here of images and the corresponding labels. We can use <code>getobs(dataset, i)</code> to load the <code>i</code>-th observation and <code>nobs</code> to find out how many observations there are.</p>
 <pre><code cell="main" result="false" class="language-julia">image, class = getobs(dataset, 1000)
 </code></pre>
@@ -93,7 +96,7 @@ image
 <pre><code cell="main" class="language-julia">classes = Datasets.loadclasses(&quot;imagenette2-160&quot;)
 method = ImageClassification(classes, (224, 224))
 </code></pre>
-<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, DataDeps.DisabledError(&quot;DataDeps download disabled, as we appear to be in a CI environment, and the environment variable `DATADEPS_ALWAYS_ACCEPT` is not set.\nIf this is indeed running in a headless CI environment, then set the `DATADEPS_ALWAYS_ACCEPT` environment variable to `true` to bypass the accept download prompt (if you do wish to always accept.)\nIf not, then either unset the `CI` environment variable from true, or set `DATADEPS_ALWAYS_ACCEPT` to `false` for the normal prompt behaviour.&quot;))</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, UndefVarError(:loadclasses))</code></pre>
 <p>Here we define <a href="../docstrings/FastAI.ImageClassification.html"><code>ImageClassification</code></a>, which defines how data is processed before being fed to the model and how model outputs are turned into predictions. <code>classes</code> is a vector of strings naming each class, and <code>(224, 224)</code> the size of the images that are input to the model.</p>
 <p><code>ImageClassification</code> is a <code>LearningMethod</code>, an abstraction that encapsulates the logic and configuration for training models on a specific learning task. See <a href="learning_methods.html">learning methods</a> to find out more about how they can be used and how to create custom learning methods.</p>
 <h2 id="data-loaders"><a href="#data-loaders" class="anchor"></a>Data loaders</h2>

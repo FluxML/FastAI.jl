@@ -33,6 +33,7 @@
         </div>
         <div id="toc"><ul>
 <li><a href="../README.html">README</a></li>
+<li><a href="../docs/setup.html">Setup</a></li>
 <li><a href="../docs/quickstart.html">Quickstart</a></li>
 </ul>
 <h1 id="tutorials"><a href="../#tutorials" class="anchor"></a>Tutorials</h1>
@@ -41,62 +42,37 @@
 <li><a href="../docs/data_containers.html">Data containers</a></li>
 <li><a href="../docs/learning_methods.html">Learning methods</a></li>
 </ul>
-<h1 id="methods"><a href="../#methods" class="anchor"></a>Methods</h1>
+<h1 id="learning-tasks"><a href="../#learning-tasks" class="anchor"></a>Learning tasks</h1>
 <ul>
 <li><a href="../docs/methods/imageclassification.html">Image classification</a></li>
 </ul>
-<h1 id="notebooks"><a href="../#notebooks" class="anchor"></a>Notebooks</h1>
+<h1 id="how-to"><a href="../#how-to" class="anchor"></a>How To</h1>
 <ul>
-<li><a href="../docs/notebooks/fitonecycle.html">One-cycle schedule</a></li>
-<li><a href="../docs/notebooks/lrfind.html">Learning rate finder</a></li>
+<li><a href="../docs/notebooks/fitonecycle.html">Train a model from scratch</a></li>
+<li><a href="../docs/notebooks/fitonecycle.html">Finetune a pretrained model</a></li>
+<li><a href="../docs/notebooks/lrfind.html">Find a good learning rate</a></li>
 </ul>
 <h1 id="reference"><a href="../#reference" class="anchor"></a>Reference</h1>
 <ul>
-<li><a href="../docs/glossary.html">Glossary</a></li>
 <li><a href="../docstrings.html">Docstrings</a></li>
+<li><a href="../docs/interfaces.html">Interfaces</a></li>
+<li><a href="../docs/glossary.html">Glossary</a></li>
 </ul>
-<h1 id="project-status"><a href="../#project-status" class="anchor"></a>Project status</h1>
+<h1 id="background"><a href="../#background" class="anchor"></a>Background</h1>
 <ul>
-<li><a href="../docs/status.html">vs. fastai</a></li>
+<li><a href="../background/datapipelines.html">Performant data pipelines</a></li>
 </ul>
 </div>
-        <article id="content"><h1 id="status"><a href="#status" class="anchor"></a>Status</h1>
-<h2 id="to-dos"><a href="#to-dos" class="anchor"></a>To-Dos</h2>
-<ul>
-<li>release DLPipelines.jl
-<ul>
-<li>update its documentation</li>
-<li>register</li>
-</ul>
-</li>
-<li>release DataAugmentation.jl
-<ul>
-<li>add onehot-encoding of <code>MaskMulti</code>s</li>
-<li>add tests for <code>PinOrigin</code></li>
-<li>fix bounds assignment for <code>PinOrigin</code> on <code>Keypoints</code></li>
-</ul>
-</li>
-<li>move basic datasets and dataset utilities from DLDatasets.jl to FastAI.jl
-<ul>
-<li>[x] image classification datasets</li>
-<li>[ ] other datasets</li>
-</ul>
-</li>
-<li>add <code>ImageSegmentation</code> method</li>
-<li>training utilities
-<ul>
-<li>[x] <code>fitonecycle!</code></li>
-<li>[ ] <code>finetune!</code></li>
-<li>[ ] <code>lrfind!</code></li>
-</ul>
-</li>
-<li>wait for Flux<span class="citation"><a href="#ref-0">@0</a></span>.12.0 to be released</li>
-<li>plot recipes for learning rate finder, visualizing losses, hyperparameters</li>
-</ul>
+        <article id="content"><h1 id="setup"><a href="#setup" class="anchor"></a>Setup</h1>
+<p>FastAI.jl is not registered yet since it depends on some unregistered packages (Flux.jl v0.12.0), but you can try it out using the included <code>Manifest.toml</code>. You will need Julia 1.6 for this (!) as the Manifest is not backwards compatible. You should be able to install FastAI.jl using the REPL as follows:</p>
+<pre><code class="language-julia">] clone https://github.com/lorenzoh/FastAI.jl
+] activate FastAI
+] instantiate
+</code></pre>
 </article>
         <div id="page-navigation">
-            <a id="previous-page" title="Previous" href="..&#x2F;docstrings.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.2426 6.34317L14.8284 4.92896L7.75739 12L14.8285 19.0711L16.2427 17.6569L10.5858 12L16.2426 6.34317Z" fill="currentColor" /></svg></a>
-            <a id="next-page" title="Next" href="..&#x2F;docstrings&#x2F;FastAI.Datasets.datasetpath.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2427 12L10.5858 6.34317Z" fill="currentColor" /></svg></a>
+            <a id="previous-page" title="Previous" href="..&#x2F;README.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.2426 6.34317L14.8284 4.92896L7.75739 12L14.8285 19.0711L16.2427 17.6569L10.5858 12L16.2426 6.34317Z" fill="currentColor" /></svg></a>
+            <a id="next-page" title="Next" href="quickstart.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2427 12L10.5858 6.34317Z" fill="currentColor" /></svg></a>
         </div>
         <footer>
             Built with <a target="_blank" href="https://github.com/MichaelHatherly/Publish.jl">Publish.jl</a> and the <a target="_blank" href="https://julialang.org">Julia Language</a>.
