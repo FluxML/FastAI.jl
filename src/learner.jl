@@ -6,7 +6,7 @@ Create a `Learner` to train a model for learning method `method` using
 `data`. See also [`Learner`](#).
 """
 function methodlearner(
-        method,
+        method::LearningMethod,
         data,
         backbone,
         callbacks...;
@@ -19,7 +19,7 @@ function methodlearner(
         dlkwargs = (;),
     )
     model = isbackbone ? methodmodel(method, backbone) : backbone
-    dls = methoddataloaders(data;
-        batchsize = batchsize, validbsfactor = validbsfactor, pctgval = pctgval)
+    dls = methoddataloaders(data, method, batchsize;
+        validbsfactor = validbsfactor, pctgval = pctgval)
     return Learner(model, dls, optimizer, lossfn, callbacks...)
 end

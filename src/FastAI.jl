@@ -9,6 +9,7 @@ using Reexport
 @reexport using Flux
 
 using Animations
+using AbstractPlotting
 using Colors
 using DataAugmentation
 using DataAugmentation: getbounds, makebounds
@@ -24,6 +25,8 @@ using Parameters
 using StaticArrays
 
 include("tasks.jl")
+include("plotting.jl")
+include("learner.jl")
 
 # method implementations and helpers
 include("./steps/utils.jl")
@@ -67,6 +70,10 @@ export
     # pipeline steps
     ProjectiveTransforms, ImagePreprocessing,
 
+    # tasks
+    ImageClassificationTask,
+    ImageSegmentationTask,
+
     # methods
     ImageClassification,
     ImageSegmentation,
@@ -77,6 +84,8 @@ export
     fit!,
     fitonecycle!,
     finetune!
+
+
 
 
 end  # module

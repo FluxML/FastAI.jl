@@ -43,7 +43,7 @@ function ImageClassification(
         C = RGB{N0f8},
         T = Float32
     )
-    projetivetransforms = ProjectiveTransforms(sz, augmentations = augmentations)
+    projectivetransforms = ProjectiveTransforms(sz, augmentations = augmentations)
     imagepreprocessing = ImagePreprocessing(means, stds; C = C, T = T)
     ImageClassification(sz, classes, projectivetransforms, imagepreprocessing)
 end
@@ -86,12 +86,12 @@ end
 
 DLPipelines.decodeŷ(method::ImageClassification, context, ŷ) = method.classes[argmax(ŷ)]
 
-# Interpetration interface
+# Interpretation interface
 
-DLPipelines.interpretinput(task::ImageClassification, image) = image
+DLPipelines.interpretinput(::ImageClassification, image) = image
 
-function DLPipelines.interpretx(task::ImageClassification, x)
-    return invert(task.imagepreprocessing, x)
+function DLPipelines.interpretx(method::ImageClassification, x)
+    return invert(method.imagepreprocessing, x)
 end
 
 

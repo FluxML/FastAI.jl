@@ -67,6 +67,18 @@ function loadtaskdata(
 end
 
 
+"""
+    getclasses(name)
+
+Get the list of classes for classification dataset `name`.
+"""
+function getclassesclassification(dir)
+    data = mapobs(filterobs(isimagefile, FileDataset(dir))) do path
+        return filename(parent(path))
+    end
+    return unique(collect(eachobsparallel(data, useprimary=true, buffered=false)))
+end
+getclassesclassification(name::String) = getclassesclassification(datasetpath(name))
 
 
 """
@@ -74,14 +86,11 @@ end
 
 Get the list of classes for classification dataset `name`.
 """
-function getclasses(name)
-    dir = datasetpath(name)
-    data = mapobs(filterobs(isimagefile, FileDataset(dir))) do path
-        return filename(parent(path))
-    end
-    return unique(collect(eachobsparallel(data, useprimary=true, buffered=false)))
-
+function getclassessegmentation(dir::AbstractPath)
+    classes = readlines(open(joinpath(dir, "codes.txt")))
+    return classes
 end
+getclassessegmentation(name::String) = getclassessegmentation(datasetpath(name))
 
 """
     loadtaskdata(dir, ImageSegmentationTask; [split = false])
@@ -99,6 +108,19 @@ function loadtaskdata(
         split=false,
         kwargs...)
     imagedata = mapobs(loadfile, filterobs(isimagefile, FileDataset(joinpath(dir, "images"))))
-    maskdata = mapobs(loadfile, filterobs(isimagefile, FileDataset(joinpath(dir, "labels"))))
+    maskdata = mapobs(maskfromimage ∘ loadfile, filterobs(isimagefile, FileDataset(joinpath(dir, "labels"))))
     return mapobs((input = obs -> obs[1], target = obs -> obs[2]), (imagedata, maskdata))
 end
+
+
+
+
+maskfromimage(a::AbstractArray{<:Gray{T}}) where T = maskfromimage(reinterpret(T, a))
+maskfromimage(a::AbstractArray{<:Normed{T}}) where T = maskfromimage(reinterpret(T, a))
+function maskfromimage(a::AbstractArray{I}) where {I<:Integer}
+    return a .+ one(I)
+end
+
+0 - (0 - 1)
+1 - (1 - 1)
+10 - (10 - 1)

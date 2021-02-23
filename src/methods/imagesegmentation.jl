@@ -25,8 +25,11 @@ function ImageSegmentation(
         projectivetransforms, imagepreprocessing)
 end
 
+# ## Core interface
+
 DLPipelines.encode(method::ImageSegmentation, context, sample::NamedTuple) =
     DLPipelines.encode(method, context, Tuple(sample))
+
 function DLPipelines.encode(
         method::ImageSegmentation,
         context,
@@ -35,7 +38,7 @@ function DLPipelines.encode(
     imagec, maskc = run(
         method.projectivetransforms,
         context,
-        (Image(image), MaskMulti(mask, method.classes)))
+        (DataAugmentation.Image(image), MaskMulti(mask, 1:length(method.classes))))
 
     x = run(method.imagepreprocessing, context, imagec)
 
@@ -46,13 +49,13 @@ function DLPipelines.encode(
     else
         ytfm = OneHot()
     end
-    y = apply(ytfm, MaskMulti(maskc, method.classes)) |> itemdata
+    y = apply(ytfm, MaskMulti(maskc, 1:length(method.classes))) |> itemdata
     return (x, y)
 end
 
 
 function DLPipelines.decodeŷ(method::ImageSegmentation, context, ŷ)
-    return map(I -> I.I[end], argmax(ŷ; dims=ndims(ŷ)))
+    return onecoldmask(ŷ)
 end
 
 
@@ -73,4 +76,28 @@ function DLPipelines.mockmodel(method::ImageSegmentation)
             size(xs)[end])
         return rand(Float32, outsz)
     end
+end
+
+
+onecoldmask(mask) = reshape(map(I -> I.I[end], argmax(mask; dims=ndims(mask))), size(mask)[1:end-1])
+
+
+# ## Plotting interface
+
+function plotsample!(f, method::ImageSegmentation, sample)
+    image, mask = sample
+    f[1, 1] = ax1 = imageaxis(f)
+    f[1, 2] = ax2 = imageaxis(f)
+    plotimage!(ax1, image)
+    plotmask!(ax2, mask, method.classes, )
+end
+
+
+function plotxy!(f, method::ImageSegmentation, (x, y))
+    image = invert(method.imagepreprocessing, x)
+    mask = decodeŷ(method, Inference(), y)
+    f[1, 1] = ax1 = imageaxis(f)
+    f[1, 2] = ax2 = imageaxis(f)
+    plotimage!(ax1, image)
+    plotmask!(ax2, mask, method.classes, )
 end

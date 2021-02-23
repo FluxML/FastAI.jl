@@ -1,8 +1,20 @@
 module Models
 
 using ..FastAI
-using Flux
 
+using BSON
+using Flux
+using Zygote
+using DataDeps
+using Metalhead
+
+include("./datadeps.jl")
+
+function __init__()
+    initdatadeps()
+end
+
+include("./metalhead.jl")
 include("./xresnet.jl")
 
 

@@ -123,6 +123,8 @@ using FileTrees
 using MLDataPattern
 using MLDataPattern: splitobs
 import LearnBase
+using Colors
+using FixedPointNumbers
 
 include("datadeps/imageclassification.jl")
 include("datadeps/imagelocalization.jl")

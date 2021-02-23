@@ -41,7 +41,7 @@ struct NamedTupleData{TData, F}
     namedfs::NamedTuple{F}
 end
 
-LearnBase.nobs(data::NamedTupleData) = nobs(data.data)
+LearnBase.nobs(data::NamedTupleData) = nobs(getfield(data, :data))
 
 function LearnBase.getobs(data::NamedTupleData{TData, F}, idx::Int) where {TData, F}
     obs = getobs(getfield(data, :data), idx)
