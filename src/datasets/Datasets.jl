@@ -126,14 +126,10 @@ import LearnBase
 using Colors
 using FixedPointNumbers
 
-include("datadeps/imageclassification.jl")
-include("datadeps/imagelocalization.jl")
-include("datadeps/nlp.jl")
-include("datadeps/sample.jl")
-include("datadeps/init.jl")
+include("fastaidatasets.jl")
 
 function __init__()
-    init_datadeps()
+    initdatadeps()
 end
 
 include("containers.jl")

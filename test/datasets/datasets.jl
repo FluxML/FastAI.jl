@@ -1,9 +1,11 @@
 include("../imports.jl")
 
 @testset ExtendedTestSet "datasetpath" begin
-    @test Datasets.datasetpath("imagenette2-160") isa FilePathsBase.AbstractPath
+    @test Datasets.datasetpath("mnist_var_size_tiny") isa FilePathsBase.AbstractPath
 end
 
 @testset ExtendedTestSet "loaddataset" begin
-    @test Datasets.loaddataset("imagenette2-160")
+    @test_nowarn Datasets.loadtaskdata(
+        Datasets.datasetpath("mnist_var_size_tiny"),
+        ImageClassificationTask)
 end

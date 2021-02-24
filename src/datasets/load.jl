@@ -48,11 +48,14 @@ function loadtaskdata(
         dir,
         Task::Type{FastAI.ImageClassificationTask};
         split=false,
+        filterparent= (!=("test")),
         kwargs...)
-    data = filterobs(isimagefile, FileDataset(dir))
+    data = filterobs(FileDataset(dir)) do path
+        isimagefile(path) && filterparent(filename(parent(path)))
+    end
     if split
         datas = groupobs(data) do path
-            filename(parent(parent(obs)))
+            filename(parent(parent(path)))
         end
         return Tuple(mapobs(
             (input = loadfile, target = path -> filename(parent(path))),
