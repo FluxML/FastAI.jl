@@ -4,13 +4,14 @@ struct FastAIDataset
     extension
     description
     checksum
+    datadepname
 end
 
 const ROOT_URL = "https://s3.amazonaws.com/fast-ai-"
 
 function FastAIDataset(
-        name, subfolder, checksum = ""; extension = "tgz", description = "")
-    return FastAIDataset(name, subfolder, extension, description, checksum)
+        name, subfolder, checksum = ""; extension = "tgz", description = "", datadepname = name)
+    return FastAIDataset(name, subfolder, extension, description, checksum, datadepname)
 end
 
 
@@ -79,12 +80,24 @@ DATASETS = [
     FastAIDataset("movie_lens_sample", "sample"),
     FastAIDataset("planet_sample", "sample"),
     FastAIDataset("planet_tiny", "sample"),
+
+    # coco
+    FastAIDataset("coco_sample", "coco"),
+    FastAIDataset("train2017", "coco", datadepname="coco-train2017", extension="zip"),
+    FastAIDataset("val2017", "coco", datadepname="coco-val2017", extension="zip"),
+    FastAIDataset("test2017", "coco", datadepname="coco-test2017", extension="zip"),
+    FastAIDataset("unlabeled2017", "coco", datadepname="coco-unlabeled2017", extension="zip"),
+    FastAIDataset("image_info_test2017", "coco", datadepname="coco-image_info_test2017", extension="zip"),
+    FastAIDataset("image_info_unlabeled2017", "coco", datadepname="coco-image_info_unlabeled2017", extension="zip"),
+    FastAIDataset("annotations_trainval2017", "coco", datadepname="coco-annotations_trainval2017", extension="zip"),
+    FastAIDataset("stuff_annotations_trainval2017", "coco", datadepname="coco-stuff_annotations_trainval2017", extension="zip"),
+    FastAIDataset("panoptic_annotations_trainval2017", "coco", datadepname="coco-panoptic_annotations_trainval2017", extension="zip"),
 ]
 
 
 function DataDeps.DataDep(d::FastAIDataset)
     return DataDep(
-        "fastai-$(d.name)",
+        "fastai-$(d.datadepname)",
         """
         "$(d.name)" from the fastai dataset repository (https://course.fast.ai/datasets)
 
