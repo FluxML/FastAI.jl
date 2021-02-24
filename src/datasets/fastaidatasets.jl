@@ -5,13 +5,14 @@ struct FastAIDataset
     description
     checksum
     datadepname
+    size
 end
 
 const ROOT_URL = "https://s3.amazonaws.com/fast-ai-"
 
 function FastAIDataset(
-        name, subfolder, checksum = ""; extension = "tgz", description = "", datadepname = name)
-    return FastAIDataset(name, subfolder, extension, description, checksum, datadepname)
+        name, subfolder, checksum = ""; extension = "tgz", description = "", datadepname = name, size = "---")
+    return FastAIDataset(name, subfolder, extension, description, checksum, datadepname, size)
 end
 
 
@@ -82,7 +83,7 @@ DATASETS = [
     FastAIDataset("planet_tiny", "sample"),
 
     # coco
-    FastAIDataset("coco_sample", "coco"),
+    FastAIDataset("coco_sample", "coco", "56960c0ac09ff35cd8588823d37e1ed0954cb88b8bfbd214a7763e72f982911c", size = "3GB"),
     FastAIDataset("train2017", "coco", datadepname="coco-train2017", extension="zip"),
     FastAIDataset("val2017", "coco", datadepname="coco-val2017", extension="zip"),
     FastAIDataset("test2017", "coco", datadepname="coco-test2017", extension="zip"),
@@ -103,6 +104,7 @@ function DataDeps.DataDep(d::FastAIDataset)
 
         $(d.description)
 
+        Download size: $(d.size)
         """,
         "$(ROOT_URL)$(d.subfolder)/$(d.name).$(d.extension)",
         d.checksum,
