@@ -45,6 +45,7 @@
 <h1 id="learning-tasks"><a href="../#learning-tasks" class="anchor"></a>Learning tasks</h1>
 <ul>
 <li><a href="../docs/methods/imageclassification.html">Image classification</a></li>
+<li><a href="../docs/methods/imagesegmentation.html">Image segmentation</a></li>
 </ul>
 <h1 id="how-to"><a href="../#how-to" class="anchor"></a>How To</h1>
 <ul>
@@ -60,21 +61,24 @@
 </ul>
 <h1 id="background"><a href="../#background" class="anchor"></a>Background</h1>
 <ul>
-<li><a href="../background/datapipelines.html">Performant data pipelines</a></li>
+<li><a href="../docs/background/datapipelines.html">Performant data pipelines</a></li>
 </ul>
 </div>
         <article id="content"><h1 id="quickstart"><a href="#quickstart" class="anchor"></a>Quickstart</h1>
 <p>FastAI.jl makes it easy to train models for common tasks. For example, we can train an image classification model in just 6 lines.</p>
 <pre><code class="language-julia">using FastAI
+using FastAI.Datasets
 </code></pre>
 <h2 id="image-classification"><a href="#image-classification" class="anchor"></a>Image classification</h2>
-<pre><code class="language-julia">dataset = loaddataset(&quot;imagenette2-160&quot;)
-method = ImageClassification(loadclasses(&quot;imagenette2-160&quot;), (224, 224))
-dls = methoddataloaders(dataset, method)
-model = methodmodel(method, Models.xresnet18());
-
-learner = Learner(model, dls, ADAM(), methodlossfn(method), ToGPU(), Metrics(accuracy))
+<p>Train an image classifier from scratch:</p>
+<pre><code class="language-julia">data = Datasets.loadtaskdata(Datasets.datasetpath(&quot;imagenette2-160&quot;), ImageClassificationTask)
+method = ImageClassification(Datasets.loadclassesclassification(&quot;imagenette2-160&quot;), (160, 160))
+learner = methodlearner(method, data, Models.xresnet18(), ToGPU(), Metrics(accuracy))
 fitonecycle!(learner, 5)
+</code></pre>
+<p>Or finetune a pretrained model:</p>
+<pre><code class="language-julia">learner = methodlearner(method, data, Models.resnet50(pretrained=true))
+finetune!(learner, 3)
 </code></pre>
 </article>
         <div id="page-navigation">

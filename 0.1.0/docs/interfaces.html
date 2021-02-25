@@ -45,6 +45,7 @@
 <h1 id="learning-tasks"><a href="../#learning-tasks" class="anchor"></a>Learning tasks</h1>
 <ul>
 <li><a href="../docs/methods/imageclassification.html">Image classification</a></li>
+<li><a href="../docs/methods/imagesegmentation.html">Image segmentation</a></li>
 </ul>
 <h1 id="how-to"><a href="../#how-to" class="anchor"></a>How To</h1>
 <ul>
@@ -60,7 +61,7 @@
 </ul>
 <h1 id="background"><a href="../#background" class="anchor"></a>Background</h1>
 <ul>
-<li><a href="../background/datapipelines.html">Performant data pipelines</a></li>
+<li><a href="../docs/background/datapipelines.html">Performant data pipelines</a></li>
 </ul>
 </div>
         <article id="content"><h1 id="fastaijl-interfaces"><a href="#fastaijl-interfaces" class="anchor"></a>FastAI.jl interfaces</h1>
@@ -68,11 +69,11 @@
 <h3 id="high-level"><a href="#high-level" class="anchor"></a>High-level</h3>
 <p>Quickly get started training and finetuning models using already implemented learning methods and callbacks.</p>
 <ul>
-<li><a href="#"><code>methodlearner</code></a></li>
+<li><a href="../docstrings/FastAI.methodlearner.html"><code>methodlearner</code></a></li>
 <li><a href="../docstrings/FluxTraining.fit!.html"><code>fit!</code></a></li>
 <li><a href="../docstrings/FastAI.fitonecycle!.html"><code>fitonecycle!</code></a></li>
 <li><a href="../docstrings/FastAI.finetune!.html"><code>finetune!</code></a></li>
-<li><a href="#"><code>evaluate!</code></a></li>
+<li><code>evaluate</code></li>
 <li>learning methods
 <ul>
 <li><a href="../docstrings/FastAI.ImageClassification.html"><code>ImageClassification</code></a></li>
@@ -85,9 +86,9 @@
 <ul>
 <li><a href="../docstrings/FluxTraining.Learner.html"><code>Learner</code></a></li>
 <li><a href="../docstrings/DLPipelines.methodmodel.html"><code>methodmodel</code></a></li>
-<li><a href="#"><code>adaptmodel</code></a></li>
+<li><code>adaptmodel</code></li>
 <li><a href="../docstrings/DLPipelines.methodlossfn.html"><code>methodlossfn</code></a></li>
-<li><a href="#"><code>Callback</code></a></li>
+<li><code>Callback</code></li>
 </ul>
 <h3 id="low-level"><a href="#low-level" class="anchor"></a>Low-level</h3>
 <ul>
@@ -95,21 +96,21 @@
 <li><a href="../docstrings/DLPipelines.LearningTask.html"><code>LearningTask</code></a></li>
 <li><a href="../docstrings/DLPipelines.encode.html"><code>encode</code></a></li>
 <li><a href="../docstrings/DLPipelines.encodeinput.html"><code>encodeinput</code></a></li>
-<li><a href="#"><code>decodey</code></a></li>
+<li><code>decodey</code></li>
 </ul>
 <h2 id="datasets"><a href="#datasets" class="anchor"></a>Datasets</h2>
 <h3 id="high-level-1"><a href="#high-level-1" class="anchor"></a>High-level</h3>
 <p>Quickly download and load task data containers from the fastai dataset library.</p>
 <ul>
-<li><a href="#"><code>loaddataset</code></a></li>
-<li><a href="#"><code>DATASETS</code></a></li>
+<li><a href="../docstrings/FastAI.Datasets.loadtaskdata.html"><code>Datasets.loadtaskdata</code></a></li>
+<li><a href="../docstrings/FastAI.Datasets.DATASETS.html"><code>Datasets.DATASETS</code></a></li>
 </ul>
 <h3 id="mid-level-1"><a href="#mid-level-1" class="anchor"></a>Mid-level</h3>
 <p>Load and transform data containers.</p>
 <ul>
-<li><a href="#"><code>datasetpath</code></a></li>
-<li><a href="../docstrings/FastAI.Datasets.FileDataset.html"><code>FileDataset</code></a></li>
-<li><a href="#"><code>TableDataset</code></a></li>
+<li><a href="../docstrings/FastAI.Datasets.datasetpath.html"><code>Datasets.datasetpath</code></a></li>
+<li><a href="../docstrings/FastAI.Datasets.FileDataset.html"><code>Datasets.FileDataset</code></a></li>
+<li><code>Datasets.TableDataset</code></li>
 <li><a href="../docstrings/FastAI.Datasets.mapobs.html"><code>mapobs</code></a></li>
 <li><a href="../docstrings/FastAI.Datasets.groupobs.html"><code>groupobs</code></a></li>
 <li><a href="../docstrings/FastAI.Datasets.joinobs.html"><code>joinobs</code></a></li>
