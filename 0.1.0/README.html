@@ -70,11 +70,9 @@
 <a href="https://github.com/FluxML/FastAI.jl/actions"><img src="https://github.com/FluxML/FastAI.jl/workflows/CI/badge.svg" alt="Build Status" /></a></p>
 <p>FastAI.jl is inspired by <a href="https://github.com/fastai/fastai/blob/master/fastai/">fastai</a>, and is a repository of best practices for deep learning in Julia. Its goal is to easily enable creating state-of-the-art models. FastAI enables the design, training, and delivery of deep learning models that compete with the best in class, using few lines of code.</p>
 <p>As an example, training an image classification model from scratch is as simple as</p>
-<pre><code class="language-julia">dataset = loaddataset(&quot;imagenette2-160&quot;)
-method = ImageClassification(loadclasses(&quot;imagenette2-160&quot;), (224, 224))
-dls = methoddataloaders(dataset, method)
-model = methodmodel(method, Models.xresnet18());
-learner = Learner(model, dls, ADAM(), methodlossfn(method), ToGPU(), Metrics(accuracy))
+<pre><code class="language-julia">data = Datasets.loadtaskdata(Datasets.datasetpath(&quot;imagenette2-160&quot;), ImageClassificationTask)
+method = ImageClassification(Datasets.loadclassesclassification(&quot;imagenette2-160&quot;), (160, 160))
+learner = methodlearner(method, data, Models.xresnet18(), ToGPU(), Metrics(accuracy))
 fitonecycle!(learner, 5)
 </code></pre>
 <p>Please read <a href="https://lorenzoh.github.io/FastAI.jl/dev">the documentation</a> for more information and see the <a href="docs/setup.html">setup instructions</a></p>
