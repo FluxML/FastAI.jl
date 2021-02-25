@@ -11,6 +11,7 @@
 # Learning tasks
 
 - [Image classification](docs/methods/imageclassification.md)
+- [Image segmentation](docs/methods/imagesegmentation.md)
 
 # How To
 
@@ -26,4 +27,4 @@
 
 # Background
 
-- [Performant data pipelines](background/datapipelines.md)
+- [Performant data pipelines](docs/background/datapipelines.md)

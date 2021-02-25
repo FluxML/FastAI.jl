@@ -11,12 +11,12 @@ end
 const ROOT_URL = "https://s3.amazonaws.com/fast-ai-"
 
 function FastAIDataset(
-        name, subfolder, checksum = ""; extension = "tgz", description = "", datadepname = name, size = "---")
+        name, subfolder, checksum = ""; extension = "tgz", description = "", datadepname = name, size = "???")
     return FastAIDataset(name, subfolder, extension, description, checksum, datadepname, size)
 end
 
 
-DATASETS = [
+const DATASETCONFIGS = [
     # imageclas
     FastAIDataset("CUB_200_2011", "imageclas"),
     FastAIDataset("bedroom", "imageclas"),
@@ -95,6 +95,13 @@ DATASETS = [
     FastAIDataset("panoptic_annotations_trainval2017", "coco", datadepname="coco-panoptic_annotations_trainval2017", extension="zip"),
 ]
 
+const DATASETS = [d.datadepname for d in DATASETCONFIGS]
+const DATASETS_IMAGECLASSIFICATION = vcat(
+    [d.datadepname for d in DATASETCONFIGS if d.subfolder == "imageclas"],
+    ["mnist_sample", "mnist_tiny", "dogscats"],
+
+)
+
 
 function DataDeps.DataDep(d::FastAIDataset)
     return DataDep(
@@ -113,7 +120,7 @@ function DataDeps.DataDep(d::FastAIDataset)
 end
 
 function initdatadeps()
-    for d in DATASETS
+    for d in DATASETCONFIGS
         DataDeps.register(DataDep(d))
     end
 end

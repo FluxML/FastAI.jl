@@ -9,7 +9,7 @@ function finetune!(
         nepochs,
         base_lr = 0.002;
         freezeepochs = 1,
-        trainlayers = [2,],
+        trainlayers = 1:1,
         lr_mult = 100,
         div = 5,
         pct_start = 0.3,

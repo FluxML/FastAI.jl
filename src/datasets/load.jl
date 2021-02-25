@@ -5,7 +5,7 @@
 Return the folder that dataset `name` is stored.
 
 If it hasn't been downloaded yet, you will be asked if you want to
-download it. See [`DATASETS`](#) for a list of available datasets.
+download it. See [`Datasets.DATASETS`](#) for a list of available datasets.
 """
 function datasetpath(name)
     datadeppath = @datadep_str "fastai-$name"
@@ -123,7 +123,3 @@ maskfromimage(a::AbstractArray{<:Normed{T}}) where T = maskfromimage(reinterpret
 function maskfromimage(a::AbstractArray{I}) where {I<:Integer}
     return a .+ one(I)
 end
-
-0 - (0 - 1)
-1 - (1 - 1)
-10 - (10 - 1)

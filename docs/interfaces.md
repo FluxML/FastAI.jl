@@ -10,7 +10,7 @@ Quickly get started training and finetuning models using already implemented lea
 - [`fit!`](#)
 - [`fitonecycle!`](#)
 - [`finetune!`](#)
-- [`evaluate!`](#)
+- `evaluate`
 - learning methods
     - [`ImageClassification`](#)
     - [`ImageSegmentation`](#)
@@ -20,9 +20,9 @@ Quickly get started training and finetuning models using already implemented lea
 
 - [`Learner`](#)
 - [`methodmodel`](#)
-- [`adaptmodel`](#)
+- `adaptmodel`
 - [`methodlossfn`](#)
-- [`Callback`](#)
+- `Callback`
 
 ### Low-level
 
@@ -30,7 +30,7 @@ Quickly get started training and finetuning models using already implemented lea
 - [`LearningTask`](#)
 - [`encode`](#)
 - [`encodeinput`](#)
-- [`decodey`](#)
+- `decodey`
 
 ## Datasets
 
@@ -38,16 +38,16 @@ Quickly get started training and finetuning models using already implemented lea
 
 Quickly download and load task data containers from the fastai dataset library.
 
-- [`loaddataset`](#)
-- [`DATASETS`](#)
+- [`Datasets.loadtaskdata`](#)
+- [`Datasets.DATASETS`](#)
 
 ### Mid-level
 
 Load and transform data containers.
 
-- [`datasetpath`](#)
-- [`FileDataset`](#)
-- [`TableDataset`](#)
+- [`Datasets.datasetpath`](#)
+- [`Datasets.FileDataset`](#)
+- `Datasets.TableDataset`
 - [`mapobs`](#)
 - [`groupobs`](#)
 - [`joinobs`](#)

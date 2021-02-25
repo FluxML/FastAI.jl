@@ -33,7 +33,7 @@ end
 
 Freeze all parameters in `model`, except those in `model[indices]`.
 """
-freeze(model, indices::AbstractVector) = FrozenModel(model, model -> model[indices])
+freeze(model, indices) = FrozenModel(model, model -> model[indices])
 
 
 struct FrozenModel

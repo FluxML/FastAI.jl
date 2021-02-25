@@ -4,16 +4,23 @@ FastAI.jl makes it easy to train models for common tasks. For example, we can tr
 
 ```julia
 using FastAI
+using FastAI.Datasets
 ```
 
 ## Image classification
 
-```julia
-dataset = loaddataset("imagenette2-160")
-method = ImageClassification(loadclasses("imagenette2-160"), (224, 224))
-dls = methoddataloaders(dataset, method)
-model = methodmodel(method, Models.xresnet18());
+Train an image classifier from scratch:
 
-learner = Learner(model, dls, ADAM(), methodlossfn(method), ToGPU(), Metrics(accuracy))
+```julia
+data = Datasets.loadtaskdata(Datasets.datasetpath("imagenette2-160"), ImageClassificationTask)
+method = ImageClassification(Datasets.loadclassesclassification("imagenette2-160"), (160, 160))
+learner = methodlearner(method, data, Models.xresnet18())
 fitonecycle!(learner, 5)
+```
+
+Or finetune a pretrained model:
+
+```julia
+learner = methodlearner(method, data, Models.resnet50(pretrained=true))
+finetune!(learner, 3)
 ```

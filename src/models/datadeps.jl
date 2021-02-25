@@ -25,8 +25,5 @@ function initdatadeps()
             "https://github.com/darsnack/MetalheadWeights/raw/main/$name.bson",
             checksum,
         ))
-
-
-
     end
 end

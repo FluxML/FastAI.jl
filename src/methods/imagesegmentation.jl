@@ -101,3 +101,16 @@ function plotxy!(f, method::ImageSegmentation, (x, y))
     plotimage!(ax1, image)
     plotmask!(ax2, mask, method.classes, )
 end
+
+
+function DLPipelines.methodmodel(method, backbone)
+    h, w, ch, b = Flux.outdims(backbone, (method.sz..., 3, 1))
+    headupscale = (method.sz[1] / method.downscale) / h
+    n_upscale = ceil(Int, log2(headupscale))
+    return Chain(
+        backbone,
+        Models.pixelshufflehead(ch, length(method.classes), n_upscale = n_upscale)
+    )
+
+
+end

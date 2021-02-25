@@ -57,6 +57,11 @@ export
     Datasets,
     Models,
     datasetpath,
+    loadtaskdata,
+    mapobs,
+    groupobs,
+    filterobs,
+    shuffleobs,
 
     # method API
     methodmodel,
@@ -65,7 +70,6 @@ export
     methodlossfn,
     getobs,
     nobs,
-
 
     # pipeline steps
     ProjectiveTransforms, ImagePreprocessing,
@@ -83,7 +87,11 @@ export
     Learner,
     fit!,
     fitonecycle!,
-    finetune!
+    finetune!,
+
+    gpu
+
+
 
 
 

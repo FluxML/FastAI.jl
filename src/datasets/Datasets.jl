@@ -118,6 +118,7 @@ using ..FastAI
 
 using DataDeps
 using FilePathsBase
+using FilePathsBase: filename
 import FileIO
 using FileTrees
 using MLDataPattern
@@ -154,7 +155,8 @@ export
 
     # utilities
     isimagefile,
-    loadfile
+    loadfile,
+    filename,
 
     # datasets
     DATASETS,

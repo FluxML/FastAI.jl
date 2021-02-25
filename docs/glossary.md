@@ -38,4 +38,4 @@ An abstract subtype of `DLPipelines.LearningTask` that represents the problem of
 
 ### Task data container / dataset
 
-`DC{(I, T)}`. A data container containing pairs of inputs and targets. Used in [`methoddataset`](#), [`methoddataloaders`](#) and [`evaluate`](#)
+`DC{(I, T)}`. A data container containing pairs of inputs and targets. Used in [`methoddataset`](#), [`methoddataloaders`](#) and `evaluate`.
