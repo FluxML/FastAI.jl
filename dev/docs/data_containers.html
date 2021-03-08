@@ -76,22 +76,19 @@ NAME = &quot;imagenette2-160&quot;
 dir = datasetpath(NAME)
 data = loadtaskdata(dir, ImageClassificationTask)
 </code></pre>
-<pre><code class="plaintext cell-output cell-stream">┌ Warning: Checksum did not match
-│   expected_hash = &quot;88daccb09b6fce93f45e6c09ddeb269cce705549e6bff322092a2a5a11489863&quot;
-│   actual_hash = &quot;64d0c4859f35a461889e0147755a999a48b49bf38a7e0f9bd27003f10db02fe5&quot;
-│   path = &quot;/home/runner/.julia/datadeps/fastai-imagenette2-160/imagenette2-160.tgz&quot;
-└ @ DataDeps ~/.julia/packages/DataDeps/ooWXe/src/verification.jl:24
-Do you wish to Abort, Retry download or Ignore
-[a/r/i]
-</code></pre>
-<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 6, Base.IOError(&quot;Could not open stream.&quot;, -1))</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">mapobs((input = FastAI.Datasets.loadfile, target = FastAI.Datasets.var&quot;#27#32&quot;()), DataSubset(::FastAI.Datasets.FileDataset, ::Vector{Int64}, ObsDim.Undefined())
+ 13394 observations)</code></pre>
 <p>A data container is any type that holds observations of data and allows us to load them with <code>getobs</code> and query the number of observations with <code>nobs</code>:</p>
 <pre><code cell="main" class="language-julia">obs = getobs(data, 1)
 </code></pre>
-<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, UndefVarError(:data))</code></pre>
+<pre><code class="plaintext cell-output cell-stream">Error encountered while load FileIO.File{FileIO.DataFormat{:JPEG}, String}(&quot;/home/runner/.julia/datadeps/fastai-imagenette2-160/imagenette2-160/train/n01440764/ILSVRC2012_val_00000293.JPEG&quot;).
+
+Fatal error:
+</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, CapturedException(ArgumentError(&quot;Package ImageMagick [6218d12a-5da1-5696-b52f-db25d2ecc6d1] is required but does not seem to be installed:\n - Run `Pkg.instantiate()` to install all recorded dependencies.\n&quot;), Any[(_require(pkg::Base.PkgId) at loading.jl:986, 1), (require(uuidkey::Base.PkgId) at loading.jl:910, 1), (action(::Symbol, ::Vector{Union{Base.PkgId, Module}}, ::FileIO.Formatted; options::Base.Iterators.Pairs{Symbol, Bool, Tuple{Symbol}, NamedTuple{(:view,), Tuple{Bool}}}) at loadsave.jl:198, 1), (action(::Symbol, ::Vector{Union{Base.PkgId, Module}}, ::Symbol, ::String; options::Base.Iterators.Pairs{Symbol, Bool, Tuple{Symbol}, NamedTuple{(:view,), Tuple{Bool}}}) at loadsave.jl:181, 1), (load(::String; options::Base.Iterators.Pairs{Symbol, Bool, Tuple{Symbol}, NamedTuple{(:view,), Tuple{Bool}}}) at loadsave.jl:113, 1), (loadfile at containers.jl:33 [inlined], 1), (loadfile at containers.jl:39 [inlined], 1), (#11 at none:0 [inlined], 1), (iterate at generator.jl:47 [inlined], 1), (collect(itr::Base.Generator{NamedTuple{(:input, :target), Tuple{typeof(FastAI.Datasets.loadfile), FastAI.Datasets.var&quot;#27#32&quot;}}, FastAI.Datasets.var&quot;#11#12&quot;{FilePathsBase.PosixPath}}) at array.jl:678, 1)  …  ((::Publish.var&quot;#22#23&quot;{Dict{String, Any}})(io::IOStream) at load.jl:79, 1), (open(f::Publish.var&quot;#22#23&quot;{Dict{String, Any}}, args::String; kwargs::Base.Iterators.Pairs{Union{}, Union{}, Tuple{}, NamedTuple{(), Tuple{}}}) at io.jl:330, 1), (open at io.jl:328 [inlined], 1), (#open#40 at system.jl:376 [inlined], 1), (open at system.jl:376 [inlined], 1), (loadfile(#unused#::Publish.Extension{:md}, env::Dict{String, Any}, path::FilePathsBase.PosixPath) at load.jl:77, 1), (loadfile(env::Dict{String, Any}, path::FilePathsBase.PosixPath) at load.jl:75, 1), ((::Publish.var&quot;#19#21&quot;{Dict{String, Any}, FileTrees.FileTree})(file::FileTrees.File) at load.jl:59, 1), (macro expansion at processor.jl:187 [inlined], 1), ((::Dagger.var&quot;#47#48&quot;{Dagger.ThreadProc, Publish.var&quot;#19#21&quot;{Dict{String, Any}, FileTrees.FileTree}, Tuple{FileTrees.File}, Dagger.Sch.SchedulerHandle})() at threadingconstructs.jl:169, 1)]))</code></pre>
 <pre><code cell="main" class="language-julia">nobs(data)
 </code></pre>
-<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, UndefVarError(:data))</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">13394</code></pre>
 <p>In this case, each observation is a tuple of an image and the corresponding class; after all, we want to use it for image classification.</p>
 <pre><code cell="main" class="language-julia">image, class = obs
 @show class
@@ -109,11 +106,11 @@ image
 
 filedata = FileDataset(dir)
 </code></pre>
-<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 3, UndefVarError(:dir))</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">FileDataset(&quot;/home/runner/.julia/datadeps/fastai-imagenette2-160/imagenette2-160&quot;, 13397 observations)</code></pre>
 <p><code>filedata</code> is a data container where each observation is a path to a file. We’ll confirm that using <code>getobs</code>:</p>
 <pre><code cell="main" class="language-julia">p = getobs(filedata, 100)
 </code></pre>
-<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, UndefVarError(:filedata))</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">p&quot;/home/runner/.julia/datadeps/fastai-imagenette2-160/imagenette2-160/train/n01440764/n01440764_10847.JPEG&quot;</code></pre>
 <p>Next we need to load an image and the corresponding class from the path. If you have a look at the folder structure of <code>dir</code> you can see that the parent folder of each file gives the name of class. So we can use the following function to load the <code>(image, class)</code> pair from a path:</p>
 <pre><code cell="main" class="language-julia">using FastAI.Datasets: loadfile, filename
 
@@ -128,11 +125,15 @@ image, class = loadimageclass(p)
 @show class
 image
 </code></pre>
-<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 10, UndefVarError(:p))</code></pre>
+<pre><code class="plaintext cell-output cell-stream">Error encountered while load FileIO.File{FileIO.DataFormat{:JPEG}, String}(&quot;/home/runner/.julia/datadeps/fastai-imagenette2-160/imagenette2-160/train/n01440764/n01440764_10847.JPEG&quot;).
+
+Fatal error:
+</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 10, CapturedException(ArgumentError(&quot;Package ImageMagick [6218d12a-5da1-5696-b52f-db25d2ecc6d1] is required but does not seem to be installed:\n - Run `Pkg.instantiate()` to install all recorded dependencies.\n&quot;), Any[(_require(pkg::Base.PkgId) at loading.jl:986, 1), (require(uuidkey::Base.PkgId) at loading.jl:910, 1), (action(::Symbol, ::Vector{Union{Base.PkgId, Module}}, ::FileIO.Formatted; options::Base.Iterators.Pairs{Symbol, Bool, Tuple{Symbol}, NamedTuple{(:view,), Tuple{Bool}}}) at loadsave.jl:198, 1), (action(::Symbol, ::Vector{Union{Base.PkgId, Module}}, ::Symbol, ::String; options::Base.Iterators.Pairs{Symbol, Bool, Tuple{Symbol}, NamedTuple{(:view,), Tuple{Bool}}}) at loadsave.jl:181, 1), (load(::String; options::Base.Iterators.Pairs{Symbol, Bool, Tuple{Symbol}, NamedTuple{(:view,), Tuple{Bool}}}) at loadsave.jl:113, 1), (loadfile at containers.jl:33 [inlined], 1), (loadfile at containers.jl:39 [inlined], 1), (loadimageclass(p::FilePathsBase.PosixPath) at string:4, 1), (top-level scope at string:10, 1), (eval at boot.jl:360 [inlined], 1)  …  ((::Publish.var&quot;#22#23&quot;{Dict{String, Any}})(io::IOStream) at load.jl:79, 1), (open(f::Publish.var&quot;#22#23&quot;{Dict{String, Any}}, args::String; kwargs::Base.Iterators.Pairs{Union{}, Union{}, Tuple{}, NamedTuple{(), Tuple{}}}) at io.jl:330, 1), (open at io.jl:328 [inlined], 1), (#open#40 at system.jl:376 [inlined], 1), (open at system.jl:376 [inlined], 1), (loadfile(#unused#::Publish.Extension{:md}, env::Dict{String, Any}, path::FilePathsBase.PosixPath) at load.jl:77, 1), (loadfile(env::Dict{String, Any}, path::FilePathsBase.PosixPath) at load.jl:75, 1), ((::Publish.var&quot;#19#21&quot;{Dict{String, Any}, FileTrees.FileTree})(file::FileTrees.File) at load.jl:59, 1), (macro expansion at processor.jl:187 [inlined], 1), ((::Dagger.var&quot;#47#48&quot;{Dagger.ThreadProc, Publish.var&quot;#19#21&quot;{Dict{String, Any}, FileTrees.FileTree}, Tuple{FileTrees.File}, Dagger.Sch.SchedulerHandle})() at threadingconstructs.jl:169, 1)]))</code></pre>
 <p>Finally, we use <a href="../docstrings/FastAI.Datasets.mapobs.html"><code>mapobs</code></a> to lazily transform each observation and have a data container ready to be used for training an image classifier.</p>
 <pre><code cell="main" class="language-julia">data = mapobs(loadimageclass, filedata);
 </code></pre>
-<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, UndefVarError(:filedata))</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">mapobs(loadimageclass, FileDataset(&quot;/home/runner/.julia/datadeps/fastai-imagenette2-160/imagenette2-160&quot;, 13397 observations))</code></pre>
 <h3 id="exercises-1"><a href="#exercises-1" class="anchor"></a>Exercises</h3>
 <ol>
 <li>Using <code>mapobs</code> and <code>loadfile</code>, create a data container where every observation is only an image.</li>
@@ -141,7 +142,9 @@ image
 <p>Until now, we’ve only created a single data container containing all observations in a dataset. In practice, though, you’ll want to have at least a training and validation split. The easiest way to get these is to randomly split your data container into two parts. Here we split <code>data</code> into 80% training and 20% validation data. Note the use of <code>shuffleobs</code> to make sure each split has approximately the same class distribution.</p>
 <pre><code cell="main" class="language-julia">traindata, valdata = splitobs(shuffleobs(data), at = 0.8);
 </code></pre>
-<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, UndefVarError(:data))</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">(DataSubset(::FastAI.Datasets.MappedData, view(::Vector{Int64}, 1:10718), ObsDim.Undefined())
+ 10718 observations, DataSubset(::FastAI.Datasets.MappedData, view(::Vector{Int64}, 10719:13397), ObsDim.Undefined())
+ 2679 observations)</code></pre>
 <p>This is great for experimenting, but where possible you will want to use the official training/validation split for a dataset. Consider the image classification dataset folder structure:</p>
 <pre><code>- $dir
     - train
@@ -162,7 +165,7 @@ image
 end
 nobs(trainfiledata), nobs(validfiledata)
 </code></pre>
-<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, UndefVarError(:filedata))</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">(2, 1)</code></pre>
 <p>Using this official split, it will be easier to compare the performance of your results with those of others’.</p>
 </article>
         <div id="page-navigation">

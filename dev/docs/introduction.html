@@ -81,17 +81,14 @@ fitonecycle!(learner, 5)
 <h2 id="data-containers"><a href="#data-containers" class="anchor"></a>Data containers</h2>
 <pre><code cell="main" class="language-julia">dataset = Datasets.loadtaskdata(Datasets.datasetpath(&quot;imagenette2-160&quot;), ImageClassificationTask)
 </code></pre>
-<pre><code class="plaintext cell-output cell-stream">┌ Warning: Checksum did not match
-│   expected_hash = &quot;88daccb09b6fce93f45e6c09ddeb269cce705549e6bff322092a2a5a11489863&quot;
-│   actual_hash = &quot;64d0c4859f35a461889e0147755a999a48b49bf38a7e0f9bd27003f10db02fe5&quot;
-│   path = &quot;/home/runner/.julia/datadeps/fastai-imagenette2-160/imagenette2-160.tgz&quot;
-└ @ DataDeps ~/.julia/packages/DataDeps/ooWXe/src/verification.jl:24
-Do you wish to Abort, Retry download or Ignore
-[a/r/i]
-</code></pre>
-<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, Base.IOError(&quot;Could not open stream.&quot;, -1))</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">mapobs((input = FastAI.Datasets.loadfile, target = FastAI.Datasets.var&quot;#27#32&quot;()), DataSubset(::FastAI.Datasets.FileDataset, ::Vector{Int64}, ObsDim.Undefined())
+ 13394 observations)</code></pre>
 <p>This line downloads and loads the <a href="">ImageNette</a> image classification dataset, a small subset of ImageNet with 10 different classes. <code>dataset</code> is a <a href="data_containers.html">data container</a> that can be used to load individual observations, here of images and the corresponding labels. We can use <code>getobs(dataset, i)</code> to load the <code>i</code>-th observation and <code>nobs</code> to find out how many observations there are.</p>
 <pre><code cell="main" result="false" class="language-julia">image, class = getobs(dataset, 1000)
+</code></pre>
+<pre><code class="plaintext cell-output cell-stream">Error encountered while load FileIO.File{FileIO.DataFormat{:JPEG}, String}(&quot;/home/runner/.julia/datadeps/fastai-imagenette2-160/imagenette2-160/train/n02102040/n02102040_1004.JPEG&quot;).
+
+Fatal error:
 </code></pre>
 <pre><code style="display:none" cell="main" class="language-julia">@show class
 image
@@ -99,27 +96,23 @@ image
 <pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, UndefVarError(:class))</code></pre>
 <pre><code cell="main" class="language-julia">nobs(dataset)
 </code></pre>
-<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, UndefVarError(:dataset))</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">13394</code></pre>
 <p>To train on a different dataset, you could replace <code>dataset</code> with other data containers made up of pairs of images and classes.</p>
 <h2 id="method"><a href="#method" class="anchor"></a>Method</h2>
 <pre><code cell="main" class="language-julia">classes = Datasets.getclassesclassification(&quot;imagenette2-160&quot;)
 method = ImageClassification(classes, (160, 160))
 </code></pre>
-<pre><code class="plaintext cell-output cell-stream">┌ Warning: Checksum did not match
-│   expected_hash = &quot;88daccb09b6fce93f45e6c09ddeb269cce705549e6bff322092a2a5a11489863&quot;
-│   actual_hash = &quot;64d0c4859f35a461889e0147755a999a48b49bf38a7e0f9bd27003f10db02fe5&quot;
-│   path = &quot;/home/runner/.julia/datadeps/fastai-imagenette2-160/imagenette2-160.tgz&quot;
-└ @ DataDeps ~/.julia/packages/DataDeps/ooWXe/src/verification.jl:24
-Do you wish to Abort, Retry download or Ignore
-[a/r/i]
-</code></pre>
-<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, Base.IOError(&quot;Could not open stream.&quot;, -1))</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">ImageClassification() with 10 classes</code></pre>
 <p>Here we define <a href="../docstrings/FastAI.ImageClassification.html"><code>ImageClassification</code></a>, which defines how data is processed before being fed to the model and how model outputs are turned into predictions. <code>classes</code> is a vector of strings naming each class, and <code>(224, 224)</code> the size of the images that are input to the model.</p>
 <p><code>ImageClassification</code> is a <code>LearningMethod</code>, an abstraction that encapsulates the logic and configuration for training models on a specific learning task. See <a href="learning_methods.html">learning methods</a> to find out more about how they can be used and how to create custom learning methods.</p>
 <h2 id="data-loaders"><a href="#data-loaders" class="anchor"></a>Data loaders</h2>
 <pre><code cell="main" class="language-julia">dls = methoddataloaders(dataset, method, 16)
 </code></pre>
-<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, UndefVarError(:dataset))</code></pre>
+<pre><code class="plaintext cell-output cell-stream">Error encountered while load FileIO.File{FileIO.DataFormat{:JPEG}, String}(&quot;/home/runner/.julia/datadeps/fastai-imagenette2-160/imagenette2-160/train/n02102040/n02102040_3078.JPEG&quot;).
+
+Fatal error:
+</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, CapturedException(ArgumentError(&quot;Package ImageMagick [6218d12a-5da1-5696-b52f-db25d2ecc6d1] is required but does not seem to be installed:\n - Run `Pkg.instantiate()` to install all recorded dependencies.\n&quot;), Any[(_require(pkg::Base.PkgId) at loading.jl:986, 1), (require(uuidkey::Base.PkgId) at loading.jl:910, 1), (action(::Symbol, ::Vector{Union{Base.PkgId, Module}}, ::FileIO.Formatted; options::Base.Iterators.Pairs{Symbol, Bool, Tuple{Symbol}, NamedTuple{(:view,), Tuple{Bool}}}) at loadsave.jl:198, 1), (action(::Symbol, ::Vector{Union{Base.PkgId, Module}}, ::Symbol, ::String; options::Base.Iterators.Pairs{Symbol, Bool, Tuple{Symbol}, NamedTuple{(:view,), Tuple{Bool}}}) at loadsave.jl:181, 1), (load(::String; options::Base.Iterators.Pairs{Symbol, Bool, Tuple{Symbol}, NamedTuple{(:view,), Tuple{Bool}}}) at loadsave.jl:113, 1), (loadfile at containers.jl:33 [inlined], 1), (loadfile at containers.jl:39 [inlined], 1), (#11 at none:0 [inlined], 1), (iterate at generator.jl:47 [inlined], 1), (collect(itr::Base.Generator{NamedTuple{(:input, :target), Tuple{typeof(FastAI.Datasets.loadfile), FastAI.Datasets.var&quot;#27#32&quot;}}, FastAI.Datasets.var&quot;#11#12&quot;{FilePathsBase.PosixPath}}) at array.jl:678, 1)  …  ((::Publish.var&quot;#22#23&quot;{Dict{String, Any}})(io::IOStream) at load.jl:79, 1), (open(f::Publish.var&quot;#22#23&quot;{Dict{String, Any}}, args::String; kwargs::Base.Iterators.Pairs{Union{}, Union{}, Tuple{}, NamedTuple{(), Tuple{}}}) at io.jl:330, 1), (open at io.jl:328 [inlined], 1), (#open#40 at system.jl:376 [inlined], 1), (open at system.jl:376 [inlined], 1), (loadfile(#unused#::Publish.Extension{:md}, env::Dict{String, Any}, path::FilePathsBase.PosixPath) at load.jl:77, 1), (loadfile(env::Dict{String, Any}, path::FilePathsBase.PosixPath) at load.jl:75, 1), ((::Publish.var&quot;#19#21&quot;{Dict{String, Any}, FileTrees.FileTree})(file::FileTrees.File) at load.jl:59, 1), (macro expansion at processor.jl:187 [inlined], 1), ((::Dagger.var&quot;#47#48&quot;{Dagger.ThreadProc, Publish.var&quot;#19#21&quot;{Dict{String, Any}, FileTrees.FileTree}, Tuple{FileTrees.File}, Dagger.Sch.SchedulerHandle})() at threadingconstructs.jl:169, 1)]))</code></pre>
 <p>Next we turn the data container into training and validation data loaders. These take care of efficiently loading batches of data (by default in parallel). The observations are already preprocessed using the information in <code>method</code> and then batched together. Let’s look at a single batch:</p>
 <pre><code cell="main" class="language-julia">traindl, valdl = dls
 (xs, ys), _ = iterate(traindl)
@@ -130,12 +123,12 @@ summary.((xs, ys))
 <h2 id="model"><a href="#model" class="anchor"></a>Model</h2>
 <pre><code cell="main" class="language-julia">model = methodmodel(method, Models.xresnet18())
 </code></pre>
-<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, UndefVarError(:method))</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, MethodError(Flux.outdims, (BatchNorm(32, λ = relu), (80, 80)), 0x0000000000007677))</code></pre>
 <p>Now we create a Flux.jl model. <code>methodmodel</code> is a part of the learning method interface that knows how to smartly construct an image classification model from different backbone architectures. Here a classficiation head with the appropriate number of classes is stacked on a slightly modified version of the ResNet architecture.</p>
 <h2 id="learner"><a href="#learner" class="anchor"></a>Learner</h2>
 <pre><code cell="main" class="language-julia">learner = Learner(model, dls, ADAM(), methodlossfn(method), ToGPU(), Metrics(accuracy))
 </code></pre>
-<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, UndefVarError(:method))</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, UndefVarError(:model))</code></pre>
 <p>Finally we bring the model and data loaders together with an optimizer and loss function in a <code>Learner</code>. The <code>Learner</code> stores all state for training the model. It also features a powerful, extensible <a href="https://lorenzoh.github.io/FluxTraining.jl/dev/docs/callbacks/reference.html">callback system</a> enabling checkpointing, hyperparameter scheduling, TensorBoard logging, and many other features. Here we use the <code>ToGPU()</code> callback so that model and batch data will be transferred to an available GPU and <code>Metrics(accuracy)</code> to track the classification accuracy during training.</p>
 <p>With that setup, training <code>learner</code> is dead simple:</p>
 <pre><code class="language-julia">fitonecycle!(learner, 5)

@@ -40,9 +40,9 @@ version = "0.1.0"
 
 [[ArrayInterface]]
 deps = ["IfElse", "LinearAlgebra", "Requires", "SparseArrays", "Static"]
-git-tree-sha1 = "269243951f9724d9f67cd654deb0d610e7d7ee76"
+git-tree-sha1 = "da557609446152beb6ee134683d7b79ece129eae"
 uuid = "4fba245c-0d91-5ea0-9b3e-6abc04ee57a9"
-version = "3.1.4"
+version = "3.1.5"
 
 [[Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
@@ -233,9 +233,9 @@ version = "1.6.0"
 
 [[DataAugmentation]]
 deps = ["ColorBlendModes", "CoordinateTransformations", "ImageDraw", "ImageTransformations", "Images", "Interpolations", "LinearAlgebra", "Parameters", "Rotations", "Setfield", "StaticArrays", "Statistics"]
-git-tree-sha1 = "8138afd39eb19c8b47e094fb7a18fb8f752cc3b3"
+git-tree-sha1 = "b35325748cf97e4dcb665edea87f023a972cfae5"
 uuid = "88a5189c-e7ff-4f85-ac6b-e6158070f02e"
-version = "0.1.1"
+version = "0.1.2"
 
 [[DataDeps]]
 deps = ["BinaryProvider", "HTTP", "Libdl", "Reexport", "SHA", "p7zip_jll"]
