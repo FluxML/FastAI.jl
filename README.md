@@ -8,11 +8,9 @@ FastAI.jl is inspired by [fastai](https://github.com/fastai/fastai/blob/master/f
 As an example, training an image classification model from scratch is as simple as
 
 ```julia
-dataset = loaddataset("imagenette2-160")
-method = ImageClassification(loadclasses("imagenette2-160"), (224, 224))
-dls = methoddataloaders(dataset, method)
-model = methodmodel(method, Models.xresnet18());
-learner = Learner(model, dls, ADAM(), methodlossfn(method), ToGPU(), Metrics(accuracy))
+data = Datasets.loadtaskdata(Datasets.datasetpath("imagenette2-160"), ImageClassificationTask)
+method = ImageClassification(Datasets.loadclassesclassification("imagenette2-160"), (160, 160))
+learner = methodlearner(method, data, Models.xresnet18(), ToGPU(), Metrics(accuracy))
 fitonecycle!(learner, 5)
 ```
 

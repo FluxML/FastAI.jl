@@ -12,12 +12,12 @@ using FastAI: Datasets
 On the [quickstart page](quickstart.ipynb), we showed how to train models on common tasks in a few lines of code:
 
 ```julia
-dataset = Datasets.loaddataset("imagenette2-160")
-method = ImageClassification(Datasets.loadclasses("imagenette2-160"), (224, 224))
-dls = methoddataloaders(dataset, method)
+dataset = Datasets.loadtaskdata(Datasets.datasetpath("imagenette2-160"), ImageClassificationTask)
+method = ImageClassification(Datasets.getclassesclassification("imagenette2-160"), (160, 160))
+dls = methoddataloaders(dataset, method, 16)
 model = methodmodel(method, Models.xresnet18())
 learner = Learner(model, dls, ADAM(), methodlossfn(method), ToGPU(), Metrics(accuracy))
-fit!(learner, 10)
+fitonecycle!(learner, 5)
 ```
 
 Let's unpack each line.
@@ -26,7 +26,7 @@ Let's unpack each line.
 
 {cell=main}
 ```julia
-dataset = Datasets.loaddataset("imagenette2-160")
+dataset = Datasets.loadtaskdata(Datasets.datasetpath("imagenette2-160"), ImageClassificationTask)
 ```
 
 This line downloads and loads the [ImageNette]() image classification dataset, a small subset of ImageNet with 10 different classes. `dataset` is a [data container](data_containers.md) that can be used to load individual observations, here of images and the corresponding labels. We can use `getobs(dataset, i)` to load the `i`-th observation and `nobs` to find out how many observations there are.
@@ -53,8 +53,8 @@ To train on a different dataset, you could replace `dataset` with other data con
 
 {cell=main}
 ```julia
-classes = Datasets.loadclasses("imagenette2-160")
-method = ImageClassification(classes, (224, 224))
+classes = Datasets.getclassesclassification("imagenette2-160")
+method = ImageClassification(classes, (160, 160))
 ```
 
 Here we define [`ImageClassification`](#), which defines how data is processed before being fed to the model and how model outputs are turned into predictions. `classes` is a vector of strings naming each class, and `(224, 224)` the size of the images that are input to the model.
