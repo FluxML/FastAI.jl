@@ -1,63 +1,99 @@
-#= 
-FastAI.jl:
-
-Author: Peter Wolf (opus111@gmail.com)
-=#
-
 module FastAI
 
-using Random
-using StatsBase
-using Statistics
+
+using Reexport
+
+@reexport using DLPipelines
+@reexport using FluxTraining
+@reexport using DataLoaders
+@reexport using Flux
+
+using Animations
+using AbstractPlotting
+using Colors
+using DataAugmentation
+using DataAugmentation: getbounds, makebounds
+using DLPipelines: methoddataset, methodmodel, methodlossfn, methoddataloaders
+using LearnBase: getobs, nobs
+using FilePathsBase
+using FixedPointNumbers
 using Flux
-using Flux: update!
-using Flux.Data
-using Zygote
-using Infiltrator
-using Base: length, getindex
-using Random: randperm
-using DocStringExtensions
+using FluxTraining: Learner, handle
+using FluxTraining.Events
+using MLDataPattern
+using Parameters
+using StaticArrays
 
-export AbstractLearner
-export AbstractCallback
-export IterableDataset
-export MapDataset
-
-export DataBunch
-export train
-export valid
-
-export DummyCallback
-export ProgressCallback
-
-export Learner
-export model
-export data_bunch
-export loss
-export loss!
-export opt
-export opt!
-export fit!
-export add_cb!
-
-export Recorder
-
-@template (FUNCTIONS, METHODS) = 
-    """
-    $(TYPEDSIGNATURES)
-    $(DOCSTRING)
-    """
-
-@template (TYPES) =
-    """
-    $(TYPEDEF)
-    $(DOCSTRING)
-    """
-
-include("dataset.jl")
-include("databunch.jl")
+include("tasks.jl")
+include("plotting.jl")
 include("learner.jl")
-include("callback.jl")
-include("recorder.jl")
 
-end
+# method implementations and helpers
+include("./steps/utils.jl")
+include("./steps/step.jl")
+include("./steps/spatial.jl")
+include("./steps/imagepreprocessing.jl")
+include("./methods/imageclassification.jl")
+include("./methods/imagesegmentation.jl")
+
+# submodules
+include("datasets/Datasets.jl")
+using .Datasets
+
+include("models/Models.jl")
+using .Models
+
+# training
+include("training/utils.jl")
+include("training/onecycle.jl")
+include("training/finetune.jl")
+include("training/lrfind.jl")
+
+export methodlossfn
+
+
+export
+    # submodules
+    Datasets,
+    Models,
+    datasetpath,
+    loadtaskdata,
+    mapobs,
+    groupobs,
+    filterobs,
+    shuffleobs,
+
+    # method API
+    methodmodel,
+    methoddataset,
+    methoddataloaders,
+    methodlossfn,
+    getobs,
+    nobs,
+
+    # pipeline steps
+    ProjectiveTransforms, ImagePreprocessing,
+
+    # tasks
+    ImageClassificationTask,
+    ImageSegmentationTask,
+
+    # methods
+    ImageClassification,
+    ImageSegmentation,
+
+    # training
+    methodlearner,
+    Learner,
+    fit!,
+    fitonecycle!,
+    finetune!,
+
+    gpu
+
+
+
+
+
+
+end  # module

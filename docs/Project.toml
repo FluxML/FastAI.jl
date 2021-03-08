@@ -1,3 +1,3 @@
 [deps]
-Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-FastAI = "5d0beca9-ade8-49ae-ad0b-a3cf890e669f"
+BSON = "fbb218c0-5317-5bc6-957e-2ee96dd4b1f0"
+Publish = "f065f642-d108-4f50-8aa5-6749150a895a"
