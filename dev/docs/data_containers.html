@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="generator" content="Publish.jl" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="" />
+    <title>FastAI.jl</title>
+    <link rel="stylesheet" href="..&#x2F;normalize.css" />
+    <link rel="stylesheet" href="https:&#x2F;&#x2F;cdn.jsdelivr.net&#x2F;npm&#x2F;katex@0.12.0&#x2F;dist&#x2F;katex.min.css" />
+    <link rel="stylesheet" href="..&#x2F;tabulator_simple.min.css" />
+    <link rel="stylesheet" href="..&#x2F;publish.css" />
+    <link rel="stylesheet" href="..&#x2F;default.min.css" />
+    <link rel="stylesheet" href="..&#x2F;custom.css" />
+    <script src="https:&#x2F;&#x2F;cdn.jsdelivr.net&#x2F;npm&#x2F;katex@0.12.0&#x2F;dist&#x2F;katex.min.js"></script>
+    <script src="https:&#x2F;&#x2F;cdn.jsdelivr.net&#x2F;npm&#x2F;katex@0.12.0&#x2F;dist&#x2F;contrib&#x2F;auto-render.min.js"></script>
+    <script src="..&#x2F;versions.js"></script>
+    <script src="..&#x2F;lunr.js"></script>
+    <script src="..&#x2F;highlight.min.js"></script>
+    <script src="..&#x2F;tabulator.min.js"></script>
+    <script src="..&#x2F;julia.min.js"></script>
+    <script src="..&#x2F;julia-repl.min.js"></script>
+    <script src="..&#x2F;publish.js"></script>
+    
+</head>
+<body>
+    <main id="page">
+        <div class="menu">
+            <div id="projectname">FastAI.jl</div>
+            <input id="search-input" placeholder="Search">
+            <select id="version-selector"></select>
+            <svg id="menu-toggler" title="Contents" onclick="toggleIndexPage();" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 6C2 5.44772 2.44772 5 3 5H21C21.5523 5 22 5.44772 22 6C22 6.55228 21.5523 7 21 7H3C2.44772 7 2 6.55228 2 6Z" fill="currentColor" /><path d="M2 12.0322C2 11.4799 2.44772 11.0322 3 11.0322H21C21.5523 11.0322 22 11.4799 22 12.0322C22 12.5845 21.5523 13.0322 21 13.0322H3C2.44772 13.0322 2 12.5845 2 12.0322Z" fill="currentColor" /><path d="M3 17.0645C2.44772 17.0645 2 17.5122 2 18.0645C2 18.6167 2.44772 19.0645 3 19.0645H21C21.5523 19.0645 22 18.6167 22 18.0645C22 17.5122 21.5523 17.0645 21 17.0645H3Z" fill="currentColor" /></svg>
+        </div>
+        <div id="toc"><ul>
+<li><a href="../README.html">README</a></li>
+<li><a href="../docs/setup.html">Setup</a></li>
+<li><a href="../docs/quickstart.html">Quickstart</a></li>
+</ul>
+<h1 id="tutorials"><a href="../#tutorials" class="anchor"></a>Tutorials</h1>
+<ul>
+<li><a href="../docs/introduction.html">Introduction</a></li>
+<li><a href="../docs/data_containers.html">Data containers</a></li>
+<li><a href="../docs/learning_methods.html">Learning methods</a></li>
+</ul>
+<h1 id="learning-tasks"><a href="../#learning-tasks" class="anchor"></a>Learning tasks</h1>
+<ul>
+<li><a href="../docs/methods/imageclassification.html">Image classification</a></li>
+<li><a href="../docs/methods/imagesegmentation.html">Image segmentation</a></li>
+</ul>
+<h1 id="how-to"><a href="../#how-to" class="anchor"></a>How To</h1>
+<ul>
+<li><a href="../docs/notebooks/fitonecycle.html">Train a model from scratch</a></li>
+<li><a href="../docs/notebooks/finetune.html">Finetune a pretrained model</a></li>
+<li><a href="../docs/notebooks/lrfind.html">Find a good learning rate</a></li>
+</ul>
+<h1 id="reference"><a href="../#reference" class="anchor"></a>Reference</h1>
+<ul>
+<li><a href="../docstrings.html">Docstrings</a></li>
+<li><a href="../docs/interfaces.html">Interfaces</a></li>
+<li><a href="../docs/glossary.html">Glossary</a></li>
+</ul>
+<h1 id="background"><a href="../#background" class="anchor"></a>Background</h1>
+<ul>
+<li><a href="../docs/background/datapipelines.html">Performant data pipelines</a></li>
+</ul>
+</div>
+        <article id="content"><h1 id="data-containers"><a href="#data-containers" class="anchor"></a>Data containers</h1>
+<p><em>This tutorial explains what data containers are, how they are used in FastAI.jl and how to create your own. You are encouraged to follow along in a REPL or a Jupyter notebook and explore the code. You will find small exercises at the end of some sections to deepen your understanding.</em></p>
+<h2 id="introduction"><a href="#introduction" class="anchor"></a>Introduction</h2>
+<p>In the <a href="quickstart.html">quickstart</a> section, you have already come in contact with data containers. The following code was used to load a data container for image classification:</p>
+<pre><code cell="main" class="language-julia">using FastAI
+using FastAI.Datasets
+using FastAI.Datasets: datasetpath, loadtaskdata
+
+NAME = &quot;imagenette2-160&quot;
+dir = datasetpath(NAME)
+data = loadtaskdata(dir, ImageClassificationTask)
+</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">mapobs((input = FastAI.Datasets.loadfile, target = FastAI.Datasets.var&quot;#27#32&quot;()), DataSubset(::FastAI.Datasets.FileDataset, ::Vector{Int64}, ObsDim.Undefined())
+ 13394 observations)</code></pre>
+<p>A data container is any type that holds observations of data and allows us to load them with <code>getobs</code> and query the number of observations with <code>nobs</code>:</p>
+<pre><code cell="main" class="language-julia">obs = getobs(data, 1)
+</code></pre>
+<pre><code class="plaintext cell-output cell-stream">Error encountered while load FileIO.File{FileIO.DataFormat{:JPEG}, String}(&quot;/home/runner/.julia/datadeps/fastai-imagenette2-160/imagenette2-160/train/n01440764/ILSVRC2012_val_00000293.JPEG&quot;).
+
+Fatal error:
+</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, CapturedException(ArgumentError(&quot;Package ImageMagick [6218d12a-5da1-5696-b52f-db25d2ecc6d1] is required but does not seem to be installed:\n - Run `Pkg.instantiate()` to install all recorded dependencies.\n&quot;), Any[(_require(pkg::Base.PkgId) at loading.jl:986, 1), (require(uuidkey::Base.PkgId) at loading.jl:910, 1), (action(::Symbol, ::Vector{Union{Base.PkgId, Module}}, ::FileIO.Formatted; options::Base.Iterators.Pairs{Symbol, Bool, Tuple{Symbol}, NamedTuple{(:view,), Tuple{Bool}}}) at loadsave.jl:198, 1), (action(::Symbol, ::Vector{Union{Base.PkgId, Module}}, ::Symbol, ::String; options::Base.Iterators.Pairs{Symbol, Bool, Tuple{Symbol}, NamedTuple{(:view,), Tuple{Bool}}}) at loadsave.jl:181, 1), (load(::String; options::Base.Iterators.Pairs{Symbol, Bool, Tuple{Symbol}, NamedTuple{(:view,), Tuple{Bool}}}) at loadsave.jl:113, 1), (loadfile at containers.jl:33 [inlined], 1), (loadfile at containers.jl:39 [inlined], 1), (#11 at none:0 [inlined], 1), (iterate at generator.jl:47 [inlined], 1), (collect(itr::Base.Generator{NamedTuple{(:input, :target), Tuple{typeof(FastAI.Datasets.loadfile), FastAI.Datasets.var&quot;#27#32&quot;}}, FastAI.Datasets.var&quot;#11#12&quot;{FilePathsBase.PosixPath}}) at array.jl:678, 1)  …  ((::Publish.var&quot;#22#23&quot;{Dict{String, Any}})(io::IOStream) at load.jl:79, 1), (open(f::Publish.var&quot;#22#23&quot;{Dict{String, Any}}, args::String; kwargs::Base.Iterators.Pairs{Union{}, Union{}, Tuple{}, NamedTuple{(), Tuple{}}}) at io.jl:330, 1), (open at io.jl:328 [inlined], 1), (#open#40 at system.jl:376 [inlined], 1), (open at system.jl:376 [inlined], 1), (loadfile(#unused#::Publish.Extension{:md}, env::Dict{String, Any}, path::FilePathsBase.PosixPath) at load.jl:77, 1), (loadfile(env::Dict{String, Any}, path::FilePathsBase.PosixPath) at load.jl:75, 1), ((::Publish.var&quot;#19#21&quot;{Dict{String, Any}, FileTrees.FileTree})(file::FileTrees.File) at load.jl:59, 1), (macro expansion at processor.jl:187 [inlined], 1), ((::Dagger.var&quot;#47#48&quot;{Dagger.ThreadProc, Publish.var&quot;#19#21&quot;{Dict{String, Any}, FileTrees.FileTree}, Tuple{FileTrees.File}, Dagger.Sch.SchedulerHandle})() at threadingconstructs.jl:169, 1)]))</code></pre>
+<pre><code cell="main" class="language-julia">nobs(data)
+</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">13394</code></pre>
+<p>In this case, each observation is a tuple of an image and the corresponding class; after all, we want to use it for image classification.</p>
+<pre><code cell="main" class="language-julia">image, class = obs
+@show class
+image
+</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, UndefVarError(:obs))</code></pre>
+<p>As you saw above, the <code>Datasets</code> submodule provides functions for loading and creating data containers. We used <a href="../docstrings/FastAI.Datasets.datasetpath.html"><code>Datasets.datasetpath</code></a> to download a dataset if it wasn’t yet and get the folder it was downloaded to. Then, <a href="../docstrings/FastAI.Datasets.loadtaskdata.html"><code>Datasets.loadtaskdata</code></a> took the folder and loaded a data container suitable for image classification. FastAI.jl makes it easy to download the datasets from fastai’s collection on AWS Open Datasets. For the full list, see <a href="../docstrings/FastAI.Datasets.DATASETS.html"><code>Datasets.DATASETS</code></a></p>
+<h3 id="exercises"><a href="#exercises" class="anchor"></a>Exercises</h3>
+<ol>
+<li>Have a look at the other image classification datasets in <a href="../docstrings/FastAI.Datasets.DATASETS_IMAGECLASSIFICATION.html"><code>Datasets.DATASETS_IMAGECLASSIFICATION</code></a> and change the above code to load a different dataset.</li>
+</ol>
+<h2 id="creating-data-containers-from-files"><a href="#creating-data-containers-from-files" class="anchor"></a>Creating data containers from files</h2>
+<p><code>loadtaskdata</code> makes it easy to get started when your dataset already comes in the correct format, but alas, datasets come in all different shapes and sizes. Let’s create the same data container, but now using more general functions FastAI.jl provides to get a look behind the scenes. If each observation in your dataset is a file in a folder, <a href="../docstrings/FastAI.Datasets.FileDataset.html"><code>FileDataset</code></a> conveniently creates a data container given a path. We’ll use the path of the downloaded dataset:</p>
+<pre><code cell="main" class="language-julia">using FastAI.Datasets: FileDataset
+
+filedata = FileDataset(dir)
+</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">FileDataset(&quot;/home/runner/.julia/datadeps/fastai-imagenette2-160/imagenette2-160&quot;, 13397 observations)</code></pre>
+<p><code>filedata</code> is a data container where each observation is a path to a file. We’ll confirm that using <code>getobs</code>:</p>
+<pre><code cell="main" class="language-julia">p = getobs(filedata, 100)
+</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">p&quot;/home/runner/.julia/datadeps/fastai-imagenette2-160/imagenette2-160/train/n01440764/n01440764_10847.JPEG&quot;</code></pre>
+<p>Next we need to load an image and the corresponding class from the path. If you have a look at the folder structure of <code>dir</code> you can see that the parent folder of each file gives the name of class. So we can use the following function to load the <code>(image, class)</code> pair from a path:</p>
+<pre><code cell="main" class="language-julia">using FastAI.Datasets: loadfile, filename
+
+function loadimageclass(p)
+    return (
+        Datasets.loadfile(p),
+        filename(parent(p)),
+    )
+end
+
+image, class = loadimageclass(p)
+@show class
+image
+</code></pre>
+<pre><code class="plaintext cell-output cell-stream">Error encountered while load FileIO.File{FileIO.DataFormat{:JPEG}, String}(&quot;/home/runner/.julia/datadeps/fastai-imagenette2-160/imagenette2-160/train/n01440764/n01440764_10847.JPEG&quot;).
+
+Fatal error:
+</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 10, CapturedException(ArgumentError(&quot;Package ImageMagick [6218d12a-5da1-5696-b52f-db25d2ecc6d1] is required but does not seem to be installed:\n - Run `Pkg.instantiate()` to install all recorded dependencies.\n&quot;), Any[(_require(pkg::Base.PkgId) at loading.jl:986, 1), (require(uuidkey::Base.PkgId) at loading.jl:910, 1), (action(::Symbol, ::Vector{Union{Base.PkgId, Module}}, ::FileIO.Formatted; options::Base.Iterators.Pairs{Symbol, Bool, Tuple{Symbol}, NamedTuple{(:view,), Tuple{Bool}}}) at loadsave.jl:198, 1), (action(::Symbol, ::Vector{Union{Base.PkgId, Module}}, ::Symbol, ::String; options::Base.Iterators.Pairs{Symbol, Bool, Tuple{Symbol}, NamedTuple{(:view,), Tuple{Bool}}}) at loadsave.jl:181, 1), (load(::String; options::Base.Iterators.Pairs{Symbol, Bool, Tuple{Symbol}, NamedTuple{(:view,), Tuple{Bool}}}) at loadsave.jl:113, 1), (loadfile at containers.jl:33 [inlined], 1), (loadfile at containers.jl:39 [inlined], 1), (loadimageclass(p::FilePathsBase.PosixPath) at string:4, 1), (top-level scope at string:10, 1), (eval at boot.jl:360 [inlined], 1)  …  ((::Publish.var&quot;#22#23&quot;{Dict{String, Any}})(io::IOStream) at load.jl:79, 1), (open(f::Publish.var&quot;#22#23&quot;{Dict{String, Any}}, args::String; kwargs::Base.Iterators.Pairs{Union{}, Union{}, Tuple{}, NamedTuple{(), Tuple{}}}) at io.jl:330, 1), (open at io.jl:328 [inlined], 1), (#open#40 at system.jl:376 [inlined], 1), (open at system.jl:376 [inlined], 1), (loadfile(#unused#::Publish.Extension{:md}, env::Dict{String, Any}, path::FilePathsBase.PosixPath) at load.jl:77, 1), (loadfile(env::Dict{String, Any}, path::FilePathsBase.PosixPath) at load.jl:75, 1), ((::Publish.var&quot;#19#21&quot;{Dict{String, Any}, FileTrees.FileTree})(file::FileTrees.File) at load.jl:59, 1), (macro expansion at processor.jl:187 [inlined], 1), ((::Dagger.var&quot;#47#48&quot;{Dagger.ThreadProc, Publish.var&quot;#19#21&quot;{Dict{String, Any}, FileTrees.FileTree}, Tuple{FileTrees.File}, Dagger.Sch.SchedulerHandle})() at threadingconstructs.jl:169, 1)]))</code></pre>
+<p>Finally, we use <a href="../docstrings/FastAI.Datasets.mapobs.html"><code>mapobs</code></a> to lazily transform each observation and have a data container ready to be used for training an image classifier.</p>
+<pre><code cell="main" class="language-julia">data = mapobs(loadimageclass, filedata);
+</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">mapobs(loadimageclass, FileDataset(&quot;/home/runner/.julia/datadeps/fastai-imagenette2-160/imagenette2-160&quot;, 13397 observations))</code></pre>
+<h3 id="exercises-1"><a href="#exercises-1" class="anchor"></a>Exercises</h3>
+<ol>
+<li>Using <code>mapobs</code> and <code>loadfile</code>, create a data container where every observation is only an image.</li>
+</ol>
+<h2 id="splitting-a-data-container-into-subsets"><a href="#splitting-a-data-container-into-subsets" class="anchor"></a>Splitting a data container into subsets</h2>
+<p>Until now, we’ve only created a single data container containing all observations in a dataset. In practice, though, you’ll want to have at least a training and validation split. The easiest way to get these is to randomly split your data container into two parts. Here we split <code>data</code> into 80% training and 20% validation data. Note the use of <code>shuffleobs</code> to make sure each split has approximately the same class distribution.</p>
+<pre><code cell="main" class="language-julia">traindata, valdata = splitobs(shuffleobs(data), at = 0.8);
+</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">(DataSubset(::FastAI.Datasets.MappedData, view(::Vector{Int64}, 1:10718), ObsDim.Undefined())
+ 10718 observations, DataSubset(::FastAI.Datasets.MappedData, view(::Vector{Int64}, 10719:13397), ObsDim.Undefined())
+ 2679 observations)</code></pre>
+<p>This is great for experimenting, but where possible you will want to use the official training/validation split for a dataset. Consider the image classification dataset folder structure:</p>
+<pre><code>- $dir
+    - train
+        - class1
+            - image1.jpg
+            - image2.jpg
+            - ...
+        - class2
+        - ...
+    - valid
+        - class1
+        - class2
+        - ...
+</code></pre>
+<p>As you can see, the grandparent folder of each image indicates which split it is a part of. <a href="../docstrings/FastAI.Datasets.groupobs.html"><code>groupobs</code></a> allows us to partition a data container using a function. Let’s use it to split <code>filedata</code> based on the name of the grandparent directory. (We can’t reuse <code>data</code> for this since it no longer carries the file information.)</p>
+<pre><code cell="main" class="language-julia">trainfiledata, validfiledata = groupobs(filedata) do p
+    filename(parent(parent(p)))
+end
+nobs(trainfiledata), nobs(validfiledata)
+</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">(2, 1)</code></pre>
+<p>Using this official split, it will be easier to compare the performance of your results with those of others’.</p>
+</article>
+        <div id="page-navigation">
+            <a id="previous-page" title="Previous" href="introduction.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.2426 6.34317L14.8284 4.92896L7.75739 12L14.8285 19.0711L16.2427 17.6569L10.5858 12L16.2426 6.34317Z" fill="currentColor" /></svg></a>
+            <a id="next-page" title="Next" href="learning_methods.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2427 12L10.5858 6.34317Z" fill="currentColor" /></svg></a>
+        </div>
+        <footer>
+            Built with <a target="_blank" href="https://github.com/MichaelHatherly/Publish.jl">Publish.jl</a> and the <a target="_blank" href="https://julialang.org">Julia Language</a>.
+        </footer>
+    </main>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false},
+                    {left: "\\(", right: "\\)", display: false},
+                    {left: "\\[", right: "\\]", display: true}
+                ]
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+theme = "flux-theme"
+version = "0.2.1"
+
+[html]
+default_css = [
+    "normalize.css",
+    "https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css",
+    "tabulator_simple.min.css",
+    "publish.css",
+    "default.min.css",
+    "custom.css",
+]
+default_js = [
+    "https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js",
+    "https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js",
+    "versions.js",
+    "lunr.js",
+    "highlight.min.js",
+    "tabulator.min.js",
+    "julia.min.js",
+    "julia-repl.min.js",
+    "publish.js",
+]
+template = {file = "html.mustache"}
+
+[html_doc]
+default_css = [
+    "normalize.css",
+    "bulma.min.css",
+    "https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css",
+    "tabulator_simple.min.css",
+    "tocbot.min.css",
+    "default.min.css",
+    "publish_doc.css",
+]
+default_js = [
+    "https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js",
+    "https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js",
+    "tocbot.min.js",
+    "highlight.min.js",
+    "tabulator.min.js",
+    "mermaid.min.js",
+    "svg-pan-zoom.min.js",
+    "julia.min.js",
+    "julia-repl.min.js",
+    "publish_doc.js",
+]
+template = {file = "html_doc.mustache"}
+
+[latex]
+documentclass = "article"
+template = {file = "latex.mustache"}

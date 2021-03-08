@@ -1,0 +1,525 @@
+
+/* font imports */
+
+@font-face {
+    font-family: 'VeraMono';
+    src: URL('theme/fonts/VeraMono.ttf') format('truetype');
+}
+@font-face {
+    font-family: 'Charter';
+    src: URL('theme/fonts/Charter Regular.otf') format('opentype');
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Charter';
+    src: URL('theme/fonts/Charter Bold.otf') format('opentype');
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: 'Charter';
+    src: URL('theme/fonts/Charter Italic.otf') format('opentype');
+    font-style: italic;
+}
+
+
+:root {
+    /* width of the main article for desktop screens */
+    --content-width: 90ch;
+    /* width of the sidebar table of contents on desktop screens */
+    --toc-width: 240px;
+    /* width of margin notes */
+    --margin-width: 240px;
+}
+
+/* Positioning, widths, margins and padding for article content */
+
+#page {
+    max-width: calc(var(--content-width) + var(--toc-width) + 16px);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+article {
+    max-width: var(--content-width);
+    min-height: 420px;
+    margin-top: 24px;
+    margin-left: var(--toc-width);
+}
+
+article > p {
+    margin-block-start: 22px;
+    margin-block-end: 22px;
+}
+
+article > img {
+    max-width: var(--content-width);
+}
+
+article > h2 {
+    margin-top: 32px;
+}
+
+article > h3 {
+    margin-top: 28px;
+    margin-bottom: 8px;
+}
+
+article > hr {
+    margin-top: 50px;
+    margin-bottom: 50px;
+    max-width: 200px;
+    color: #aaa;
+}
+
+
+/* Typography */
+
+article p, article li, article table {
+    color: #111111;
+    font-family: 'Charter', 'Source Serif Pro', serif;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 18px;
+    line-height: 24px;
+}
+
+
+article h1, article h2, article h3, article h4, article h5 {
+    font-family: 'Charter', serif;
+    font-style: italic;
+    color: #333;
+}
+
+article > h1 {
+    font-size: 26px;
+}
+
+article > h2 {
+    font-size: 22px;
+}
+
+article > h3 {
+    font-size: 20px;
+}
+
+
+code {
+    font-family: 'VeraMono', monospace;
+    font-style: normal;
+    font-size: 15px;
+    padding: 2px;
+    border-radius: 2px;
+    background-color: #f3f3f3;
+    color: #222;
+}
+
+pre > code {
+    overflow-x: auto;
+    display: block;
+    line-height: 125%;
+    border-radius: 0px;
+    padding: 8px;
+    background-color: #f3f3f3;
+}
+
+
+code.cell-output {
+    color: #111;
+    background-color: #ffffff;
+}
+
+pre {
+    margin: 8px 0px;
+}
+
+/* Tables */
+
+article table {
+    margin: 16px 16px;
+    overflow-x: auto;
+    display: block;
+}
+article th + th , article td + td{
+    padding-left: 12px;
+}
+
+article th {
+    font-style: italic;
+    text-decoration: underline;
+}
+
+article li * {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.marginnote {
+    float: right;
+    font-size: 13px;
+    width: var(--margin-width);
+    clear: right;
+    margin-left: calc(var(--content-width) + 90px);
+    line-height: 1.3;
+    vertical-align: baseline;
+    position: absolute;
+    margin-top: 25px;
+}
+
+/* Admonitions */
+
+.admonition {
+    margin: 32px 16px;
+    border-left: 8px solid #aaa;
+    padding: 0.5px 1px;
+    border: none;
+    background-color: inherit;
+}
+
+.admonition-title {
+    font-weight: bold;
+}
+
+.admonition > * {
+    margin-left: 16px;
+    margin-right: 8px;
+}
+
+.admonition.info {
+    border-left: 8px solid rgb(135, 206, 235);
+}
+
+.admonition.tip {
+    border-left: 8px solid #5ac480;
+}
+
+.admonition.compat {
+    border-left: 8px solid #5d9fcb;
+}
+
+.admonition.warning {
+    border-left: 8px solid #fae280;
+}
+
+.admonition.danger {
+    border: 2px solid #cd5c56;
+    border-left: 8px solid #cd5c56;
+}
+
+/* Footnotes */
+
+a.footnote {
+    vertical-align: super;
+    font-size: 0.5em;
+    margin-left: 2px;
+}
+
+div.footnote {
+    margin: 16px 16px;
+    border-top: 1px solid #aaa;
+    border-bottom: 1px solid #aaa;
+}
+
+div.footnote > p {
+    margin: 8px;
+    display: inline;
+}
+
+div.footnote > p.footnote-title {
+    display: inline;
+}
+
+/* Project name */
+
+#projectname {
+    width: calc(var(--toc-width) - 32px);
+    float: left;
+    text-align: right;
+    margin-right: 16px;
+    padding-right: 16px;
+    font-size: 22px;
+}
+
+/* Menu container */
+
+.menu {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-top: 8px;
+    height: 40px;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.97);
+    max-width: inherit;
+}
+
+#menu-toggler {
+    cursor: pointer;
+    margin-left: 8px;
+    margin-right: 20px;
+}
+#search-input {
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    font-size: 17px;
+    margin: 0px;
+    flex-grow: 1;
+    padding: 4px 8px;
+    padding-top: 5px;
+}
+
+#version-selector {
+    border: 1px solid #ddd;
+    padding: 4px;
+    margin-left: 8px;
+    border-radius: 412px;
+}
+
+#page-navigation {
+    max-width: var(--content-width);
+    margin-left: var(--toc-width);
+    margin-top: 48px;
+}
+#page-navigation > a {
+    color: #aaa;
+    padding: 0px 32px;
+    text-decoration: none;
+    background: unset;
+    text-shadow: unset;
+}
+#page-navigation > #next-page {
+    float: right;
+}
+
+/* Table of contents container */
+
+#toc {
+    width: calc(var(--toc-width) - 32px);
+    display: block;
+    float: left;
+    margin-top: 76px;
+    border-right: 1px solid #ddd;
+    margin-right: 16px;
+    padding-right: 16px;
+}
+
+#toc:not(:hover) {
+    opacity: 60%;
+}
+
+#toc * {
+    font-family: Charter, serif;
+    font-size: 16px;
+    font-weight: normal;
+    font-style: normal;
+    text-align: right;
+}
+
+#toc ul {
+    list-style-type: none;
+    margin-block-start: 2px;
+    margin-block-end: 2px;
+    padding-inline-start: 4px;
+}
+
+#toc li * {
+    font-size: 14px;
+    line-height: 20px;
+}
+
+#toc h1, #toc h2, #toc h3 {
+    font-style: italic;
+    margin-block-start: 8px;
+    margin-block-end: 4px;
+}
+
+#toc h1 a:link, #toc h2 a:link, #toc h3 a:link {
+    font-style: italic;
+}
+
+#toc h1, #toc h2 {
+    font-size: 17px;
+}
+
+#toc h3 {
+    font-size: 15px;
+}
+
+#toc hr {
+    height: 0;
+    border-top: 1px solid #ddd;
+    margin: 16px 0px 0px 30px;
+}
+
+#toc a {
+    color: inherit;
+}
+
+#toc a:hover {
+    color: rgb(0, 126, 0);
+}
+
+.katex {
+    font-size: 1.1em;
+}
+
+#search-results {
+    width: calc(0.9 * var(--content-width));
+}
+
+footer {
+    margin-left: var(--toc-width);
+    margin-top: 32px;
+    margin-bottom: 16px;
+    text-align: center;
+    color: #aaa;
+    width: 300px;
+}
+
+@media (max-width: 1260px) {
+    .marginnote {
+        float: none;
+        margin: 18px 8px;
+        width: 100%;
+        position: relative;
+    }
+}
+
+@media (max-width: 760px) {    
+    #page {
+        width: 100%;
+    }
+
+    article {
+        margin-left: 12px;
+        margin-right: 12px;
+        width: 90%;
+    }
+    
+    .marginnote {
+        float: none;
+        margin: 16px 8px;
+        width: 100%;
+    }
+    
+    img {
+        max-width: 100%;
+    }
+
+    #toc {
+        width: 90%;
+        margin: 16px 5%;
+        border: none;
+    }
+    #toc * {
+        text-align: left;
+    }
+
+    #toc:not(:hover) {
+        opacity: 100%;
+    }
+
+    #toc hr {
+        height: 0;
+        border-top: 1px solid #ddd;
+        margin: 16px 0px 0px 0px;
+    }
+
+    footer, #page-navigation {
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+/* Link styling */
+
+a {
+    text-decoration: none;
+} 
+
+a:link {
+    color: rgb(0, 126, 0);
+}
+
+a:visited {
+    color: rgb(0, 97, 0);
+}
+
+a > code {
+    color:inherit;
+    font-weight: bold;
+}
+
+/* Code styling From https://github.com/highlightjs/highlight.js/blob/master/src/styles/atom-one-light.css */
+
+.hljs-comment,
+.hljs-quote {
+    color: #a0a1a7;
+    font-style: italic;
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-formula {
+    color: #666;
+}
+
+
+
+
+.hljs-section,
+.hljs-name,
+.hljs-selector-tag,
+.hljs-deletion,
+.hljs-subst {
+    color: #e45649;
+}
+
+.hljs-literal {
+    color: #0184bb;
+}
+
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta-string {
+    color: #50a14f;
+}
+
+.hljs-built_in,
+.hljs-class .hljs-title {
+    color: #c18401;
+}
+
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-type,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo,
+.hljs-number {
+    color: #986801;
+}
+
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-title {
+    color: #4078f2;
+}
+
+.hljs-emphasis {
+    font-style: italic;
+}
+
+.hljs-strong {
+    font-weight: bold;
+}
+
+.hljs-link {
+    text-decoration: underline;
+}
