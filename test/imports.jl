@@ -12,7 +12,7 @@ using StaticArrays
 using Test
 using TestSetExtensions
 
-#ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
+ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 include("testdata.jl")
 
 function test_gpu(f)

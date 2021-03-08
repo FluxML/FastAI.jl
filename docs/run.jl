@@ -6,7 +6,8 @@ using Artifacts
 using FastAI
 using Publish
 
-cd(@__DIR__)
-Publish.Themes.default() = artifact"flux-theme"
+cd(@__DIR__) do
+    @eval Publish.Themes.default() = artifact"flux-theme"
+end
 
-serve(FastAI, port = 8002)
+serve(FastAI, port = 8001)
