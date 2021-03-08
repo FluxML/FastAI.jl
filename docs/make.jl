@@ -11,6 +11,7 @@ download_artifact(
 )
 
 Publish.Themes.default() = artifact"flux-theme"
+ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 
 p = Publish.Project(FastAI)
 

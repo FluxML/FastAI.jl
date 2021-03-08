@@ -7,3 +7,9 @@ FastAI.jl is not registered yet since it depends on some unregistered packages (
 ] activate FastAI
 ] instantiate
 ```
+
+FastAI.jl also defines [Makie.jl] plotting recipes to visualize data. If you want to use them, you'll have to install and one of the Makie.jl backends [CairoMakie.jl](https://github.com/JuliaPlots/CairoMakie.jl), [GLMakie.jl](https://github.com/JuliaPlots/GLMakie.jl) or [WGLMakie.jl](https://github.com/JuliaPlots/WGLMakie.jl). For example:
+
+```julia
+] add CairoMakie
+```

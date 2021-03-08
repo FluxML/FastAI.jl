@@ -73,3 +73,28 @@ function FluxTraining.fitepochphase!(
 
     phase.result = LRFinderResult(losses, lrs)
 end
+
+
+
+function plotlrfind(lrs, losses)
+    f = Figure(resolution = (700, 400))
+    f[1, 1] = ax = Axis(f)
+
+    xtickvalues = (10.) .^(-10:10)
+    ax.xlabel = "Learning rate"
+    ax.xticks = log.(xtickvalues)
+    ax.xtickformat[] = vals -> string.(xtickvalues)
+    ax.xticklabelsize = 10.
+
+    ax.ylabel = "Loss"
+    ax.yticks = []
+    ax.ytickformat[] = vals -> string.(log.(vals))
+    ax.yticklabelsize = 10.
+
+
+    AbstractPlotting.lines!(ax, log.(lrs), log.(losses), axis = (xticks = LinearTicks(10),))
+    return f
+end
+
+plotlrfind(phase::LRFinderPhase) = plotlrfind(phase.result)
+plotlrfind(lrresult::LRFinderResult) = plotlrfind(lrresult.lrs, lrresult.losses)
