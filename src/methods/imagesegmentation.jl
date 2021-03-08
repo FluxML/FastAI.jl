@@ -45,7 +45,7 @@ function DLPipelines.encode(
     f = method.downscale
     if f != 1
         newsz = ntuple(i -> round(Int, size(image, i) * 1 / f), ndims(image))
-        ytfm = ScaleFixed(newsz) |> DataAugmentation.Crop(newsz) |> OneHot()
+        ytfm = ScaleFixed(newsz) |> DataAugmentation.Crop(newsz, DataAugmentation.FromOrigin()) |> OneHot()
     else
         ytfm = OneHot()
     end
