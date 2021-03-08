@@ -14,4 +14,4 @@ learner = methodlearner(method, data, Models.xresnet18(), ToGPU(), Metrics(accur
 fitonecycle!(learner, 5)
 ```
 
-Please read [the documentation](https://lorenzoh.github.io/FastAI.jl/dev) for more information and see the [setup instructions](docs/setup.md)
+Please read [the documentation](https://fluxml.github.io/FastAI.jl/dev) for more information and see the [setup instructions](docs/setup.md)
