@@ -50,7 +50,7 @@
 <h1 id="how-to"><a href="../../#how-to" class="anchor"></a>How To</h1>
 <ul>
 <li><a href="../../docs/notebooks/fitonecycle.html">Train a model from scratch</a></li>
-<li><a href="../../docs/notebooks/fitonecycle.html">Finetune a pretrained model</a></li>
+<li><a href="../../docs/notebooks/finetune.html">Finetune a pretrained model</a></li>
 <li><a href="../../docs/notebooks/lrfind.html">Find a good learning rate</a></li>
 </ul>
 <h1 id="reference"><a href="../../#reference" class="anchor"></a>Reference</h1>
@@ -73,15 +73,45 @@ using CairoMakie
 image, mask = getobs(taskdata, 1)
 summary.((image, mask))
 </code></pre>
-<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, DataDeps.DisabledError(&quot;DataDeps download disabled, as we appear to be in a CI environment, and the environment variable `DATADEPS_ALWAYS_ACCEPT` is not set.\nIf this is indeed running in a headless CI environment, then set the `DATADEPS_ALWAYS_ACCEPT` environment variable to `true` to bypass the accept download prompt (if you do wish to always accept.)\nIf not, then either unset the `CI` environment variable from true, or set `DATADEPS_ALWAYS_ACCEPT` to `false` for the normal prompt behaviour.&quot;))</code></pre>
+<pre><code class="plaintext cell-output cell-stream">Errors encountered while load FileIO.File{FileIO.DataFormat{:PNG}, String}(&quot;/home/runner/.julia/datadeps/fastai-camvid_tiny/camvid_tiny/images/0001TP_006750.png&quot;).
+All errors:
+===========================================
+ImageIO load error: neither load nor fileio_load is defined
+  due to MethodError(PNGFiles.load, (&quot;/home/runner/.julia/datadeps/fastai-camvid_tiny/camvid_tiny/images/0001TP_006750.png&quot;, :view =&gt; true), 0x0000000000007611)
+  Will try next loader.
+
+===========================================
+ArgumentError: Package ImageMagick [6218d12a-5da1-5696-b52f-db25d2ecc6d1] is required but does not seem to be installed:
+ - Run `Pkg.instantiate()` to install all recorded dependencies.
+
+===========================================
+
+Fatal error:
+</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 2, CapturedException(FileIO.LoaderError(&quot;ImageIO&quot;, &quot;neither load nor fileio_load is defined&quot;, MethodError(PNGFiles.load, (&quot;/home/runner/.julia/datadeps/fastai-camvid_tiny/camvid_tiny/images/0001TP_006750.png&quot;, :view =&gt; true), 0x0000000000007611)), Any[(invokelatest(::Any, ::Any, ::Vararg{Any, N} where N; kwargs::Base.Iterators.Pairs{Union{}, Union{}, Tuple{}, NamedTuple{(), Tuple{}}}) at essentials.jl:707, 1), (invokelatest(::Any, ::Any, ::Vararg{Any, N} where N) at essentials.jl:706, 1), (load(f::FileIO.File{FileIO.DataFormat{:PNG}, String}; kwargs::Base.Iterators.Pairs{Symbol, Bool, Tuple{Symbol}, NamedTuple{(:view,), Tuple{Bool}}}) at ImageIO.jl:27, 1), ((::Base.var&quot;#inner#3&quot;{Base.Iterators.Pairs{Symbol, Bool, Tuple{Symbol}, NamedTuple{(:view,), Tuple{Bool}}}, typeof(ImageIO.load), Tuple{FileIO.File{FileIO.DataFormat{:PNG}, String}}})() at essentials.jl:710, 1), (#invokelatest#2 at essentials.jl:711 [inlined], 1), (action(::Symbol, ::Vector{Union{Base.PkgId, Module}}, ::FileIO.Formatted; options::Base.Iterators.Pairs{Symbol, Bool, Tuple{Symbol}, NamedTuple{(:view,), Tuple{Bool}}}) at loadsave.jl:212, 1), (action(::Symbol, ::Vector{Union{Base.PkgId, Module}}, ::Symbol, ::String; options::Base.Iterators.Pairs{Symbol, Bool, Tuple{Symbol}, NamedTuple{(:view,), Tuple{Bool}}}) at loadsave.jl:181, 1), (load(::String; options::Base.Iterators.Pairs{Symbol, Bool, Tuple{Symbol}, NamedTuple{(:view,), Tuple{Bool}}}) at loadsave.jl:113, 1), (loadfile at containers.jl:33 [inlined], 1), (loadfile(file::FilePathsBase.PosixPath) at containers.jl:39, 1)  …  ((::Publish.var&quot;#22#23&quot;{Dict{String, Any}})(io::IOStream) at load.jl:79, 1), (open(f::Publish.var&quot;#22#23&quot;{Dict{String, Any}}, args::String; kwargs::Base.Iterators.Pairs{Union{}, Union{}, Tuple{}, NamedTuple{(), Tuple{}}}) at io.jl:330, 1), (open at io.jl:328 [inlined], 1), (#open#40 at system.jl:376 [inlined], 1), (open at system.jl:376 [inlined], 1), (loadfile(#unused#::Publish.Extension{:md}, env::Dict{String, Any}, path::FilePathsBase.PosixPath) at load.jl:77, 1), (loadfile(env::Dict{String, Any}, path::FilePathsBase.PosixPath) at load.jl:75, 1), ((::Publish.var&quot;#19#21&quot;{Dict{String, Any}, FileTrees.FileTree})(file::FileTrees.File) at load.jl:59, 1), (macro expansion at processor.jl:187 [inlined], 1), ((::Dagger.var&quot;#47#48&quot;{Dagger.ThreadProc, Publish.var&quot;#19#21&quot;{Dict{String, Any}, FileTrees.FileTree}, Tuple{FileTrees.File}, Dagger.Sch.SchedulerHandle})() at threadingconstructs.jl:169, 1)]))</code></pre>
 <pre><code cell="main" class="language-julia">method = ImageSegmentation(Datasets.getclassessegmentation(&quot;camvid_tiny&quot;), (96, 128));
 </code></pre>
-<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, DataDeps.DisabledError(&quot;DataDeps download disabled, as we appear to be in a CI environment, and the environment variable `DATADEPS_ALWAYS_ACCEPT` is not set.\nIf this is indeed running in a headless CI environment, then set the `DATADEPS_ALWAYS_ACCEPT` environment variable to `true` to bypass the accept download prompt (if you do wish to always accept.)\nIf not, then either unset the `CI` environment variable from true, or set `DATADEPS_ALWAYS_ACCEPT` to `false` for the normal prompt behaviour.&quot;))</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">ImageSegmentation{2}((96, 128), [&quot;Animal&quot;, &quot;Archway&quot;, &quot;Bicyclist&quot;, &quot;Bridge&quot;, &quot;Building&quot;, &quot;Car&quot;, &quot;CartLuggagePram&quot;, &quot;Child&quot;, &quot;Column_Pole&quot;, &quot;Fence&quot;  …  &quot;SUVPickupTruck&quot;, &quot;TrafficCone&quot;, &quot;TrafficLight&quot;, &quot;Train&quot;, &quot;Tree&quot;, &quot;Truck_Bus&quot;, &quot;Tunnel&quot;, &quot;VegetationMisc&quot;, &quot;Void&quot;, &quot;Wall&quot;], 1, ProjectiveTransforms((96, 128)), ImagePreprocessing())</code></pre>
 <pre><code cell="main" class="language-julia">traindl, valdl = methoddataloaders(taskdata, method);
 xs, ys = batch = first(traindl)
 summary.((xs, ys))
 </code></pre>
-<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, UndefVarError(:taskdata))</code></pre>
+<pre><code class="plaintext cell-output cell-stream">Errors encountered while load FileIO.File{FileIO.DataFormat{:PNG}, String}(&quot;/home/runner/.julia/datadeps/fastai-camvid_tiny/camvid_tiny/images/Seq05VD_f02070.png&quot;).
+All errors:
+===========================================
+ImageIO load error: neither load nor fileio_load is defined
+  due to MethodError(PNGFiles.load, (&quot;/home/runner/.julia/datadeps/fastai-camvid_tiny/camvid_tiny/images/Seq05VD_f02070.png&quot;, :view =&gt; true), 0x0000000000007611)
+  Will try next loader.
+
+===========================================
+ArgumentError: Package ImageMagick [6218d12a-5da1-5696-b52f-db25d2ecc6d1] is required but does not seem to be installed:
+ - Run `Pkg.instantiate()` to install all recorded dependencies.
+
+===========================================
+
+Fatal error:
+</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, CapturedException(FileIO.LoaderError(&quot;ImageIO&quot;, &quot;neither load nor fileio_load is defined&quot;, MethodError(PNGFiles.load, (&quot;/home/runner/.julia/datadeps/fastai-camvid_tiny/camvid_tiny/images/Seq05VD_f02070.png&quot;, :view =&gt; true), 0x0000000000007611)), Any[(invokelatest(::Any, ::Any, ::Vararg{Any, N} where N; kwargs::Base.Iterators.Pairs{Union{}, Union{}, Tuple{}, NamedTuple{(), Tuple{}}}) at essentials.jl:707, 1), (invokelatest(::Any, ::Any, ::Vararg{Any, N} where N) at essentials.jl:706, 1), (load(f::FileIO.File{FileIO.DataFormat{:PNG}, String}; kwargs::Base.Iterators.Pairs{Symbol, Bool, Tuple{Symbol}, NamedTuple{(:view,), Tuple{Bool}}}) at ImageIO.jl:27, 1), ((::Base.var&quot;#inner#3&quot;{Base.Iterators.Pairs{Symbol, Bool, Tuple{Symbol}, NamedTuple{(:view,), Tuple{Bool}}}, typeof(ImageIO.load), Tuple{FileIO.File{FileIO.DataFormat{:PNG}, String}}})() at essentials.jl:710, 1), (#invokelatest#2 at essentials.jl:711 [inlined], 1), (action(::Symbol, ::Vector{Union{Base.PkgId, Module}}, ::FileIO.Formatted; options::Base.Iterators.Pairs{Symbol, Bool, Tuple{Symbol}, NamedTuple{(:view,), Tuple{Bool}}}) at loadsave.jl:212, 1), (action(::Symbol, ::Vector{Union{Base.PkgId, Module}}, ::Symbol, ::String; options::Base.Iterators.Pairs{Symbol, Bool, Tuple{Symbol}, NamedTuple{(:view,), Tuple{Bool}}}) at loadsave.jl:181, 1), (load(::String; options::Base.Iterators.Pairs{Symbol, Bool, Tuple{Symbol}, NamedTuple{(:view,), Tuple{Bool}}}) at loadsave.jl:113, 1), (loadfile at containers.jl:33 [inlined], 1), (loadfile(file::FilePathsBase.PosixPath) at containers.jl:39, 1)  …  ((::Publish.var&quot;#22#23&quot;{Dict{String, Any}})(io::IOStream) at load.jl:79, 1), (open(f::Publish.var&quot;#22#23&quot;{Dict{String, Any}}, args::String; kwargs::Base.Iterators.Pairs{Union{}, Union{}, Tuple{}, NamedTuple{(), Tuple{}}}) at io.jl:330, 1), (open at io.jl:328 [inlined], 1), (#open#40 at system.jl:376 [inlined], 1), (open at system.jl:376 [inlined], 1), (loadfile(#unused#::Publish.Extension{:md}, env::Dict{String, Any}, path::FilePathsBase.PosixPath) at load.jl:77, 1), (loadfile(env::Dict{String, Any}, path::FilePathsBase.PosixPath) at load.jl:75, 1), ((::Publish.var&quot;#19#21&quot;{Dict{String, Any}, FileTrees.FileTree})(file::FileTrees.File) at load.jl:59, 1), (macro expansion at processor.jl:187 [inlined], 1), ((::Dagger.var&quot;#47#48&quot;{Dagger.ThreadProc, Publish.var&quot;#19#21&quot;{Dict{String, Any}, FileTrees.FileTree}, Tuple{FileTrees.File}, Dagger.Sch.SchedulerHandle})() at threadingconstructs.jl:169, 1)]))</code></pre>
 <pre><code cell="main" class="language-julia">FastAI.plotbatch(method, (xs, ys))
 </code></pre>
 <pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, UndefVarError(:xs))</code></pre>

@@ -50,7 +50,7 @@
 <h1 id="how-to"><a href="../#how-to" class="anchor"></a>How To</h1>
 <ul>
 <li><a href="../docs/notebooks/fitonecycle.html">Train a model from scratch</a></li>
-<li><a href="../docs/notebooks/fitonecycle.html">Finetune a pretrained model</a></li>
+<li><a href="../docs/notebooks/finetune.html">Finetune a pretrained model</a></li>
 <li><a href="../docs/notebooks/lrfind.html">Find a good learning rate</a></li>
 </ul>
 <h1 id="reference"><a href="../#reference" class="anchor"></a>Reference</h1>
@@ -76,7 +76,15 @@ NAME = &quot;imagenette2-160&quot;
 dir = datasetpath(NAME)
 data = loadtaskdata(dir, ImageClassificationTask)
 </code></pre>
-<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 6, DataDeps.DisabledError(&quot;DataDeps download disabled, as we appear to be in a CI environment, and the environment variable `DATADEPS_ALWAYS_ACCEPT` is not set.\nIf this is indeed running in a headless CI environment, then set the `DATADEPS_ALWAYS_ACCEPT` environment variable to `true` to bypass the accept download prompt (if you do wish to always accept.)\nIf not, then either unset the `CI` environment variable from true, or set `DATADEPS_ALWAYS_ACCEPT` to `false` for the normal prompt behaviour.&quot;))</code></pre>
+<pre><code class="plaintext cell-output cell-stream">┌ Warning: Checksum did not match
+│   expected_hash = &quot;88daccb09b6fce93f45e6c09ddeb269cce705549e6bff322092a2a5a11489863&quot;
+│   actual_hash = &quot;64d0c4859f35a461889e0147755a999a48b49bf38a7e0f9bd27003f10db02fe5&quot;
+│   path = &quot;/home/runner/.julia/datadeps/fastai-imagenette2-160/imagenette2-160.tgz&quot;
+└ @ DataDeps ~/.julia/packages/DataDeps/ooWXe/src/verification.jl:24
+Do you wish to Abort, Retry download or Ignore
+[a/r/i]
+</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 6, Base.IOError(&quot;Could not open stream.&quot;, -1))</code></pre>
 <p>A data container is any type that holds observations of data and allows us to load them with <code>getobs</code> and query the number of observations with <code>nobs</code>:</p>
 <pre><code cell="main" class="language-julia">obs = getobs(data, 1)
 </code></pre>

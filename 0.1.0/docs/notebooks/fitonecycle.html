@@ -50,7 +50,7 @@
 <h1 id="how-to"><a href="../../#how-to" class="anchor"></a>How To</h1>
 <ul>
 <li><a href="../../docs/notebooks/fitonecycle.html">Train a model from scratch</a></li>
-<li><a href="../../docs/notebooks/fitonecycle.html">Finetune a pretrained model</a></li>
+<li><a href="../../docs/notebooks/finetune.html">Finetune a pretrained model</a></li>
 <li><a href="../../docs/notebooks/lrfind.html">Find a good learning rate</a></li>
 </ul>
 <h1 id="reference"><a href="../../#reference" class="anchor"></a>Reference</h1>
@@ -64,21 +64,22 @@
 <li><a href="../../docs/background/datapipelines.html">Performant data pipelines</a></li>
 </ul>
 </div>
-        <article id="content"><pre><code class="language-julia">using FastAI
+        <article id="content"><h1 id="how-to-train-a-model-from-scratch-"><a href="#how-to-train-a-model-from-scratch-" class="anchor"></a>How to train a model from scratch</h1>
+<p>When training a model from scratch, using a one-cycle learning rate schedule is a good starting point.</p>
+<pre><code class="language-julia">using FastAI
 </code></pre>
-<pre><code class="language-julia">dataset = Datasets.loaddataset(&quot;imagenette2-160&quot;);
-method = ImageClassification(Datasets.loadclasses(&quot;imagenette2-160&quot;), (160, 160))
-dls = methoddataloaders(dataset, method)
-model = methodmodel(method, Models.xresnet18());
+<p>We’ll set up a <code>Learner</code> in the usual way. Note that <code>Models.xresnet18()</code>, the backbone we’re using, doesn’t have pretrained weights.</p>
+<pre><code class="language-julia">data = Datasets.loadtaskdata(Datasets.datasetpath(&quot;imagenette2-160&quot;), ImageClassificationTask)
+method = ImageClassification(Datasets.getclassesclassification(&quot;imagenette2-160&quot;), (160, 160))
+learner = methodlearner(method, data, Models.xresnet18(), ToGPU(), Metrics(accuracy))
 </code></pre>
-<pre><code class="language-julia">learner = Learner(model, dls, ADAM(), methodlossfn(method), ToGPU(), Metrics(SmoothLoss(), accuracy))
-</code></pre>
+<p>And then simply call <code>fitonecycle!</code>:</p>
 <pre><code class="language-julia">fitonecycle!(learner, 5)
 </code></pre>
 </article>
         <div id="page-navigation">
-            <a id="previous-page" title="Previous" href="fitonecycle.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.2426 6.34317L14.8284 4.92896L7.75739 12L14.8285 19.0711L16.2427 17.6569L10.5858 12L16.2426 6.34317Z" fill="currentColor" /></svg></a>
-            <a id="next-page" title="Next" href="lrfind.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2427 12L10.5858 6.34317Z" fill="currentColor" /></svg></a>
+            <a id="previous-page" title="Previous" href="..&#x2F;methods&#x2F;imagesegmentation.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.2426 6.34317L14.8284 4.92896L7.75739 12L14.8285 19.0711L16.2427 17.6569L10.5858 12L16.2426 6.34317Z" fill="currentColor" /></svg></a>
+            <a id="next-page" title="Next" href="finetune.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2427 12L10.5858 6.34317Z" fill="currentColor" /></svg></a>
         </div>
         <footer>
             Built with <a target="_blank" href="https://github.com/MichaelHatherly/Publish.jl">Publish.jl</a> and the <a target="_blank" href="https://julialang.org">Julia Language</a>.

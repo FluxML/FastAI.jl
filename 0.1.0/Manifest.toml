@@ -228,11 +228,9 @@ version = "1.6.0"
 
 [[DataAugmentation]]
 deps = ["ColorBlendModes", "CoordinateTransformations", "ImageDraw", "ImageTransformations", "Images", "Interpolations", "LinearAlgebra", "Parameters", "Rotations", "Setfield", "StaticArrays", "Statistics"]
-git-tree-sha1 = "2e9b277d0e5458c84e0c310cdfb2d591901dda4e"
-repo-rev = "master"
-repo-url = "https://github.com/lorenzoh/DataAugmentation.jl"
+git-tree-sha1 = "8138afd39eb19c8b47e094fb7a18fb8f752cc3b3"
 uuid = "88a5189c-e7ff-4f85-ac6b-e6158070f02e"
-version = "0.1.0"
+version = "0.1.1"
 
 [[DataDeps]]
 deps = ["BinaryProvider", "HTTP", "Libdl", "Reexport", "SHA", "p7zip_jll"]
@@ -527,9 +525,9 @@ version = "0.8.20"
 
 [[ImageDistances]]
 deps = ["ColorVectorSpace", "Distances", "ImageCore", "ImageMorphology", "LinearAlgebra", "Statistics"]
-git-tree-sha1 = "159e24b4313d9197eef900e97fbd7365986f2844"
+git-tree-sha1 = "622fdcb6ec80aee6f6620f3788ea269702a24545"
 uuid = "51556ac3-7006-55f5-8cb3-34580c88182d"
-version = "0.2.10"
+version = "0.2.11"
 
 [[ImageDraw]]
 deps = ["Distances", "ImageCore", "LinearAlgebra"]
@@ -538,10 +536,10 @@ uuid = "4381153b-2b60-58ae-a1ba-fd683676385f"
 version = "0.2.4"
 
 [[ImageFiltering]]
-deps = ["CatIndices", "ColorVectorSpace", "ComputationalResources", "DataStructures", "FFTViews", "FFTW", "ImageCore", "ImageMetadata", "LinearAlgebra", "OffsetArrays", "Requires", "SparseArrays", "StaticArrays", "Statistics", "TiledIteration"]
-git-tree-sha1 = "f82a52fa2e684d4ed69028b16188852ff94b3f75"
+deps = ["CatIndices", "ColorVectorSpace", "ComputationalResources", "DataStructures", "FFTViews", "FFTW", "ImageCore", "LinearAlgebra", "OffsetArrays", "Requires", "SparseArrays", "StaticArrays", "Statistics", "TiledIteration"]
+git-tree-sha1 = "81b493f57c67a8dff822e43cb2abefece7b52131"
 uuid = "6a3955dd-da59-5b1f-98d4-e7296123deb5"
-version = "0.6.19"
+version = "0.6.20"
 
 [[ImageIO]]
 deps = ["FileIO", "Netpbm", "PNGFiles"]

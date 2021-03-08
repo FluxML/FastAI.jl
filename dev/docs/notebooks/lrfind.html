@@ -50,7 +50,7 @@
 <h1 id="how-to"><a href="../../#how-to" class="anchor"></a>How To</h1>
 <ul>
 <li><a href="../../docs/notebooks/fitonecycle.html">Train a model from scratch</a></li>
-<li><a href="../../docs/notebooks/fitonecycle.html">Finetune a pretrained model</a></li>
+<li><a href="../../docs/notebooks/finetune.html">Finetune a pretrained model</a></li>
 <li><a href="../../docs/notebooks/lrfind.html">Find a good learning rate</a></li>
 </ul>
 <h1 id="reference"><a href="../../#reference" class="anchor"></a>Reference</h1>
@@ -64,31 +64,30 @@
 <li><a href="../../docs/background/datapipelines.html">Performant data pipelines</a></li>
 </ul>
 </div>
-        <article id="content"><pre><code class="language-julia">using FastAI
-using FluxTraining
+        <article id="content"><h1 id="how-to-find-a-good-learning-rate"><a href="#how-to-find-a-good-learning-rate" class="anchor"></a>How to find a good learning rate</h1>
+<p>Finding a good learning rate is very important when training models. If it’s too large, the training will diverge, and if it’s too low, training will be unnecessarily slow.
+We can use a heuristic called the learning rate finder to find a good learning rate. It works by training with a very low learning rate and exponentially increasing it very quickly until the loss diverges. By plotting learning rates against losses we can find a good a value.
+We’ll set up a <code>Learner</code> as usual:</p>
+<pre><code class="language-julia">using FastAI
+data = Datasets.loadtaskdata(Datasets.datasetpath(&quot;imagenette2-160&quot;), ImageClassificationTask)
+method = ImageClassification(Datasets.getclassesclassification(&quot;imagenette2-160&quot;), (160, 160))
+learner = methodlearner(method, data, Models.xresnet18(), ToGPU(), Metrics(accuracy))
 </code></pre>
-<pre><code class="language-julia">dataset = Datasets.loaddataset(&quot;imagenette2-160&quot;);
-
-method = ImageClassification(Datasets.loadclasses(&quot;imagenette2-160&quot;), (160, 160))
-
-dls = methoddataloaders(dataset, method)
-
-model = methodmodel(method, Models.xresnet18());
-
-learner = Learner(model, dls, ADAM(), methodlossfn(method), ToGPU(), Metrics(SmoothLoss(), accuracy))
-</code></pre>
-<pre><code class="language-julia">fit!(learner, ValidationPhase())
-</code></pre>
-<pre><code class="language-julia">phase = FastAI.LRFinderPhase(steps = 100, β = 0.08)
+<p>Then we use the <code>LRFinderPhase</code> which handles the exponential learning rate scheduling and early termination. It will also reset the model when it is done.</p>
+<pre><code class="language-julia">phase = FastAI.LRFinderPhase(steps = 100, β = 0.02)
 fit!(learner, phase)
 </code></pre>
-<pre><code class="language-julia">using SimplePlots
+<p>To visualize the results, you will need to import a plotting backend.</p>
+<pre><code class="language-julia">using CairoMakie
 </code></pre>
-<pre><code class="language-julia">SimplePlots.plot(phase.result.lrs, phase.result.losses, xscale=:log)
+<pre><code class="language-julia">FastAI.plotlrfind(phase)
+</code></pre>
+<p>A good rule of thumb is to look at where the loss diverges and divide the learning rate at that point by 10. In this case this gives us a learning rate of about <code>0.1</code>. Let’s use that to train our model:</p>
+<pre><code class="language-julia">fitonecycle!(learner, 5, 0.1)
 </code></pre>
 </article>
         <div id="page-navigation">
-            <a id="previous-page" title="Previous" href="fitonecycle.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.2426 6.34317L14.8284 4.92896L7.75739 12L14.8285 19.0711L16.2427 17.6569L10.5858 12L16.2426 6.34317Z" fill="currentColor" /></svg></a>
+            <a id="previous-page" title="Previous" href="finetune.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.2426 6.34317L14.8284 4.92896L7.75739 12L14.8285 19.0711L16.2427 17.6569L10.5858 12L16.2426 6.34317Z" fill="currentColor" /></svg></a>
             <a id="next-page" title="Next" href="..&#x2F;..&#x2F;docstrings.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2427 12L10.5858 6.34317Z" fill="currentColor" /></svg></a>
         </div>
         <footer>
