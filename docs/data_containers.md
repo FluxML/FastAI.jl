@@ -6,6 +6,10 @@
 
 In the [quickstart](quickstart.md) section, you have already come in contact with data containers. The following code was used to load a data container for image classification:
 
+{cell=main, result=false, output=false style="display:none;"}
+```julia
+ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
+```
 {cell=main}
 ```julia
 using FastAI
