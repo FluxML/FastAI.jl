@@ -50,7 +50,7 @@
 <h1 id="how-to"><a href="../#how-to" class="anchor"></a>How To</h1>
 <ul>
 <li><a href="../docs/notebooks/fitonecycle.html">Train a model from scratch</a></li>
-<li><a href="../docs/notebooks/fitonecycle.html">Finetune a pretrained model</a></li>
+<li><a href="../docs/notebooks/finetune.html">Finetune a pretrained model</a></li>
 <li><a href="../docs/notebooks/lrfind.html">Find a good learning rate</a></li>
 </ul>
 <h1 id="reference"><a href="../#reference" class="anchor"></a>Reference</h1>
@@ -105,23 +105,23 @@ method = ImageClassification(classes, (160, 160))
 <h2 id="data-loaders"><a href="#data-loaders" class="anchor"></a>Data loaders</h2>
 <pre><code cell="main" class="language-julia">dls = methoddataloaders(dataset, method, 16)
 </code></pre>
-<pre><code class="plaintext cell-output cell-result" class="language-plaintext">(eachobsparallel(batchviewcollated() with 670 batches of size 16), eachobsparallel(batchviewcollated() with 84 batches of size 32))</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, MethodError(DLPipelines.encode, (ImageClassification() with 10 classes, Training(), (input = ColorTypes.RGB{FixedPointNumbers.N0f8}[RGB{N0f8}(0.51,0.451,0.329) RGB{N0f8}(0.529,0.471,0.357) … RGB{N0f8}(1.0,0.953,0.957) RGB{N0f8}(1.0,0.976,0.984); RGB{N0f8}(0.518,0.451,0.333) RGB{N0f8}(0.533,0.467,0.357) … RGB{N0f8}(1.0,0.957,0.953) RGB{N0f8}(1.0,0.984,0.984); … ; RGB{N0f8}(0.396,0.392,0.373) RGB{N0f8}(0.396,0.392,0.373) … RGB{N0f8}(0.549,0.533,0.486) RGB{N0f8}(0.545,0.529,0.482); RGB{N0f8}(0.396,0.392,0.373) RGB{N0f8}(0.4,0.396,0.376) … RGB{N0f8}(0.545,0.529,0.482) RGB{N0f8}(0.541,0.525,0.478)], target = &quot;n03417042&quot;)), 0x000000000000767c))</code></pre>
 <p>Next we turn the data container into training and validation data loaders. These take care of efficiently loading batches of data (by default in parallel). The observations are already preprocessed using the information in <code>method</code> and then batched together. Let’s look at a single batch:</p>
 <pre><code cell="main" class="language-julia">traindl, valdl = dls
 (xs, ys), _ = iterate(traindl)
 summary.((xs, ys))
 </code></pre>
-<pre><code class="plaintext cell-output cell-result" class="language-plaintext">(&quot;160×160×3×16 Array{Float32, 4}&quot;, &quot;10×16 Matrix{Float32}&quot;)</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, UndefVarError(:dls))</code></pre>
 <p><code>xs</code> is a batch of cropped and normalized images with dimensions <code>(height, width, color channels, batch size)</code> and <code>ys</code> a batch of one-hot encoded classes with dimensions <code>(classes, batch size)</code>.</p>
 <h2 id="model"><a href="#model" class="anchor"></a>Model</h2>
 <pre><code cell="main" class="language-julia">model = methodmodel(method, Models.xresnet18())
 </code></pre>
-<pre><code class="plaintext cell-output cell-result" class="language-plaintext">Chain(Chain(Chain(Conv((3, 3), 3=&gt;32), BatchNorm(32, λ = relu)), Chain(Conv((3, 3), 32=&gt;64), BatchNorm(64, λ = relu)), Chain(Conv((3, 3), 64=&gt;64), BatchNorm(64, λ = relu)), MaxPool((3, 3), pad=1, stride=2), Chain(FastAI.Models.ResBlock(Chain(Chain(Conv((3, 3), 64=&gt;64), BatchNorm(64, λ = relu)), Chain(Conv((3, 3), 64=&gt;64), BatchNorm(64))), identity, identity), FastAI.Models.ResBlock(Chain(Chain(Conv((3, 3), 64=&gt;64), BatchNorm(64, λ = relu)), Chain(Conv((3, 3), 64=&gt;64), BatchNorm(64))), identity, identity)), Chain(FastAI.Models.ResBlock(Chain(Chain(Conv((3, 3), 64=&gt;128), BatchNorm(128, λ = relu)), Chain(Conv((3, 3), 128=&gt;128), BatchNorm(128))), Chain(Conv((1, 1), 64=&gt;128), BatchNorm(128, λ = relu)), MeanPool((2, 2))), FastAI.Models.ResBlock(Chain(Chain(Conv((3, 3), 128=&gt;128), BatchNorm(128, λ = relu)), Chain(Conv((3, 3), 128=&gt;128), BatchNorm(128))), identity, identity)), Chain(FastAI.Models.ResBlock(Chain(Chain(Conv((3, 3), 128=&gt;256), BatchNorm(256, λ = relu)), Chain(Conv((3, 3), 256=&gt;256), BatchNorm(256))), Chain(Conv((1, 1), 128=&gt;256), BatchNorm(256, λ = relu)), MeanPool((2, 2))), FastAI.Models.ResBlock(Chain(Chain(Conv((3, 3), 256=&gt;256), BatchNorm(256, λ = relu)), Chain(Conv((3, 3), 256=&gt;256), BatchNorm(256))), identity, identity)), Chain(FastAI.Models.ResBlock(Chain(Chain(Conv((3, 3), 256=&gt;512), BatchNorm(512, λ = relu)), Chain(Conv((3, 3), 512=&gt;512), BatchNorm(512))), Chain(Conv((1, 1), 256=&gt;512), BatchNorm(512, λ = relu)), MeanPool((2, 2))), FastAI.Models.ResBlock(Chain(Chain(Conv((3, 3), 512=&gt;512), BatchNorm(512, λ = relu)), Chain(Conv((3, 3), 512=&gt;512), BatchNorm(512))), identity, identity))), Chain(AdaptiveMeanPool((1, 1)), flatten, Dense(512, 10)))</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, MethodError(Flux.outdims, (BatchNorm(32, λ = relu), (80, 80)), 0x000000000000767c))</code></pre>
 <p>Now we create a Flux.jl model. <code>methodmodel</code> is a part of the learning method interface that knows how to smartly construct an image classification model from different backbone architectures. Here a classficiation head with the appropriate number of classes is stacked on a slightly modified version of the ResNet architecture.</p>
 <h2 id="learner"><a href="#learner" class="anchor"></a>Learner</h2>
 <pre><code cell="main" class="language-julia">learner = Learner(model, dls, ADAM(), methodlossfn(method), ToGPU(), Metrics(accuracy))
 </code></pre>
-<pre><code class="plaintext cell-output cell-result" class="language-plaintext">Learner()</code></pre>
+<pre><code class="plaintext cell-output cell-result" class="language-plaintext">LoadError(&quot;string&quot;, 1, UndefVarError(:model))</code></pre>
 <p>Finally we bring the model and data loaders together with an optimizer and loss function in a <code>Learner</code>. The <code>Learner</code> stores all state for training the model. It also features a powerful, extensible <a href="https://lorenzoh.github.io/FluxTraining.jl/dev/docs/callbacks/reference.html">callback system</a> enabling checkpointing, hyperparameter scheduling, TensorBoard logging, and many other features. Here we use the <code>ToGPU()</code> callback so that model and batch data will be transferred to an available GPU and <code>Metrics(accuracy)</code> to track the classification accuracy during training.</p>
 <p>With that setup, training <code>learner</code> is dead simple:</p>
 <pre><code class="language-julia">fitonecycle!(learner, 5)
