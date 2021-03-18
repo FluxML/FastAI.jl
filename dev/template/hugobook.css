@@ -20,9 +20,12 @@
   --header-height: 3.5rem;
   --menu-width: 16rem;
   --toc-width: 16rem;
+  /*
   --mobile-breakpoint: calc(
     var(--menu-width) + var(--body-min-width) * 1.2 + var(--toc-width)
   );
+  16rem + 20rem * 1.2 + 16rem = 46rem
+  */
 }
 
 /* Light theme */
@@ -402,7 +405,6 @@ article li p {
          url('fonts/roboto-mono-v6-latin-regular.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
   }
 
-  /*
 @font-face {
   font-family: 'VeraMono';
   src: URL('/fonts/VeraMono.ttf') format('truetype');
@@ -424,8 +426,28 @@ article li p {
   src: URL('/fonts/Charter Italic.otf') format('opentype');
   font-style: italic;
 }
-*/
   
+/* Mobile */
+#menu-control, #toc-control {
+  display: none;
+}
+
+
+@media (max-width: 46rem) {
+  .container {
+    display: block;
+  }
+  
+.book-toc .book-toc-content {
+  display: none;
+}
+}
+
+
+
+
+/* CUSTOM */
+
 body {
     font-family: 'Roboto', sans-serif;
 }
