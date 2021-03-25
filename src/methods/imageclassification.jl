@@ -4,7 +4,7 @@
     ImageClassification(classes, sz[; augmentations, ...]) <: Method{ImageClassificationTask}
     ImageClassification(n, ...)
 
-A [`Method`](#) for multi-class image classification using softmax probabilities.
+A [`LearningMethod`](#) for multi-class image classification using softmax probabilities.
 
 `classes` is a vector of the category labels. Alternatively, you can pass an integer.
 Images are resized to `sz`.
