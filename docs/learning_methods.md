@@ -15,7 +15,7 @@ In essence, the learning method interface allows us to implement these steps and
 Next to FastAI.jl, you'll need to install
 
 ```juliarepl
-] add DataAugmentation DLPipelines
+] add DataAugmentation DLPipelines Colors
 ```
 
 ## Datasets
@@ -96,8 +96,8 @@ We implement [`encodeinput`](#) using [DataAugmenation.jl](https://github.com/lo
 {cell=main}
 ```julia
 using DataAugmentation
-# for normalization
-using FastAI: IMAGENET_MEANS, IMAGENET_STDS
+using Colors: RGB
+using FastAI: IMAGENET_MEANS, IMAGENET_STDS  # color statistics for normalization
 
 # Helper for crop based on context
 getresizecrop(context::Training, sz) = DataAugmentation.RandomResizeCrop(sz)
@@ -110,6 +110,7 @@ function DLPipelines.encodeinput(
         image)
     tfm = DataAugmentation.compose(
         getresizecrop(context, method.size),
+        ToEltype(RGB{Float32}),
         ImageToTensor(),
         Normalize(IMAGENET_MEANS, IMAGENET_STDS);
     )
