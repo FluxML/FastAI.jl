@@ -84,8 +84,6 @@ function DLPipelines.encodetarget!(
     return y
 end
 
-#DLPipelines.encode(method::ImageClassification, context, (input, category)) = (DLPipelines.encodeinput(method, context, input), DLPipelines.encodetarget(method, context, category))
-DLPipelines.encode(method::ImageClassification, context, inputCategoryTuple::NamedTuple) = DLPipelines.encode(method::ImageClassification, context, values(inputCategoryTuple))
 DLPipelines.decodeŷ(method::ImageClassification, context, ŷ) = method.classes[argmax(ŷ)]
 
 # Interpretation interface
