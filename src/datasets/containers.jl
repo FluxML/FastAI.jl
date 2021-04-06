@@ -65,7 +65,7 @@ function LearnBase.getobs(dataset::FastAI.Datasets.TableDataset{T}, idx) where {
         end
     elseif Tables.columnaccess(dataset.table)
         rowvals = []
-        for i in 1:(length ∘ Tables.columnnames)(dataset.table)
+        for i in 1:length(Tables.columnnames(dataset.table))
             append!(rowvals, Tables.getcolumn(dataset.table, i)[idx])
         end
         return rowvals
