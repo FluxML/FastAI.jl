@@ -157,7 +157,6 @@ getobs(jdata, 15) == 15
 """
 joinobs(datas...) = JoinedData(datas)
 
-
 # TODO: NamedTupleData transformation
 #
 # mdata = mapobs(data, (col1 = f1, col2 = f2))
