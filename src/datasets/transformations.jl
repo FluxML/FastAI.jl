@@ -41,8 +41,9 @@ struct NamedTupleData{TData, F}
     namedfs::NamedTuple{F}
 end
 
-LearnBase.nobs(data::NamedTupleData) = nobs(getfield(data, :data))
+# LearnBase functions {nobs, getobs} for NamedTupleData
 
+LearnBase.nobs(data::NamedTupleData) = nobs(getfield(data, :data))
 function LearnBase.getobs(data::NamedTupleData{TData, F}, idx::Int) where {TData, F}
     obs = getobs(getfield(data, :data), idx)
     namedfs = getfield(data, :namedfs)
@@ -132,6 +133,8 @@ struct JoinedData{T,N}
 end
 
 JoinedData(datas) = JoinedData(datas, nobs.(datas))
+
+# LearnBase functions {nobs, getobs} for JoinedData
 
 LearnBase.nobs(data::JoinedData) = sum(data.ns)
 function LearnBase.getobs(data::JoinedData, idx)
