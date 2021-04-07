@@ -47,6 +47,7 @@ isimagefile(file::File) = isimagefile(file.name)
 isimagefile(file::String) = occursin(IMAGEFILE_REGEX, lowercase(file))
 const IMAGEFILE_REGEX = r"\.(gif|jpe?g|tiff?|png|webp|bmp)$"
 
+#TableDataset
 
 struct TableDataset{T}
     table::T #Should implement Tables.jl interface
@@ -66,7 +67,7 @@ function LearnBase.getobs(dataset::FastAI.Datasets.TableDataset{T}, idx) where {
     elseif Tables.columnaccess(dataset.table)
         rowvals = []
         for i in 1:length(Tables.columnnames(dataset.table))
-            append!(rowvals, Tables.getcolumn(dataset.table, i)[idx])
+            push!(rowvals, Tables.getcolumn(dataset.table, i)[idx])
         end
         return rowvals
     else error("The Tables.jl implementation used should have either rowaccess or columnaccess.")
