@@ -37,10 +37,10 @@ include("../imports.jl")
     @testset ExtendedTestSet "tokenize" begin
         data1 = "The quick rabbit jumps over the lazy fox."
         data2 = " The quick rabbit jumps over the lazy fox."
-        tdata1 = tokenize(:words,data1)
-        tdata2 = tokenize(:words,data2)
-        tdata3 = tokenize(:chars,data1)
-        tdata4 = tokenize(:chars,data2)
+        tdata1 = Datasets.tokenize(:words,data1)
+        tdata2 = Datasets.tokenize(:words,data2)
+        tdata3 = Datasets.tokenize(:chars,data1)
+        tdata4 = Datasets.tokenize(:chars,data2)
         @test getobs(tdata1,3) == "rabbit"
         @test getobs(tdata2,3) == "rabbit"
         @test getobs(tdata3,3) == "e"
