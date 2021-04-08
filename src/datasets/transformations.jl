@@ -1,4 +1,4 @@
-using WordTokenizers
+using WordTokenizers: TokenBuffer, flush!, character, isdone, spaces
 
 # mapobs
 
