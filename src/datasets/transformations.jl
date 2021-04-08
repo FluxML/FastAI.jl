@@ -172,6 +172,7 @@ function tokenize(type::Symbol,input)::AbstractArray{AbstractString}
     if type === :chars
         while !isdone(ts)
             character(ts)
+            flush!(ts)
         end
     elseif type === :words
         while !isdone(ts)

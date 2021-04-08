@@ -44,7 +44,7 @@ include("../imports.jl")
         @test getobs(tdata1,3) == "rabbit"
         @test getobs(tdata2,3) == "rabbit"
         @test getobs(tdata3,3) == "e"
-        @test getobs(tdata4,3) == "e"
+        @test getobs(tdata4,3) == "h"
         #TODO: add stream tests
     end
 end
