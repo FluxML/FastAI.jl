@@ -33,4 +33,14 @@ include("../imports.jl")
         jdata = joinobs(data1, data2)
         @test getobs(jdata, 15) == 15
     end
+
+    @testset ExtendedTestSet "tokenize" begin
+        data1 = "The quick rabbit jumps over the lazy fox."
+        data2 = " The quick rabbit jumps over the lazy fox."
+        tdata1 = tokenize(:words,data1)
+        tdata2 = tokenize(:words,data2)
+        @test getobs(tdata1,3) == "rabbit"
+        @test getobs(tdata2,3) == "rabbit"
+        #TODO: add stream tests
+    end
 end

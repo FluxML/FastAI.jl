@@ -379,11 +379,11 @@ version = "0.8.4"
 
 [[Flux]]
 deps = ["AbstractTrees", "Adapt", "CUDA", "CodecZlib", "Colors", "DelimitedFiles", "Functors", "Juno", "LinearAlgebra", "MacroTools", "NNlib", "Pkg", "Printf", "Random", "Reexport", "SHA", "Statistics", "StatsBase", "Test", "ZipFile", "Zygote"]
-git-tree-sha1 = "b9cec9fc7b95e3b1ed9363475d8c97805b879a18"
+git-tree-sha1 = "287705d01ab510afe075b0165a159b9e5a4bf082"
 repo-rev = "master"
 repo-url = "https://github.com/FluxML/Flux.jl.git"
 uuid = "587475ba-b771-5e3f-ad9e-33799f191a9c"
-version = "0.12.0"
+version = "0.12.1"
 
 [[FluxTraining]]
 deps = ["Animations", "BSON", "DataStructures", "Flux", "Glob", "ImageCore", "LightGraphs", "OnlineStats", "Parameters", "PrettyTables", "ProgressMeter", "Statistics", "TensorBoardLogger", "UUIDs", "ValueHistories", "Zygote"]
@@ -475,6 +475,12 @@ version = "0.5.4"
 [[Grisu]]
 git-tree-sha1 = "03d381f65183cb2d0af8b3425fde97263ce9a995"
 uuid = "42e2da0e-8278-4e71-bc24-59509adca0fe"
+version = "1.0.0"
+
+[[HTML_Entities]]
+deps = ["StrTables"]
+git-tree-sha1 = "aa19515d6ebe7f91a39cfc1dc6341f38fcac1282"
+uuid = "7693890a-d069-55fe-a829-b4a6d304f0ee"
 version = "1.0.0"
 
 [[HTTP]]
@@ -784,11 +790,11 @@ version = "0.4.4"
 
 [[Metalhead]]
 deps = ["BSON", "Flux", "Pkg"]
-git-tree-sha1 = "965644e4505e9003a63331fae4e6f89bf0bf074e"
+git-tree-sha1 = "9324c02673dc8ad2dec6152db7700ce6d150206f"
 repo-rev = "darsnack/vision-refactor"
 repo-url = "https://github.com/darsnack/Metalhead.jl"
 uuid = "dbeba491-748d-5e0e-a39e-b530a07fa0cc"
-version = "0.5.3"
+version = "0.6.0"
 
 [[Missings]]
 deps = ["DataAPI"]
@@ -1108,6 +1114,12 @@ git-tree-sha1 = "3b9f665c70712af3264b61c27a7e1d62055dafd1"
 uuid = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
 version = "0.9.6"
 
+[[StrTables]]
+deps = ["Dates"]
+git-tree-sha1 = "5998faae8c6308acc25c25896562a1e66a3bb038"
+uuid = "9700d1a9-a7c8-5760-9816-a99fda30bb8f"
+version = "1.0.1"
+
 [[StructArrays]]
 deps = ["Adapt", "DataAPI", "Tables"]
 git-tree-sha1 = "26ea43b4be7e919a2390c3c0f824e7eb4fc19a0a"
@@ -1218,6 +1230,12 @@ deps = ["LinearAlgebra", "SparseArrays"]
 git-tree-sha1 = "59e2ad8fd1591ea019a5259bd012d7aee15f995c"
 uuid = "efce3f68-66dc-5838-9240-27a6d6f5f9b6"
 version = "0.5.3"
+
+[[WordTokenizers]]
+deps = ["DataDeps", "HTML_Entities", "StrTables", "Unicode"]
+git-tree-sha1 = "01dd4068c638da2431269f49a5964bf42ff6c9d2"
+uuid = "796a5d58-b03d-544a-977e-18100b691f6e"
+version = "0.5.6"
 
 [[ZipFile]]
 deps = ["Libdl", "Printf", "Zlib_jll"]
