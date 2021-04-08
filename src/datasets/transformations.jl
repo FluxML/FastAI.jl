@@ -183,6 +183,13 @@ function tokenize(type::Symbol,input)::AbstractArray{AbstractString}
     return ts.tokens
 end
 
+# LearnBase functions {nobs, getobs} for AbstractArray{AbstractString}
+
+LearnBase.nobs(data::AbstractArray{AbstractString}) = size(data,1)
+function LearnBase.getobs(data::AbstractArray{AbstractString}, idx::Int)
+    return data[idx]
+end
+
 # TODO: NamedTupleData transformation
 #
 # mdata = mapobs(data, (col1 = f1, col2 = f2))

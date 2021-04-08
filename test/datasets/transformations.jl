@@ -39,8 +39,12 @@ include("../imports.jl")
         data2 = " The quick rabbit jumps over the lazy fox."
         tdata1 = tokenize(:words,data1)
         tdata2 = tokenize(:words,data2)
+        tdata3 = tokenize(:chars,data1)
+        tdata4 = tokenize(:chars,data2)
         @test getobs(tdata1,3) == "rabbit"
         @test getobs(tdata2,3) == "rabbit"
+        @test getobs(tdata3,3) == "e"
+        @test getobs(tdata4,3) == "e"
         #TODO: add stream tests
     end
 end
