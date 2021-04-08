@@ -23,6 +23,7 @@ using FluxTraining.Events
 using MLDataPattern
 using Parameters
 using StaticArrays
+using WordTokenizers: spaces, TokenBuffer, character, isdone
 
 include("tasks.jl")
 include("plotting.jl")

@@ -1,3 +1,4 @@
+using WordTokenizers
 
 # mapobs
 
@@ -159,6 +160,28 @@ getobs(jdata, 15) == 15
 ```
 """
 joinobs(datas...) = JoinedData(datas)
+
+"""
+    tokenize(type, input)
+
+Tokenizes an input string or stream into pieces depending on selected type. 
+"""
+
+function tokenize(type::Symbol,input)::AbstractArray{AbstractString}
+    ts = TokenBuffer(input)
+    if type === :chars
+        while !isdone(ts)
+            while !isdone(ts)
+                character(ts)
+            end
+        end
+    elseif type === :words
+        while !isdone(ts)
+            spaces(ts) || character(ts)
+        end
+    end
+    return ts.tokens
+end
 
 # TODO: NamedTupleData transformation
 #
