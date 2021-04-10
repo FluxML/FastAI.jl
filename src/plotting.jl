@@ -1,22 +1,40 @@
 
 defaultfigure(;kwargs...) = Figure(
-    ;resolution = (800, 800),
-    background = RGBA(0, 0, 0, 0),
+    ;resolution=(800, 800),
+    background=RGBA(0, 0, 0, 0),
     kwargs...)
 
 # ## Plotting interface definition
 
 """
     plotsample(method, sample)
+
+Plot a `sample` of a `method` or `Task` type.
+See also [`plotsample!`](#)
+
+## Examples
+
+```julia
+sample = (rand(Gray, 28, 28), 1)
+plotsample(ImageClassificationTask, sample)
+
+method = ImageClassification(1:10, (16, 16))
+plotsample(method, sample)
+```
 """
 function plotsample(method, sample)
-    f = defaultfigure(resolution = (300, 150))
+    f = defaultfigure(resolution=(300, 150))
     plotsample!(f, method, sample)
     return f
 end
 
 """
+    plotsample!(f, Task, sample)
     plotsample!(f, method, sample)
+
+Plot a `sample` of a `method` or `Task` type on figure or axis `f`.
+See also [`plotsample`](#)
+
 """
 function plotsample! end
 
@@ -24,7 +42,7 @@ function plotsample! end
     plotxy(method, (x, y))
 """
 function plotxy(method, xy)
-    f = defaultfigure(resolution = (300, 150))
+    f = defaultfigure(resolution=(300, 150))
     plotxy!(f, method, xy)
     return f
 end
@@ -34,13 +52,36 @@ end
 function plotxy! end
 
 
-function plotbatch(method, (xs, ys))
+"""
+    plotbatch(method, xs, ys)
+    plotbatch(method, dataloader)
+
+Plot an encoded batch of data in a grid.
+"""
+function plotbatch(method, xs, ys)
     n = size(xs)[end]
     nrows = Int(ceil(sqrt(n)))
-    f = Figure()
+    f = defaultfigure()
     is = Iterators.product(1:nrows, 1:nrows)
     for (i, (x, y)) in zip(is, DataLoaders.obsslices((xs, ys)))
         plotxy!(f[i...], method, (x, y))
+    end
+    return f
+end
+# TODO: implement `plotbatch(method, dataloader; n)`
+"""
+    plotsamples(Task, samples)
+    plotsamples(method, samples)
+
+Plot samples for a `LearningTask`/`LearningMethod` in a grid.
+"""
+function plotsamples(method::LearningMethod, samples)
+    n = length(samples)
+    nrows = Int(ceil(sqrt(n)))
+    f = Figure()
+    is = Iterators.product(1:nrows, 1:nrows)
+    for (i, sample) in zip(is, samples)
+        plotsample!(f[i...], method, sample)
     end
     return f
 end
@@ -104,7 +145,7 @@ end
 
 
 function maskimage(mask, classes)
-    colors = distinguishable_colors(length(classes), transform = deuteranopic)
+    colors = distinguishable_colors(length(classes), transform=deuteranopic)
     im = map(c -> colors[c], mask)
 end
 
