@@ -13,7 +13,7 @@ Train an image classifier from scratch:
 
 ```julia
 data = Datasets.loadtaskdata(Datasets.datasetpath("imagenette2-160"), ImageClassificationTask)
-method = ImageClassification(Datasets.getclassesclassification("imagenette2-160"), (160, 160))
+method = ImageClassification(Datasets.loadclassesclassification("imagenette2-160"), (160, 160))
 learner = methodlearner(method, data, Models.xresnet18(), ToGPU(), Metrics(accuracy))
 fitonecycle!(learner, 5)
 ```

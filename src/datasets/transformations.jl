@@ -163,11 +163,14 @@ joinobs(datas...) = JoinedData(datas)
 
 """
     tokenize(type, input)
+    type = :words or :chars
 
 Tokenizes an input string or stream into pieces depending on selected type. 
 """
 
-function tokenize(type::Symbol,input)::AbstractArray{AbstractString}
+abstract type Tokens <: AbstractArray{AbstractString} end
+
+function tokenize(type,input)
     ts = TokenBuffer(input)
     if type === :chars
         while !isdone(ts)
@@ -175,17 +178,15 @@ function tokenize(type::Symbol,input)::AbstractArray{AbstractString}
             flush!(ts)
         end
     elseif type === :words
-        while !isdone(ts)
-            spaces(ts) || character(ts)
-        end
+        WordTokenizer.tokenize(input)
     end
     return ts.tokens
 end
 
-# LearnBase functions {nobs, getobs} for AbstractArray{AbstractString}
+# LearnBase functions {nobs, getobs} for Tokens
 
-LearnBase.nobs(data::AbstractArray{AbstractString}) = size(data,1)
-function LearnBase.getobs(data::AbstractArray{AbstractString}, idx::Int)
+LearnBase.nobs(data::Tokens) = length(data)
+function LearnBase.getobs(data::Tokens, idx)
     return data[idx]
 end
 
