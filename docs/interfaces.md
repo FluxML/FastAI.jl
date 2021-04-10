@@ -1,63 +1,70 @@
-# FastAI.jl interfaces
+# Interfaces
 
-## Training
+FastAI.jl provides many interfaces that allow extending its functionality. 
 
-### High-level
+## Learning method interfaces
 
-Quickly get started training and finetuning models using already implemented learning methods and callbacks.
+Learning methods form the core of FastAI.jl's high-level API. See [this tutorial](learning_methods.md) for a motivation and introduction.
 
-- [`methodlearner`](#)
-- [`fit!`](#)
-- [`fitonecycle!`](#)
-- [`finetune!`](#)
-- `evaluate`
-- learning methods
-    - [`ImageClassification`](#)
-    - [`ImageSegmentation`](#)
-- callbacks
+Functions for the learning method interfaces always dispatch on a [`LearningMethod`](#)`{T}` where `T` is an abstract subtype of [`LearningTask`](#). `LearningTask` only constrains what input and target data look like, while `LearningMethod` defines everything that needs to happen to turn an input into a target and much more. `LearningMethod` should be a `struct` containing configuration.
 
-### Mid-level
+### Core interface
 
-- [`Learner`](#)
-- [`methodmodel`](#)
-- `adaptmodel`
-- [`methodlossfn`](#)
-- `Callback`
+Enables training and prediction. Prerequisite for other, optional learning method interfaces.
 
-### Low-level
+{.tight}
+- Required methods:
+    - [`encode`](#) or both [`encodeinput`](#) and [`encodetarget`](#).
+    - [`decodeŷ`](#)
+- Optional methods:
+    - [`shouldbatch`](#)
+    - [`encode!`](#) or both [`encodeinput!`](#) and [`encodetarget!`](#).
+- Enables use of:
+    - [`methoddataset`](#)
+    - [`methoddataloaders`](#)
+    - [`predict`](#)
+    - [`predictbatch`](#)
 
-- [`LearningMethod`](#)
-- [`LearningTask`](#)
-- [`encode`](#)
-- [`encodeinput`](#)
-- `decodey`
+### Plotting interface
 
-## Datasets
+For visualizing observations and predictions using [Makie.jl](https://github.com/JuliaPlots/Makie.jl).
 
-### High-level
+{.tight}
+- Required methods:
+    - [`plotsample!`](#)
+    - [`plotxy!`](#)
+- Enables use of:
+    - [`plotsamples`](#)
+    - [`plotbatch`](#)
+    - `MethodVisualizationCallback`
 
-Quickly download and load task data containers from the fastai dataset library.
+### Training interface
 
-- [`Datasets.loadtaskdata`](#)
-- [`Datasets.DATASETS`](#)
+Convenience for creating [`Learner`](#)s.
 
-### Mid-level
+{.tight}
+- Required methods:
+    - [`methodlossfn`](#)
+    - [`methodmodel`](#)
+- Enables use of:
+    - [`methodlearner`](#)
 
-Load and transform data containers.
 
-- [`Datasets.datasetpath`](#)
-- [`Datasets.FileDataset`](#)
-- `Datasets.TableDataset`
-- [`mapobs`](#)
-- [`groupobs`](#)
-- [`joinobs`](#)
-- [`groupobs`](#)
+### Testing interface
 
-### Low-level
+Automatically test interfaces.
 
-Full control over data containers.
+{.tight}
+- Required methods: 
+    - [`mockmodel`](#)
+    - [`mocksample`](#) or both [`mockinput`](#) and [`mocktarget`](#)
+- Enables use of:
+    - [`checkmethod_core`](#)
 
-- [`getobs`](#)
-- [`nobs`](#)
 
+## Callback interface
+
+See the [FluxTraining.jl tutorial](https://lorenzoh.github.io/FluxTraining.jl/dev/docs/callbacks/custom.html).
+
+## Data container interface
 

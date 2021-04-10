@@ -15,6 +15,7 @@
 - Reference
     - [Docstrings](REFERENCE)
     - [Interfaces](docs/interfaces.md)
+    - [API](docs/api.md)
     - [Glossary](docs/glossary.md)
 - Background
     - [Performant data pipelines](docs/background/datapipelines.md)
