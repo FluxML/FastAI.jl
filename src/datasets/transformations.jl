@@ -168,7 +168,9 @@ joinobs(datas...) = JoinedData(datas)
 Tokenizes an input string or stream into pieces depending on selected type. 
 """
 
-abstract type Tokens <: AbstractArray{AbstractString} end
+struct Tokenizer
+    data::AbstractArray{AbstractString}
+end
 
 function tokenize(type,input)
     ts = TokenBuffer(input)
@@ -180,14 +182,14 @@ function tokenize(type,input)
     elseif type === :words
         WordTokenizer.tokenize(input)
     end
-    return ts.tokens
+    return Tokenizer(ts.tokens)
 end
 
 # LearnBase functions {nobs, getobs} for Tokens
 
-LearnBase.nobs(data::Tokens) = length(data)
-function LearnBase.getobs(data::Tokens, idx)
-    return data[idx]
+LearnBase.nobs(toks::Tokenizer) = length(toks.data)
+function LearnBase.getobs(toks::Tokenizer, idx)
+    return toks.data[idx]
 end
 
 # TODO: NamedTupleData transformation
