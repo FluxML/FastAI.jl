@@ -2,30 +2,52 @@
 
 """
     ImageClassification(classes, sz[; augmentations, ...]) <: Method{ImageClassificationTask}
-    ImageClassification(n, ...)
 
-A [`LearningMethod`](#) for multi-class image classification using softmax probabilities.
+A learning method for single-label image classification:
+given an image and a set of `classes`, determine which class the image
+falls into. For example, decide if an image contains a dog or a cat.
 
-`classes` is a vector of the category labels. Alternatively, you can pass an integer.
-Images are resized to `sz`.
+Images are resized and cropped to `sz` (see [`ProjectiveTransforms`](#))
+and preprocessed using [`ImagePreprocessing`](#). `classes` is a vector of the class labels.
 
-During training, a random crop is used and `augmentations`, a `DataAugmentation.Transform`
-are applied.
+## Reference
+
+This learning method implements the following interfaces:
+
+{.tight}
+- Core interface
+- Plotting interface
+- Training interface
+- Testing interface
 
 ### Types
 
-- `input::AbstractMatrix{2, <:Colorant}`: an image
-- `target` the class label that the image belongs to
-- `x::AbstractArray{Float32, 3}`: a normalized 3D-array with dimensions *height, width, channels*
-- `y::AbstractVector{Float32}`: one-hot encoding of category
+{.tight}
+- **`sample`**: `Tuple`/`NamedTuple` of
+    - **`input`**`::AbstractArray{2, T}`: A 2-dimensional array with dimensions (height, width)
+        and elements of a color or number type. `Matrix{RGB{Float32}}` is a 2D RGB image,
+        while `Array{Float32, 3}` would be a 3D grayscale image. If element type is a number
+        it should fall between `0` and `1`. It is recommended to use the `Gray` color type
+        to represent grayscale images.
+    - **`target`**: A class. Has to be an element in `method.classes`.
+- **`x`**`::AbstractArray{Float32, 3}`: a normalized array with dimensions (height, width, color channels). See [`ImagePreprocessing`](#) for additional information.
+- **`y`**`::AbstractVector{Float32}`: a one-hot encoded vector of length `length(method.classes)` with true class index  `1.` and all other entries `0`.
+- **`y`**`::AbstractVector{Float32}`: vector of predicted class scores.
 
-### Model
+### Model sizes
 
-- input size: `(sz..., ch, batch)` where `ch` depends on color type `C`.
-- output size: `(nclasses, batch)`
+Array sizes that compatible models must conform to.
+
+- Full model: `(method.sz..., 3, batch) -> (length(method.classes), batch)`
+- Backbone model: `(method.sz..., 3, batch) -> ((method.sz ./ f)..., ch, batch)` where `f`
+    is a downscaling factor `f = 2^k`
+
+It is recommended *not* to use [`Flux.softmax`](#) as the final layer for custom models;
+instead use [`Flux.logitcrossentropy`](#) as the loss function for increased numerical
+stability. This is done automatically if using with `methodmodel` and `methodlossfn`.
 """
 mutable struct ImageClassification <: DLPipelines.LearningMethod{ImageClassificationTask}
-    sz::Tuple{Int, Int}
+    sz::Tuple{Int,Int}
     classes::AbstractVector
     projectivetransforms::ProjectiveTransforms
     imagepreprocessing::ImagePreprocessing
@@ -36,19 +58,18 @@ Base.show(io::IO, method::ImageClassification) = print(
 
 function ImageClassification(
         classes::AbstractVector,
-        sz = (224, 224);
-        augmentations = Identity(),
-        means = IMAGENET_MEANS,
-        stds = IMAGENET_STDS,
-        C = RGB{N0f8},
-        T = Float32
+        sz=(224, 224);
+        augmentations=Identity(),
+        means=IMAGENET_MEANS,
+        stds=IMAGENET_STDS,
+        C=RGB{N0f8},
+        T=Float32,
+        buffered=false,
     )
-    projectivetransforms = ProjectiveTransforms(sz, augmentations = augmentations)
-    imagepreprocessing = ImagePreprocessing(means, stds; C = C, T = T)
+    projectivetransforms = ProjectiveTransforms(sz, augmentations=augmentations, buffered=buffered)
+    imagepreprocessing = ImagePreprocessing(means, stds; C=C, T=T)
     ImageClassification(sz, classes, projectivetransforms, imagepreprocessing)
 end
-
-ImageClassification(n::Int, args...; kwargs...) = ImageClassification(1:n, args...; kwargs...)
 
 
 # Core interface implementation
@@ -99,6 +120,20 @@ function DLPipelines.interprettarget(task::ImageClassification, class)
     return "Class $class"
 end
 
+# Plotting interface
+
+function plotsample!(f, method::ImageClassification, sample)
+    image, class = sample
+    f[1, 1] = ax1 = imageaxis(f, title = class)
+    plotimage!(ax1, image)
+end
+
+function plotxy!(f, method::ImageClassification, (x, y))
+    image = invert(method.imagepreprocessing, x)
+    i = argmax(y)
+    ax1 = f[1, 1] = imageaxis(f, title = "$(method.classes[i]) ($(y[i]))", titlesize=12.)
+    plotimage!(ax1, image)
+end
 
 # Training interface
 
@@ -107,7 +142,7 @@ function DLPipelines.methodmodel(method::ImageClassification, backbone)
     return Chain(
         backbone,
         Chain(
-            AdaptiveMeanPool((1,1)),
+            AdaptiveMeanPool((1, 1)),
             flatten,
             Dense(ch, length(method.classes)),
         )
