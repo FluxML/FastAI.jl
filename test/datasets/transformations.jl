@@ -41,9 +41,9 @@ include("../imports.jl")
         tdata2 = Datasets.tokenize(:words,data2)
         tdata3 = Datasets.tokenize(:chars,data1)
         tdata4 = Datasets.tokenize(:chars,data2)
-        @test getobs(tdata1,3) == "rabbit"
+        @test getobs(tdata1,[3,4]) == ["rabbit","jumps"]
         @test getobs(tdata2,3) == "rabbit"
-        @test getobs(tdata3,3) == "e"
+        @test getobs(tdata3,[3,5]) == ["e","q"]
         @test getobs(tdata4,3) == "h"
         #TODO: add stream tests
     end

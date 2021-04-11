@@ -152,11 +152,13 @@ export
     # primitive containers
     FileDataset,
     TableDataset,
+    Tokenizer,
 
     # utilities
     isimagefile,
     loadfile,
     filename,
+    tokenize,
 
     # datasets
     DATASETS,
