@@ -1,4 +1,4 @@
-using WordTokenizers: TokenBuffer, flush!, character, isdone, spaces
+using WordTokenizers: TokenBuffer, flush!, character, isdone, spaces, tokenize
 
 # mapobs
 
@@ -180,7 +180,7 @@ function tokenize(type,input)
             flush!(ts)
         end
     elseif type === :words
-        WordTokenizers.tokenize(input)
+        tokenize(input)
     end
     return Tokenizer(ts.tokens)
 end
