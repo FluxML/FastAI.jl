@@ -35,8 +35,8 @@ include("../imports.jl")
     end
 
     @testset ExtendedTestSet "tokenize" begin
-        data1 = "The quick rabbit jumps over the lazy fox."
-        data2 = " The quick rabbit jumps over the lazy fox."
+        data1 = Datasets.Tokenizer("The quick rabbit jumps over the lazy fox.")
+        data2 = Datasets.Tokenizer(" The quick rabbit jumps over the lazy fox.")
         tdata1 = Datasets.tokenize(:words,data1)
         tdata2 = Datasets.tokenize(:words,data2)
         tdata3 = Datasets.tokenize(:chars,data1)
