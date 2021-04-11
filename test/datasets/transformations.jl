@@ -41,6 +41,5 @@ include("../imports.jl")
         @test getobs(tdata2,[3,5]) == ["e","q"]
         @test nobs(tdata1) == 8
         @test nobs(tdata2) == 41
-        #TODO: add stream tests
     end
 end
