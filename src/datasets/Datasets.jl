@@ -158,7 +158,7 @@ export
     isimagefile,
     loadfile,
     filename,
-    tokenize,
+    tokenize_input,
 
     # datasets
     DATASETS,
