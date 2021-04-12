@@ -180,7 +180,7 @@ function tokenize(type,input)
             flush!(ts)
         end
     elseif type === :words
-        tokenize(input)
+        WordTokenizers.tokenize(input)
     end
     return Tokenizer(ts.tokens)
 end
