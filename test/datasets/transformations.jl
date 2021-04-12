@@ -35,11 +35,11 @@ include("../imports.jl")
     end
 
     @testset ExtendedTestSet "tokenize" begin
-        tdata1 = Datasets.Tokenizer(Datasets.tokenize(:words,"The quick rabbit jumps over the lazy fox."))
-        tdata2 = Datasets.Tokenizer(Datasets.tokenize(:chars,"The quick rabbit jumps over the lazy fox."))
+        tdata1 = Datasets.tokenize_input(:words,"The quick rabbit jumps over the lazy fox.")
+        tdata2 = Datasets.tokenize_input(:chars,"The quick rabbit jumps over the lazy fox.")
         @test getobs(tdata1,[3,4]) == ["rabbit","jumps"]
         @test getobs(tdata2,[3,5]) == ["e","q"]
-        @test nobs(tdata1) == 8
+        @test nobs(tdata1) == 9
         @test nobs(tdata2) == 41
     end
 end

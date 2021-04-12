@@ -1,4 +1,5 @@
-using WordTokenizers: TokenBuffer, flush!, character, isdone, spaces
+using WordTokenizers
+using WordTokenizers: TokenBuffer, flush!, character, isdone, spaces, tokenize
 
 # mapobs
 
@@ -172,7 +173,7 @@ end
 Tokenizes an input string or stream into pieces depending on selected type. 
 """
 
-function tokenize(type,input)
+function tokenize_input(type,input)
     ts = TokenBuffer(input)
     if type === :chars
         while !isdone(ts)
@@ -180,7 +181,7 @@ function tokenize(type,input)
             flush!(ts)
         end
     elseif type === :words
-        WordTokenizers.tokenize(input)
+        ts.tokens = WordTokenizers.tokenize(input)
     end
     return Tokenizer(ts.tokens)
 end
