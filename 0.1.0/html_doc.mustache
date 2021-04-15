@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="${lang}">
+<head>
+    <meta charset="utf-8" />
+    <meta name="generator" content="Publish.jl" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="${#keywords}${.}${^.[end]} ${/.[end]}${/keywords}" />
+    ${#authors}
+    <meta name="author" content="${.}" />
+    ${/authors}
+    <title>${#subtitle}${subtitle} - ${/subtitle}${title}</title>
+    ${#html.default_css}
+    <link rel="stylesheet" href="${.}" />
+    ${/html.default_css}
+    ${#html.default_js}
+    <script src="${.}"></script>
+    ${/html.default_js}
+    ${#html.css}
+    <link rel="stylesheet" href="${.}" />
+    ${/html.css}
+    ${#html.js}
+    <script src="${.}"></script>
+    ${/html.js}
+    ${{html.header}}
+</head>
+<body>
+    <div class="container">
+        <div class="hero-body">
+            <div class="container has-text-centered">
+                <h1 class="title">${title}</h1>
+                <h2 class="subtitle">${subtitle}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="columns is-centered">
+        <div class="column is-one-fifth">
+            <div class="menu sticky" id="table-of-contents">
+            </div>
+        </div>
+        <div class="column is-four-fifths content" id="main-body">
+            ${{body}}
+        </div>
+    </div>
+    <script>
+        window.addEventListener("DOMContentLoaded", function () {
+            tocbot.init({
+                tocSelector: '#table-of-contents',
+                contentSelector: '#main-body',
+                headingSelector: 'h1, h2',
+                extraListClasses: 'menu-list',
+                activeLinkClass: 'is-active',
+            });
+            hljs.initHighlightingOnLoad();
+            mermaid.initialize({startOnLoad:true});
+            try {
+                // KaTeX might not be loaded if the file is viewed offline.
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: "$$", right: "$$", display: true},
+                        {left: "$", right: "$", display: true},
+                        {left: "\\(", right: "\\)", display: false},
+                        {left: "\\[", right: "\\]", display: true},
+                        {left: "\\begin{equation}", right: "\\end{equation}", display: true}
+                    ]
+                });
+            } catch {
+                console.log("KaTeX could not be found.")
+            }
+        });
+        // svgPanZoom appears to not be able to be called in `DOMContentLoaded`, call here instead.
+        window.addEventListener("load", function () {
+            document.querySelectorAll(".mermaid").forEach((value) => {
+                svgPanZoom(value.firstChild, {controlIconsEnabled: true});
+            });
+        });
+    </script>
+</body>
+</html>

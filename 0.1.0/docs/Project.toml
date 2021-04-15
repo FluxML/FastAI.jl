@@ -1,0 +1,6 @@
+[deps]
+BSON = "fbb218c0-5317-5bc6-957e-2ee96dd4b1f0"
+FastAI = "5d0beca9-ade8-49ae-ad0b-a3cf890e669f"
+ImageIO = "82e4d734-157c-48bb-816b-45c225c6df19"
+ImageMagick = "6218d12a-5da1-5696-b52f-db25d2ecc6d1"
+Publish = "f065f642-d108-4f50-8aa5-6749150a895a"

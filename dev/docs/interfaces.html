@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="generator" content="Publish.jl" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="" />
+    <title>FastAI.jl</title>
+    <link rel="stylesheet" href="..&#x2F;normalize.css" />
+    <link rel="stylesheet" href="https:&#x2F;&#x2F;cdn.jsdelivr.net&#x2F;npm&#x2F;katex@0.12.0&#x2F;dist&#x2F;katex.min.css" />
+    <link rel="stylesheet" href="..&#x2F;tabulator_simple.min.css" />
+    <link rel="stylesheet" href="..&#x2F;publish.css" />
+    <link rel="stylesheet" href="..&#x2F;default.min.css" />
+    <link rel="stylesheet" href="..&#x2F;custom.css" />
+    <script src="https:&#x2F;&#x2F;cdn.jsdelivr.net&#x2F;npm&#x2F;katex@0.12.0&#x2F;dist&#x2F;katex.min.js"></script>
+    <script src="https:&#x2F;&#x2F;cdn.jsdelivr.net&#x2F;npm&#x2F;katex@0.12.0&#x2F;dist&#x2F;contrib&#x2F;auto-render.min.js"></script>
+    <script src="..&#x2F;versions.js"></script>
+    <script src="..&#x2F;lunr.js"></script>
+    <script src="..&#x2F;highlight.min.js"></script>
+    <script src="..&#x2F;tabulator.min.js"></script>
+    <script src="..&#x2F;julia.min.js"></script>
+    <script src="..&#x2F;julia-repl.min.js"></script>
+    <script src="..&#x2F;publish.js"></script>
+    
+</head>
+<body>
+    <main id="page">
+        <div class="menu">
+            <div id="projectname">FastAI.jl</div>
+            <input id="search-input" placeholder="Search">
+            <select id="version-selector"></select>
+            <svg id="menu-toggler" title="Contents" onclick="toggleIndexPage();" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 6C2 5.44772 2.44772 5 3 5H21C21.5523 5 22 5.44772 22 6C22 6.55228 21.5523 7 21 7H3C2.44772 7 2 6.55228 2 6Z" fill="currentColor" /><path d="M2 12.0322C2 11.4799 2.44772 11.0322 3 11.0322H21C21.5523 11.0322 22 11.4799 22 12.0322C22 12.5845 21.5523 13.0322 21 13.0322H3C2.44772 13.0322 2 12.5845 2 12.0322Z" fill="currentColor" /><path d="M3 17.0645C2.44772 17.0645 2 17.5122 2 18.0645C2 18.6167 2.44772 19.0645 3 19.0645H21C21.5523 19.0645 22 18.6167 22 18.0645C22 17.5122 21.5523 17.0645 21 17.0645H3Z" fill="currentColor" /></svg>
+        </div>
+        <div id="toc"><ul>
+<li><a href="../README.html">README</a></li>
+<li><a href="../docs/setup.html">Setup</a></li>
+<li><a href="../docs/quickstart.html">Quickstart</a></li>
+<li>Tutorials
+<ul>
+<li><a href="../docs/introduction.html">Introduction</a></li>
+<li><a href="../docs/data_containers.html">Data containers</a></li>
+<li><a href="../docs/learning_methods.html">Learning methods</a></li>
+</ul>
+</li>
+<li>Learning tasks
+<ul>
+<li><a href="../docs/methods/imageclassification.html">Image classification</a></li>
+<li><a href="../docs/methods/imagesegmentation.html">Image segmentation</a></li>
+</ul>
+</li>
+<li>How To
+<ul>
+<li><a href="../docs/notebooks/fitonecycle.html">Train a model from scratch</a></li>
+<li><a href="../docs/notebooks/finetune.html">Finetune a pretrained model</a></li>
+<li><a href="../docs/notebooks/lrfind.html">Find a good learning rate</a></li>
+</ul>
+</li>
+<li>Reference
+<ul>
+<li><a href="../REFERENCE.html">Docstrings</a></li>
+<li><a href="../docs/interfaces.html">Interfaces</a></li>
+<li><a href="../docs/api.html">API</a></li>
+<li><a href="../docs/glossary.html">Glossary</a></li>
+</ul>
+</li>
+<li>Background
+<ul>
+<li><a href="../docs/background/datapipelines.html">Performant data pipelines</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        <article id="content"><h1 id="interfaces"><a href="#interfaces" class="anchor"></a>Interfaces</h1>
+<p>FastAI.jl provides many interfaces that allow extending its functionality.</p>
+<h2 id="learning-method-interfaces"><a href="#learning-method-interfaces" class="anchor"></a>Learning method interfaces</h2>
+<p>Learning methods form the core of FastAI.jl’s high-level API. See <a href="learning_methods.html">this tutorial</a> for a motivation and introduction.</p>
+<p>Functions for the learning method interfaces always dispatch on a <a href="../docstrings/DLPipelines.LearningMethod.html"><code>LearningMethod</code></a><code>{T}</code> where <code>T</code> is an abstract subtype of <a href="../docstrings/DLPipelines.LearningTask.html"><code>LearningTask</code></a>. <code>LearningTask</code> only constrains what input and target data look like, while <code>LearningMethod</code> defines everything that needs to happen to turn an input into a target and much more. <code>LearningMethod</code> should be a <code>struct</code> containing configuration.</p>
+<h3 id="core-interface"><a href="#core-interface" class="anchor"></a>Core interface</h3>
+<p>Enables training and prediction. Prerequisite for other, optional learning method interfaces.</p>
+<ul class="tight">
+<li>Required methods:
+<ul>
+<li><a href="../docstrings/DLPipelines.encode.html"><code>encode</code></a> or both <a href="../docstrings/DLPipelines.encodeinput.html"><code>encodeinput</code></a> and <a href="../docstrings/DLPipelines.encodetarget.html"><code>encodetarget</code></a>.</li>
+<li><a href="../docstrings/DLPipelines.decodeŷ.html"><code>decodeŷ</code></a></li>
+</ul>
+</li>
+<li>Optional methods:
+<ul>
+<li><a href="#"><code>shouldbatch</code></a></li>
+<li><a href="../docstrings/DLPipelines.encode!.html"><code>encode!</code></a> or both <a href="../docstrings/DLPipelines.encodeinput!.html"><code>encodeinput!</code></a> and <a href="../docstrings/DLPipelines.encodetarget!.html"><code>encodetarget!</code></a>.</li>
+</ul>
+</li>
+<li>Enables use of:
+<ul>
+<li><a href="../docstrings/DLPipelines.methoddataset.html"><code>methoddataset</code></a></li>
+<li><a href="../docstrings/DLPipelines.methoddataloaders.html"><code>methoddataloaders</code></a></li>
+<li><a href="#"><code>predict</code></a></li>
+<li><a href="#"><code>predictbatch</code></a></li>
+</ul>
+</li>
+</ul>
+<h3 id="plotting-interface"><a href="#plotting-interface" class="anchor"></a>Plotting interface</h3>
+<p>For visualizing observations and predictions using <a href="https://github.com/JuliaPlots/Makie.jl">Makie.jl</a>.</p>
+<ul class="tight">
+<li>Required methods:
+<ul>
+<li><a href="../docstrings/FastAI.plotsample!.html"><code>plotsample!</code></a></li>
+<li><a href="../docstrings/FastAI.plotxy!.html"><code>plotxy!</code></a></li>
+</ul>
+</li>
+<li>Enables use of:
+<ul>
+<li><a href="../docstrings/FastAI.plotsamples.html"><code>plotsamples</code></a></li>
+<li><a href="../docstrings/FastAI.plotbatch.html"><code>plotbatch</code></a></li>
+<li><code>MethodVisualizationCallback</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="training-interface"><a href="#training-interface" class="anchor"></a>Training interface</h3>
+<p>Convenience for creating <a href="../docstrings/FluxTraining.Learner.html"><code>Learner</code></a>s.</p>
+<ul class="tight">
+<li>Required methods:
+<ul>
+<li><a href="../docstrings/DLPipelines.methodlossfn.html"><code>methodlossfn</code></a></li>
+<li><a href="../docstrings/DLPipelines.methodmodel.html"><code>methodmodel</code></a></li>
+</ul>
+</li>
+<li>Enables use of:
+<ul>
+<li><a href="../docstrings/FastAI.methodlearner.html"><code>methodlearner</code></a></li>
+</ul>
+</li>
+</ul>
+<h3 id="testing-interface"><a href="#testing-interface" class="anchor"></a>Testing interface</h3>
+<p>Automatically test interfaces.</p>
+<ul class="tight">
+<li>Required methods:
+<ul>
+<li><a href="#"><code>mockmodel</code></a></li>
+<li><a href="#"><code>mocksample</code></a> or both <a href="#"><code>mockinput</code></a> and <a href="#"><code>mocktarget</code></a></li>
+</ul>
+</li>
+<li>Enables use of:
+<ul>
+<li><a href="#"><code>checkmethod_core</code></a></li>
+</ul>
+</li>
+</ul>
+<h2 id="callback-interface"><a href="#callback-interface" class="anchor"></a>Callback interface</h2>
+<p>See the <a href="https://lorenzoh.github.io/FluxTraining.jl/dev/docs/callbacks/custom.html">FluxTraining.jl tutorial</a>.</p>
+<h2 id="data-container-interface"><a href="#data-container-interface" class="anchor"></a>Data container interface</h2>
+</article>
+        <div id="page-navigation">
+            <a id="previous-page" title="Previous" href="REFERENCE.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.2426 6.34317L14.8284 4.92896L7.75739 12L14.8285 19.0711L16.2427 17.6569L10.5858 12L16.2426 6.34317Z" fill="currentColor" /></svg></a>
+            <a id="next-page" title="Next" href="api.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10.5858 6.34317L12 4.92896L19.0711 12L12 19.0711L10.5858 17.6569L16.2427 12L10.5858 6.34317Z" fill="currentColor" /></svg></a>
+        </div>
+        <footer>
+            Built with <a target="_blank" href="https://github.com/MichaelHatherly/Publish.jl">Publish.jl</a> and the <a target="_blank" href="https://julialang.org">Julia Language</a>.
+        </footer>
+    </main>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false},
+                    {left: "\\(", right: "\\)", display: false},
+                    {left: "\\[", right: "\\]", display: true}
+                ]
+            });
+        });
+    </script>
+</body>
+</html>
