@@ -64,7 +64,7 @@ function ImageClassification(
         stds=IMAGENET_STDS,
         C=RGB{N0f8},
         T=Float32,
-        buffered=false,
+        buffered=true,
     )
     projectivetransforms = ProjectiveTransforms(sz, augmentations=augmentations, buffered=buffered)
     imagepreprocessing = ImagePreprocessing(means, stds; C=C, T=T)

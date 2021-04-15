@@ -18,11 +18,11 @@ method = ImageSegmentation(Datasets.getclassessegmentation("camvid_tiny"), (96, 
 ```
 {cell=main}
 ```julia
-traindl, valdl = methoddataloaders(taskdata, method);
+traindl, valdl = methoddataloaders(taskdata, method, 4);
 xs, ys = batch = first(traindl)
 summary.((xs, ys))
 ```
 {cell=main}
 ```julia
-FastAI.plotbatch(method, (xs, ys))
+FastAI.plotbatch(method, xs, ys)
 ```

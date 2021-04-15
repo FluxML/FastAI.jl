@@ -71,6 +71,10 @@ export
     getobs,
     nobs,
 
+    # plotting API
+    plotbatch,
+    plotsamples,
+
     # pipeline steps
     ProjectiveTransforms, ImagePreprocessing,
 

@@ -3,6 +3,8 @@ include("../imports.jl")
 
 @testset ExtendedTestSet "`ImageClassification`" begin
     @testset ExtendedTestSet "Core interface" begin
+        DLPipelines.checkmethod_core(ImageClassification(10, (32, 32)))
+
         @testset ExtendedTestSet "`encodeinput`" begin
             method = ImageClassification(10, (32, 32))
             image = rand(RGB, 64, 96)

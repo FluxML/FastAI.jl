@@ -11,15 +11,15 @@ end
 const ROOT_URL = "https://s3.amazonaws.com/fast-ai-"
 
 function FastAIDataset(
-        name, subfolder, checksum = ""; extension = "tgz", description = "", datadepname = name, size = "???")
+        name, subfolder, checksum=""; extension="tgz", description="", datadepname=name, size="???")
     return FastAIDataset(name, subfolder, extension, description, checksum, datadepname, size)
 end
 
 
 const DATASETCONFIGS = [
     # imageclas
-    FastAIDataset("CUB_200_2011", "imageclas"),
-    FastAIDataset("bedroom", "imageclas"),
+    FastAIDataset("CUB_200_2011", "imageclas", "0c685df5597a8b24909f6a7c9db6d11e008733779a671760afef78feb49bf081", size = "1GiB"),
+    FastAIDataset("bedroom", "imageclas", size="4.25GiB"),
     FastAIDataset("caltech_101", "imageclas"),
     FastAIDataset("cifar10", "imageclas", "637c5814e11aefcb6ee76d5f59c67ddc8de7f5b5077502a195b0833d1e3e4441"),
     FastAIDataset("cifar100", "imageclas", "085ac613ceb0b3659c8072143ae553d5dd146b3c4206c3672a56ed02d0e77d28"),
@@ -30,10 +30,10 @@ const DATASETCONFIGS = [
     FastAIDataset("imagenette2-160", "imageclas", "64d0c4859f35a461889e0147755a999a48b49bf38a7e0f9bd27003f10db02fe5"),
     FastAIDataset("imagenette2-320", "imageclas", "569b4497c98db6dd29f335d1f109cf315fe127053cedf69010d047f0188e158c"),
     FastAIDataset("imagenette2", "imageclas"),
-    FastAIDataset("imagewang-160", "imageclas"),
-    FastAIDataset("imagewang-320", "imageclas"),
+    FastAIDataset("imagewang-160", "imageclas", "a0d360f9d8159055b3bf2b8926a51d19b2f1ff98a1eef6034e4b891c59ca3f1a", size="182MiB"),
+    FastAIDataset("imagewang-320", "imageclas", "fd53301c335aa46f0f4add68dd471cd0b8b66412382cc36f5f510d0a03fb4d9d", size="639MiB"),
     FastAIDataset("imagewang", "imageclas"),
-    FastAIDataset("imagewoof-160", "imageclas"),
+    FastAIDataset("imagewoof-160", "imageclas", "a0d360f9d8159055b3bf2b8926a51d19b2f1ff98a1eef6034e4b891c59ca3f1a"),
     FastAIDataset("imagewoof-320", "imageclas"),
     FastAIDataset("imagewoof", "imageclas"),
     FastAIDataset("imagewoof2-160", "imageclas", "663c22f69c2802d85e2a67103c017e047096702ffddf9149a14011b7002539bf"),
@@ -83,7 +83,7 @@ const DATASETCONFIGS = [
     FastAIDataset("planet_tiny", "sample"),
 
     # coco
-    FastAIDataset("coco_sample", "coco", "56960c0ac09ff35cd8588823d37e1ed0954cb88b8bfbd214a7763e72f982911c", size = "3GB"),
+    FastAIDataset("coco_sample", "coco", "56960c0ac09ff35cd8588823d37e1ed0954cb88b8bfbd214a7763e72f982911c", size="3GB"),
     FastAIDataset("train2017", "coco", datadepname="coco-train2017", extension="zip"),
     FastAIDataset("val2017", "coco", datadepname="coco-val2017", extension="zip"),
     FastAIDataset("test2017", "coco", datadepname="coco-test2017", extension="zip"),
@@ -115,7 +115,7 @@ function DataDeps.DataDep(d::FastAIDataset)
         """,
         "$(ROOT_URL)$(d.subfolder)/$(d.name).$(d.extension)",
         d.checksum,
-        post_fetch_method = DataDeps.unpack,
+        post_fetch_method=DataDeps.unpack,
     )
 end
 
