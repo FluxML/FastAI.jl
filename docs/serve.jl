@@ -1,3 +1,4 @@
+using CairoMakie
 using Pollen
 using FastAI
 using FluxTraining
