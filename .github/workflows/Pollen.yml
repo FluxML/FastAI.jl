@@ -1,5 +1,5 @@
-# Adapted from https://github.com/MichaelHatherly/Publish.jl
-name: Publish
+
+name: Pollen
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   publish:
-    name: "Publish Documentation (dev)"
+    name: "Pollen Documentation (dev)"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -17,7 +17,7 @@ jobs:
           path: gh-pages
       - uses: julia-actions/setup-julia@latest
         with:
-          version: '1.6-nightly'
+          version: '1.6'
       - name: Install dependencies
         run: |
           julia --color=yes --project=. -e 'using Pkg; Pkg.instantiate()'
@@ -25,7 +25,7 @@ jobs:
         run: |
           cd gh-pages
           julia --color=yes --project=../docs -e "using Pkg; Pkg.instantiate()"
-          julia --color=yes --project=../docs -e 'using Pkg; Pkg.develop(path="..")'
+          julia --color=yes --project=../docs -e 'using Pkg; Pkg.develop(path=".."); Pkg.add(Pkg.PackageSpec(url="https://github.com/lorenzoh/Pollen.jl", rev="main"))'
           julia --color=yes --project=../docs ../docs/make.jl
           git config user.name github-actions
           git config user.email github-actions@github.com
