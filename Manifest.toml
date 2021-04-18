@@ -227,9 +227,9 @@ version = "1.6.0"
 
 [[DataAugmentation]]
 deps = ["ColorBlendModes", "CoordinateTransformations", "Distributions", "ImageDraw", "ImageTransformations", "Images", "Interpolations", "LinearAlgebra", "MosaicViews", "OffsetArrays", "Parameters", "Random", "Rotations", "Setfield", "StaticArrays", "Statistics"]
-git-tree-sha1 = "4d8eac5e00b5fbaba2e8e5e5abfdb847d7997732"
+git-tree-sha1 = "c9d9e3b2259629dbfee1f60e70050926af52cfb8"
 uuid = "88a5189c-e7ff-4f85-ac6b-e6158070f02e"
-version = "0.1.5"
+version = "0.1.6"
 
 [[DataDeps]]
 deps = ["BinaryProvider", "HTTP", "Libdl", "Reexport", "SHA", "p7zip_jll"]
