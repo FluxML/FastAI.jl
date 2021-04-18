@@ -1,7 +1,10 @@
 [deps]
 BSON = "fbb218c0-5317-5bc6-957e-2ee96dd4b1f0"
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
+DLPipelines = "e6530d7c-7faa-4ede-a0d6-9eff9baad396"
+DataAugmentation = "88a5189c-e7ff-4f85-ac6b-e6158070f02e"
+FilePathsBase = "48062228-2e41-5def-b9a4-89aafe57970f"
+FluxTraining = "7bf95e4d-ca32-48da-9824-f0dc5310474f"
 ImageIO = "82e4d734-157c-48bb-816b-45c225c6df19"
 ImageMagick = "6218d12a-5da1-5696-b52f-db25d2ecc6d1"
 ImageShow = "4e3cecfd-b093-5904-9786-8bbb286a6a31"
-Publish = "f065f642-d108-4f50-8aa5-6749150a895a"
