@@ -1,7 +1,7 @@
 # See **[`ImagePreprocessing`](#).**
 
 """
-    ImagePreprocessing(means, stds[; C = RGB{N0f8}, T = Float32])
+    ImagePreprocessing(means, stds[; augmentations, C = RGB{N0f8}, T = Float32])
 
 Converts an image to a color `C`, then to a 3D-array of type `T` and
 finally normalizes the values using `means` and `stds`.
@@ -20,12 +20,13 @@ end
 function ImagePreprocessing(
         means::SVector{N} = IMAGENET_MEANS,
         stds::SVector{N} = IMAGENET_STDS;
+        augmentations = Identity(),
         C = RGB{N0f8},
         T = Float32,
         buffered = true) where N
     # TODO: tensor of type T
     tfms = (
-        ToEltype(C) |> ImageToTensor() |> Normalize(means, stds),
+        augmentations |> ToEltype(C) |> ImageToTensor() |> Normalize(means, stds),
         ToEltype(C) |> ImageToTensor() |> Normalize(means, stds),
         ToEltype(C) |> ImageToTensor() |> Normalize(means, stds),
     )

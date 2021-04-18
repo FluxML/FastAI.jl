@@ -59,15 +59,16 @@ Base.show(io::IO, method::ImageClassification) = print(
 function ImageClassification(
         classes::AbstractVector,
         sz=(224, 224);
-        augmentations=Identity(),
+        aug_projection=Identity(),
+        aug_image=Identity(),
         means=IMAGENET_MEANS,
         stds=IMAGENET_STDS,
         C=RGB{N0f8},
         T=Float32,
         buffered=true,
     )
-    projectivetransforms = ProjectiveTransforms(sz, augmentations=augmentations, buffered=buffered)
-    imagepreprocessing = ImagePreprocessing(means, stds; C=C, T=T)
+    projectivetransforms = ProjectiveTransforms(sz, augmentations=aug_projection, buffered=buffered)
+    imagepreprocessing = ImagePreprocessing(means, stds; augmentations=aug_image, C=C, T=T)
     ImageClassification(sz, classes, projectivetransforms, imagepreprocessing)
 end
 
