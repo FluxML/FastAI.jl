@@ -6,7 +6,7 @@ include("../imports.jl")
         DLPipelines.checkmethod_core(ImageClassification(1:10, (32, 32)))
 
         @testset ExtendedTestSet "`encodeinput`" begin
-            method = ImageClassification(10, (32, 32))
+            method = ImageClassification(1:10, (32, 32))
             image = rand(RGB, 64, 96)
 
             xtrain = encodeinput(method, Training(), image)
@@ -19,7 +19,7 @@ include("../imports.jl")
         end
 
         @testset ExtendedTestSet "`encodetarget`" begin
-            method = ImageClassification(2, (32, 32))
+            method = ImageClassification(1:2, (32, 32))
             category = 1
             y = encodetarget(method, Training(), category)
             @test y ≈ [1, 0]
@@ -28,7 +28,7 @@ include("../imports.jl")
         end
 
         @testset ExtendedTestSet "`encode`" begin
-            method = ImageClassification(10, (32, 32))
+            method = ImageClassification(1:10, (32, 32))
             image = rand(RGB, 64, 96)
             category = 1
             @test_nowarn encode(method, Training(), (image, category))
