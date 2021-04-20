@@ -1,0 +1,63 @@
+<HTML><head><title>How to train a model from scratch</title><link href=../../template/hugobook.css rel=stylesheet ></link><meta content=Type=text/html; charset=utf-8 http-equiv=Content-Type ></meta></head><body><input onclick=toggleMenu() id=menu-control class=hidden toggle type=checkbox ></input><input id=toc-control type=checkbox class=hidden toggle ></input><main class=container flex ><aside id=menu-container class=book-menu ><nav class=book-menu-content ><h2 id=title >FastAI.jl</h2><div id=sidebar ><div class=doctree ><body><ul><li><p><a href=../../README.md.html title= >README</a></p></li><li><p><a href=../setup.md.html title= >Setup</a></p></li><li><p><a href=../quickstart.md.html title= >Quickstart</a></p></li><li><p>Tutorials</p><ul><li><p><a href=../introduction.md.html title= >Introduction</a></p></li><li><p><a href=../data_containers.md.html title= >Data containers</a></p></li><li><p><a href=../learning_methods.md.html title= >Learning methods</a></p></li></ul></li><li><p>Learning tasks</p><ul><li><p><a href=../methods/imageclassification.md.html title= >Image classification</a></p></li><li><p><a href=../methods/imagesegmentation.md.html title= >Image segmentation</a></p></li></ul></li><li><p>How To</p><ul><li><p><a href=fitonecycle.ipynb.html title= >Train a model from scratch</a></p></li><li><p><a href=finetune.ipynb.html title= >Finetune a pretrained model</a></p></li><li><p><a href=lrfind.ipynb.html title= >Find a good learning rate</a></p></li><li><p><a href=../howto/augmentvision.md.html title= >Augment vision data</a></p></li></ul></li><li><p>Reference</p><ul><li><p><a href=../../REFERENCE.html title= >Docstrings</a></p></li><li><p><a href=../interfaces.md.html title= >Interfaces</a></p></li><li><p><a href=../api.md.html title= >API</a></p></li><li><p><a href=../glossary.md.html title= >Glossary</a></p></li></ul></li><li><p>Background</p><ul><li><p><a href=../background/datapipelines.md.html title= >Performant data pipelines</a></p></li></ul></li></ul></body></div></div></nav></aside><div class=book-page ><header class=book-header ></header><article><h1 id=how-to-train-a-model-from-scratch >How to train a model from scratch</h1><p>When training a model from scratch, using a one-cycle learning rate schedule is a good starting point.</p><pre lang=julia ><code>using FastAI</code></pre><p>We’ll set up a <code>Learner</code> in the usual way. Note that <code>Models.xresnet18()</code>, the backbone we’re using, doesn’t have pretrained weights.</p><pre lang=julia ><code>data = Datasets.loadtaskdata(Datasets.datasetpath(&quot;imagenette2-160&quot;), ImageClassificationTask)
+method = ImageClassification(Datasets.getclassesclassification(&quot;imagenette2-160&quot;), (160, 160))
+learner = methodlearner(method, data, Models.xresnet18(), ToGPU(), Metrics(accuracy))</code></pre><p>And then simply call <code>fitonecycle!</code>:</p><pre lang=julia ><code>fitonecycle!(learner, 5)</code></pre><pre class=codeoutput ><code>[32mEpoch 1 TrainingPhase(): 100%|██████████████████████████| Time: 0:03:33[39mm48[39m
+┌───────────────┬───────┬─────────┬──────────┐
+│[1m         Phase [0m│[1m Epoch [0m│[1m    Loss [0m│[1m Accuracy [0m│
+├───────────────┼───────┼─────────┼──────────┤
+│ TrainingPhase │   1.0 │ 1.65082 │  0.44755 │
+└───────────────┴───────┴─────────┴──────────┘
+[32mEpoch 1 ValidationPhase(): 100%|████████████████████████| Time: 0:00:16[39m
+┌─────────────────┬───────┬─────────┬──────────┐
+│[1m           Phase [0m│[1m Epoch [0m│[1m    Loss [0m│[1m Accuracy [0m│
+├─────────────────┼───────┼─────────┼──────────┤
+│ ValidationPhase │   1.0 │ 1.63232 │  0.44022 │
+└─────────────────┴───────┴─────────┴──────────┘
+[32mEpoch 2 TrainingPhase(): 100%|██████████████████████████| Time: 0:01:00[39m
+┌───────────────┬───────┬─────────┬──────────┐
+│[1m         Phase [0m│[1m Epoch [0m│[1m    Loss [0m│[1m Accuracy [0m│
+├───────────────┼───────┼─────────┼──────────┤
+│ TrainingPhase │   2.0 │ 1.20881 │  0.60492 │
+└───────────────┴───────┴─────────┴──────────┘
+[32mEpoch 2 ValidationPhase(): 100%|████████████████████████| Time: 0:00:07[39m
+┌─────────────────┬───────┬─────────┬──────────┐
+│[1m           Phase [0m│[1m Epoch [0m│[1m    Loss [0m│[1m Accuracy [0m│
+├─────────────────┼───────┼─────────┼──────────┤
+│ ValidationPhase │   2.0 │ 1.09497 │  0.65716 │
+└─────────────────┴───────┴─────────┴──────────┘
+[32mEpoch 3 TrainingPhase(): 100%|██████████████████████████| Time: 0:00:59[39m
+┌───────────────┬───────┬─────────┬──────────┐
+│[1m         Phase [0m│[1m Epoch [0m│[1m    Loss [0m│[1m Accuracy [0m│
+├───────────────┼───────┼─────────┼──────────┤
+│ TrainingPhase │   3.0 │ 0.89745 │  0.70957 │
+└───────────────┴───────┴─────────┴──────────┘
+[32mEpoch 3 ValidationPhase(): 100%|████████████████████████| Time: 0:00:15[39m
+┌─────────────────┬───────┬─────────┬──────────┐
+│[1m           Phase [0m│[1m Epoch [0m│[1m    Loss [0m│[1m Accuracy [0m│
+├─────────────────┼───────┼─────────┼──────────┤
+│ ValidationPhase │   3.0 │ 0.71428 │  0.77397 │
+└─────────────────┴───────┴─────────┴──────────┘
+[32mEpoch 4 TrainingPhase(): 100%|██████████████████████████| Time: 0:00:59[39m
+┌───────────────┬───────┬─────────┬──────────┐
+│[1m         Phase [0m│[1m Epoch [0m│[1m    Loss [0m│[1m Accuracy [0m│
+├───────────────┼───────┼─────────┼──────────┤
+│ TrainingPhase │   4.0 │ 0.64939 │  0.78573 │
+└───────────────┴───────┴─────────┴──────────┘
+[32mEpoch 4 ValidationPhase(): 100%|████████████████████████| Time: 0:00:15[39m
+┌─────────────────┬───────┬─────────┬──────────┐
+│[1m           Phase [0m│[1m Epoch [0m│[1m    Loss [0m│[1m Accuracy [0m│
+├─────────────────┼───────┼─────────┼──────────┤
+│ ValidationPhase │   4.0 │ 0.64105 │  0.80068 │
+└─────────────────┴───────┴─────────┴──────────┘
+[32mEpoch 5 TrainingPhase(): 100%|██████████████████████████| Time: 0:00:59[39m
+┌───────────────┬───────┬─────────┬──────────┐
+│[1m         Phase [0m│[1m Epoch [0m│[1m    Loss [0m│[1m Accuracy [0m│
+├───────────────┼───────┼─────────┼──────────┤
+│ TrainingPhase │   5.0 │ 0.45134 │  0.85322 │
+└───────────────┴───────┴─────────┴──────────┘
+[32mEpoch 5 ValidationPhase(): 100%|████████████████████████| Time: 0:00:15[39m
+┌─────────────────┬───────┬─────────┬──────────┐
+│[1m           Phase [0m│[1m Epoch [0m│[1m    Loss [0m│[1m Accuracy [0m│
+├─────────────────┼───────┼─────────┼──────────┤
+│ ValidationPhase │   5.0 │ 0.53648 │  0.83267 │
+└─────────────────┴───────┴─────────┴──────────┘
+</code></pre><pre class=coderesult ><code>Learner()</code></pre></article><footer class=book-footer ></footer></div><aside class=book-toc ><nav id=toc class=book-toc-content ><ul><li><a href=#how-to-train-a-model-from-scratch >How to train a model from scratch</a><ul></ul></li></ul></nav></aside></main></body></HTML>
