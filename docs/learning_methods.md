@@ -36,7 +36,7 @@ We'll also collect the unique class names:
 
 {cell=main}
 ```julia
-classes = unique(eachobsparallel(data.target, buffered = false))
+classes = unique([getobs(data.target, i) for i in 1:nobs(data.target)])
 ```
 
 
