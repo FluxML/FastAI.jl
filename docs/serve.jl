@@ -5,6 +5,7 @@ using FluxTraining
 using DLPipelines
 using DataAugmentation
 using FilePathsBase
+using Colors
 
 refmodules = [FluxTraining, DLPipelines, DataAugmentation, FastAI.Datasets, FastAI]
 project = Pollen.documentationproject(FastAI; refmodules, inlineincludes = false)
