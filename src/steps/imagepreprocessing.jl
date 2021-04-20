@@ -53,7 +53,8 @@ Base.show(io::IO, ::ImagePreprocessing) = print(io, "ImagePreprocessing()")
 
 function run(ip::ImagePreprocessing, context::Context, image)
     tfm = _gettfm(ip, context)
-    return DataAugmentation.apply(tfm, DataAugmentation.Image(image)) |> itemdata
+    x = DataAugmentation.apply(tfm, DataAugmentation.Image(image)) |> itemdata
+    return deepcopy(x)
 end
 
 function run!(x, ip::ImagePreprocessing, context::Context, image)
