@@ -126,6 +126,9 @@ using MLDataPattern: splitobs
 import LearnBase
 using Colors
 using FixedPointNumbers
+using DataFrames
+using Tables
+using CSV
 
 include("fastaidatasets.jl")
 
