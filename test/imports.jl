@@ -1,6 +1,6 @@
 
 using CUDA
-using Colors: RGB
+using Colors: RGB, N0f8
 using FastAI
 using FilePathsBase
 using FastAI.Datasets
