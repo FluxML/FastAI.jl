@@ -26,7 +26,6 @@ function ProjectiveTransforms(
         CenterResizeCrop(size),
         ResizePadDivisible(size, inferencefactor),
     )
-    @show tfms[1]
 
     if buffered
         tfms = (

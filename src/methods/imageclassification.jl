@@ -67,7 +67,7 @@ function ImageClassification(
         T=Float32,
         buffered=true,
     )
-    projectivetransforms = ProjectiveTransforms(sz, augmentations=aug_projection, buffered=buffered)
+    projectivetransforms = ProjectiveTransforms(sz; augmentations=aug_projection, buffered=buffered)
     imagepreprocessing = ImagePreprocessing(means, stds; augmentations=aug_image, C=C, T=T)
     ImageClassification(sz, classes, projectivetransforms, imagepreprocessing)
 end

@@ -78,7 +78,7 @@ export
     plotsamples,
 
     # pipeline steps
-    ProjectiveTransforms, ImagePreprocessing, augs_projection,
+    ProjectiveTransforms, ImagePreprocessing, augs_projection, augs_lighting,
 
     # tasks
     ImageClassificationTask,

@@ -58,10 +58,11 @@ function plotxy! end
 
 Plot an encoded batch of data in a grid.
 """
-function plotbatch(method, xs, ys)
+plotbatch(method, xs, ys) = plotbatch!(defaultfigure(), method, xs, ys)
+
+function plotbatch!(f, method, xs, ys)
     n = size(xs)[end]
     nrows = Int(ceil(sqrt(n)))
-    f = defaultfigure()
     is = Iterators.product(1:nrows, 1:nrows)
     for (i, (x, y)) in zip(is, DataLoaders.obsslices((xs, ys)))
         plotxy!(f[i...], method, (x, y))
@@ -121,7 +122,7 @@ end
 
 function AbstractPlotting.plot!(plot::PlotImage)
     im = plot[:image]
-    rim = @lift rotr90($im)
+    rim = @lift copy(rotr90($im))
     image!(plot, rim; plot.attributes...)
     return plot
 end
