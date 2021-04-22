@@ -8,10 +8,6 @@ using Zygote
 using DataDeps
 
 
-function __init__()
-    initdatadeps()
-end
-
 include("layers.jl")
 include("blocks.jl")
 
