@@ -6,7 +6,6 @@ using BSON
 using Flux
 using Zygote
 using DataDeps
-using Metalhead
 
 
 function __init__()
