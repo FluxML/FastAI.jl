@@ -109,3 +109,9 @@ function withcallbacks(f, learner, callbacks...)
         end
     end
 end
+
+
+function makebatch(method::LearningMethod, data, idxs; context = Training())
+    xys = [encode(method, context, getobs(data, i)) for i in idxs]
+    return DataLoaders.collate(xys)
+end

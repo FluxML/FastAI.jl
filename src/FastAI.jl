@@ -32,9 +32,11 @@ include("learner.jl")
 include("./steps/utils.jl")
 include("./steps/step.jl")
 include("./steps/spatial.jl")
+include("augmentation.jl")
 include("./steps/imagepreprocessing.jl")
 include("./methods/imageclassification.jl")
 include("./methods/imagesegmentation.jl")
+
 
 # submodules
 include("datasets/Datasets.jl")
@@ -76,7 +78,7 @@ export
     plotsamples,
 
     # pipeline steps
-    ProjectiveTransforms, ImagePreprocessing,
+    ProjectiveTransforms, ImagePreprocessing, augs_projection, augs_lighting,
 
     # tasks
     ImageClassificationTask,

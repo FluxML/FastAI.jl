@@ -12,6 +12,7 @@
     - [Train a model from scratch](docs/notebooks/fitonecycle.ipynb)
     - [Finetune a pretrained model](docs/notebooks/finetune.ipynb)
     - [Find a good learning rate](docs/notebooks/lrfind.ipynb)
+    - [Augment vision data](docs/howto/augmentvision.md)
 - Reference
     - [Docstrings](REFERENCE)
     - [Interfaces](docs/interfaces.md)

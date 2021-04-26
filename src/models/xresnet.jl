@@ -67,5 +67,5 @@ function XResNet(expansion, layers; c_in = 3)
     )
 end
 
-xresnet18(;init = true, kwargs...) = XResNet(1, [2, 2, 2, 2]; kwargs...)
-xresnet50(;init = true, kwargs...) = XResNet(4, [3, 4, 6, 3]; kwargs...)
+xresnet18(; kwargs...) = XResNet(1, [2, 2, 2, 2]; kwargs...)
+xresnet50(; kwargs...) = XResNet(4, [3, 4, 6, 3]; kwargs...)

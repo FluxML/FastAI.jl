@@ -22,7 +22,7 @@ function ProjectiveTransforms(
         inferencefactor = 1,
         buffered = true)
     tfms = (
-        augmentations |> RandomResizeCrop(size),
+        ScaleKeepAspect(size) |> augmentations |> RandomCrop(size) |> PinOrigin(),
         CenterResizeCrop(size),
         ResizePadDivisible(size, inferencefactor),
     )
@@ -51,7 +51,7 @@ function run(spatial::ProjectiveTransforms, context, datas::Tuple)
     items = makespatialitems(datas)
     tfm = _gettfm(spatial, context)
     tdatas = itemdata.(DataAugmentation.apply(tfm, items))
-    return tdatas
+    return deepcopy(tdatas)
 end
 
 
