@@ -21,6 +21,8 @@ jobs:
         exclude:
           - os: macOS-latest
             arch: x86
+          - os: windows-latest
+            arch: x86
     steps:
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
