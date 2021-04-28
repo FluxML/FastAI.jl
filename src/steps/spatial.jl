@@ -78,7 +78,7 @@ function makespatialitems(datas::Tuple)
     if datas[begin] isa Item
         return makespatialitems(datas, getbounds(datas[begin]))
     else
-        return makespatialitems(datas, makebounds(size(datas[begin])))
+        return makespatialitems(datas, Bounds(axes(datas[begin])))
     end
 end
 function makespatialitems(datas::Tuple, bounds)
