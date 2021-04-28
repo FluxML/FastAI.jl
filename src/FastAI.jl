@@ -12,7 +12,7 @@ using Animations
 using AbstractPlotting
 using Colors
 using DataAugmentation
-using DataAugmentation: getbounds, makebounds
+using DataAugmentation: getbounds, Bounds
 using DLPipelines: methoddataset, methodmodel, methodlossfn, methoddataloaders
 using LearnBase: getobs, nobs
 using FilePathsBase
