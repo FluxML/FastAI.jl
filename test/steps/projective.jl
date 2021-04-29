@@ -21,16 +21,14 @@ include("../imports.jl")
     end
 
     @testset ExtendedTestSet "keypoints" begin
-        transform = ProjectiveTransforms((32, 32))
+        transform = ProjectiveTransforms((32, 48))
         ks = [SVector(0., 0), SVector(64, 96)]
         keypoints = Keypoints(ks, (64, 96))
         kstrain = FastAI.run(transform, Training(), keypoints)
         ksvalid = FastAI.run(transform, Validation(), keypoints)
         ksinference = FastAI.run(transform, Inference(), keypoints)
 
-        @test ksvalid[1][1] == 0
-        @test ksvalid[2][1] == 32
-        @test ksinference[2] == ks[2] ./ 2
+        @test kstrain == ksvalid == ksinference
     end
 
     @testset ExtendedTestSet "image and keypoints" begin
