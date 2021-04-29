@@ -45,7 +45,7 @@ the name of the grandparent folder.
     - ...
 """
 function loadtaskdata(
-        dir,
+        dir::AbstractPath,
         Task::Type{FastAI.ImageClassificationTask};
         split=false,
         filterparent= (!=("test")),

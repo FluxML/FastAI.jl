@@ -17,9 +17,9 @@ and keypoint data. Similar to fastai's
 function augs_projection(;
         flipx = true,
         flipy = false,
-        max_zoom = 1.2,
+        max_zoom = 1.5,
         max_rotate = 10.,
-        max_warp = 0.1,
+        max_warp = 0.05,
         )
     tfms = []
 

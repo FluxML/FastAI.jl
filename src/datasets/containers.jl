@@ -17,7 +17,7 @@ Base.show(io::IO, data::FileDataset) = print(
     "FileDataset(\"", data.tree.name, "\", ", nobs(data), " observations)")
 
 LearnBase.nobs(ds::FileDataset) = length(ds.nodes)
-LearnBase.getobs(ds::FileDataset, idx::Int) = path(ds.nodes[idx])
+LearnBase.getobs(ds::FileDataset, idx::Int) = Path(path(ds.nodes[idx]))
 
 
 # File utilities
