@@ -11,15 +11,16 @@ end
 function ImageSegmentation(
         classes::AbstractVector,
         sz=(224, 224);
-        augmentations=Identity(),
+        aug_projection=Identity(),
+        aug_image=Identity(),
         downscale=1,
         means=IMAGENET_MEANS,
         stds=IMAGENET_STDS,
         C=RGB{N0f8},
         T=Float32)
 
-    projectivetransforms = ProjectiveTransforms(sz, augmentations=augmentations)
-    imagepreprocessing = ImagePreprocessing(means, stds; C=C, T=T)
+    projectivetransforms = ProjectiveTransforms(sz, augmentations=aug_projection)
+    imagepreprocessing = ImagePreprocessing(means, stds; C=C, T=T, augmentations=aug_image)
     return ImageSegmentation(
         sz, classes, downscale,
         projectivetransforms, imagepreprocessing)
@@ -111,6 +112,15 @@ function DLPipelines.methodmodel(method, backbone)
         backbone,
         Models.pixelshufflehead(ch, length(method.classes), n_upscale = n_upscale)
     )
+end
 
 
+DLPipelines.methodlossfn(::ImageSegmentation) = segmentationloss
+
+
+function segmentationloss(ypreds, ys; kwargs...)
+    # Has to be reshaped to 3D array since `logitcrossentropy(...; dims = 3)` doesn't work on GPU
+    ypreds = reshape(ypreds, :, size(ypreds, 3), size(ypreds, 4))
+    ys = reshape(ys, :, size(ys, 3), size(ys, 4))
+    Flux.Losses.logitcrossentropy(ypreds, ys; dims = 2, kwargs...)
 end
