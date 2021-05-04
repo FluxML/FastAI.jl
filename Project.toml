@@ -1,6 +1,6 @@
 name = "FastAI"
 uuid = "5d0beca9-ade8-49ae-ad0b-a3cf890e669f"
-authors = ["Peter Wolf", "Julia Community"]
+authors = ["Lorenz Ohly", "Julia Community"]
 version = "0.1.0"
 
 [deps]
@@ -33,7 +33,7 @@ Animations = "0.4"
 BSON = "0.3"
 Colors = "0.12"
 DLPipelines = "0.2"
-DataAugmentation = "0.2.1"
+DataAugmentation = "0.2.2"
 DataDeps = "0.7"
 DataLoaders = "0.1"
 FileIO = "1.7"
