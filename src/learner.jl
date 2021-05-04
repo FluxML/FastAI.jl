@@ -13,13 +13,19 @@ function methodlearner(
         isbackbone = true,
         pctgval = 0.2,
         batchsize = 16,
+        validdata = nothing,
         validbsfactor = 2,
         optimizer = ADAM(),
         lossfn = methodlossfn(method),
         dlkwargs = (;),
     )
     model = isbackbone ? methodmodel(method, backbone) : backbone
-    dls = methoddataloaders(data, method, batchsize;
-        validbsfactor = validbsfactor, pctgval = pctgval)
+    dls = if isnothing(validdata)
+        methoddataloaders(data, method, batchsize;
+            validbsfactor = validbsfactor, pctgval = pctgval)
+    else
+        methoddataloaders(data, validdata, method, batchsize;
+            validbsfactor = validbsfactor)
+    end
     return Learner(model, dls, optimizer, lossfn, callbacks...)
 end
