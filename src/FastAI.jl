@@ -18,6 +18,8 @@ using LearnBase: getobs, nobs
 using FilePathsBase
 using FixedPointNumbers
 using Flux
+using Flux.Optimise
+import Flux.Optimise: apply!
 using FluxTraining: Learner, handle
 using FluxTraining.Events
 using MLDataPattern
@@ -46,6 +48,8 @@ include("models/Models.jl")
 using .Models
 
 # training
+include("training/paramgroups.jl")
+include("training/discriminativelrs.jl")
 include("training/utils.jl")
 include("training/onecycle.jl")
 include("training/finetune.jl")
@@ -64,6 +68,7 @@ export
     groupobs,
     filterobs,
     shuffleobs,
+    datasubset,
 
     # method API
     methodmodel,

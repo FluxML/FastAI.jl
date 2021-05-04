@@ -54,6 +54,5 @@ include("../imports.jl")
         FastAI.run!(buf, transform, Validation(), image2)
         # buf should be modified on different input
         @test !(buf ≈ cbuf)
-
     end
 end
