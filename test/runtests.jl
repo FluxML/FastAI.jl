@@ -4,14 +4,45 @@ include("imports.jl")
 ##
 
 @testset ExtendedTestSet "FastAI.jl" begin
-    include("steps/projective.jl")
-    include("steps/imagepreprocessing.jl")
+    @testset ExtendedTestSet "steps/" begin
+        @testset ExtendedTestSet "projective.jl" begin
+            include("steps/projective.jl")
+        end
+        @testset ExtendedTestSet "imagepreprocessing.jl" begin
+            include("steps/imagepreprocessing.jl")
+        end
+    end
 
-    include("methods/imageclassification.jl")
-    include("methods/imagesegmentation.jl")
+    @testset ExtendedTestSet "methods/" begin
+        @testset ExtendedTestSet "imageclassification.jl" begin
+            include("methods/imageclassification.jl")
+        end
+        @testset ExtendedTestSet "imagesegmentation.jl" begin
+            include("methods/imagesegmentation.jl")
+        end
+    end
 
-    include("datasets/transformations.jl")
-    include("datasets/containers.jl")
+    @testset ExtendedTestSet "datasets/" begin
+        @testset ExtendedTestSet "transformations.jl" begin
+            include("datasets/transformations.jl")
+        end
+        @testset ExtendedTestSet "containers.jl" begin
+            include("datasets/containers.jl")
+        end
+    end
 
-    include("training.jl")
+    @testset ExtendedTestSet "training/" begin
+        @testset ExtendedTestSet "paramgroups.jl" begin
+            include("training/paramgroups.jl")
+        end
+        @testset ExtendedTestSet "discriminativelrs.jl" begin
+            include("training/discriminativelrs.jl")
+        end
+        @testset ExtendedTestSet "fitonecycle.jl" begin
+            include("training/fitonecycle.jl")
+        end
+        @testset ExtendedTestSet "finetune.jl" begin
+            include("training/finetune.jl")
+        end
+    end
 end

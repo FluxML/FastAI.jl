@@ -29,29 +29,10 @@ end
 
 
 """
-    freeze(model, indices)
-
-Freeze all parameters in `model`, except those in `model[indices]`.
-"""
-freeze(model, indices) = FrozenModel(model, model -> model[indices])
-
-
-struct FrozenModel
-    model
-    fn
-end
-Flux.@functor FrozenModel
-
-Flux.params(model::FrozenModel) = params(model.fn(model.model))
-
-(m::FrozenModel)(x) = m.model(x)
-
-
-"""
     withfields(f, x; kwargs...)
 
 Replace fields on `x` with given keyword arguments, run `f` and then
-restore the fields.
+restore the fields. `x` needs to be a `mutable struct`.
 
 Every keyword argument is a mapping `(field, value)` or `(field, (setfn!, value))`.
 `setfn!(x, val)` will be used to set the field; if as in the first case none
