@@ -7,8 +7,8 @@ include("../imports.jl")
         DiscriminativeLRs(pg, Dict(1 => 0., 2 => 1.)),
         Descent(0.1)
     )
-    x1 = model[1].W
-    x2 = model[2].W
+    x1 = model[1].weight
+    x2 = model[2].weight
     # Weight of layer 1 has zeroed gradient
     @test apply!(o, x1, ones(size(x1))) == zeros(size(x1))
     # Weight of layer 2 has regular gradient
