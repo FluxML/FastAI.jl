@@ -1,9 +1,9 @@
 """
-    checkmethod_plot(method; model)
+    checkmethod_plot(method)
 
 """
 function checkmethod_plot(
-        method;
+        method::LearningMethod;
         model = mockmodel(method),
         sample = mocksample(method),
         devicefn = cpu,
@@ -12,8 +12,14 @@ function checkmethod_plot(
         x, y = DLPipelines.encode(method, context, sample)
         ŷ = DLPipelines._predictx(method, model, x, devicefn)
 
-        @test_nowarn plotsample(method, sample; resolution = (200, 200))
-        @test_nowarn plotxy(method, x, y; resolution = (200, 200))
-        @test_nowarn plotprediction(method, x, ŷ, y; resolution = (200, 200))
+        @testset ExtendedTestSet "plotsample!" begin
+            @test_nowarn plotsample(method, sample; resolution = (200, 200))
+        end
+        @testset ExtendedTestSet "plotxy!" begin
+            @test_nowarn plotxy(method, x, y; resolution = (200, 200))
+        end
+        @testset ExtendedTestSet "plotprediction!" begin
+            @test_nowarn plotprediction(method, x, ŷ, y; resolution = (200, 200))
+        end
     end
 end

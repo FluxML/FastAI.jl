@@ -96,6 +96,10 @@ function DLPipelines.encode(method::SingleKeypointRegression, context, sample::U
     return x, y
 end
 
+function DLPipelines.decodeŷ(method::SingleKeypointRegression, context, ŷ)
+    return ((ŷ ) .+ 1) ./ (2 ./ method.projections.sz)
+end
+
 scalepoint(v, sz) = v .* (2 ./ sz) .- 1
 
 # Plotting interface
@@ -110,7 +114,7 @@ end
 
 function FastAI.plotxy!(f, method::SingleKeypointRegression, x, y)
     image = FastAI.invert(method.imagepreprocessing, x)
-    v = ((y) .+ 1) ./ (2 ./ method.projections.sz)
+    v = decodeŷ(method, Validation(),  y)
     _drawkeypoint!(image, v)
 
     ax1 = f[1, 1] = FastAI.imageaxis(f)
@@ -122,10 +126,11 @@ end
 
 function FastAI.plotprediction!(f, method::SingleKeypointRegression, x, ŷ, y)
     image = FastAI.invert(method.imagepreprocessing, x)
-    v_gt = ((y) .+ 1) ./ (2 ./ method.projections.sz)
-    v_pred = ((ŷ) .+ 1) ./ (2 ./ method.projections.sz)
-    _drawkeypoint!(image, v_gt, c = RGB(0, 1, 0))
-    _drawkeypoint!(image, v_pred, c = RGB(1, 0, 0))
+    v = decodeŷ(method, Validation(), y)
+    v̂ = decodeŷ(method, Validation(), ŷ)
+
+    _drawkeypoint!(image, v, c = RGB(0, 1, 0))
+    _drawkeypoint!(image, v̂, c = RGB(1, 0, 0))
     ax1 = f[1, 1] = FastAI.imageaxis(f)
     plotimage!(ax1, image)
 
