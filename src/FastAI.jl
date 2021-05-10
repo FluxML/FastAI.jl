@@ -38,6 +38,7 @@ include("augmentation.jl")
 include("./steps/imagepreprocessing.jl")
 include("./methods/imageclassification.jl")
 include("./methods/imagesegmentation.jl")
+include("./methods/singlekeypointregression.jl")
 
 
 # submodules
@@ -92,6 +93,7 @@ export
     # methods
     ImageClassification,
     ImageSegmentation,
+    SingleKeypointRegression,
 
     # training
     methodlearner,

@@ -7,7 +7,8 @@
     - [Learning methods](docs/learning_methods.md)
 - Learning tasks
     - [Image classification](docs/methods/imageclassification.md)
-    - [Image segmentation](docs/methods/imagesegmentation.md)
+    - [Image segmentation](docs/notebooks/imagesegmentation.ipynb)
+    - [Keypoint regression](docs/notebooks/keypointregression.ipynb)
 - How To
     - [Train a model from scratch](docs/notebooks/fitonecycle.ipynb)
     - [Finetune a pretrained model](docs/notebooks/finetune.ipynb)
