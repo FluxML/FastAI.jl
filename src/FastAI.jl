@@ -13,7 +13,8 @@ using AbstractPlotting
 using Colors
 using DataAugmentation
 using DataAugmentation: getbounds, Bounds
-using DLPipelines: methoddataset, methodmodel, methodlossfn, methoddataloaders
+using DLPipelines: methoddataset, methodmodel, methodlossfn, methoddataloaders,
+    mockmodel, mocksample
 using LearnBase: getobs, nobs
 using FilePathsBase
 using FixedPointNumbers
@@ -25,6 +26,7 @@ using FluxTraining.Events
 using MLDataPattern
 using Parameters
 using StaticArrays
+using Test: @testset, @test, @test_nowarn
 
 include("tasks.jl")
 include("plotting.jl")
@@ -39,6 +41,7 @@ include("./steps/imagepreprocessing.jl")
 include("./methods/imageclassification.jl")
 include("./methods/imagesegmentation.jl")
 include("./methods/singlekeypointregression.jl")
+include("./methods/checks.jl")
 
 
 # submodules

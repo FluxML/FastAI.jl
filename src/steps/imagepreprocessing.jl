@@ -70,7 +70,7 @@ end
 
 
 function ImagePreprocessing(means::NTuple{N}, stds::NTuple{N}; kwargs...) where N
-    return ImagePreprocessing(SVector{N}(means), SVector{N}(stds); kwargs...)
+    return ImagePreprocessing(;means=SVector{N}(means), stds=SVector{N}(stds), kwargs...)
 end
 
 Base.show(io::IO, ::ImagePreprocessing) = print(io, "ImagePreprocessing()")
