@@ -136,15 +136,24 @@ end
 
 function plotsample!(f, method::ImageClassification, sample)
     image, class = sample
-    f[1, 1] = ax1 = imageaxis(f, title = class)
+    f[1, 1] = ax1 = imageaxis(f, title = string(class))
     plotimage!(ax1, image)
 end
 
-function plotxy!(f, method::ImageClassification, (x, y))
+function plotxy!(f, method::ImageClassification, x, y)
     image = invert(method.imagepreprocessing, x)
     i = argmax(y)
     ax1 = f[1, 1] = imageaxis(f, title = "$(method.classes[i]) ($(y[i]))", titlesize=12.)
     plotimage!(ax1, image)
+end
+
+function plotprediction!(f, method::ImageClassification, x, ŷ, y)
+    image = invert(method.imagepreprocessing, x)
+    gt = method.classes[argmax(y)]
+    pred = method.classes[argmax(ŷ)]
+    ax1 = f[1, 1] = imageaxis(f, title = "Pred: $pred | GT: $gt", titlesize=12.)
+    plotimage!(ax1, image)
+    return f
 end
 
 # Training interface
