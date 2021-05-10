@@ -11,10 +11,11 @@ using DataDeps
 include("layers.jl")
 include("blocks.jl")
 
-include("./xresnet.jl")
+include("xresnet.jl")
+include("unet.jl")
 
 
-export xresnet18, xresnet50
+export xresnet18, xresnet50, UNetDynamic
 
 
 end

@@ -1,9 +1,13 @@
 
+"""
+    ImageSegmentation(classes[, sz; kwargs...]) <: LearningMethod
+
+A learning method for image segmentation.
+"""
 mutable struct ImageSegmentation{N} <: DLPipelines.LearningMethod{ImageSegmentationTask}
-    sz::NTuple{N}
     classes::AbstractVector
     downscale::Int
-    projectivetransforms::ProjectiveTransforms
+    projections::ProjectiveTransforms{N}
     imagepreprocessing::ImagePreprocessing
 end
 
@@ -20,9 +24,9 @@ function ImageSegmentation(
         T=Float32)
 
     projectivetransforms = ProjectiveTransforms(sz, augmentations=aug_projection)
-    imagepreprocessing = ImagePreprocessing(means, stds; C=C, T=T, augmentations=aug_image)
+    imagepreprocessing = ImagePreprocessing(;means=means, stds=stds, C=C, T=T, augmentations=aug_image)
     return ImageSegmentation(
-        sz, classes, downscale,
+        classes, downscale,
         projectivetransforms, imagepreprocessing)
 end
 
@@ -37,7 +41,7 @@ function DLPipelines.encode(
         sample::Tuple)
     image, mask = sample
     imagec, maskc = run(
-        method.projectivetransforms,
+        method.projections,
         context,
         (DataAugmentation.Image(image), MaskMulti(mask, 1:length(method.classes))))
 
@@ -45,7 +49,7 @@ function DLPipelines.encode(
 
     f = method.downscale
     if f != 1
-        newsz = ntuple(i -> round(Int, size(image, i) * 1 / f), ndims(image))
+        newsz = ntuple(i -> round(Int, size(image, i) * 1 / 2^f), ndims(image))
         ytfm = ScaleFixed(newsz) |> DataAugmentation.Crop(newsz, DataAugmentation.FromOrigin()) |> OneHot()
     else
         ytfm = OneHot()
@@ -61,7 +65,7 @@ end
 
 
 function DLPipelines.mocksample(method::ImageSegmentation)
-    inputsz = rand.(UnitRange.(method.sz, method.sz .* 2))
+    inputsz = rand.(UnitRange.(method.projections.sz, method.projections.sz .* 2))
     return (
         input = rand(RGB{N0f8}, inputsz),
         target = rand(1:length(method.classes), inputsz)
@@ -72,7 +76,7 @@ end
 function DLPipelines.mockmodel(method::ImageSegmentation)
     return function segmodel(xs)
         outsz = (
-            round.(Int, size(xs)[1:end-1] ./ method.downscale)...,
+            round.(Int, size(xs)[1:end-1] ./ 2^method.downscale)...,
             length(method.classes),
             size(xs)[end])
         return rand(Float32, outsz)
@@ -98,20 +102,20 @@ function plotxy!(f, method::ImageSegmentation, (x, y))
     image = invert(method.imagepreprocessing, x)
     mask = decodeŷ(method, Inference(), y)
     f[1, 1] = ax1 = imageaxis(f)
-    f[1, 2] = ax2 = imageaxis(f)
+    f[2, 1] = ax2 = imageaxis(f)
     plotimage!(ax1, image)
     plotmask!(ax2, mask, method.classes, )
 end
 
 
-function DLPipelines.methodmodel(method, backbone)
-    h, w, ch, b = Flux.outdims(backbone, (method.sz..., 3, 1))
-    headupscale = (method.sz[1] / method.downscale) / h
-    n_upscale = ceil(Int, log2(headupscale))
-    return Chain(
+function DLPipelines.methodmodel(method, backbone; kwargs...)
+    return UNetDynamic(
         backbone,
-        Models.pixelshufflehead(ch, length(method.classes), n_upscale = n_upscale)
-    )
+        (method.projections.sz..., 3, 1),
+        length(method.classes);
+        fdownscale = method.downscale,
+        kwargs...)
+
 end
 
 
