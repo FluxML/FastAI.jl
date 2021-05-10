@@ -52,6 +52,11 @@ end
 function plotxy! end
 
 
+function plotprediction(method, x, ŷ, y)
+
+end
+
+
 """
     plotbatch(method, xs, ys)
     plotbatch(method, dataloader)
