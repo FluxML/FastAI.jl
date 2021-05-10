@@ -1,7 +1,7 @@
 
 
 """
-    ImageClassification(classes, sz[; augmentations, ...]) <: Method{ImageClassificationTask}
+    ImageClassification(classes, [sz = (224, 224); kwargs...]) <: LearningMethod
 
 A learning method for single-label image classification:
 given an image and a set of `classes`, determine which class the image
@@ -10,7 +10,20 @@ falls into. For example, decide if an image contains a dog or a cat.
 Images are resized and cropped to `sz` (see [`ProjectiveTransforms`](#))
 and preprocessed using [`ImagePreprocessing`](#). `classes` is a vector of the class labels.
 
-## Reference
+## Keyword arguments
+
+- `aug_projection::`[`DataAugmentation.Transform`](#)` = Identity()`: Projective
+    augmentation to apply during training. See
+    [`ProjectiveTransforms`](#) and [`augs_projection`](#).
+- `aug_image::`[`DataAugmentation.Transform`](#)` = Identity()`: Other image
+    augmentation to apply to cropped image during training. See
+    [`ImagePreprocessing`](#) and [`augs_lighting`](#).
+- `means = IMAGENET_MEANS` and `stds = IMAGENET_STDS`: Color channel means and
+    standard deviations to use for normalizing the image.
+- `buffered = true`: Whether to use inplace transformations when projecting and
+  preprocessing image. Reduces memory usage.
+
+## Learning method reference
 
 This learning method implements the following interfaces:
 
@@ -22,7 +35,6 @@ This learning method implements the following interfaces:
 
 ### Types
 
-{.tight}
 - **`sample`**: `Tuple`/`NamedTuple` of
     - **`input`**`::AbstractArray{2, T}`: A 2-dimensional array with dimensions (height, width)
         and elements of a color or number type. `Matrix{RGB{Float32}}` is a 2D RGB image,
@@ -38,18 +50,17 @@ This learning method implements the following interfaces:
 
 Array sizes that compatible models must conform to.
 
-- Full model: `(method.sz..., 3, batch) -> (length(method.classes), batch)`
-- Backbone model: `(method.sz..., 3, batch) -> ((method.sz ./ f)..., ch, batch)` where `f`
+- Full model: `(sz..., 3, batch) -> (length(classes), batch)`
+- Backbone model: `(sz..., 3, batch) -> ((sz ./ f)..., ch, batch)` where `f`
     is a downscaling factor `f = 2^k`
 
-It is recommended *not* to use [`Flux.softmax`](#) as the final layer for custom models;
-instead use [`Flux.logitcrossentropy`](#) as the loss function for increased numerical
+It is recommended *not* to use [`Flux.softmax`](#) as the final layer for custom models.
+Instead use [`Flux.logitcrossentropy`](#) as the loss function for increased numerical
 stability. This is done automatically if using with `methodmodel` and `methodlossfn`.
 """
-mutable struct ImageClassification <: DLPipelines.LearningMethod{ImageClassificationTask}
-    sz::Tuple{Int,Int}
+mutable struct ImageClassification{N} <: DLPipelines.LearningMethod{ImageClassificationTask}
     classes::AbstractVector
-    projectivetransforms::ProjectiveTransforms
+    projections::ProjectiveTransforms{N}
     imagepreprocessing::ImagePreprocessing
 end
 
@@ -68,8 +79,8 @@ function ImageClassification(
         buffered=true,
     )
     projectivetransforms = ProjectiveTransforms(sz; augmentations=aug_projection, buffered=buffered)
-    imagepreprocessing = ImagePreprocessing(means, stds; augmentations=aug_image, C=C, T=T)
-    ImageClassification(sz, classes, projectivetransforms, imagepreprocessing)
+    imagepreprocessing = ImagePreprocessing(;means=means, stds=stds, augmentations=aug_image, C=C, T=T)
+    ImageClassification(classes, projectivetransforms, imagepreprocessing)
 end
 
 
@@ -79,7 +90,7 @@ function DLPipelines.encodeinput(
         method::ImageClassification,
         context,
         image)
-    imagecropped = run(method.projectivetransforms, context, image)
+    imagecropped = run(method.projections, context, image)
     x = run(method.imagepreprocessing, context, imagecropped)
     return x
 end
@@ -139,7 +150,9 @@ end
 # Training interface
 
 function DLPipelines.methodmodel(method::ImageClassification, backbone)
-    h, w, ch, b = Flux.outdims(backbone, (method.sz..., 3, 1))
+    h, w, ch, b = Flux.outdims(backbone, (method.projections.sz..., 3, 1))
+    head = Models.visionhead(ch, length(method.classes), p = 0.)
+    return Chain(backbone, head)
     return Chain(
         backbone,
         Chain(
@@ -155,7 +168,7 @@ DLPipelines.methodlossfn(::ImageClassification) = Flux.Losses.logitcrossentropy
 # Testing interface
 
 function DLPipelines.mockinput(method::ImageClassification)
-    inputsz = rand.(UnitRange.(method.sz, method.sz .* 2))
+    inputsz = rand.(UnitRange.(method.projections.sz, method.projections.sz .* 2))
     return rand(RGB{N0f8}, inputsz)
 end
 

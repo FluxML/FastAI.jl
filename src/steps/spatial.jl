@@ -4,27 +4,93 @@
 
 
 """
-    ProjectiveTransforms(size, [augmentations])
+    ProjectiveTransforms(sz; [augmentations, buffered])
 
-Pipeline step that resizes images and keypoints to `size`.
+A helper for building learning methods with vision data. Handles
+resizing to `sz` and cropping images, masks and keypoints together as well
+as applying projective `augmentations` like flipping and rotation.
 
-In context [`Training`](#), applies `augmentations`.
+Use with [`FastAI.run`](#), for example
+`FastAI.run(::ProjectiveTransforms, context, (image, mask))`. `context`
+is a [`DLPipelines.Context`](#) with different behavior for the different
+contexts:
+
+{.tight}
+- [`DLPipelines.Training`](#):
+    1. Resizes the data so the smallest side equals
+    a side length in `sz` while keeping the aspect ratio.
+    2. Applies `augmentations`.
+    3. Crops a random `sz`-sized portion of the data
+- [`DLPipelines.Validation`](#):
+    1. Resizes the data so the smallest side equals
+    a side length in `sz` while keeping the aspect ratio.
+    2. Crops a `sz`-sized portion from the center.
+- [`DLPipelines.Inference`](#):
+    1. Resizes the data so the smallest side equals
+    a side length in `sz` while keeping the aspect ratio.
+        Note that in this context, the data does not have
+        size `sz`, since no cropping happens and aspect ratio
+        is preserved.
+
+Can also be applied inplace to buffers of the correct size using [`FastAI.run!`](#).
+
+Uses DataAugmentation.jl under the hood and tries to guess the [`DataAugmentation.Item`](#)
+type based on the types of the data. You can also explicitly pass in the items.
+
+`ProjectiveTransforms` is not limited to 2D data, and works on 3D data as well.
+Note, however, that some transformations in `augs_projection` (rotation, warping, flipping)
+are 2D only so `augs_projection` cannot be used for 3D data.
+
+## Keyword arguments
+
+- `augmentations::`[`DataAugmentation.Transform`](#)` = Identity()`: Projective
+    augmentation to apply during training. See [`augs_projection`](#).
+- `buffered = true`: Whether to use inplace transformations. Reduces memory usage.
+
+## Examples
+
+{cell=ProjectiveTransforms, output=false}
+```julia
+using FastAI, TestImages
+using DLPipelines: Training, Validation, Inference
+
+img = testimage("lighthouse")
+projections = FastAI.ProjectiveTransforms((128, 128); augmentations=augs_projection())
+
+trainimg = FastAI.run(projections, Training(), img)
+```
+
+{cell=ProjectiveTransforms, output=false}
+```julia
+FastAI.run(projections, Validation(), img)
+```
+
+{cell=ProjectiveTransforms, output=false}
+```julia
+FastAI.run(projections, Inference(), img)
+```
+
+{cell=ProjectiveTransforms, output=false}
+```julia
+FastAI.run!(copy(trainimg), projections, Training(), img)
+```
 """
-@with_kw_noshow struct ProjectiveTransforms <: PipelineStep
+@with_kw_noshow struct ProjectiveTransforms{N} <: PipelineStep
+    sz::NTuple{N, Int}
     traintfm
     validtfm
     inferencetfm
 end
 
 function ProjectiveTransforms(
-        size;
+        sz;
         augmentations = Identity(),
         inferencefactor = 1,
         buffered = true)
     tfms = (
-        ScaleKeepAspect(size) |> augmentations |> RandomCrop(size) |> PinOrigin(),
-        CenterResizeCrop(size),
-        ResizePadDivisible(size, inferencefactor),
+        ScaleKeepAspect(sz) |> augmentations |> RandomCrop(sz) |> PinOrigin(),
+        CenterResizeCrop(sz),
+        ResizePadDivisible(sz, inferencefactor),
     )
 
     if buffered
@@ -37,13 +103,12 @@ function ProjectiveTransforms(
         )
     end
 
-    return ProjectiveTransforms(tfms...)
+    return ProjectiveTransforms(sz, tfms...)
 end
 
 
-function Base.show(io::IO, spatial::ProjectiveTransforms)
-    outsize = _parenttfm(spatial.validtfm).transforms[1].crop.size
-    print(io, "ProjectiveTransforms($(outsize))")
+function Base.show(io::IO, ptfms::ProjectiveTransforms)
+    print(io, "ProjectiveTransforms($(ptfms.sz))")
 end
 
 
@@ -100,5 +165,5 @@ makeitem(item::Item, args...) = item
 makeitem(datas::Tuple, args...) = Tuple(makeitem(data, args...) for data in datas)
 
 
-itemtype(data::AbstractMatrix{<:Colorant}) = DataAugmentation.Image
-itemtype(data::Vector{<:Union{Nothing, SVector}}) = DataAugmentation.Keypoints
+itemtype(::AbstractMatrix{<:Colorant}) = DataAugmentation.Image
+itemtype(::Vector{<:Union{Nothing, SVector}}) = DataAugmentation.Keypoints
