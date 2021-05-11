@@ -4,7 +4,7 @@ When doing image classification, we want to train a model to classify a given im
 
 ## Single-label classification
 
-In the simple case, every image will have one class from a list associated with it. For example, the Cats&Dogs dataset contains pictures of cats and dogs (duh). The learning method [`ImageClassification`](#) handles single-label image classification. Let's load some samples and visualize them:
+In the simple case, every image will have one class from a list associated with it. For example, the Cats&Dogs dataset contains pictures of cats and dogs. The learning method [`ImageClassification`](#) handles single-label image classification. Let's load some samples and visualize them:
 
 {cell=main output=false result=false style="display:none;"}
 ```julia

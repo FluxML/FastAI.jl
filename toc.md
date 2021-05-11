@@ -5,6 +5,7 @@
     - [Introduction](docs/introduction.md)
     - [Data containers](docs/data_containers.md)
     - [Learning methods](docs/learning_methods.md)
+    - [Saving and loading models](docs/notebooks/serialization.ipynb)
 - Learning tasks
     - [Image classification](docs/methods/imageclassification.md)
     - [Image segmentation](docs/notebooks/imagesegmentation.ipynb)

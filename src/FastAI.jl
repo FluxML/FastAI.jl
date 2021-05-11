@@ -14,7 +14,7 @@ using Colors
 using DataAugmentation
 using DataAugmentation: getbounds, Bounds
 using DLPipelines: methoddataset, methodmodel, methodlossfn, methoddataloaders,
-    mockmodel, mocksample
+    mockmodel, mocksample, predict, predictbatch
 using LearnBase: getobs, nobs
 using FilePathsBase
 using FixedPointNumbers
@@ -23,9 +23,11 @@ using Flux.Optimise
 import Flux.Optimise: apply!
 using FluxTraining: Learner, handle
 using FluxTraining.Events
+using JLD2: jldsave, jldopen
 using MLDataPattern
 using Parameters
 using StaticArrays
+using ShowCases
 using Test: @testset, @test, @test_nowarn
 
 include("tasks.jl")
@@ -59,7 +61,9 @@ include("training/onecycle.jl")
 include("training/finetune.jl")
 include("training/lrfind.jl")
 
-export methodlossfn
+include("serialization.jl")
+
+
 
 
 export
@@ -81,6 +85,8 @@ export
     methodlossfn,
     getobs,
     nobs,
+    predict,
+    predictbatch,
 
     # plotting API
     plotbatch,
@@ -104,6 +110,8 @@ export
     fit!,
     fitonecycle!,
     finetune!,
+    savemethodmodel,
+    loadmethodmodel,
 
     gpu
 
