@@ -77,9 +77,15 @@ FastAI.run!(copy(trainimg), projections, Training(), img)
 """
 @with_kw_noshow struct ProjectiveTransforms{N} <: PipelineStep
     sz::NTuple{N, Int}
+    buffered::Bool
+    augmentations
     traintfm
     validtfm
     inferencetfm
+end
+
+function Base.show(io::IO, p::ProjectiveTransforms)
+    show(io, ShowCase(p, [:sz, :buffered, :augmentations]))
 end
 
 function ProjectiveTransforms(
@@ -103,7 +109,7 @@ function ProjectiveTransforms(
         )
     end
 
-    return ProjectiveTransforms(sz, tfms...)
+    return ProjectiveTransforms(sz, buffered, augmentations, tfms...)
 end
 
 

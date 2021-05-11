@@ -37,10 +37,16 @@ summary(a)
 
 """
 struct ImagePreprocessing
+    C
+    T
+    buffered
+    augmentations
     traintfm
     validtfm
     inferencetfm
 end
+
+Base.show(io::IO, ip::ImagePreprocessing) = show(io, ShowCase(ip, (:C, :T, :buffered)))
 
 function ImagePreprocessing(;
         means::SVector{N} = IMAGENET_MEANS,
@@ -65,7 +71,7 @@ function ImagePreprocessing(;
         )
     end
 
-    return ImagePreprocessing(tfms...)
+    return ImagePreprocessing(C, T, buffered, augmentations, tfms...)
 end
 
 

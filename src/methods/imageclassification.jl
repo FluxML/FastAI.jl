@@ -64,8 +64,15 @@ mutable struct ImageClassification{N} <: DLPipelines.LearningMethod{ImageClassif
     imagepreprocessing::ImagePreprocessing
 end
 
-Base.show(io::IO, method::ImageClassification) = print(
-    io, "ImageClassification() with $(length(method.classes)) classes")
+function Base.show(io::IO, method::ImageClassification)
+    show(io, ShowTypeOf(method))
+    fields = (
+        classes = ShowLimit(ShowList(method.classes, brackets="[]"), limit=80),
+        projections = method.projections,
+        imageprepocessing = method.imagepreprocessing
+    )
+    show(io, ShowProps(fields, new_lines=true))
+end
 
 function ImageClassification(
         classes::AbstractVector,

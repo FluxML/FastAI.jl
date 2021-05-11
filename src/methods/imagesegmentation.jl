@@ -77,6 +77,18 @@ mutable struct ImageSegmentation{N} <: DLPipelines.LearningMethod{ImageSegmentat
 end
 
 
+function Base.show(io::IO, method::ImageSegmentation)
+    show(io, ShowTypeOf(method))
+    fields = (
+        classes = ShowLimit(ShowList(method.classes, brackets="[]"), limit=50),
+        downscale = method.downscale,
+        projections = method.projections,
+        imageprepocessing = method.imagepreprocessing
+    )
+    show(io, ShowProps(fields, new_lines=true))
+end
+
+
 function ImageSegmentation(
         classes::AbstractVector,
         sz=(224, 224);
