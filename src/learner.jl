@@ -22,10 +22,10 @@ function methodlearner(
     model = isbackbone ? methodmodel(method, backbone) : backbone
     dls = if isnothing(validdata)
         methoddataloaders(data, method, batchsize;
-            validbsfactor = validbsfactor, pctgval = pctgval)
+            validbsfactor = validbsfactor, pctgval = pctgval, dlkwargs...)
     else
         methoddataloaders(data, validdata, method, batchsize;
-            validbsfactor = validbsfactor)
+            validbsfactor = validbsfactor, dlkwargs...)
     end
     return Learner(model, dls, optimizer, lossfn, callbacks...)
 end
