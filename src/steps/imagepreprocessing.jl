@@ -1,25 +1,56 @@
 # See **[`ImagePreprocessing`](#).**
 
 """
-    ImagePreprocessing(means, stds[; augmentations, C = RGB{N0f8}, T = Float32])
+    ImagePreprocessing([; kwargs...])
 
-Converts an image to a color `C`, then to a 3D-array of type `T` and
-finally normalizes the values using `means` and `stds`.
+A helper for building learning methods that need to preprocess images.
+Preprocessing consists of applying color `augmentations` like [`augs_lighting`]
+(only during training), conversion to a common color type `C`, expanding color
+channels to an array dimension and normalizing the values.
 
-If no `means` or `stds` are given, uses ImageNet statistics.
+Apply to an image using [`FastAI.run`](#) or inplace using [`FastAI.run!`](#).
+
+The only difference between different contexts is that augmentations are only
+applied during [`DLPipelines.Training`](#).
+
+## Keyword arguments
+
+- `augmentations::`[`DataAugmentation.Transform`](#): Augmentation to apply to every image
+    before preprocessing. See [`augs_lighting`](#)
+- `buffered = true`: Whether to use inplace transformations. Reduces memory usage.
+- `means::SVector = IMAGENET_MEANS`: mean value of each color channel.
+- `stds::SVector = IMAGENET_STDS`: standard deviation of each color channel.
+- `C::Type{<:Colorant} = RGB{N0f8}`: color type to convert images to.
+- `T::Type{<:Real} = Float32`: element type of output
+
+## Examples
+
+
+{cell=ImagePreprocessing, output=false}
+```julia
+using FastAI, TestImages
+img = testimage("lighthouse")
+preprocessing = FastAI.ImagePreprocessing(augmentations=augs_lighting())
+a = FastAI.run(preprocessing, Training(), img)
+summary(a)
+```
+
 """
 struct ImagePreprocessing
-    # hold one copy of the transform for every context
-    # in case the input sizes differ based on `context`
-    # since that would create problems with the buffers
+    C
+    T
+    buffered
+    augmentations
     traintfm
     validtfm
     inferencetfm
 end
 
-function ImagePreprocessing(
+Base.show(io::IO, ip::ImagePreprocessing) = show(io, ShowCase(ip, (:C, :T, :buffered)))
+
+function ImagePreprocessing(;
         means::SVector{N} = IMAGENET_MEANS,
-        stds::SVector{N} = IMAGENET_STDS;
+        stds::SVector{N} = IMAGENET_STDS,
         augmentations = Identity(),
         C = RGB{N0f8},
         T = Float32,
@@ -40,15 +71,13 @@ function ImagePreprocessing(
         )
     end
 
-    return ImagePreprocessing(tfms...)
+    return ImagePreprocessing(C, T, buffered, augmentations, tfms...)
 end
 
 
 function ImagePreprocessing(means::NTuple{N}, stds::NTuple{N}; kwargs...) where N
-    return ImagePreprocessing(SVector{N}(means), SVector{N}(stds); kwargs...)
+    return ImagePreprocessing(;means=SVector{N}(means), stds=SVector{N}(stds), kwargs...)
 end
-
-Base.show(io::IO, ::ImagePreprocessing) = print(io, "ImagePreprocessing()")
 
 
 function run(ip::ImagePreprocessing, context::Context, image)

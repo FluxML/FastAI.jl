@@ -60,7 +60,7 @@ const DATASETCONFIGS = [
     FastAIDataset("yelp_review_polarity_csv", "nlp"),
 
     # imagelocal
-    FastAIDataset("biwi_head_pose", "imagelocal"),
+    FastAIDataset("biwi_head_pose", "imagelocal", "9cfefd53ed85f824c5908bc6eb21fc719583eec57a7df1d8141d3156645693cf", size="430MiB"),
     FastAIDataset("camvid", "imagelocal"),
     FastAIDataset("pascal-voc", "imagelocal"),
     FastAIDataset("pascal_2007", "imagelocal"),

@@ -20,6 +20,9 @@ include("imports.jl")
         @testset ExtendedTestSet "imagesegmentation.jl" begin
             include("methods/imagesegmentation.jl")
         end
+        @testset ExtendedTestSet "singlekeypointregression.jl" begin
+            include("methods/singlekeypointregression.jl")
+        end
     end
 
     @testset ExtendedTestSet "datasets/" begin

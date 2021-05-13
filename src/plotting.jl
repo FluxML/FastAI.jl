@@ -9,52 +9,84 @@ defaultfigure(;kwargs...) = Figure(
 """
     plotsample(method, sample)
 
-Plot a `sample` of a `method` or `Task` type.
-See also [`plotsample!`](#)
+Plot a `sample` of a `method`.
+
+Learning methods should implement [`plotsample!`](#) to make this work.
 
 ## Examples
 
 ```julia
-sample = (rand(Gray, 28, 28), 1)
-plotsample(ImageClassificationTask, sample)
+using FastAI, Colors
 
+sample = (rand(Gray, 28, 28), 1)
 method = ImageClassification(1:10, (16, 16))
 plotsample(method, sample)
 ```
 """
-function plotsample(method, sample)
-    f = defaultfigure(resolution=(300, 150))
+function plotsample(method, sample; figkwargs...)
+    f = defaultfigure(; figkwargs...)
     plotsample!(f, method, sample)
     return f
 end
 
 """
-    plotsample!(f, Task, sample)
     plotsample!(f, method, sample)
 
-Plot a `sample` of a `method` or `Task` type on figure or axis `f`.
-See also [`plotsample`](#)
+Plot a `sample` of a `method` type on a Makie.jl figure or
+axis `f`. See also [`plotsample`](#).
 
+Part of the plotting interface for learning methods.
 """
 function plotsample! end
 
 """
     plotxy(method, (x, y))
 """
-function plotxy(method, xy)
-    f = defaultfigure(resolution=(300, 150))
-    plotxy!(f, method, xy)
+function plotxy(method, x, y; figkwargs...)
+    f = defaultfigure(; figkwargs...)
+    plotxy!(f, method, x, y)
     return f
 end
 """
-    plotxy!(f, method, (x, y))
+    plotxy!(f, method, x, y)
 """
 function plotxy! end
 
+function plotprediction(method, x, ŷ, y; figkwargs...)
+    f = defaultfigure(; figkwargs...)
+    plotprediction!(f, method, x, ŷ, y)
+    return f
+end
+
+"""
+    plotprediction(method, x, ŷ, y)
+    plotprediction!(f, method, x, ŷ, y)
+
+Plot a comparison of model output `ŷ` with the ground truth `y` on
+Makie.jl figure or axis `f`. `x` is the model input.
+"""
+function plotprediction! end
+
+"""
+    plotpredictions(method, xs, ŷs, ys)
+
+Plot a comparison of batches of model outputs `ŷs` with the ground truths
+`ys` on Makie.jl figure or axis `f`. `xs` is a batch of model inputs.
+"""
+plotpredictions(method, xs, ŷs, ys) = plotpredictions!(defaultfigure(), method, xs, ŷs, ys)
+
+function plotpredictions!(f, method, xs, ŷs, ys)
+    n = size(xs)[end]
+    nrows = Int(ceil(sqrt(n)))
+    is = Iterators.product(1:nrows, 1:nrows)
+    for (i, (x, ŷ, y)) in zip(is, DataLoaders.obsslices((xs, ŷs, ys)))
+        plotprediction!(f[i...], method, x, ŷ, y)
+    end
+    return f
+end
 
 """
     plotbatch(method, xs, ys)
-    plotbatch(method, dataloader)
 
 Plot an encoded batch of data in a grid.
 """
@@ -65,7 +97,7 @@ function plotbatch!(f, method, xs, ys)
     nrows = Int(ceil(sqrt(n)))
     is = Iterators.product(1:nrows, 1:nrows)
     for (i, (x, y)) in zip(is, DataLoaders.obsslices((xs, ys)))
-        plotxy!(f[i...], method, (x, y))
+        plotxy!(f[i...], method, x, y)
     end
     return f
 end
@@ -147,7 +179,7 @@ end
 
 function maskimage(mask, classes)
     colors = distinguishable_colors(length(classes), transform=deuteranopic)
-    im = map(c -> colors[c], mask)
+    return map(c -> colors[c], mask)
 end
 
 maskimage(mask::AbstractArray{<:Gray{T}}, args...) where T =

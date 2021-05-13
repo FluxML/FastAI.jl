@@ -5,14 +5,17 @@
     - [Introduction](docs/introduction.md)
     - [Data containers](docs/data_containers.md)
     - [Learning methods](docs/learning_methods.md)
+    - [Saving and loading models](docs/notebooks/serialization.ipynb)
 - Learning tasks
     - [Image classification](docs/methods/imageclassification.md)
-    - [Image segmentation](docs/methods/imagesegmentation.md)
+    - [Image segmentation](docs/notebooks/imagesegmentation.ipynb)
+    - [Keypoint regression](docs/notebooks/keypointregression.ipynb)
 - How To
     - [Train a model from scratch](docs/notebooks/fitonecycle.ipynb)
     - [Finetune a pretrained model](docs/notebooks/finetune.ipynb)
     - [Find a good learning rate](docs/notebooks/lrfind.ipynb)
     - [Augment vision data](docs/howto/augmentvision.md)
+    - [Visualize data](docs/notebooks/how_to_visualize.ipynb)
 - Reference
     - [Docstrings](REFERENCE)
     - [Interfaces](docs/interfaces.md)

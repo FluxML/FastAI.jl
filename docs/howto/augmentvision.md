@@ -12,7 +12,7 @@ function showfig(f)
 end
 ```
 
-{cell=main, result=false}
+{cell=main result=false output=false}
 ```julia
 using FastAI
 using CairoMakie
@@ -53,3 +53,7 @@ method3 = ImageClassification(
 xs3, ys3 = FastAI.makebatch(method3, data, fill(4, 9))
 f = FastAI.plotbatch(method3, xs3, ys3)
 ```
+
+## Augmentation in custom learning methods
+
+To use projective and image augmentations in custom learning methods for computer vision tasks, see [`ProjectiveTransforms`](#) and [`ImagePreprocessing`](#), two helpers that every vision method in FastAI.jl uses.
