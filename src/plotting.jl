@@ -79,7 +79,7 @@ function plotbatch!(f, method, xs, ys)
     nrows = Int(ceil(sqrt(n)))
     is = Iterators.product(1:nrows, 1:nrows)
     for (i, (x, y)) in zip(is, DataLoaders.obsslices((xs, ys)))
-        plotxy!(f[i...], method, (x, y))
+        plotxy!(f[i...], method, x, y)
     end
     return f
 end
