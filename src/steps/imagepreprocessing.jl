@@ -79,8 +79,6 @@ function ImagePreprocessing(means::NTuple{N}, stds::NTuple{N}; kwargs...) where 
     return ImagePreprocessing(;means=SVector{N}(means), stds=SVector{N}(stds), kwargs...)
 end
 
-Base.show(io::IO, ::ImagePreprocessing) = print(io, "ImagePreprocessing()")
-
 
 function run(ip::ImagePreprocessing, context::Context, image)
     tfm = _gettfm(ip, context)

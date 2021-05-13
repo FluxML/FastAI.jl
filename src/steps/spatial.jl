@@ -113,11 +113,6 @@ function ProjectiveTransforms(
 end
 
 
-function Base.show(io::IO, ptfms::ProjectiveTransforms)
-    print(io, "ProjectiveTransforms($(ptfms.sz))")
-end
-
-
 function run(spatial::ProjectiveTransforms, context, datas::Tuple)
     items = makespatialitems(datas)
     tfm = _gettfm(spatial, context)
