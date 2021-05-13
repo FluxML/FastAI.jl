@@ -8,6 +8,6 @@ using FilePathsBase
 
 ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 
-refmodules = [FluxTraining, DLPipelines, DataAugmentation, FastAI.Datasets, FastAI]
+refmodules = [FastAI, FluxTraining, DLPipelines, DataAugmentation, FastAI.Datasets]
 project = Pollen.documentationproject(FastAI; refmodules = refmodules)
 Pollen.fullbuild(project, Pollen.FileBuilder(Pollen.HTML(), p"dev/"))
