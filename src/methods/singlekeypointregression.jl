@@ -86,6 +86,15 @@ function SingleKeypointRegression(
     return SingleKeypointRegression(projections, imagepreprocessing)
 end
 
+function Base.show(io::IO, method::SingleKeypointRegression)
+    show(io, ShowTypeOf(method))
+    fields = (
+        projections = ShowLimit(method.projections, limit=80),
+        imageprepocessing = ShowLimit(method.imagepreprocessing, limit=80)
+    )
+    show(io, ShowProps(fields, new_lines=true))
+end
+
 # Core interface
 
 function DLPipelines.encode(method::SingleKeypointRegression, context, sample::Union{Tuple, NamedTuple})
