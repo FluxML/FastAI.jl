@@ -15,6 +15,7 @@
     - [Finetune a pretrained model](docs/notebooks/finetune.ipynb)
     - [Find a good learning rate](docs/notebooks/lrfind.ipynb)
     - [Augment vision data](docs/howto/augmentvision.md)
+    - [Visualize data](docs/notebooks/how_to_visualize.ipynb)
 - Reference
     - [Docstrings](REFERENCE)
     - [Interfaces](docs/interfaces.md)
