@@ -28,7 +28,7 @@ image = getobs(taskdata, 1).input</code></pre><div class=coderesult ><img src="d
  "Tunnel"
  "VegetationMisc"
  "Void"
- "Wall"</code></pre><p><a href=../../REFERENCE/FastAI.Datasets.Datasets.ImageSegmentation.html ><code>FastAI.Datasets.ImageSegmentation</code></a> is the <a href=../tutorials/learning_methods.md.html title= >learning method</a> for this task. We can pass it the classes and an input image size a model will be trained on. As always, you can click on a symbol to look up its documentation and find out about other, optional, arguments.</p><pre lang=julia ><code>method = ImageSegmentation(classes, (96, 128))</code></pre><pre class=coderesult ><code>ImageSegmentation{2}(
+ "Wall"</code></pre><p><a href=../../REFERENCE/FastAI.ImageSegmentation.html ><code>ImageSegmentation</code></a> is the <a href=../tutorials/learning_methods.md.html title= >learning method</a> for this task. We can pass it the classes and an input image size a model will be trained on. As always, you can click on a symbol to look up its documentation and find out about other, optional, arguments.</p><pre lang=julia ><code>method = ImageSegmentation(classes, (96, 128))</code></pre><pre class=coderesult ><code>ImageSegmentation{2}(
     classes = ["Animal", "Archway", "Bicyclist", "Bridge", "Buil…], 
     downscale = 0, 
     projections = ProjectiveTransforms{2}(sz=(96, 128), buffered=true, augmentations=DataAugmentation.Identity()), 

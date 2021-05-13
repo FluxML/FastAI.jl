@@ -10,23 +10,6 @@ learner = Learner(model, dls, ADAM(), methodlossfn(method), ToGPU(), Metrics(acc
 fitonecycle!(learner, 5)
 </code></pre><p>Let’s unpack each line.</p><h2 id=data-containers >Data containers</h2><div class=cellcontainer ><pre cell=main lang=julia ><code>path = datasetpath(&quot;imagenette2-160&quot;)
 dataset = loadtaskdata(path, ImageClassificationTask)
-</code></pre><pre class=codeoutput ><code>
-7-Zip (a) [64] 16.02 : Copyright (c) 1999-2016 Igor Pavlov : 2016-05-21
-p7zip Version 16.02 (locale=C.UTF-8,Utf16=on,HugeFiles=on,64 bits,2 CPUs Intel(R) Xeon(R) CPU E5-2673 v4 @ 2.30GHz (406F1),ASM,AES-NI)
-
-
-Extracting archive: 
---
-Path = 
-Type = tar
-Code Page = UTF-8
-
-Everything is Ok
-
-Folders: 23
-Files: 13397
-Size:       107794109
-Compressed: 6872064
 </code></pre><pre class=coderesult ><code>mapobs((input = FastAI.Datasets.loadfile, target = FastAI.Datasets.var"#27#32"()), DataSubset(::FastAI.Datasets.FileDataset, ::Vector{Int64}, ObsDim.Undefined())
  13394 observations)</code></pre></div><p>These two lines download and load the <a href=https://github.com/fastai/imagenette title= >ImageNette</a> image classification dataset, a small subset of ImageNet with 10 different classes. <code>dataset</code> is a <a href=./data_containers.md.html title= >data container</a> that can be used to load individual observations, here of images and the corresponding labels. We can use <code>getobs(dataset, i)</code> to load the <code>i</code>-th observation and <code>nobs</code> to find out how many observations there are.</p><div class=cellcontainer ><pre cell=main lang=julia ><code>image, class = getobs(dataset, 1000)
 @show class
@@ -39,7 +22,7 @@ method = ImageClassification(classes, (160, 160))
     classes = ["n01440764", "n02102040", "n02979186", "n03000684", "n03028079", "n03394916", "…], 
     projections = ProjectiveTransforms{2}(sz=(160, 160), buffered=true, augmentations=Identity()), 
     imageprepocessing = ImagePreprocessing(C=ColorTypes.RGB{FixedPointNumbers.N0f8}, T=Float32, buffered=true)
-)</code></pre></div><p>Here we define an instance of the learning method <a href=../REFERENCE/FastAI.Datasets.Datasets.ImageClassification.html ><code>FastAI.Datasets.ImageClassification</code></a> which defines how data is processed before being fed to the model and how model outputs are turned into predictions. <code>classes</code> is a vector of strings naming each class, and <code>(224, 224)</code> the size of the images that are input to the model.</p><p><code>ImageClassification</code> is a <code>LearningMethod</code>, an abstraction that encapsulates the logic and configuration for training models on a specific learning task. See <a href=./learning_methods.md.html title= >learning methods</a> to find out more about how they can be used and how to create custom learning methods.</p><h2 id=data-loaders >Data loaders</h2><div class=cellcontainer ><pre cell=main lang=julia ><code>dls = methoddataloaders(dataset, method, 16)
+)</code></pre></div><p>Here we define an instance of the learning method <a href=../REFERENCE/FastAI.ImageClassification.html ><code>ImageClassification</code></a> which defines how data is processed before being fed to the model and how model outputs are turned into predictions. <code>classes</code> is a vector of strings naming each class, and <code>(224, 224)</code> the size of the images that are input to the model.</p><p><code>ImageClassification</code> is a <code>LearningMethod</code>, an abstraction that encapsulates the logic and configuration for training models on a specific learning task. See <a href=./learning_methods.md.html title= >learning methods</a> to find out more about how they can be used and how to create custom learning methods.</p><h2 id=data-loaders >Data loaders</h2><div class=cellcontainer ><pre cell=main lang=julia ><code>dls = methoddataloaders(dataset, method, 16)
 </code></pre><pre class=coderesult ><code>(eachobsparallel(batchviewcollated() with 670 batches of size 16), eachobsparallel(batchviewcollated() with 84 batches of size 32))</code></pre></div><p>Next we turn the data container into training and validation data loaders. These take care of efficiently loading batches of data (by default in parallel). The observations are already preprocessed using the information in <code>method</code> and then batched together. Let’s look at a single batch:</p><div class=cellcontainer ><pre cell=main lang=julia ><code>traindl, valdl = dls
 (xs, ys), _ = iterate(traindl)
 summary.((xs, ys))
