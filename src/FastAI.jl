@@ -13,7 +13,8 @@ using AbstractPlotting
 using Colors
 using DataAugmentation
 using DataAugmentation: getbounds, Bounds
-using DLPipelines: methoddataset, methodmodel, methodlossfn, methoddataloaders
+using DLPipelines: methoddataset, methodmodel, methodlossfn, methoddataloaders,
+    mockmodel, mocksample, predict, predictbatch
 using LearnBase: getobs, nobs
 using FilePathsBase
 using FixedPointNumbers
@@ -22,9 +23,12 @@ using Flux.Optimise
 import Flux.Optimise: apply!
 using FluxTraining: Learner, handle
 using FluxTraining.Events
+using JLD2: jldsave, jldopen
 using MLDataPattern
 using Parameters
 using StaticArrays
+using ShowCases
+using Test: @testset, @test, @test_nowarn
 
 include("tasks.jl")
 include("plotting.jl")
@@ -38,6 +42,8 @@ include("augmentation.jl")
 include("./steps/imagepreprocessing.jl")
 include("./methods/imageclassification.jl")
 include("./methods/imagesegmentation.jl")
+include("./methods/singlekeypointregression.jl")
+include("./methods/checks.jl")
 
 
 # submodules
@@ -55,7 +61,9 @@ include("training/onecycle.jl")
 include("training/finetune.jl")
 include("training/lrfind.jl")
 
-export methodlossfn
+include("serialization.jl")
+
+
 
 
 export
@@ -77,10 +85,14 @@ export
     methodlossfn,
     getobs,
     nobs,
+    predict,
+    predictbatch,
 
     # plotting API
     plotbatch,
     plotsamples,
+    plotpredictions,
+    makebatch,
 
     # pipeline steps
     ProjectiveTransforms, ImagePreprocessing, augs_projection, augs_lighting,
@@ -92,6 +104,7 @@ export
     # methods
     ImageClassification,
     ImageSegmentation,
+    SingleKeypointRegression,
 
     # training
     methodlearner,
@@ -99,6 +112,8 @@ export
     fit!,
     fitonecycle!,
     finetune!,
+    savemethodmodel,
+    loadmethodmodel,
 
     gpu
 

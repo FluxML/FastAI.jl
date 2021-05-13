@@ -23,7 +23,7 @@ function visionhead(
         k_in,
         k_out;
         ks_dense=[512],
-        p=0.5,
+        p=0.,
         concat_pool=true,
         bn_first=true,
         bn_final=true,

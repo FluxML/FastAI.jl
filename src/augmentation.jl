@@ -8,9 +8,9 @@ and keypoint data. Similar to fastai's
 ## Keyword arguments
 
 - `flipx = true`: Whether to perform a horizontal flip with probability `1/2`
-- `flipy = true`: Whether to perform a vertical flip with probability `1/2`
+- `flipy = false`: Whether to perform a vertical flip with probability `1/2`
 - `max_zoom = 1.2`: Maximum factor by which to zoom. Set to `1.` to disable.
-- `max_rotate = 10`: Maximum absolute degree by which to rotate.
+- `max_rotate = 10`: Maximum absolute degree by which to rotate. Set to `0.` to disable.
 - `max_warp = 0.1`: Intensity of corner warp. Set to `0.` to disable.
 
 """
@@ -26,7 +26,7 @@ function augs_projection(;
     flipx && push!(tfms, Maybe(FlipX()))
     flipy && push!(tfms, Maybe(FlipY()))
     max_warp > 0 && push!(tfms, WarpAffine(max_warp))
-    push!(tfms, Rotate(max_rotate))
+    max_rotate > 0 && push!(tfms, Rotate(max_rotate))
     push!(tfms, Zoom((1., max_zoom)))
     return DataAugmentation.compose(tfms...)
 end
