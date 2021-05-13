@@ -59,6 +59,7 @@ function plotprediction(method, x, ŷ, y; figkwargs...)
 end
 
 """
+    plotprediction(method, x, ŷ, y)
     plotprediction!(f, method, x, ŷ, y)
 
 Plot a comparison of model output `ŷ` with the ground truth `y` on
@@ -66,6 +67,23 @@ Makie.jl figure or axis `f`. `x` is the model input.
 """
 function plotprediction! end
 
+"""
+    plotpredictions(method, xs, ŷs, ys)
+
+Plot a comparison of batches of model outputs `ŷs` with the ground truths
+`ys` on Makie.jl figure or axis `f`. `xs` is a batch of model inputs.
+"""
+plotpredictions(method, xs, ŷs, ys) = plotpredictions!(defaultfigure(), method, xs, ŷs, ys)
+
+function plotpredictions!(f, method, xs, ŷs, ys)
+    n = size(xs)[end]
+    nrows = Int(ceil(sqrt(n)))
+    is = Iterators.product(1:nrows, 1:nrows)
+    for (i, (x, ŷ, y)) in zip(is, DataLoaders.obsslices((xs, ŷs, ys)))
+        plotprediction!(f[i...], method, x, ŷ, y)
+    end
+    return f
+end
 
 """
     plotbatch(method, xs, ys)

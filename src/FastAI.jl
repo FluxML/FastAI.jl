@@ -91,6 +91,8 @@ export
     # plotting API
     plotbatch,
     plotsamples,
+    plotpredictions,
+    makebatch,
 
     # pipeline steps
     ProjectiveTransforms, ImagePreprocessing, augs_projection, augs_lighting,
