@@ -6,6 +6,23 @@ using FastAI.Datasets: datasetpath, loadtaskdata
 NAME = &quot;imagenette2-160&quot;
 dir = datasetpath(NAME)
 data = loadtaskdata(dir, ImageClassificationTask)
+</code></pre><pre class=codeoutput ><code>
+7-Zip (a) [64] 16.02 : Copyright (c) 1999-2016 Igor Pavlov : 2016-05-21
+p7zip Version 16.02 (locale=C.UTF-8,Utf16=on,HugeFiles=on,64 bits,2 CPUs Intel(R) Xeon(R) Platinum 8171M CPU @ 2.60GHz (50654),ASM,AES-NI)
+
+
+Extracting archive: 
+--
+Path = 
+Type = tar
+Code Page = UTF-8
+
+Everything is Ok
+
+Folders: 23
+Files: 13397
+Size:       107794109
+Compressed: 6872064
 </code></pre><pre class=coderesult ><code>mapobs((input = FastAI.Datasets.loadfile, target = FastAI.Datasets.var"#27#32"()), DataSubset(::FastAI.Datasets.FileDataset, ::Vector{Int64}, ObsDim.Undefined())
  13394 observations)</code></pre></div><p>A data container is any type that holds observations of data and allows us to load them with <code>getobs</code> and query the number of observations with <code>nobs</code>:</p><div class=cellcontainer ><pre cell=main lang=julia ><code>obs = getobs(data, 1)
 </code></pre><pre class=coderesult ><code>(input = ColorTypes.RGB{FixedPointNumbers.N0f8}[RGB{N0f8}(0.451,0.424,0.314) RGB{N0f8}(0.6,0.569,0.478) … RGB{N0f8}(0.773,0.824,0.784) RGB{N0f8}(0.753,0.804,0.765); RGB{N0f8}(0.584,0.557,0.447) RGB{N0f8}(0.745,0.714,0.624) … RGB{N0f8}(0.71,0.761,0.722) RGB{N0f8}(0.678,0.729,0.69); … ; RGB{N0f8}(0.525,0.627,0.624) RGB{N0f8}(0.498,0.612,0.596) … RGB{N0f8}(0.506,0.553,0.459) RGB{N0f8}(0.392,0.439,0.345); RGB{N0f8}(0.396,0.498,0.486) RGB{N0f8}(0.431,0.533,0.522) … RGB{N0f8}(0.361,0.412,0.294) RGB{N0f8}(0.353,0.408,0.278)], target = "n01440764")</code></pre></div><div class=cellcontainer ><pre cell=main lang=julia ><code>nobs(data)
