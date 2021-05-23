@@ -24,7 +24,7 @@ const DATASETCONFIGS = [
     FastAIDataset("cifar10", "imageclas", "637c5814e11aefcb6ee76d5f59c67ddc8de7f5b5077502a195b0833d1e3e4441"),
     FastAIDataset("cifar100", "imageclas", "085ac613ceb0b3659c8072143ae553d5dd146b3c4206c3672a56ed02d0e77d28"),
     FastAIDataset("food-101", "imageclas"),
-    FastAIDataset("imagenette-160", "imageclas"),
+    FastAIDataset("imagenette-160", "imageclas", "1bd650bc16884ca88e4f0f537ed8569b1f8d7ae865d37eba8ecdd87d9cd9dcfa", size="1.45GiB"),
     FastAIDataset("imagenette-320", "imageclas"),
     FastAIDataset("imagenette", "imageclas"),
     FastAIDataset("imagenette2-160", "imageclas", "64d0c4859f35a461889e0147755a999a48b49bf38a7e0f9bd27003f10db02fe5"),
