@@ -160,7 +160,7 @@ end
 
 # Training interface
 
-DLPipelines.methodlossfn(method::SingleKeypointRegression) = Flux.mse
+DLPipelines.methodlossfn(::SingleKeypointRegression) = Flux.mse
 
 function DLPipelines.methodmodel(method::SingleKeypointRegression, backbone)
     h, w, ch, b = Flux.outdims(backbone, (method.projections.sz..., 3, 1))
