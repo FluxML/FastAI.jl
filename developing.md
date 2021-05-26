@@ -36,7 +36,7 @@ On subsequent runs, it'll be enough to activate the environment and include the 
 ```julia
 using FastAI, Pkg
 Pkg.activate(joinpath(pkgdir(FastAI), "docs"))
-include(joinpath(pkgdir("FastAI"), "docs", "serve.jl"))
+include(joinpath(pkgdir(FastAI), "docs", "serve.jl"))
 ```
 
 ### Notes
