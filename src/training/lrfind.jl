@@ -92,7 +92,7 @@ function plotlrfind(lrs, losses)
     ax.yticklabelsize = 10.
 
 
-    AbstractPlotting.lines!(ax, log.(lrs), log.(losses), axis = (xticks = LinearTicks(10),))
+    Makie.lines!(ax, log.(lrs), log.(losses), axis = (xticks = LinearTicks(10),))
     return f
 end
 
