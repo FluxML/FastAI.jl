@@ -83,4 +83,4 @@ LearnBase.getobs(dataset::TableDataset{<:DataFrame}, idx) = dataset.table[idx, :
 LearnBase.nobs(dataset::TableDataset{<:DataFrame}) = nrow(dataset.table)
 
 LearnBase.getobs(dataset::TableDataset{<:CSV.File}, idx) = dataset.table[idx]
-LearnBase.getobs(dataset::TableDataset{<:CSV.File}) = length(dataset.table)
+LearnBase.nobs(dataset::TableDataset{<:CSV.File}) = length(dataset.table)
