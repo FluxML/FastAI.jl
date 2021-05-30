@@ -123,7 +123,7 @@ end
 # ## Utilities
 
 function imageaxis(f; kwargs...)
-    ax = AbstractPlotting.Axis(f; kwargs...)
+    ax = Makie.Axis(f; kwargs...)
     ax.aspect = DataAspect()
     ax.xzoomlock = true
     ax.yzoomlock = true
@@ -143,16 +143,26 @@ function imageaxis(f; kwargs...)
 end
 
 
-imageaxis(f::AbstractPlotting.FigurePosition; kwargs...) = imageaxis(f.fig; kwargs...)
+imageaxis(f::Makie.FigurePosition; kwargs...) = imageaxis(f.fig; kwargs...)
 
 # ## Plot recipes
 
 
 @recipe(PlotImage, image) do scene
-    Attributes()
+    Attributes(;
+    #=
+        default_theme(scene)...,
+        colormap = [:black, :white],
+        colorrange = automatic,
+        interpolate = true,
+        fxaa = false,
+        lowclip = nothing,
+        highclip = nothing,
+    =#
+    )
 end
 
-function AbstractPlotting.plot!(plot::PlotImage)
+function Makie.plot!(plot::PlotImage)
     im = plot[:image]
     rim = @lift copy(rotr90($im))
     image!(plot, rim; plot.attributes...)
@@ -164,7 +174,7 @@ end
     Attributes()
 end
 
-function AbstractPlotting.plot!(plot::PlotMask; kwargs...)
+function Makie.plot!(plot::PlotMask; kwargs...)
     mask = plot[:mask]
     classes = try
         classes = plot[:classes]
