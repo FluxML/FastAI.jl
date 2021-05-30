@@ -51,7 +51,6 @@ struct TableDataset{T}
 end
 
 TableDataset(path::AbstractPath) = TableDataset(DataFrame(CSV.File(path)))
-TableDataset(table::T) where {T} = TableDataset{T}(table)
 
 function LearnBase.getobs(dataset::FastAI.Datasets.TableDataset{T}, idx) where {T}
     if Tables.rowaccess(dataset.table)
