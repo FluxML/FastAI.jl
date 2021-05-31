@@ -50,13 +50,14 @@ struct TableDataset{T}
     TableDataset{T}(table::T) where T = Tables.istable(table) ? new{T}(table) : error("Object doesn't implement Tables.jl interface")
 end
 
+TableDataset(table::T) where {T} = TableDataset{T}(table)
 TableDataset(path::AbstractPath) = TableDataset(DataFrame(CSV.File(path)))
 
 function LearnBase.getobs(dataset::FastAI.Datasets.TableDataset{T}, idx) where {T}
     if Tables.rowaccess(dataset.table)
         for (index, row) in enumerate(Tables.rows(dataset.table))
             if index==idx
-                return row
+                return [data for data in row]
             end
         end
     elseif Tables.columnaccess(dataset.table)
@@ -78,8 +79,8 @@ function LearnBase.nobs(dataset::TableDataset{T}) where {T}
     end
 end
 
-LearnBase.getobs(dataset::TableDataset{<:DataFrame}, idx) = dataset.table[idx, :]
+LearnBase.getobs(dataset::TableDataset{<:DataFrame}, idx) = [data for data in dataset.table[idx, :]]
 LearnBase.nobs(dataset::TableDataset{<:DataFrame}) = nrow(dataset.table)
 
-LearnBase.getobs(dataset::TableDataset{<:CSV.File}, idx) = dataset.table[idx]
+LearnBase.getobs(dataset::TableDataset{<:CSV.File}, idx) = [data for data in dataset.table[idx]]
 LearnBase.nobs(dataset::TableDataset{<:CSV.File}) = length(dataset.table)
