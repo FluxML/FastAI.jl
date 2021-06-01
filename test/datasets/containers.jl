@@ -36,7 +36,7 @@ include("imports.jl")
         @inferred TableDataset TableDataset(testtable)
         td = TableDataset(testtable)
 
-        @test getobs(td, 1) == [1, "a", 10, "A", 100., "train"]
+        @test [data for data in getobs(td, 1)] == [1, "a", 10, "A", 100., "train"]
         @test nobs(td) == 5 
     end
 

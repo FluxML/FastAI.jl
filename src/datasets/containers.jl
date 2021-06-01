@@ -79,7 +79,7 @@ function LearnBase.nobs(dataset::TableDataset{T}) where {T}
     end
 end
 
-LearnBase.getobs(dataset::TableDataset{<:DataFrame}, idx) = [data for data in dataset.table[idx, :]]
+LearnBase.getobs(dataset::TableDataset{<:DataFrame}, idx) = dataset.table[idx, :]
 LearnBase.nobs(dataset::TableDataset{<:DataFrame}) = nrow(dataset.table)
 
 LearnBase.getobs(dataset::TableDataset{<:CSV.File}, idx) = [data for data in dataset.table[idx]]
