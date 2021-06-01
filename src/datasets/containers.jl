@@ -74,7 +74,7 @@ function LearnBase.nobs(dataset::TableDataset{T}) where {T}
     if Tables.columnaccess(dataset.table)
         return length(Tables.getcolumn(dataset.table, 1))
     elseif Tables.rowaccess(dataset.table)
-        return length(Tables.rows(dataset.table)) # Lenght might not be defined, but has to be for this to work.
+        return length(Tables.rows(dataset.table)) # length might not be defined, but has to be for this to work.
     else error("The Tables.jl implementation used should have either rowaccess or columnaccess.")
     end
 end
