@@ -53,34 +53,29 @@ end
 TableDataset(table::T) where {T} = TableDataset{T}(table)
 TableDataset(path::AbstractPath) = TableDataset(DataFrame(CSV.File(path)))
 
-function LearnBase.getobs(dataset::FastAI.Datasets.TableDataset{T}, idx) where {T}
+function LearnBase.getobs(dataset::FastAI.Datasets.TableDataset, idx)
     if Tables.rowaccess(dataset.table)
-        for (index, row) in enumerate(Tables.rows(dataset.table))
-            if index==idx
-                return [data for data in row]
-            end
-        end
+        row, _ = Iterators.peel(Iterators.drop(Tables.rows(dataset.table), idx - 1))
+        return row
     elseif Tables.columnaccess(dataset.table)
-        rowvals = []
-        for i in 1:length(Tables.columnnames(dataset.table))
-            push!(rowvals, Tables.getcolumn(dataset.table, i)[idx])
-        end
-        return rowvals
-    else error("The Tables.jl implementation used should have either rowaccess or columnaccess.")
+        return [Tables.getcolumn(dataset.table, i)[idx] for i in 1:length(Tables.columnnames(dataset.table))]
+    else 
+        error("The Tables.jl implementation used should have either rowaccess or columnaccess.")
     end
 end
 
-function LearnBase.nobs(dataset::TableDataset{T}) where {T}
+function LearnBase.nobs(dataset::TableDataset)
     if Tables.columnaccess(dataset.table)
         return length(Tables.getcolumn(dataset.table, 1))
     elseif Tables.rowaccess(dataset.table)
         return length(Tables.rows(dataset.table)) # length might not be defined, but has to be for this to work.
-    else error("The Tables.jl implementation used should have either rowaccess or columnaccess.")
+    else 
+        error("The Tables.jl implementation used should have either rowaccess or columnaccess.")
     end
 end
 
 LearnBase.getobs(dataset::TableDataset{<:DataFrame}, idx) = dataset.table[idx, :]
 LearnBase.nobs(dataset::TableDataset{<:DataFrame}) = nrow(dataset.table)
 
-LearnBase.getobs(dataset::TableDataset{<:CSV.File}, idx) = [data for data in dataset.table[idx]]
+LearnBase.getobs(dataset::TableDataset{<:CSV.File}, idx) = dataset.table[idx]
 LearnBase.nobs(dataset::TableDataset{<:CSV.File}) = length(dataset.table)

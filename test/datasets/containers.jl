@@ -9,7 +9,7 @@ include("imports.jl")
         testtable = Tables.table([1 4.0 "7"; 2 5.0 "8"; 3 6.0 "9"])
         td = TableDataset(testtable)
 
-        @test getobs(td, 1) == [1, 4.0, "7"]
+        @test [data for data in getobs(td, 1)] == [1, 4.0, "7"]
         @test nobs(td) == 3
     end
 
@@ -33,7 +33,7 @@ include("imports.jl")
             col5=[100., 200., 300., 400., 500.],
             split=["train", "train", "train", "valid", "valid"]
         )
-        @inferred TableDataset TableDataset(testtable)
+        @test TableDataset(testtable) isa TableDataset{<:DataFrame}
         td = TableDataset(testtable)
 
         @test [data for data in getobs(td, 1)] == [1, "a", 10, "A", 100., "train"]
@@ -43,10 +43,10 @@ include("imports.jl")
     @testset ExtendedTestSet "TableDataset from CSV" begin
         path = datasetpath("adult_sample")
         testtable = CSV.File(joinpath(path, "adult.csv"))
-        @inferred TableDataset TableDataset(testtable)
+        @test TableDataset(testtable) isa TableDataset{<:CSV.File}
         td = TableDataset(testtable)
 
-        @test getobs(td, 2) == [44, " Private", 236746, " Masters", 14.0, " Divorced", " Exec-managerial", " Not-in-family", " White", " Male", 10520, 0, 45, " United-States", ">=50k"]
+        @test [data for data in getobs(td, 2)] == [44, " Private", 236746, " Masters", 14.0, " Divorced", " Exec-managerial", " Not-in-family", " White", " Male", 10520, 0, 45, " United-States", ">=50k"]
         @test nobs(td) == 32561
         
     end
