@@ -20,7 +20,7 @@ include("imports.jl")
         testtable = Tables.table([1 4.0 "7"; 2 5.0 "8"; 3 6.0 "9"])
         td = TableDataset(testtable)
 
-        @test getobs(td, 2) == [2, 5.0, "8"]
+        @test [data for data in getobs(td, 2)] == [2, 5.0, "8"]
         @test nobs(td) == 3
     end
 

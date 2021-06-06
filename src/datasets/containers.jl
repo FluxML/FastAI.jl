@@ -58,7 +58,9 @@ function LearnBase.getobs(dataset::FastAI.Datasets.TableDataset, idx)
         row, _ = Iterators.peel(Iterators.drop(Tables.rows(dataset.table), idx - 1))
         return row
     elseif Tables.columnaccess(dataset.table)
-        return [Tables.getcolumn(dataset.table, i)[idx] for i in 1:length(Tables.columnnames(dataset.table))]
+        colnames = Tables.columnnames(dataset.table)
+        rowvals = [Tables.getcolumn(dataset.table, i)[idx] for i in 1:length(colnames)]
+        return (; zip(colnames, rowvals)...)
     else 
         error("The Tables.jl implementation used should have either rowaccess or columnaccess.")
     end
