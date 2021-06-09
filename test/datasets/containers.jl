@@ -22,6 +22,8 @@ include("imports.jl")
 
         @test [data for data in getobs(td, 2)] == [2, 5.0, "8"]
         @test nobs(td) == 3
+
+        @test getobs(td, 1) isa NamedTuple
     end
 
     @testset ExtendedTestSet "TableDataset from DataFrames" begin
