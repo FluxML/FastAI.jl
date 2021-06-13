@@ -1,6 +1,6 @@
 module Models
 
-using Base: Bool
+using Base: Bool, Symbol
 using ..FastAI
 
 using BSON
@@ -17,7 +17,8 @@ include("unet.jl")
 include("tabularmodel.jl")
 
 
-export xresnet18, xresnet50, UNetDynamic, TabularModel
+export xresnet18, xresnet50, UNetDynamic, TabularModel,
+get_emb_sz
 
 
 end

@@ -1,3 +1,23 @@
+function emb_sz_rule(n_cat)
+	min(600, round(1.6 * n_cat^0.56))
+end
+
+function _one_emb_sz(catdict, catcol::Symbol, sz_dict=nothing)
+	sz_dict = isnothing(sz_dict) ? Dict() : sz_dict
+	n_cat = length(catdict[catcol])
+	sz = catcol in keys(sz_dict) ? sz_dict[catcol] : emb_sz_rule(n_cat)
+	n_cat, sz
+end
+
+function get_emb_sz(catdict, cols, sz_dict=nothing)
+	[_one_emb_sz(catdict, catcol, sz_dict) for catcol in cols]
+end
+
+# function get_emb_sz(td::TableDataset, sz_dict=nothing)
+# 	cols = Tables.columnaccess(td.table) ? Tables.columnnames(td.table) : Tables.columnnames(Tables.rows(td.table)[1])
+# 	[_one_emb_sz(catdict, catcol, sz_dict) for catcol in cols]
+# end
+
 struct TabularModel
 	embeds
 	emb_drop
