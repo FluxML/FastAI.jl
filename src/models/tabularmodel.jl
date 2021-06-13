@@ -30,7 +30,7 @@ function TabularModel(
 	end
 	embedslist = [Embedding(ni, nf) for (ni, nf) in emb_szs]
 	emb_drop = Dropout(embed_p)
-	bn_cont = bn_cont && BatchNorm(n_cont)
+	bn_cont = bn_cont ? BatchNorm(n_cont) : false
 	n_emb = sum(size(embedlayer.weight)[1] for embedlayer in embedslist)
 	sizes = append!(zeros(0), [n_emb+n_cont], layers, [out_sz])
 	actns = append!([], [act_cls for i in 1:(length(sizes)-1)], [nothing])
@@ -50,7 +50,7 @@ function (tm::TabularModel)(x)
 		x = tm.emb_drop(x)
 	end
 	if tm.n_cont != 0
-		if !isnothing(tm.bn_cont)
+		if (tm.bn_cont != false)
 			x_cont = tm.bn_cont(x_cont)
 		end
 		x = tm.n_emb!=0 ? vcat(x, x_cont) : x_cont
