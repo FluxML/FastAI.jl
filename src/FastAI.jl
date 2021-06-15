@@ -9,7 +9,7 @@ using Reexport
 @reexport using Flux
 
 using Animations
-using AbstractPlotting
+using Makie
 using Colors
 using DataAugmentation
 using DataAugmentation: getbounds, Bounds

@@ -203,7 +203,7 @@ end
 
 # ## Training interface
 
-function DLPipelines.methodmodel(method, backbone; kwargs...)
+function DLPipelines.methodmodel(method::ImageSegmentation, backbone; kwargs...)
     return UNetDynamic(
         backbone,
         (method.projections.sz..., 3, 1),
