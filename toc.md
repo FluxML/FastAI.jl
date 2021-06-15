@@ -6,6 +6,7 @@
     - [Data containers](docs/data_containers.md)
     - [Learning methods](docs/learning_methods.md)
     - [Saving and loading models](docs/notebooks/serialization.ipynb)
+    - [Presizing vision datasets](docs/tutorials/presizing.ipynb)
 - Learning tasks
     - [Image classification](docs/methods/imageclassification.md)
     - [Image segmentation](docs/notebooks/imagesegmentation.ipynb)
