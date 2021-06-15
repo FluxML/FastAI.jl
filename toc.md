@@ -16,6 +16,7 @@
     - [Find a good learning rate](docs/notebooks/lrfind.ipynb)
     - [Augment vision data](docs/howto/augmentvision.md)
     - [Visualize data](docs/notebooks/how_to_visualize.ipynb)
+    - [Log to TensorBoard](docs/howto/logtensorboard.md)
 - Reference
     - [Docstrings](REFERENCE)
     - [Interfaces](docs/interfaces.md)
