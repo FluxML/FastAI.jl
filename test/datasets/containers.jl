@@ -1,4 +1,4 @@
-include("imports.jl")
+include("../imports.jl")
 
 @testset ExtendedTestSet "TableDataset" begin
 
