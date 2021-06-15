@@ -12,6 +12,9 @@ using Flux.Optimise: Optimiser, apply!
 using StaticArrays
 using Test
 using TestSetExtensions
+using DataFrames
+using Tables
+using CSV
 
 ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 include("testdata.jl")
