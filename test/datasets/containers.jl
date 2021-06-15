@@ -43,28 +43,6 @@ include("../imports.jl")
     end
 
     @testset ExtendedTestSet "TableDataset from CSV" begin
-        # path = datasetpath("adult_sample")
-        # testtable = CSV.File(joinpath(path, "adult.csv"))
-        # td = TableDataset(testtable)
-        # @test td isa TableDataset{<:CSV.File}
-
-        # @test [data for data in getobs(td, 2)] == [44,
-        #                                            " Private",
-        #                                            236746,
-        #                                            " Masters",
-        #                                            14.0,
-        #                                            " Divorced",
-        #                                            " Exec-managerial",
-        #                                            " Not-in-family",
-        #                                            " White",
-        #                                            " Male",
-        #                                            10520,
-        #                                            0,
-        #                                            45,
-        #                                            " United-States",
-        #                                            ">=50k"]
-        # @test nobs(td) == 32561
-
         open("test.csv", "w") do io
             write(io, "col1,col2,col3,col4,col5, split\n1,a,10,A,100.,train")
         end
