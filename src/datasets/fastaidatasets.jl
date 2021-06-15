@@ -29,7 +29,7 @@ const DATASETCONFIGS = [
     FastAIDataset("imagenette", "imageclas"),
     FastAIDataset("imagenette2-160", "imageclas", "64d0c4859f35a461889e0147755a999a48b49bf38a7e0f9bd27003f10db02fe5"),
     FastAIDataset("imagenette2-320", "imageclas", "569b4497c98db6dd29f335d1f109cf315fe127053cedf69010d047f0188e158c"),
-    FastAIDataset("imagenette2", "imageclas"),
+    FastAIDataset("imagenette2", "imageclas", "6cbfac238434d89fe99e651496f0812ebc7a10fa62bd42d6874042bf01de4efd"),
     FastAIDataset("imagewang-160", "imageclas", "a0d360f9d8159055b3bf2b8926a51d19b2f1ff98a1eef6034e4b891c59ca3f1a", size="182MiB"),
     FastAIDataset("imagewang-320", "imageclas", "fd53301c335aa46f0f4add68dd471cd0b8b66412382cc36f5f510d0a03fb4d9d", size="639MiB"),
     FastAIDataset("imagewang", "imageclas"),
