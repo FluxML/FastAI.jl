@@ -40,11 +40,10 @@ function TabularModel(
 
 	n_emb = sum(size(embedlayer.weight)[1] for embedlayer in embedslist)
 	sizes = append!(zeros(0), [n_emb+n_cont], layers)
-	actns = append!([], [act_cls for i in 1:(length(sizes)-1)])
 
 	_layers = []
 	for (i, (p, a)) in enumerate(zip(Iterators.cycle(ps), actns))
-		layer = linbndrop(Int64(sizes[i]), Int64(sizes[i+1]), use_bn=use_bn, p=p, act=a, lin_first=lin_first)
+		layer = linbndrop(Int64(sizes[i]), Int64(sizes[i+1]), use_bn=use_bn, p=p, act=act_cls, lin_first=lin_first)
 		push!(_layers, layer)
 	end
 	push!(_layers, linbndrop(Int64(last(sizes)), Int64(out_sz), use_bn=bn_final, lin_first=lin_first))
