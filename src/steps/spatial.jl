@@ -85,7 +85,13 @@ FastAI.run!(copy(trainimg), projections, Training(), img)
 end
 
 function Base.show(io::IO, p::ProjectiveTransforms)
-    show(io, ShowCase(p, [:sz, :buffered, :augmentations]))
+    show(io, ShowTypeOf(p))
+    fields = (
+        sz = ShowLimit(p.sz, limit=80),
+        buffered = ShowLimit(p.buffered, limit=80),
+        augmentations = ShowLimit(p.augmentations, limit=80)
+    )
+    show(io, ShowProps(fields, new_lines=true))
 end
 
 function ProjectiveTransforms(
