@@ -169,14 +169,6 @@ function DLPipelines.methodmodel(method::ImageClassification, backbone)
     h, w, ch, b = Flux.outdims(backbone, (method.projections.sz..., 3, 1))
     head = Models.visionhead(ch, length(method.classes), p = 0.)
     return Chain(backbone, head)
-    return Chain(
-        backbone,
-        Chain(
-            AdaptiveMeanPool((1, 1)),
-            flatten,
-            Dense(ch, length(method.classes)),
-        )
-    )
 end
 
 DLPipelines.methodlossfn(::ImageClassification) = Flux.Losses.logitcrossentropy
