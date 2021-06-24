@@ -46,8 +46,6 @@ struct ImagePreprocessing
     inferencetfm
 end
 
-Base.show(io::IO, ip::ImagePreprocessing) = show(io, ShowCase(ip, (:C, :T, :buffered)))
-
 function Base.show(io::IO, ip::ImagePreprocessing)
     show(io, ShowTypeOf(ip))
     fields = (
