@@ -103,10 +103,9 @@ function plotbatch!(f, method, xs, ys)
 end
 # TODO: implement `plotbatch(method, dataloader; n)`
 """
-    plotsamples(Task, samples)
-    plotsamples(method, samples)
+    plotsamples(method::LearningMethod, samples)
 
-Plot samples for a `LearningTask`/`LearningMethod` in a grid.
+Plot samples for a `LearningMethod` in a grid.
 """
 function plotsamples(method::LearningMethod, samples)
     n = length(samples)

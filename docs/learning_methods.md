@@ -27,7 +27,7 @@ Before we get started, let's load up a [data container](data_containers.md) that
 using FastAI
 using FastAI.Datasets
 DATASET = "imagenette2-160"
-data = Datasets.loadtaskdata(Datasets.datasetpath(DATASET), ImageClassificationTask)
+data = Datasets.loadtaskdata(Datasets.datasetpath(DATASET), ImageClasssification)
 image, class = getobs(data, 1)
 image
 ```
@@ -45,21 +45,13 @@ classes = unique([getobs(data.target, i) for i in 1:nobs(data.target)])
 
 ### Learning method struct
 
-Now let's get to it! The first thing we need to do is to create a [`DLPipelines.LearningTask`](#) and a [`DLPipelines.LearningMethod`](#) struct. The **task** represents learning a mapping from an image to a class, while the **method** is a concrete way to solve the task. The distinction is made since in practice there can be multiple methods to solve a task. After this part, we'll only deal with `LearningMethod`.
+Now let's get to it! The first thing we need to do is to create a [`DLPipelines.LearningMethod`](#) struct. The `LearningMethod` `struct` should contain all the configuration needed for encoding and decoding the data. We'll keep it simple here and include a list of the classes and the image dimensions input to the model. The reference implementation [`ImageClassification`](#) of course has many more parameters that can be configured.
 
 {cell=main}
 ```julia
 using FastAI: DLPipelines
 
-abstract type MyImageClassificationTask <: DLPipelines.LearningTask end
-```
-
-
-The `LearningMethod` `struct` should contain all the configuration needed for encoding and decoding the data. We'll keep it simple here and include a list of the classes and the image dimensions input to the model. The reference implementation [`FastAI.ImageClassification`](#) of course has many more parameters that can be configured.
-
-{cell=main}
-```julia
-struct MyImageClassification <: DLPipelines.LearningMethod{MyImageClassificationTask}
+struct MyImageClassification <: DLPipelines.LearningMethod
     classes
     size
 end
@@ -74,7 +66,7 @@ method = MyImageClassification(classes, (128, 128))
 
 ### Encoding and decoding
 
-There are only 3 methods we need to define before we can use our learning method to train models and make predictions:
+There are 3 methods we need to define before we can use our learning method to train models and make predictions:
 
 - `DLPipelines.encodeinput` will encode an image so it can be input to a model;
 - `DLPipelines.encodetarget` encodes a class so we can compare it with a model output; and
@@ -91,7 +83,7 @@ Each of the methods also takes a `context::`[`DLPipelines.Context`](#) argument 
 
 #### Inputs
 
-We implement [`encodeinput`](#) using [DataAugmenation.jl](https://github.com/lorenzoh/DataAugmentation.jl). Feel free to look at [its documentation](https://lorenzoh.github.io/DataAugmentation.jl/dev/docs/literate/intro.html), we won't focus on it here.
+We implement [`encodeinput`](#) using [DataAugmentation.jl](https://github.com/lorenzoh/DataAugmentation.jl). Feel free to look at [its documentation](https://lorenzoh.github.io/DataAugmentation.jl/dev/docs/literate/intro.html), we won't focus on it here.
 
 {cell=main}
 ```julia
@@ -118,7 +110,7 @@ function DLPipelines.encodeinput(
 end
 ```
 
-If we test this out on our image, it should give us a 3D array of size `(128, 128, 3)`, and indeed it does:
+If we test this out on an image, it should give us a 3D array of size `(128, 128, 3)`, and indeed it does:
 
 {cell=main}
 ```julia
@@ -148,7 +140,7 @@ end
 y = encodetarget(method, Training(), class)
 ```
 
-The decoding step as well:
+The same goes for the decoding step:
 
 {cell=main}
 ```julia

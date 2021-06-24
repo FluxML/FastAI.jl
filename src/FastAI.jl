@@ -97,10 +97,6 @@ export
     # pipeline steps
     ProjectiveTransforms, ImagePreprocessing, augs_projection, augs_lighting,
 
-    # tasks
-    ImageClassificationTask,
-    ImageSegmentationTask,
-
     # methods
     ImageClassification,
     ImageSegmentation,

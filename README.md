@@ -9,7 +9,7 @@ As an example, training an image classification model from scratch is as simple 
 ```julia
 using FastAI
 path = datasetpath("imagenette2-160")
-data = loadtaskdata(path, ImageClassificationTask)
+data = loadtaskdata(path, ImageClassification)
 method = ImageClassification(Datasets.getclassesclassification("imagenette2-160"), (160, 160))
 learner = methodlearner(method, data, Models.xresnet18(), ToGPU(), Metrics(accuracy))
 fitonecycle!(learner, 5)
