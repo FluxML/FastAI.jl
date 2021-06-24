@@ -25,7 +25,12 @@ method = ImageClassification(classes, (160, 160))
     buffered = true, 
     augmentations = Identity()
 ), 
-    imageprepocessing = ImagePreprocessing(C=ColorTypes.RGB{FixedPointNumbers.N0f8}, T=Float32, buffered=true)
+    imageprepocessing = ImagePreprocessing(
+    C = ColorTypes.RGB{FixedPointNumbers.N0f8}, 
+    T = Float32, 
+    buffered = true, 
+    augmentations = Identity()
+)
 )</code></pre></div><p>Here we define an instance of the learning method <a href=../REFERENCE/FastAI.ImageClassification.html ><code>ImageClassification</code></a> which defines how data is processed before being fed to the model and how model outputs are turned into predictions. <code>classes</code> is a vector of strings naming each class, and <code>(224, 224)</code> the size of the images that are input to the model.</p><p><code>ImageClassification</code> is a <code>LearningMethod</code>, an abstraction that encapsulates the logic and configuration for training models on a specific learning task. See <a href=./learning_methods.md.html title= >learning methods</a> to find out more about how they can be used and how to create custom learning methods.</p><h2 id=data-loaders >Data loaders</h2><div class=cellcontainer ><pre cell=main lang=julia ><code>dls = methoddataloaders(dataset, method, 16)
 </code></pre><pre class=coderesult ><code>(eachobsparallel(batchviewcollated() with 670 batches of size 16), eachobsparallel(batchviewcollated() with 84 batches of size 32))</code></pre></div><p>Next we turn the data container into training and validation data loaders. These take care of efficiently loading batches of data (by default in parallel). The observations are already preprocessed using the information in <code>method</code> and then batched together. Let’s look at a single batch:</p><div class=cellcontainer ><pre cell=main lang=julia ><code>traindl, valdl = dls
 (xs, ys), _ = iterate(traindl)
