@@ -21,24 +21,29 @@ end
 function TabularModel(
         layers; 
         emb_szs,
-        n_cont::Int64,
+        n_cont,
         out_sz,
-        ps::Union{Tuple, Vector, Number}=0,
-        embed_p::Float64=0.,
-        y_range=nothing,
-        use_bn::Bool=true,
-        bn_final::Bool=false,
-        bn_cont::Bool=true,
+        ps=0,
+        embed_p=0.,
+        use_bn=true,
+        bn_final=false,
+        bn_cont=true,
         act_cls=Flux.relu,
-        lin_first::Bool=true)
+        lin_first=true,
+    final_activation=identity)
 
     embedslist = [Embedding(ni, nf) for (ni, nf) in emb_szs]
-    emb_drop = Dropout(embed_p)
-    embeds = Chain(x -> ntuple(i -> x[i, :], length(emb_szs)), Parallel(vcat, embedslist...), emb_drop)
-
-    bn_cont = bn_cont ? BatchNorm(n_cont) : identity
-
     n_emb = sum(size(embedlayer.weight)[1] for embedlayer in embedslist)
+    #     n_emb = first(Flux.outputsize(embeds, (length(emb_szs), 1)))
+    emb_drop = Dropout(embed_p)
+    embeds = Chain(
+        x -> collect(eachrow(x)), 
+        x -> ntuple(i -> x[i], length(x)), 
+        Parallel(vcat, embedslist), 
+        emb_drop
+    )
+
+    bn_cont = bn_cont && n_cont>0 ? BatchNorm(n_cont) : identity
 
     ps = Iterators.cycle(ps)
     classifiers = []
@@ -50,7 +55,11 @@ function TabularModel(
         push!(classifiers, layer)
     end
     push!(classifiers, linbndrop(last(layers), out_sz; use_bn=bn_final, lin_first=lin_first))
-
-    layers = isnothing(y_range) ? Chain(Parallel(vcat, embeds, bn_cont), classifiers...) : Chain(Parallel(vcat, embeds, bn_cont), classifiers..., @. x->Flux.sigmoid(x) * (y_range[2] - y_range[1]) + y_range[1])
+    layers = Chain(
+        x -> tuple(x...),
+        Parallel(vcat, embeds, Chain(x -> ndims(x)==1 ? Flux.unsqueeze(x, 2) : x, bn_cont)),
+        classifiers...,
+        final_activation
+    )
     layers
 end
