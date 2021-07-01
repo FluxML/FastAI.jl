@@ -2,7 +2,7 @@
 using FastAI
 
 method, model = loadmethodmodel(&quot;catsdogs.jld2&quot;)
-data = loadtaskdata(joinpath(datasetpath(&quot;dogscats&quot;), &quot;train&quot;), ImageClassificationTask)</code></pre><pre class=coderesult ><code>mapobs((input = FastAI.Datasets.loadfile, target = FastAI.Datasets.var"#27#32"()), DataSubset(::FastAI.Datasets.FileDataset, ::Vector{Int64}, ObsDim.Undefined())
+data = loadtaskdata(joinpath(datasetpath(&quot;dogscats&quot;), &quot;train&quot;), ImageClasssification)</code></pre><pre class=coderesult ><code>mapobs((input = FastAI.Datasets.loadfile, target = FastAI.Datasets.var"#27#32"()), DataSubset(::FastAI.Datasets.FileDataset, ::Vector{Int64}, ObsDim.Undefined())
  23000 observations)</code></pre><p>First we load a vector of unprocessed samples, a batch of training data and the corresponding model outputs:</p><pre lang=julia ><code>idxs = rand(1:nobs(data), 9)
 samples = [getobs(data, i) for i in idxs]
 xs, ys = makebatch(method, data, idxs)

@@ -2,7 +2,7 @@
 using FastAI
 using FastAI.Datasets
 
-data = loadtaskdata(datasetpath(&quot;imagenette2-320&quot;), ImageClassificationTask)
+data = loadtaskdata(datasetpath(&quot;imagenette2-320&quot;), ImageClasssification)
 method = ImageClassification(Datasets.getclassesclassification(&quot;imagenette2-320&quot;), (224, 224))
 
 # maps data processing over `data`
@@ -26,7 +26,7 @@ end
 using FastAI.Datasets
 using FluxTraining: fitbatchphase!
 
-data = loadtaskdata(datasetpath(&quot;imagenette2-320&quot;), ImageClassificationTask)
+data = loadtaskdata(datasetpath(&quot;imagenette2-320&quot;), ImageClasssification)
 method = ImageClassification(Datasets.getclassesclassification(&quot;imagenette2-320&quot;), (224, 224))
 
 learner = methodlearner(method, data, xresnet18())
@@ -49,7 +49,7 @@ using FastAI.Datasets
 
 # Since loading times can vary per observation, we'll average the measurements over multiple observations
 N = 10
-data = datasubset(shuffleobs(loadtaskdata(datasetpath(&quot;imagenette2&quot;), ImageClassificationTask), 1:N))
+data = datasubset(shuffleobs(loadtaskdata(datasetpath(&quot;imagenette2&quot;), ImageClasssification), 1:N))
 method = ImageClassification(Datasets.getclassesclassification(&quot;imagenette2-320&quot;), (224, 224))
 
 # Time it takes to load an `(image, class)` observation
@@ -63,12 +63,12 @@ obss = [getobs(data, i) for i in 1:N]
 @btime for i in 1:N
     encode(method, Training(), obss[i])
 end
-</code></pre><p>This will give you a pretty good idea of where the performance bottleneck is. Note that the encoding performance is often dependent of the method configuration. If we used <code>ImageClassification</code> with input size <code>(64, 64)</code> it would be much faster.</p><h2 id=improving-performance >Improving performance</h2><p>So, you’ve identified the data pipeline as a performance bottleneck. What now? Before anything else, make sure you’re doing the following:</p><ul><li><p>Use <code>DataLoaders.DataLoader</code> as a data iterator. If you’re using <a href=../../REFERENCE/DLPipelines.methoddataloaders.html ><code>DLPipelines.methoddataloaders</code></a> or <a href=../../REFERENCE/FastAI.methodlearner.html ><code>methodlearner</code></a>, this is already the case.</p></li><li><p>Start Julia with multiple threads by specifying the <code>-t n</code>/<code>-t auto</code> flag when starting Julia. If it is successful, <code>Threads.nthreads()</code> should be larger than <code>1</code>.</p></li></ul><p>If the data loading is still slowing down training, you’ll probably have to speed up the loading of each observation. As mentioned above, this can be broken down into observation loading and encoding. The exact strategy will depend on your use case, but here are some examples.</p><h3 id=reduce-loading-time-of-image-datasets-by-presizing >Reduce loading time of image datasets by presizing</h3><p>For many computer vision tasks, you will resize and crop images to a specific size during training for GPU performance reasons. If the images themselves are large, loading them from disk itself can take some time. If your dataset consists of 1920x1080 resolution images but you’re resizing them to 256x256 during training, you’re wasting a lot of time loading the large images. <em>Presizing</em> means saving resized versions of each image to disk once, and then loading these smaller versions during training. We can see the performance difference using ImageNette since it comes in 3 sizes: original, 360px and 180px.</p><pre lang=julia ><code>data_orig = loadtaskdata(datasetpath(&quot;imagenette2&quot;), ImageClassificationTask)
+</code></pre><p>This will give you a pretty good idea of where the performance bottleneck is. Note that the encoding performance is often dependent of the method configuration. If we used <code>ImageClassification</code> with input size <code>(64, 64)</code> it would be much faster.</p><h2 id=improving-performance >Improving performance</h2><p>So, you’ve identified the data pipeline as a performance bottleneck. What now? Before anything else, make sure you’re doing the following:</p><ul><li><p>Use <code>DataLoaders.DataLoader</code> as a data iterator. If you’re using <a href=../../REFERENCE/DLPipelines.methoddataloaders.html ><code>DLPipelines.methoddataloaders</code></a> or <a href=../../REFERENCE/FastAI.methodlearner.html ><code>methodlearner</code></a>, this is already the case.</p></li><li><p>Start Julia with multiple threads by specifying the <code>-t n</code>/<code>-t auto</code> flag when starting Julia. If it is successful, <code>Threads.nthreads()</code> should be larger than <code>1</code>.</p></li></ul><p>If the data loading is still slowing down training, you’ll probably have to speed up the loading of each observation. As mentioned above, this can be broken down into observation loading and encoding. The exact strategy will depend on your use case, but here are some examples.</p><h3 id=reduce-loading-time-of-image-datasets-by-presizing >Reduce loading time of image datasets by presizing</h3><p>For many computer vision tasks, you will resize and crop images to a specific size during training for GPU performance reasons. If the images themselves are large, loading them from disk itself can take some time. If your dataset consists of 1920x1080 resolution images but you’re resizing them to 256x256 during training, you’re wasting a lot of time loading the large images. <em>Presizing</em> means saving resized versions of each image to disk once, and then loading these smaller versions during training. We can see the performance difference using ImageNette since it comes in 3 sizes: original, 360px and 180px.</p><pre lang=julia ><code>data_orig = loadtaskdata(datasetpath(&quot;imagenette2&quot;), ImageClasssification)
 @time eachobsparallel(data_orig, buffered = false)
 
-data_320px = loadtaskdata(datasetpath(&quot;imagenette2-320&quot;), ImageClassificationTask)
+data_320px = loadtaskdata(datasetpath(&quot;imagenette2-320&quot;), ImageClasssification)
 @time eachobsparallel(data_320px, buffered = false)
 
-data_160px = loadtaskdata(datasetpath(&quot;imagenette2-160&quot;), ImageClassificationTask)
+data_160px = loadtaskdata(datasetpath(&quot;imagenette2-160&quot;), ImageClasssification)
 @time eachobsparallel(data_160px, buffered = false)
 </code></pre><h3 id=reducing-allocations-with-inplace-operations >Reducing allocations with inplace operations</h3><p>When implementing the <code>LearningMethod</code> interface, you have the option to implement <code>encode!(buf, method, context, sample)</code>, an inplace version of <code>encode</code> that reuses a buffer to avoid allocations. Reducing allocations often speeds up the encoding step and can also reduce the frequency of garbage collector pauses during training which can reduce GPU utilization.</p><h3 id=using-efficient-data-augmentation >Using efficient data augmentation</h3><p>Many kinds of augmentation can be composed efficiently. A prime example of this are image transformations like resizing, scaling and cropping which are powered by <a href=https://github.com/lorenzoh/DataAugmentation.jl title= >DataAugmentation.jl</a>. See <a href=https://lorenzoh.github.io/DataAugmentation.jl/dev/docs/literate/intro.html title= >its documentation</a> to find out how to implement efficient, composable data transformations.</p></article><footer class=book-footer ></footer></div><aside class=book-toc ><nav id=toc class=book-toc-content ><ul><li><a href=#performant-data-pipelines >Performant data pipelines</a><ul><li><a href=#reasons-for-low-gpu-utilization >Reasons for low GPU utilization</a><ul></ul></li><li><a href=#measuring-performance >Measuring performance</a><ul></ul></li><li><a href=#improving-performance >Improving performance</a><ul><li><a href=#reduce-loading-time-of-image-datasets-by-presizing >Reduce loading time of image datasets by presizing</a><ul></ul></li><li><a href=#reducing-allocations-with-inplace-operations >Reducing allocations with inplace operations</a><ul></ul></li><li><a href=#using-efficient-data-augmentation >Using efficient data augmentation</a><ul></ul></li></ul></li></ul></li></ul></nav></aside></main></body></HTML>

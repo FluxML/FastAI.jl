@@ -2,7 +2,7 @@
 using Metalhead
 
 dir = joinpath(datasetpath(&quot;dogscats&quot;), &quot;train&quot;)
-data = loadtaskdata(dir, ImageClassificationTask)
+data = loadtaskdata(dir, ImageClasssification)
 classes = Datasets.getclassesclassification(dir)
 method = ImageClassification(classes, (128, 128))
 backbone = Metalhead.resnet50(pretrain = true)[1:end-3]
