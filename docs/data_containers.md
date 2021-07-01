@@ -18,7 +18,7 @@ using FastAI.Datasets: datasetpath, loadtaskdata
 
 NAME = "imagenette2-160"
 dir = datasetpath(NAME)
-data = loadtaskdata(dir, ImageClassificationTask)
+data = loadtaskdata(dir, ImageClasssification)
 ```
 
 A data container is any type that holds observations of data and allows us to load them with `getobs` and query the number of observations with `nobs`:

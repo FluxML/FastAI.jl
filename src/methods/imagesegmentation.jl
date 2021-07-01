@@ -69,7 +69,7 @@ Array sizes that compatible models must conform to.
 It is recommended *not* to use [`Flux.softmax`](#) as the final layer for custom models,
 as for numerical stability, the loss function takes in the logits.
 """
-mutable struct ImageSegmentation{N} <: DLPipelines.LearningMethod{ImageSegmentationTask}
+mutable struct ImageSegmentation{N} <: LearningMethod
     classes::AbstractVector
     downscale::Int
     projections::ProjectiveTransforms{N}

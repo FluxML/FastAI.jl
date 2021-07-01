@@ -58,7 +58,7 @@ It is recommended *not* to use [`Flux.softmax`](#) as the final layer for custom
 Instead use [`Flux.logitcrossentropy`](#) as the loss function for increased numerical
 stability. This is done automatically if using with `methodmodel` and `methodlossfn`.
 """
-mutable struct ImageClassification{N} <: DLPipelines.LearningMethod{ImageClassificationTask}
+mutable struct ImageClassification{N} <: DLPipelines.LearningMethod
     classes::AbstractVector
     projections::ProjectiveTransforms{N}
     imagepreprocessing::ImagePreprocessing

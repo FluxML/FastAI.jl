@@ -13,7 +13,7 @@ On the [quickstart page](quickstart.ipynb), we showed how to train models on com
 using FastAI
 
 path = datasetpath("imagenette2-160")
-dataset = loadtaskdata(path, ImageClassificationTask)
+dataset = loadtaskdata(path, ImageClasssification)
 method = ImageClassification(Datasets.getclassesclassification("imagenette2-160"), (160, 160))
 dls = methoddataloaders(dataset, method, 16)
 model = methodmodel(method, Models.xresnet18())
@@ -28,7 +28,7 @@ Let's unpack each line.
 {cell=main}
 ```julia
 path = datasetpath("imagenette2-160")
-dataset = loadtaskdata(path, ImageClassificationTask)
+dataset = loadtaskdata(path, ImageClasssification)
 ```
 
 These two lines download and load the [ImageNette](https://github.com/fastai/imagenette) image classification dataset, a small subset of ImageNet with 10 different classes. `dataset` is a [data container](data_containers.md) that can be used to load individual observations, here of images and the corresponding labels. We can use `getobs(dataset, i)` to load the `i`-th observation and `nobs` to find out how many observations there are.

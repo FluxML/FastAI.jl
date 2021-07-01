@@ -6,7 +6,7 @@ FastAI.jl provides many interfaces that allow extending its functionality.
 
 Learning methods form the core of FastAI.jl's high-level API. See [this tutorial](learning_methods.md) for a motivation and introduction.
 
-Functions for the learning method interfaces always dispatch on a [`LearningMethod`](#)`{T}` where `T` is an abstract subtype of [`LearningTask`](#). `LearningTask` only constrains what input and target data look like, while `LearningMethod` defines everything that needs to happen to turn an input into a target and much more. `LearningMethod` should be a `struct` containing configuration.
+Functions for the learning method interfaces always dispatch on a [`LearningMethod`](#). A `LearningMethod` defines everything that needs to happen to turn an input into a target and much more. `LearningMethod` should be a `struct` containing configuration.
 
 ### Core interface
 

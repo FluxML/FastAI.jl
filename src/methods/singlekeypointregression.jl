@@ -1,4 +1,3 @@
-abstract type SingleKeypointRegressionTask <: DLPipelines.LearningTask end
 
 """
     SingleKeypointRegression(classes[, sz; kwargs...]) <: LearningMethod
@@ -64,7 +63,7 @@ Array sizes that compatible models must conform to.
 It is recommended *not* to use [`Flux.softmax`](#) as the final layer for custom models,
 as for numerical stability, the loss function takes in the logits.
 """
-struct SingleKeypointRegression{N} <: DLPipelines.LearningMethod{SingleKeypointRegressionTask}
+struct SingleKeypointRegression{N} <: LearningMethod
     projections::ProjectiveTransforms{N}
     imagepreprocessing::ImagePreprocessing
 end

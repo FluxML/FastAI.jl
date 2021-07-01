@@ -10,7 +10,7 @@ using FastAI
 using CairoMakie; CairoMakie.activate!(type="png")
 
 dir = joinpath(datasetpath("dogscats"), "train")
-data = loadtaskdata(dir, ImageClassificationTask)
+data = loadtaskdata(dir, ImageClasssification)
 classes = Datasets.getclassesclassification(dir)
 method = ImageClassification(classes, (100, 128))
 xs, ys = FastAI.makebatch(method, data, fill(4, 9))
