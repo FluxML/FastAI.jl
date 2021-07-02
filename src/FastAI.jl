@@ -108,10 +108,12 @@ export
     fit!,
     fitonecycle!,
     finetune!,
+    lrfind,
     savemethodmodel,
     loadmethodmodel,
 
-    gpu
+    gpu,
+    plot
 
 
 

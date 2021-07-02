@@ -93,6 +93,10 @@ end
 
 # Core interface implementation
 
+DLPipelines.encode(method::ImageClassification, context, (i, t)) = (
+    encodeinput(method, context, i),
+    encodetarget(method, context, t),
+)
 function DLPipelines.encodeinput(
         method::ImageClassification,
         context,
