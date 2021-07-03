@@ -7,7 +7,7 @@
 using FastAI
 ```
 
-On the [quickstart page](quickstart.ipynb), we showed how to train models on common tasks in a few lines of code:
+On the [quickstart page](../notebooks/quickstart.ipynb), we showed how to train models on common tasks in a few lines of code:
 
 ```julia
 using FastAI
