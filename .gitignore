@@ -3,4 +3,4 @@ test/Manifest.toml
 docs/Manifest.toml
 development/**
 Manifest.toml
-docs/**/*.jld2
+**/*.jld2
