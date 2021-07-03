@@ -2,7 +2,6 @@ module FastAI
 
 
 using Reexport
-
 @reexport using DLPipelines
 @reexport using FluxTraining
 @reexport using DataLoaders

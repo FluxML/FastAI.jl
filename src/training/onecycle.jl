@@ -34,6 +34,11 @@ function fitonecycle!(
 end
 
 
+"""
+    decay_optim(optim, wd)
+
+Add [`WeightDecay`](#) with value `wd` to optimizer `optim`.
+"""
 decay_optim(optim, wd) = Optimiser(WeightDecay(wd), optim)
 function decay_optim(optim::Optimiser, wd)
     # change weight decay if present, else add it

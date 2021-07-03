@@ -8,6 +8,8 @@ already exists, only write to it if `force = true`.
 
 If `model` weights are on a GPU, they will be moved to the CPU before saving
 so they can be loaded in a non-GPU environment.
+
+[JLD2.jl](https://github.com/JuliaIO/JLD2.jl) is used for serialization.
 """
 function savemethodmodel(path, method::LearningMethod, model; force = false)
     if !force && isfile(path)
@@ -22,6 +24,8 @@ end
 
 Load a trained `model` along with a `method` from `path` that were saved
 using [`savemethodmodel`](#).
+
+[JLD2.jl](https://github.com/JuliaIO/JLD2.jl) is used for serialization.
 """
 function loadmethodmodel(path)
     isfile(path) || error("\"$path\" is not an existing file.")

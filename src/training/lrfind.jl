@@ -1,4 +1,10 @@
 
+"""
+    LRFinderResult(lrs, losses)
+
+Result of the learning rate finder [`lrfind`](#). Use `plot`
+to visualize.
+"""
 struct LRFinderResult
     losses
     lrs
@@ -22,7 +28,6 @@ rate. Return a [`LRFinderResult`](#).
 - `divergefactor`: stop finder early if loss goes higher than lowest loss times
     this factor
 - `estimators = [Steepest(), MinDivByTen()]`: list of [`LREstimator`](#)s
-
 """
 function lrfind(
         learner,
@@ -75,15 +80,23 @@ end
 
 Estimator for an optimal learning rate. Needs to implement [`estimatelr`](#).
 
-See [`Steepest`](#) and [`MinDivBy10`](#).
+See [`Steepest`](#) and [`MinDivByTen`](#).
 """
 abstract type LREstimator end
 
 """
-    estimatelr(::LREstimator, losses)
+    estimatelr(::LREstimator, losses, lrs)
+
+Estimate the optimal learning rate using `losses` and `lrs`.
 """
 function estimatelr end
 
+"""
+    Steepest <: LREstimator
+
+Estimate the optimal learning rate to be where the gradient of the loss
+is the steepest, i.e. the decrease is largest.
+"""
 struct Steepest <: LREstimator
     beta
 end
@@ -97,6 +110,11 @@ function estimatelr(est::Steepest, losses, lrs)
     return lr
 end
 
+"""
+    MinDivByTen <: LREstimator
+
+Estimate the optimal learning rate to be value at the minimum loss divided by 10.
+"""
 struct MinDivByTen <: LREstimator
     beta
 end
@@ -180,6 +198,11 @@ end
 
 # Utilities
 
+"""
+    smoothvalues(xs, β)
+
+Apply exponential smoothing with parameter `b` to vector `xs`.
+"""
 function smoothvalues(xs, β)
     res = similar(xs)
     val = 0
