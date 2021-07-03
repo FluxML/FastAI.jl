@@ -20,7 +20,7 @@ using FilePathsBase
 using FixedPointNumbers
 using Flux
 using Flux.Optimise
-import Flux.Optimise: apply!
+import Flux.Optimise: apply!, Optimiser, WeightDecay
 using FluxTraining: Learner, handle
 using FluxTraining.Events
 using JLD2: jldsave, jldopen
