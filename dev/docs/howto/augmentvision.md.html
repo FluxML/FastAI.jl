@@ -1,8 +1,8 @@
-<HTML><head><title>How to augment vision data</title><link href=../../template/hugobook.css rel=stylesheet ></link><link href=../../template/ansi.css rel=stylesheet ></link><meta content=Type=text/html; charset=utf-8 http-equiv=Content-Type ></meta></head><body><input onclick=toggleMenu() id=menu-control class=hidden toggle type=checkbox ></input><input id=toc-control type=checkbox class=hidden toggle ></input><main class=container flex ><aside id=menu-container class=book-menu ><nav class=book-menu-content ><h2 id=title >FastAI.jl</h2><div id=sidebar ><div class=doctree ><body><ul><li><p><a href=../../README.md.html title= >README</a></p></li><li><p><a href=../setup.md.html title= >Setup</a></p></li><li><p><a href=../quickstart.md.html title= >Quickstart</a></p></li><li><p>Tutorials</p><ul><li><p><a href=../introduction.md.html title= >Introduction</a></p></li><li><p><a href=../data_containers.md.html title= >Data containers</a></p></li><li><p><a href=../learning_methods.md.html title= >Learning methods</a></p></li><li><p><a href=../notebooks/serialization.ipynb.html title= >Saving and loading models</a></p></li><li><p><a href=../tutorials/presizing.ipynb.html title= >Presizing vision datasets</a></p></li></ul></li><li><p>Learning tasks</p><ul><li><p><a href=../methods/imageclassification.md.html title= >Image classification</a></p></li><li><p><a href=../notebooks/imagesegmentation.ipynb.html title= >Image segmentation</a></p></li><li><p><a href=../notebooks/keypointregression.ipynb.html title= >Keypoint regression</a></p></li></ul></li><li><p>How To</p><ul><li><p><a href=../notebooks/fitonecycle.ipynb.html title= >Train a model from scratch</a></p></li><li><p><a href=../notebooks/finetune.ipynb.html title= >Finetune a pretrained model</a></p></li><li><p><a href=../notebooks/lrfind.ipynb.html title= >Find a good learning rate</a></p></li><li><p><a href=augmentvision.md.html title= >Augment vision data</a></p></li><li><p><a href=../notebooks/how_to_visualize.ipynb.html title= >Visualize data</a></p></li><li><p><a href=logtensorboard.md.html title= >Log to TensorBoard</a></p></li></ul></li><li><p>Reference</p><ul><li><p><a href=../../REFERENCE.html title= >Docstrings</a></p></li><li><p><a href=../interfaces.md.html title= >Interfaces</a></p></li><li><p><a href=../api.md.html title= >API</a></p></li><li><p><a href=../glossary.md.html title= >Glossary</a></p></li></ul></li><li><p>Background</p><ul><li><p><a href=../background/datapipelines.md.html title= >Performant data pipelines</a></p></li></ul></li></ul></body></div></div></nav></aside><div class=book-page ><header class=book-header ></header><article><h1 id=how-to-augment-vision-data >How to augment vision data</h1><p>Data augmentation is important to train models with good generalization ability, especially when the size of your dataset is limited. FastAI.jl gives you high-level helpers to use data augmentation in vision learning methods, but also allows directly using <a href=https://github.com/lorenzoh/DataAugmentation.jl title= >DataAugmentation.jl</a>, the underlying data augmentation library.</p><p>By default, the only augmentation that will be used in computer vision tasks is a random crop, meaning that after images, keypoints and masks are resized to a similar size a random portion will be cropped during training. We can demonstrate this on the image classification task.</p><div result=false output=false class=cellcontainer cell=main lang=julia ><pre result=false output=false class=codecell cell=main lang=julia ><code>using FastAI
+<HTML><head><title>How to augment vision data</title><link href=../../template/ansi.css rel=stylesheet ></link><link href=../../template/hugobook.css rel=stylesheet ></link><meta content=Type=text/html; charset=utf-8 http-equiv=Content-Type ></meta></head><body><input onclick=toggleMenu() id=menu-control class=hidden toggle type=checkbox ></input><input id=toc-control type=checkbox class=hidden toggle ></input><main class=container flex ><aside id=menu-container class=book-menu ><nav class=book-menu-content ><h2 id=title >FastAI.jl</h2><div id=sidebar ><div class=doctree ><body><ul><li><p><a href=../../README.md.html title= >README</a></p></li><li><p><a href=../setup.md.html title= >Setup</a></p></li><li><p><a href=../quickstart.md.html title= >Quickstart</a></p></li><li><p>Tutorials</p><ul><li><p><a href=../introduction.md.html title= >Introduction</a></p></li><li><p><a href=../data_containers.md.html title= >Data containers</a></p></li><li><p><a href=../learning_methods.md.html title= >Learning methods</a></p></li><li><p><a href=../../notebooks/serialization.ipynb.html title= >Saving and loading models</a></p></li><li><p><a href=../../tutorials/presizing.ipynb.html title= >Presizing vision datasets</a></p></li></ul></li><li><p>Learning tasks</p><ul><li><p><a href=../methods/imageclassification.md.html title= >Image classification</a></p></li><li><p><a href=../../notebooks/imagesegmentation.ipynb.html title= >Image segmentation</a></p></li><li><p><a href=../../notebooks/keypointregression.ipynb.html title= >Keypoint regression</a></p></li></ul></li><li><p>How To</p><ul><li><p><a href=../../notebooks/fitonecycle.ipynb.html title= >Train a model from scratch</a></p></li><li><p><a href=../../notebooks/finetune.ipynb.html title= >Finetune a pretrained model</a></p></li><li><p><a href=../../notebooks/lrfind.ipynb.html title= >Find a good learning rate</a></p></li><li><p><a href=augmentvision.md.html title= >Augment vision data</a></p></li><li><p><a href=../../notebooks/how_to_visualize.ipynb.html title= >Visualize data</a></p></li><li><p><a href=logtensorboard.md.html title= >Log to TensorBoard</a></p></li></ul></li><li><p>Reference</p><ul><li><p><a href=../../REFERENCE.html title= >Docstrings</a></p></li><li><p><a href=../interfaces.md.html title= >Interfaces</a></p></li><li><p><a href=../api.md.html title= >API</a></p></li><li><p><a href=../glossary.md.html title= >Glossary</a></p></li></ul></li><li><p>Background</p><ul><li><p><a href=../background/datapipelines.md.html title= >Performant data pipelines</a></p></li></ul></li></ul></body></div></div></nav></aside><div class=book-page ><header class=book-header ></header><article><h1 id=how-to-augment-vision-data >How to augment vision data</h1><p>Data augmentation is important to train models with good generalization ability, especially when the size of your dataset is limited. FastAI.jl gives you high-level helpers to use data augmentation in vision learning methods, but also allows directly using <a href=https://github.com/lorenzoh/DataAugmentation.jl title= >DataAugmentation.jl</a>, the underlying data augmentation library.</p><p>By default, the only augmentation that will be used in computer vision tasks is a random crop, meaning that after images, keypoints and masks are resized to a similar size a random portion will be cropped during training. We can demonstrate this on the image classification task.</p><div result=false output=false class=cellcontainer cell=main lang=julia ><pre result=false output=false class=codecell cell=main lang=julia ><code>using FastAI
 using CairoMakie; CairoMakie.activate!(type=&quot;png&quot;)
 
 dir = joinpath(datasetpath(&quot;dogscats&quot;), &quot;train&quot;)
-data = loadtaskdata(dir, ImageClasssification)
+data = loadtaskdata(dir, ImageClassification)
 classes = Datasets.getclassesclassification(dir)
 method = ImageClassification(classes, (100, 128))
 xs, ys = FastAI.makebatch(method, data, fill(4, 9))
@@ -10,9 +10,113 @@ FastAI.plotbatch(method, xs, ys)
 </code></pre></div><p>Most learning methods let you pass additional augmentations as keyword arguments. For example, <code>ImageClassification</code> takes the <code>aug_projection</code> and <code>aug_image</code> arguments. FastAI.jl provides the <a href=../../REFERENCE/FastAI.augs_projection.html ><code>augs_projection</code></a> helper to quickly construct a set of projective data augmentations.</p><div class=cellcontainer cell=main lang=julia ><pre class=codecell cell=main lang=julia ><code>method2 = ImageClassification(classes, (100, 128), aug_projection=augs_projection())
 xs2, ys2 = FastAI.makebatch(method2, data, fill(4, 9))
 f = FastAI.plotbatch(method2, xs2, ys2)
-</code></pre><pre class=coderesult ><code>LoadError("string", 1, UndefVarError(:classes))</code></pre></div><p>Likewise, there is an <a href=../../REFERENCE/FastAI.augs_lighting.html ><code>augs_lighting</code></a> helper that adds contrast and brightness augmentation:</p><div class=cellcontainer cell=main lang=julia ><pre class=codecell cell=main lang=julia ><code>method3 = ImageClassification(
+</code></pre><pre class=coderesult ><code>LoadError("string", 3, MethodError(DataLoaders._batchsize, (Float32[-2.117904 -2.117904 … 1.6837914 1.8036647; -2.117904 -2.117904 … 1.7180408 1.6324171; … ; -2.117904 -2.117904 … 1.3755459 1.4097953; -2.117904 -2.117904 … 1.42692 1.4611696]
+
+Float32[-2.0357141 -2.0357141 … 1.9558823 2.0084033; -2.0357141 -2.0357141 … 1.9558823 1.8508403; … ; -2.0357141 -2.0357141 … 0.3452382 0.3452382; -2.0357141 -2.0357141 … 0.3452382 0.3977592]
+
+Float32[-1.8044444 -1.8044444 … 2.1171243 2.169412; -1.8044444 -1.8044444 … 2.2216995 2.0474076; … ; -1.8044444 -1.8044444 … 0.3044881 0.35677567; -1.8044444 -1.8044444 … 0.2522005 0.3044881]
+
+Float32[0.63918144 0.2966864 … -2.117904 -2.117904; 1.1700488 0.70768046 … -2.117904 -2.117904; … ; 1.2727973 1.2042983 … 1.6324171 1.6152923; 1.1700488 1.3926706 … 1.6152923 1.6152923]
+
+Float32[0.3802522 -0.057422955 … -2.0357141 -2.0357141; 0.95798326 0.3102242 … -2.0357141 -2.0357141; … ; 0.45028022 0.15266106 … 1.8683473 1.7983193; 0.3802522 0.41526622 … 1.8508403 1.8158263]
+
+Float32[0.32191727 -0.02666659 … -1.8044444 -1.8044444; 0.9667976 0.39163405 … -1.8044444 -1.8044444; … ; 0.16505454 -0.02666659 … 2.0648367 1.9951199; 0.060479376 0.3044881 … 2.0474076 2.0125492]
+
+Float32[1.7865399 1.8550389 … 1.4097953 1.3584211; 1.5467933 1.8550389 … 1.42692 1.4782944; … ; -2.117904 -2.117904 … -2.117904 -2.117904; -2.117904 -2.117904 … -2.117904 -2.117904]
+
+Float32[2.0959384 2.1309524 … 0.2752102 0.17016806; 1.9733893 2.1659663 … 0.3102242 0.3102242; … ; -2.0357141 -2.0357141 … -2.0357141 -2.0357141; -2.0357141 -2.0357141 … -2.0357141 -2.0357141]
+
+Float32[2.3785625 2.4134207 … -0.11381256 -0.13124175; 2.2739873 2.465708 … -0.09638336 -0.061524976; … ; -1.8044444 -1.8044444 … -1.8044444 -1.8044444; -1.8044444 -1.8044444 … -1.8044444 -1.8044444]
+
+Float32[1.6837914 1.8379141 … 1.6837914 1.5810429; 1.7694151 1.7865399 … 1.8036647 1.8550389; … ; 1.5639181 1.5810429 … 1.5467933 1.5125438; 1.5639181 1.5810429 … 1.5296686 1.4782944]
+
+Float32[1.8683473 2.0084033 … 1.8858544 1.7808123; 1.9733893 1.9908963 … 2.0084033 2.0609243; … ; 1.6582633 1.6932774 … 1.7633053 1.7282913; 1.6582633 1.6932774 … 1.7457983 1.6932774]
+
+Float32[2.1171243 2.2216995 … 2.0822659 1.9776908; 2.169412 2.1519828 … 2.2042704 2.2565577; … ; 1.8033988 1.8208281 … 2.0996952 2.0648367; 1.8033988 1.8208281 … 2.0648367 2.0299783]
+
+Float32[1.4097953 1.2042983 … 1.7694151 1.7694151; 1.3755459 1.2042983 … 1.8207895 1.7694151; … ; 1.5296686 1.3926706 … 1.4954191 -2.117904; 1.5810429 1.4097953 … 1.4954191 -2.117904]
+
+Float32[0.87044823 0.5203082 … 1.9383754 1.9383754; 1.0630252 0.6778712 … 1.9908963 1.9383754; … ; 0.90546227 0.81792724 … 1.7107843 -2.0357141; 0.9229692 0.8004202 … 1.7107843 -2.0357141]
+
+Float32[1.0016559 0.5833553 … 2.1519828 2.1519828; 1.1759479 0.70535964 … 2.2042704 2.1519828; … ; 0.46135095 0.2870589 … 2.0474076 -1.8044444; 0.47878015 0.3044881 … 2.0474076 -1.8044444]
+
+Float32[-2.117904 -2.117904 … 1.5810429 1.6324171; -2.117904 -2.117904 … 1.4097953 1.4954191; … ; 1.5639181 1.5639181 … 0.6220567 0.810429; 1.5639181 1.5639181 … 0.69055575 0.6220567]
+
+Float32[-2.0357141 -2.0357141 … 1.7107843 1.7633053; -2.0357141 -2.0357141 … 1.5182073 1.6057423; … ; 1.6582633 1.6582633 … 0.2577032 0.4327732; 1.6582633 1.6582633 … 0.17016806 0.10014006]
+
+Float32[-1.8044444 -1.8044444 … 1.7685405 1.8382572; -1.8044444 -1.8044444 … 1.4373858 1.541961; … ; 1.8208281 1.8208281 … 0.16505454 0.51363856; 1.8208281 1.8208281 … 0.23477131 0.13019615]
+
+Float32[-2.117904 -2.117904 … -2.117904 -2.117904; -2.117904 -2.117904 … -2.117904 -2.117904; … ; -2.117904 -2.117904 … -2.117904 -2.117904; -2.117904 -2.117904 … -2.117904 -2.117904]
+
+Float32[-2.0357141 -2.0357141 … -2.0357141 -2.0357141; -2.0357141 -2.0357141 … -2.0357141 -2.0357141; … ; -2.0357141 -2.0357141 … -2.0357141 -2.0357141; -2.0357141 -2.0357141 … -2.0357141 -2.0357141]
+
+Float32[-1.8044444 -1.8044444 … -1.8044444 -1.8044444; -1.8044444 -1.8044444 … -1.8044444 -1.8044444; … ; -1.8044444 -1.8044444 … -1.8044444 -1.8044444; -1.8044444 -1.8044444 … -1.8044444 -1.8044444]
+
+Float32[1.42692 1.4782944 … -2.117904 -2.117904; 1.4782944 1.3584211 … -2.117904 -2.117904; … ; 1.2556726 1.4440448 … -2.117904 -2.117904; 1.3755459 1.4954191 … -2.117904 -2.117904]
+
+Float32[1.6057423 1.6582633 … -2.0357141 -2.0357141; 1.7633053 1.6407562 … -2.0357141 -2.0357141; … ; -0.109943956 0.047619052 … -2.0357141 -2.0357141; -0.039915953 0.0126050515 … -2.0357141 -2.0357141]
+
+Float32[1.8208281 1.8731157 … -1.8044444 -1.8044444; 1.8033988 1.6988237 … -1.8044444 -1.8044444; … ; -0.061524976 0.043050185 … -1.8044444 -1.8044444; 0.060479376 0.060479376 … -1.8044444 -1.8044444]
+
+Float32[-2.117904 -2.117904 … 0.5535577 0.5364329; -2.117904 -2.117904 … 0.9131775 0.673431; … ; -2.117904 -2.117904 … 0.79330426 0.6220567; -2.117904 -2.117904 … 0.60493195 0.74193]
+
+Float32[-2.0357141 -2.0357141 … 0.030112052 -0.00490195; -2.0357141 -2.0357141 … 0.2401962 0.047619052; … ; -2.0357141 -2.0357141 … -0.32002798 -0.635154; -2.0357141 -2.0357141 … -0.635154 -0.617647]
+
+Float32[-1.8044444 -1.8044444 … -0.18352933 -0.16610013; -1.8044444 -1.8044444 … 0.11276696 -0.13124175; … ; -1.8044444 -1.8044444 … -0.32296288 -0.74126357; -1.8044444 -1.8044444 … -0.63668835 -0.7064052],), 0x00000000000075fa))</code></pre></div><p>Likewise, there is an <a href=../../REFERENCE/FastAI.augs_lighting.html ><code>augs_lighting</code></a> helper that adds contrast and brightness augmentation:</p><div class=cellcontainer cell=main lang=julia ><pre class=codecell cell=main lang=julia ><code>method3 = ImageClassification(
     classes, (100, 128),
     aug_projection=augs_projection(), aug_image=augs_lighting())
 xs3, ys3 = FastAI.makebatch(method3, data, fill(4, 9))
 FastAI.plotbatch(method3, xs3, ys3)
-</code></pre><pre class=coderesult ><code>LoadError("string", 1, UndefVarError(:classes))</code></pre></div><h2 id=augmentation-in-custom-learning-methods >Augmentation in custom learning methods</h2><p>To use projective and image augmentations in custom learning methods for computer vision tasks, see <a href=../../REFERENCE/FastAI.ProjectiveTransforms.html ><code>ProjectiveTransforms</code></a> and <a href=../../REFERENCE/FastAI.ImagePreprocessing.html ><code>ImagePreprocessing</code></a>, two helpers that every vision method in FastAI.jl uses.</p></article><footer class=book-footer ></footer></div><aside class=book-toc ><nav id=toc class=book-toc-content ><ul><li><a href=#how-to-augment-vision-data >How to augment vision data</a><ul><li><a href=#augmentation-in-custom-learning-methods >Augmentation in custom learning methods</a><ul></ul></li></ul></li></ul></nav></aside></main></body></HTML>
+</code></pre><pre class=coderesult ><code>LoadError("string", 5, MethodError(DataLoaders._batchsize, (Float32[0.45080918 0.3651854 … 1.5296686 1.4954191; 0.022690238 0.09118938 … 1.3755459 1.3755459; … ; -0.09718303 -0.14855729 … 1.5639181 1.7180408; 0.50218344 0.21106265 … 1.5981677 1.7865399]
+
+Float32[-0.057422955 -0.12745096 … 1.7107843 1.6757703; -0.40756297 -0.21498597 … 1.5532213 1.5707283; … ; -0.460084 -0.547619 … 1.8158263 1.9733893; 0.13515405 -0.16246496 … 1.8158263 2.0084033]
+
+Float32[-0.18352933 -0.23581691 … 1.8208281 1.8033988; -0.5321132 -0.39267966 … 1.5593902 1.5942485; … ; -0.41010883 -0.47982562 … 1.9254032 2.0822659; 0.2522005 -0.04409578 … 1.8556864 2.0648367]
+
+Float32[-1.5527872 -1.5527872 … 2.1975338 2.2489083; -1.5527872 -1.5527872 … 2.2489083 2.1975338; … ; 1.8721637 1.8892884 … 2.2489083 2.2489083; 2.2489083 2.2489083 … 2.2489083 2.2489083]
+
+Float32[-1.5805322 -1.5805322 … 1.2556022 1.4306723; -1.5805322 -1.5805322 … 1.3956583 1.3781513; … ; 1.5357143 1.3606442 … 2.4285715 2.4285715; 2.3585434 2.4285715 … 2.4285715 2.4285715]
+
+Float32[-1.3861438 -1.3861438 … 1.1410894 1.3502399; -1.3861438 -1.3861438 … 1.4373858 1.367669; … ; 1.5593902 1.4722441 … 2.64 2.64; 2.535425 2.64 … 2.64 2.64]
+
+Float32[0.50218344 0.79330426 … 1.5810429 1.5810429; 0.86180323 0.9131775 … 1.5810429 1.5810429; … ; 0.63918144 0.63918144 … -2.117904 -2.117904; 0.45080918 0.5364329 … -2.117904 -2.117904]
+
+Float32[-0.14495796 0.047619052 … 1.8858544 1.8858544; 0.17016806 0.18767506 … 1.8858544 1.8858544; … ; -1.317927 -1.352941 … -2.0357141 -2.0357141; -1.5455182 -1.4404761 … -2.0357141 -2.0357141]
+
+Float32[0.043050185 0.37420484 … 2.1519828 2.1519828; 0.33934647 0.46135095 … 2.1519828 2.1519828; … ; -1.6127234 -1.6475817 … -1.8044444 -1.8044444; -1.8044444 -1.7172985 … -1.8044444 -1.8044444]
+
+Float32[2.0776608 2.0776608 … 1.7694151 1.8207895; 2.0776608 2.0947855 … 1.7694151 1.7865399; … ; 1.2042983 1.5981677 … 1.7694151 1.7694151; 1.5125438 1.42692 … 1.7694151 1.7694151]
+
+Float32[2.2535014 2.2535014 … 1.8508403 1.8683473; 2.2535014 2.2710083 … 1.8508403 1.8858544; … ; -0.12745096 0.2226892 … 1.7983193 1.7983193; 0.15266106 0.0126050515 … 1.7983193 1.7983193]
+
+Float32[2.5005665 2.5005665 … 1.9602616 1.9428324; 2.5005665 2.5179958 … 1.9602616 1.9428324; … ; -0.49725482 -0.13124175 … 1.9428324 1.9428324; -0.2706753 -0.39267966 … 1.9428324 1.9428324]
+
+Float32[0.2281874 0.4850587 … 1.5125438 1.4954191; 0.5364329 0.5193082 … 1.4782944 1.4611696; … ; 1.015926 0.69055575 … -2.0494049 -2.0494049; 0.9131775 0.79330426 … -2.0494049 -2.0494049]
+
+Float32[-0.16246496 0.047619052 … 1.7457983 1.7282913; -0.039915953 -0.092436954 … 1.7107843 1.6932774; … ; 0.4327732 0.18767506 … -1.9831933 -1.9831933; 0.18767506 0.2051822 … -1.9831933 -1.9831933]
+
+Float32[0.07790857 0.33934647 … 1.8556864 1.8382572; 0.19991292 0.16505454 … 1.8208281 1.8208281; … ; 0.47878015 0.2696297 … -1.7521569 -1.7521569; 0.2696297 0.3044881 … -1.7521569 -1.7521569]
+
+Float32[-1.9980307 -1.9980307 … -1.9980307 -1.9980307; -1.9980307 -1.9980307 … 2.11191 -1.9980307; … ; 2.060536 2.1461596 … 2.2489083 2.2489083; 2.0262864 2.1461596 … 2.1804092 2.2489083]
+
+Float32[-1.9306722 -1.9306722 … -1.9306722 -1.9306722; -1.9306722 -1.9306722 … 2.2885156 -1.9306722; … ; 2.2009804 2.3235295 … 2.4285715 2.4285715; 2.1659663 2.3235295 … 2.4285715 2.4285715]
+
+Float32[-1.6998693 -1.6998693 … -1.6998693 -1.6998693; -1.6998693 -1.6998693 … 2.4134207 -1.6998693; … ; 2.3262744 2.4482791 … 2.64 2.64; 2.2914162 2.4482791 … 2.64 2.64]
+
+Float32[-2.117904 -2.117904 … 1.5296686 1.4954191; -2.117904 -2.117904 … 1.5125438 1.5125438; … ; -2.117904 1.5981677 … 1.1700488 1.221423; -2.117904 1.5810429 … 1.1357993 1.2042983]
+
+Float32[-2.0357141 -2.0357141 … 1.7107843 1.6757703; -2.0357141 -2.0357141 … 1.6932774 1.6932774; … ; -2.0357141 1.9383754 … 0.9754903 0.9754903; -2.0357141 1.9208683 … 1.0805323 1.3081232]
+
+Float32[-1.8044444 -1.8044444 … 1.8905448 1.8556864; -1.8044444 -1.8044444 … 1.8731157 1.8731157; … ; -1.8044444 2.169412 … 0.94936836 0.9667976; -1.8044444 2.1519828 … 1.0190852 1.1759479]
+
+Float32[-0.38830382 -0.5081771 … 0.74193 0.7590547; -0.23418105 -0.26843056 … 0.79330426 0.7761795; … ; 0.27956167 0.33093593 … 0.34806067 0.31381115; 0.2281874 0.21106265 … 0.3651854 0.38231018]
+
+Float32[-0.91526604 -1.0203081 … 1.0105042 1.0280112; -0.77521 -0.810224 … 1.0455183 1.0455183; … ; -0.24999997 -0.24999997 … 0.6078432 0.5903362; -0.14495796 -0.24999997 … 0.48529422 0.5378152]
+
+Float32[-0.776122 -0.91555554 … 1.1759479 1.2456646; -0.7064052 -0.79355115 … 1.2456646 1.2805231; … ; -0.44496724 -0.35782126 … 0.8099348 0.827364; -0.2532461 -0.34039208 … 0.6007845 0.68793046]
+
+Float32[0.72480524 0.69055575 … 1.0501755 1.0501755; 0.79330426 0.63918144 … 1.0330508 1.015926; … ; 1.1871736 1.221423 … -2.117904 -2.117904; 1.1529241 1.221423 … -2.117904 -2.117904]
+
+Float32[0.6778712 0.57282925 … 1.2906163 1.2906163; 0.74789923 0.5378152 … 1.2731093 1.2556022; … ; 1.3606442 1.3956583 … -2.0357141 -2.0357141; 1.3256303 1.3956583 … -2.0357141 -2.0357141]
+
+Float32[0.6182137 0.44392177 … 1.541961 1.541961; 0.70535964 0.42649257 … 1.541961 1.5245317; … ; 1.5245317 1.5593902 … -1.8044444 -1.8044444; 1.4896734 1.5593902 … -1.8044444 -1.8044444],), 0x00000000000075fa))</code></pre></div><h2 id=augmentation-in-custom-learning-methods >Augmentation in custom learning methods</h2><p>To use projective and image augmentations in custom learning methods for computer vision tasks, see <a href=../../REFERENCE/FastAI.ProjectiveTransforms.html ><code>ProjectiveTransforms</code></a> and <a href=../../REFERENCE/FastAI.ImagePreprocessing.html ><code>ImagePreprocessing</code></a>, two helpers that every vision method in FastAI.jl uses.</p></article><footer class=book-footer ></footer></div><aside class=book-toc ><nav id=toc class=book-toc-content ><ul><li><a href=#how-to-augment-vision-data >How to augment vision data</a><ul><li><a href=#augmentation-in-custom-learning-methods >Augmentation in custom learning methods</a><ul></ul></li></ul></li></ul></nav></aside></main></body></HTML>

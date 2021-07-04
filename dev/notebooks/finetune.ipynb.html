@@ -1,0 +1,78 @@
+<HTML><head><title>Finetuning a pretrained model</title><link href=../template/ansi.css rel=stylesheet ></link><link href=../template/hugobook.css rel=stylesheet ></link><meta content=Type=text/html; charset=utf-8 http-equiv=Content-Type ></meta></head><body><input onclick=toggleMenu() id=menu-control class=hidden toggle type=checkbox ></input><input id=toc-control type=checkbox class=hidden toggle ></input><main class=container flex ><aside id=menu-container class=book-menu ><nav class=book-menu-content ><h2 id=title >FastAI.jl</h2><div id=sidebar ><div class=doctree ><body><ul><li><p><a href=../README.md.html title= >README</a></p></li><li><p><a href=../docs/setup.md.html title= >Setup</a></p></li><li><p><a href=../docs/quickstart.md.html title= >Quickstart</a></p></li><li><p>Tutorials</p><ul><li><p><a href=../docs/introduction.md.html title= >Introduction</a></p></li><li><p><a href=../docs/data_containers.md.html title= >Data containers</a></p></li><li><p><a href=../docs/learning_methods.md.html title= >Learning methods</a></p></li><li><p><a href=serialization.ipynb.html title= >Saving and loading models</a></p></li><li><p><a href=../tutorials/presizing.ipynb.html title= >Presizing vision datasets</a></p></li></ul></li><li><p>Learning tasks</p><ul><li><p><a href=../docs/methods/imageclassification.md.html title= >Image classification</a></p></li><li><p><a href=imagesegmentation.ipynb.html title= >Image segmentation</a></p></li><li><p><a href=keypointregression.ipynb.html title= >Keypoint regression</a></p></li></ul></li><li><p>How To</p><ul><li><p><a href=fitonecycle.ipynb.html title= >Train a model from scratch</a></p></li><li><p><a href=finetune.ipynb.html title= >Finetune a pretrained model</a></p></li><li><p><a href=lrfind.ipynb.html title= >Find a good learning rate</a></p></li><li><p><a href=../docs/howto/augmentvision.md.html title= >Augment vision data</a></p></li><li><p><a href=how_to_visualize.ipynb.html title= >Visualize data</a></p></li><li><p><a href=../docs/howto/logtensorboard.md.html title= >Log to TensorBoard</a></p></li></ul></li><li><p>Reference</p><ul><li><p><a href=../REFERENCE.html title= >Docstrings</a></p></li><li><p><a href=../docs/interfaces.md.html title= >Interfaces</a></p></li><li><p><a href=../docs/api.md.html title= >API</a></p></li><li><p><a href=../docs/glossary.md.html title= >Glossary</a></p></li></ul></li><li><p>Background</p><ul><li><p><a href=../docs/background/datapipelines.md.html title= >Performant data pipelines</a></p></li></ul></li></ul></body></div></div></nav></aside><div class=book-page ><header class=book-header ></header><article><h1 id=finetuning-a-pretrained-model >Finetuning a pretrained model</h1><p>To access pretrained computer vision models, you’ll have to install a work-in-progress branch of Metalhead.jl as detailed on the <a href=../docs/setup.md.html title= >setup page</a>.</p><pre lang=julia ><code>using FastAI
+using Metalhead
+using Zygote</code></pre><p>Let’s load the image classification dataset ImageNette. You’re free to replace this by any of the other classification datasets in <code>FastAI.DATASETS</code>.</p><pre lang=julia ><code>DATASETNAME = &quot;imagenette2-160&quot;;</code></pre><pre lang=julia ><code>taskdata = Datasets.loadtaskdata(Datasets.datasetpath(DATASETNAME), ImageClassification)
+classes = Datasets.getclassesclassification(DATASETNAME);
+method = ImageClassification(classes, (128, 128))</code></pre><pre class=coderesult ><code>ImageClassification{2}(
+    classes = ["n01440764", "n02102040", "n02979186", "n03000684", "n03028079", "n03394916", "…], 
+    projections = ProjectiveTransforms{2}(
+    sz = (128, 128), 
+    buffered = true, 
+    augmentations = DataAugmentation.Identity()
+), 
+    imageprepocessing = ImagePreprocessing(
+    C = ColorTypes.RGB{FixedPointNumbers.N0f8}, 
+    T = Float32, 
+    buffered = true, 
+    augmentations = DataAugmentation.Identity()
+)
+)</code></pre><p>Now we load a pretrained model backbone:</p><pre lang=julia ><code>backbone = Metalhead.ResNet50(pretrain=true).layers[1:end-3];</code></pre><p>We pass it to <code>methodlearner</code> which will call <code>methodmodel</code> to stack a classification head on top of the backbone:</p><pre lang=julia ><code>learner = methodlearner(method, taskdata, backbone, ToGPU(), Metrics(accuracy))</code></pre><pre class=coderesult ><code>Learner()</code></pre><p>The fine-tuning itself is done with <a href=../REFERENCE/FastAI.finetune!.html ><code>finetune!</code></a>. It follows the same protocol as the <a href=https://github.com/fastai/fastai/blob/f2ab8ba78b63b2f4ebd64ea440b9886a2b9e7b6f/fastai/callback/schedule.py#L153 title= >fastai implementation</a>.</p><pre lang=julia ><code>finetune!(learner, 4)</code></pre><pre class=codeoutput ><code><span class="sgr32">Epoch 1 TrainingPhase(): 100%|██████████████████████████| Time: 0:00:47</span>
+┌───────────────┬───────┬─────────┬──────────┐
+│<span class="sgr1">         Phase </span>│<span class="sgr1"> Epoch </span>│<span class="sgr1">    Loss </span>│<span class="sgr1"> Accuracy </span>│
+├───────────────┼───────┼─────────┼──────────┤
+│ TrainingPhase │   1.0 │ 1.71635 │  0.48276 │
+└───────────────┴───────┴─────────┴──────────┘
+<span class="sgr32">Epoch 1 ValidationPhase(): 100%|████████████████████████| Time: 0:00:02</span>
+┌─────────────────┬───────┬─────────┬──────────┐
+│<span class="sgr1">           Phase </span>│<span class="sgr1"> Epoch </span>│<span class="sgr1">    Loss </span>│<span class="sgr1"> Accuracy </span>│
+├─────────────────┼───────┼─────────┼──────────┤
+│ ValidationPhase │   1.0 │ 1.35517 │  0.59728 │
+└─────────────────┴───────┴─────────┴──────────┘
+<span class="sgr32">Epoch 2 TrainingPhase(): 100%|██████████████████████████| Time: 0:00:52</span>
+┌───────────────┬───────┬─────────┬──────────┐
+│<span class="sgr1">         Phase </span>│<span class="sgr1"> Epoch </span>│<span class="sgr1">    Loss </span>│<span class="sgr1"> Accuracy </span>│
+├───────────────┼───────┼─────────┼──────────┤
+│ TrainingPhase │   2.0 │ 1.05656 │  0.66247 │
+└───────────────┴───────┴─────────┴──────────┘
+<span class="sgr32">Epoch 2 ValidationPhase(): 100%|████████████████████████| Time: 0:00:02</span>
+┌─────────────────┬───────┬─────────┬──────────┐
+│<span class="sgr1">           Phase </span>│<span class="sgr1"> Epoch </span>│<span class="sgr1">    Loss </span>│<span class="sgr1"> Accuracy </span>│
+├─────────────────┼───────┼─────────┼──────────┤
+│ ValidationPhase │   2.0 │ 0.78783 │  0.75917 │
+└─────────────────┴───────┴─────────┴──────────┘
+<span class="sgr32">Epoch 3 TrainingPhase(): 100%|██████████████████████████| Time: 0:00:49</span>
+┌───────────────┬───────┬─────────┬──────────┐
+│<span class="sgr1">         Phase </span>│<span class="sgr1"> Epoch </span>│<span class="sgr1">    Loss </span>│<span class="sgr1"> Accuracy </span>│
+├───────────────┼───────┼─────────┼──────────┤
+│ TrainingPhase │   3.0 │ 0.85804 │  0.72977 │
+└───────────────┴───────┴─────────┴──────────┘
+<span class="sgr32">Epoch 3 ValidationPhase(): 100%|████████████████████████| Time: 0:00:02</span>
+┌─────────────────┬───────┬─────────┬──────────┐
+│<span class="sgr1">           Phase </span>│<span class="sgr1"> Epoch </span>│<span class="sgr1">    Loss </span>│<span class="sgr1"> Accuracy </span>│
+├─────────────────┼───────┼─────────┼──────────┤
+│ ValidationPhase │   3.0 │ 0.71917 │  0.78484 │
+└─────────────────┴───────┴─────────┴──────────┘
+<span class="sgr32">Epoch 4 TrainingPhase(): 100%|██████████████████████████| Time: 0:00:49</span>
+┌───────────────┬───────┬─────────┬──────────┐
+│<span class="sgr1">         Phase </span>│<span class="sgr1"> Epoch </span>│<span class="sgr1">    Loss </span>│<span class="sgr1"> Accuracy </span>│
+├───────────────┼───────┼─────────┼──────────┤
+│ TrainingPhase │   4.0 │ 0.62329 │   0.7972 │
+└───────────────┴───────┴─────────┴──────────┘
+<span class="sgr32">Epoch 4 ValidationPhase(): 100%|████████████████████████| Time: 0:00:02</span>
+┌─────────────────┬───────┬─────────┬──────────┐
+│<span class="sgr1">           Phase </span>│<span class="sgr1"> Epoch </span>│<span class="sgr1">    Loss </span>│<span class="sgr1"> Accuracy </span>│
+├─────────────────┼───────┼─────────┼──────────┤
+│ ValidationPhase │   4.0 │ 0.66632 │  0.80195 │
+└─────────────────┴───────┴─────────┴──────────┘
+<span class="sgr32">Epoch 5 TrainingPhase(): 100%|██████████████████████████| Time: 0:00:49</span>
+┌───────────────┬───────┬─────────┬──────────┐
+│<span class="sgr1">         Phase </span>│<span class="sgr1"> Epoch </span>│<span class="sgr1">    Loss </span>│<span class="sgr1"> Accuracy </span>│
+├───────────────┼───────┼─────────┼──────────┤
+│ TrainingPhase │   5.0 │ 0.42718 │  0.86343 │
+└───────────────┴───────┴─────────┴──────────┘
+<span class="sgr32">Epoch 5 ValidationPhase(): 100%|████████████████████████| Time: 0:00:02</span>
+┌─────────────────┬───────┬─────────┬──────────┐
+│<span class="sgr1">           Phase </span>│<span class="sgr1"> Epoch </span>│<span class="sgr1">    Loss </span>│<span class="sgr1"> Accuracy </span>│
+├─────────────────┼───────┼─────────┼──────────┤
+│ ValidationPhase │   5.0 │ 0.62322 │  0.81028 │
+└─────────────────┴───────┴─────────┴──────────┘
+</code></pre><pre class=coderesult ><code>Learner()</code></pre></article><footer class=book-footer ></footer></div><aside class=book-toc ><nav id=toc class=book-toc-content ><ul><li><a href=#finetuning-a-pretrained-model >Finetuning a pretrained model</a><ul></ul></li></ul></nav></aside></main></body></HTML>
