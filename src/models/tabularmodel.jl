@@ -18,48 +18,54 @@ end
 # 	[_one_emb_sz(catdict, catcol, sz_dict) for catcol in cols]
 # end
 
-function TabularModel(
-        layers; 
-        emb_szs,
-        n_cont,
-        out_sz,
-        ps=0,
-        embed_p=0.,
-        use_bn=true,
-        bn_final=false,
-        bn_cont=true,
-        act_cls=Flux.relu,
-        lin_first=true,
-    final_activation=identity)
-
-    embedslist = [Embedding(ni, nf) for (ni, nf) in emb_szs]
-    n_emb = sum(size(embedlayer.weight)[1] for embedlayer in embedslist)
-    #     n_emb = first(Flux.outputsize(embeds, (length(emb_szs), 1)))
-    emb_drop = Dropout(embed_p)
-    embeds = Chain(
-        x -> collect(eachrow(x)), 
-        x -> ntuple(i -> x[i], length(x)), 
+function embeddingbackbone(embedding_sizes, dropoutprob)
+    embedslist = [Embedding(ni, nf) for (ni, nf) in embedding_sizes]
+    emb_drop = Dropout(dropoutprob)
+    Chain(
+        x -> tuple(eachrow(x)...), 
         Parallel(vcat, embedslist), 
         emb_drop
     )
+end
 
-    bn_cont = bn_cont && n_cont>0 ? BatchNorm(n_cont) : identity
+function continuousbackbone(n_cont)
+    n_cont > 0 ? BatchNorm(n_cont) : identity
+end
 
+function TabularModel(
+        catbackbone,
+        contbackbone,    
+        layers; 
+        n_cat,
+        n_cont,
+        out_sz,
+        ps=0,
+        use_bn=true,
+        bn_final=false,
+        act_cls=Flux.relu,
+        lin_first=true,
+        final_activation=identity
+    )
+
+    tabularbackbone = Parallel(vcat, catbackbone, contbackbone)
+    
+    catoutsize = first(Flux.outputsize(catbackbone, (n_cat, 1)))
     ps = Iterators.cycle(ps)
     classifiers = []
 
     first_ps, ps = Iterators.peel(ps)
-    push!(classifiers, linbndrop(n_emb+n_cont, first(layers); use_bn=use_bn, p=first_ps, lin_first=lin_first, act=act_cls))
+    push!(classifiers, linbndrop(catoutsize+n_cont, first(layers); use_bn=use_bn, p=first_ps, lin_first=lin_first, act=act_cls))
+    
     for (isize, osize, p) in zip(layers[1:(end-1)], layers[2:(end)], ps)
         layer = linbndrop(isize, osize; use_bn=use_bn, p=p, act=act_cls, lin_first=lin_first)
         push!(classifiers, layer)
     end
+    
     push!(classifiers, linbndrop(last(layers), out_sz; use_bn=bn_final, lin_first=lin_first))
+    
     layers = Chain(
-        x -> tuple(x...),
-        Parallel(vcat, embeds, Chain(x -> ndims(x)==1 ? Flux.unsqueeze(x, 2) : x, bn_cont)),
+        tabularbackbone,
         classifiers...,
         final_activation
     )
-    layers
 end
