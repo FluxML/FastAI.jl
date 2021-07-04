@@ -72,6 +72,8 @@ function plotprediction! end
 
 Plot a comparison of batches of model outputs `ŷs` with the ground truths
 `ys` on Makie.jl figure or axis `f`. `xs` is a batch of model inputs.
+
+[`plotprediction!`](#) needs to be implemented for `method`.
 """
 plotpredictions(method, xs, ŷs, ys) = plotpredictions!(defaultfigure(), method, xs, ŷs, ys)
 
@@ -89,11 +91,13 @@ end
     plotbatch(method, xs, ys)
 
 Plot an encoded batch of data in a grid.
+
+[`plotxy!`](#) needs to be implemented for `method`.
 """
 plotbatch(method, xs, ys) = plotbatch!(defaultfigure(), method, xs, ys)
 
 function plotbatch!(f, method, xs, ys)
-    n = size(xs)[end]
+    n = DataLoaders._batchsize(xs)
     nrows = Int(ceil(sqrt(n)))
     is = Iterators.product(1:nrows, 1:nrows)
     for (i, (x, y)) in zip(is, DataLoaders.obsslices((xs, ys)))
@@ -105,7 +109,10 @@ end
 """
     plotsamples(method::LearningMethod, samples)
 
-Plot samples for a `LearningMethod` in a grid.
+Plot a vector of samples for a `LearningMethod` in a grid. Use
+[`plotbatch`](#) instead if you want to plot an encoded batch of data.
+
+[`plotsample!`](#) needs to be implemented for `method`.
 """
 function plotsamples(method::LearningMethod, samples)
     n = length(samples)
@@ -121,6 +128,12 @@ end
 
 # ## Utilities
 
+"""
+    imageaxis(f)
+
+Create a `Makie.Axis` with no interactivity, decorations and aspect distortion
+suitable for showing images on.
+"""
 function imageaxis(f; kwargs...)
     ax = Makie.Axis(f; kwargs...)
     ax.aspect = DataAspect()
@@ -148,17 +161,7 @@ imageaxis(f::Makie.FigurePosition; kwargs...) = imageaxis(f.fig; kwargs...)
 
 
 @recipe(PlotImage, image) do scene
-    Attributes(;
-    #=
-        default_theme(scene)...,
-        colormap = [:black, :white],
-        colorrange = automatic,
-        interpolate = true,
-        fxaa = false,
-        lowclip = nothing,
-        highclip = nothing,
-    =#
-    )
+    Attributes()
 end
 
 function Makie.plot!(plot::PlotImage)

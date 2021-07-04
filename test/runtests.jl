@@ -47,5 +47,9 @@ include("imports.jl")
         @testset ExtendedTestSet "finetune.jl" begin
             include("training/finetune.jl")
         end
+        @testset ExtendedTestSet "lrfind.jl" begin
+            include("training/lrfind.jl")
+        end
+        # TODO: test learning rate finder
     end
 end

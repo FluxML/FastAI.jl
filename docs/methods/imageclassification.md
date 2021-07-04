@@ -19,7 +19,7 @@ end
 using CairoMakie
 using FastAI
 dir = joinpath(datasetpath("dogscats"), "train")
-data = loadtaskdata(dir, ImageClasssification)
+data = loadtaskdata(dir, ImageClassification)
 samples = [getobs(data, i) for i in rand(1:nobs(data), 9)]
 classes = Datasets.getclassesclassification(dir)
 method = ImageClassification(classes, (128, 128))

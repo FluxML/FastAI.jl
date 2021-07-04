@@ -12,7 +12,7 @@ using FastAI.Datasets
 Train an image classifier from scratch:
 
 ```julia
-data = Datasets.loadtaskdata(Datasets.datasetpath("imagenette2-160"), ImageClasssification)
+data = Datasets.loadtaskdata(Datasets.datasetpath("imagenette2-160"), ImageClassification)
 method = ImageClassification(Datasets.getclassesclassification("imagenette2-160"), (160, 160))
 learner = methodlearner(method, data, Models.xresnet18(), ToGPU(), Metrics(accuracy))
 fitonecycle!(learner, 5)

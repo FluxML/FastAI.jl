@@ -27,7 +27,7 @@ Before we get started, let's load up a [data container](data_containers.md) that
 using FastAI
 using FastAI.Datasets
 DATASET = "imagenette2-160"
-data = Datasets.loadtaskdata(Datasets.datasetpath(DATASET), ImageClasssification)
+data = Datasets.loadtaskdata(Datasets.datasetpath(DATASET), ImageClassification)
 image, class = getobs(data, 1)
 image
 ```

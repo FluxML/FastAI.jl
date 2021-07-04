@@ -33,6 +33,7 @@ For visualizing observations and predictions using [Makie.jl](https://github.com
 - Required methods:
     - [`plotsample!`](#)
     - [`plotxy!`](#)
+    - [`plotprediction!`](#)
 - Enables use of:
     - [`plotsamples`](#)
     - [`plotbatch`](#)

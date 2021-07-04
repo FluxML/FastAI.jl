@@ -2,7 +2,6 @@ module FastAI
 
 
 using Reexport
-
 @reexport using DLPipelines
 @reexport using FluxTraining
 @reexport using DataLoaders
@@ -20,7 +19,7 @@ using FilePathsBase
 using FixedPointNumbers
 using Flux
 using Flux.Optimise
-import Flux.Optimise: apply!
+import Flux.Optimise: apply!, Optimiser, WeightDecay
 using FluxTraining: Learner, handle
 using FluxTraining.Events
 using JLD2: jldsave, jldopen
@@ -108,10 +107,12 @@ export
     fit!,
     fitonecycle!,
     finetune!,
+    lrfind,
     savemethodmodel,
     loadmethodmodel,
 
-    gpu
+    gpu,
+    plot
 
 
 
