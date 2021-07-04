@@ -37,7 +37,7 @@ function finetune!(
     withfields(learner, optimizer=doptim) do
         fitonecycle!(
             learner, nepochs, base_lr / 2;
-            div=div, pct_start=pct_start, kwargs...)
+            div=div, kwargs...)
     end
 
     return learner
