@@ -57,6 +57,9 @@ include("datablock/models.jl")
 include("datablock/loss.jl")
 include("datablock/plot.jl")
 
+# method implementations and helpers
+include("./steps/tabularpreprocessing.jl")
+include("./methods/tabularregression.jl")
 
 # submodules
 include("datasets/Datasets.jl")
@@ -136,6 +139,12 @@ export
     BlockMethod,
     describemethod,
     checkblock,
+    
+    # pipeline steps
+    TabularTransforms,
+
+    # methods
+    TabularRegression,
 
     # learning methods
     findlearningmethods,
