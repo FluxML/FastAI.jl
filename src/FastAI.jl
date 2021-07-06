@@ -32,7 +32,8 @@ using PrettyTables
 using StaticArrays
 using Setfield
 using ShowCases
-using Statistics: mean
+using Tables
+using Statistics
 using Test: @testset, @test, @test_nowarn
 
 include("plotting.jl")
@@ -141,7 +142,7 @@ export
     checkblock,
     
     # pipeline steps
-    TabularTransforms,
+    TabularTransforms, gettransformationdict,
 
     # methods
     TabularRegression,
