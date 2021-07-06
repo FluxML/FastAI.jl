@@ -1,3 +1,15 @@
+"""
+    TabularTransforms(tfms) <: PipelineStep
+
+A helper for building learning methods that need to preprocess table rows.
+Preprocessing could consist of 
+- [`DataAugmentation.NormalizeRow`](#) (for normalizing a row of data for continuous columns)
+- [`DataAugmentation.FillMissing`](#) (for filling missing values)
+- [`DataAugmentation.Categorify`](#) (for label encoding categorical columns, which can be later used for indexing into embedding matrices)
+or a sequence of these transformations.
+
+"""
+
 struct TabularTransforms <: PipelineStep
     tfms
 end
