@@ -17,18 +17,58 @@ decode them [`decode`]
     be overloaded for an encoding `E`, concrete `Block` types and possibly a context.
 - `encodedblock(::E, block::Block) -> block'` returns the block that is obtained by
     encoding `block` with encoding `E`. This needs to be constant for an instance of `E`,
-    so it cannot depend on the sample or on randomness. The default is to return `block`,
-    since the default `encode` doesn't do anything.
+    so it cannot depend on the sample or on randomness. The default is to return `nothing`,
+    meaning the same block is returned and not changed. Encodings that return the same
+    block but change the data (e.g. `ProjectiveTransforms`) should return `block`.
 - `decodedblock(::E, block::Block) -> block'` returns the block that is obtained by
     decoding `block` with encoding `E`. This needs to be constant for an instance of `E`,
-    so it cannot depend on the sample or on randomness. The default is to return `block`,
-    since the default `decode` doesn't do anything.
+    so it cannot depend on the sample or on randomness. The default is to return `nothing`,
+    meaning the same block is returned and not changed.
 - `encode!(buf, ::E, ::Context, block::Block, data)` encodes `data` inplace.
 - `decode!(buf, ::E, ::Context, block::Block, data)` decodes `data` inplace.
 
 """
 abstract type Encoding end
 
+
+function encode(encodings::NTuple{N, <:Encoding}, context, blocks, data) where N
+    for encoding in encodings
+        data = encode(encoding, context, blocks, data)
+        blocks = encodedblocks(encoding, blocks)
+    end
+    return data
+end
+
+function decode(encodings::NTuple{N, <:Encoding}, context, blocks, data) where N
+    for encoding in Iterators.reverse(encodings)
+        data = decode(encoding, context, blocks, data)
+        blocks = decodedblocks(encoding, blocks)
+    end
+    return data
+end
+
+
+"""
+    encodedblock(encoding, block)
+
+Return the block that is obtained by encoding `block` with encoding `E`.
+This needs to be constant for an instance of `E`, so it cannot depend on the
+sample or on randomness. The default is to return `nothing`,
+meaning the same block is returned and not changed. Encodings that return the same
+block but change the data (e.g. `ProjectiveTransforms`) should return `block`.
+"""
+function encodedblock(::Encoding, ::Block) = nothing
+
+"""
+    decodedblock(encoding, block)
+
+Return the block that is obtained by encoding `block` with encoding `E`.
+This needs to be constant for an instance of `E`, so it cannot depend on the
+sample or on randomness. The default is to return `nothing`,
+meaning the same block is returned and not changed. Encodings that return the same
+block but change the data when decoding should return `block`.
+"""
+function encodedblock(::Encoding, ::Block) = nothing
 
 """
     abstract type StatefulEncoding <: Encoding
@@ -65,7 +105,7 @@ end
 
 decodedblock(::ImagePreprocessing, ::ImageTensor{N}) where N = Image{N}()
 
-function encode()
+function encode(::ImagePreprocessing)
     # see imagepreprocessing.jl
 end
 
@@ -81,3 +121,30 @@ decodedblock(::OneHot, onehot::OneHotTensor{1, T}) = Label{T}(onehot.classes)
 
 encodedblock(::OneHot, mask::Mask{T}) = OneHotTensor{3}(label.classes)
 decodedblock(::OneHot, onehot::OneHotTensor{3, T}) = Mask{T}(label.classes)
+
+
+"""
+    checkencodings()
+
+Check that `encodings` can be sequenced, i.e. given input `blocks`, the
+`encodedblock`s of every encoding can be fed into the next.
+"""
+function checkencodings(encodings, blocks)
+
+end
+
+"""
+Some printing of the steps taken in a full pipeline would be nice. Should
+highlight which blocks change.
+Can also check that every encoding is applied to at least one block.
+
+
+- INPUT:                (Image{2}(),           Label(classes))
+
+- ImagePreprocessing:   (**ImageTensor{2}()**, Label(classes))
+- OneHot:               (ImageTensor{2}(),     **OneHot{1}(classes)**)
+
+- OUTPUT:               (ImageTensor{2}(),     OneHot{1}(classes))
+
+
+"""
