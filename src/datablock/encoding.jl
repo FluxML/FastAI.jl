@@ -31,25 +31,45 @@ decode them [`decode`]
 abstract type Encoding end
 
 
+"""
+    encode(encoding, context, block, data)
+    encode(encoding, context, blocks, data)
+    encode(encodings, context, blocks, data)
+
+
+"""
 function encode(encodings::NTuple{N, <:Encoding}, context, blocks, data) where N
     for encoding in encodings
         data = encode(encoding, context, blocks, data)
-        blocks = encodedblocks(encoding, blocks)
+        blocks = encodedblock(encoding, blocks)
     end
     return data
 end
 
+function encode(encoding::Encoding, context, blocks::NTuple{N}, datas::NTuple{N}) where N
+    return Tuple(encode(encoding, context, block, data)
+                    for (block, data) in zip(blocks, datas))
+end
+
+
 function decode(encodings::NTuple{N, <:Encoding}, context, blocks, data) where N
     for encoding in Iterators.reverse(encodings)
         data = decode(encoding, context, blocks, data)
-        blocks = decodedblocks(encoding, blocks)
+        blocks = decodedblock(encoding, blocks)
     end
     return data
+end
+
+function decode(encoding::Encoding, context, blocks::NTuple{N}, datas::NTuple{N}) where N
+    return Tuple(decode(encoding, context, block, data)
+                    for (block, data) in zip(blocks, datas))
 end
 
 
 """
     encodedblock(encoding, block)
+    encodedblock(encoding, blocks)
+    encodedblock(encodings, blocks)
 
 Return the block that is obtained by encoding `block` with encoding `E`.
 This needs to be constant for an instance of `E`, so it cannot depend on the
@@ -58,17 +78,42 @@ meaning the same block is returned and not changed. Encodings that return the sa
 block but change the data (e.g. `ProjectiveTransforms`) should return `block`.
 """
 encodedblock(::Encoding, ::Block) = nothing
+function encodedblock(encoding::Encoding, blocks::Tuple)
+    Tuple(encodedblock(encoding, block) for block in blocks)
+end
+function encodedblock(encodings::NTuple{N, <:Encoding}, blocks) where N
+    encoded = false
+    for encoding in encodings
+        outblocks = encodedblock(encoding, blocks)
+        blocks = isnothing(outblocks) ? blocks : outblocks
+        encoded = encoded || !isnothing(outblocks)
+    end
+    return encoded ? blocks : nothing
+end
 
 """
     decodedblock(encoding, block)
+    decodedblock(encoding, blocks)
 
-Return the block that is obtained by encoding `block` with encoding `E`.
+Return the block that is obtained by decoding `block` with encoding `E`.
 This needs to be constant for an instance of `E`, so it cannot depend on the
 sample or on randomness. The default is to return `nothing`,
 meaning the same block is returned and not changed. Encodings that return the same
 block but change the data when decoding should return `block`.
 """
 decodedblock(::Encoding, ::Block) = nothing
+function decodedblock(encoding::Encoding, blocks::Tuple)
+    Tuple(decodedblock(encoding, block) for block in blocks)
+end
+function decodedblock(encodings::NTuple{N, <:Encoding}, blocks) where N
+    decoded = false
+    for encoding in Iterators.reverse(encodings)
+        outblocks = decodedblock(encoding, blocks)
+        blocks = isnothing(outblocks) ? blocks : outblocks
+        decoded = decoded || !isnothing(outblocks)
+    end
+    return decoded ? blocks : nothing
+end
 
 """
     abstract type StatefulEncoding <: Encoding

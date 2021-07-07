@@ -21,45 +21,46 @@ abstract type Block end
 
 """
     checkblock(block, data)
+    checkblock(blocks, datas)
 
 Check that `data` is compatible with `block`.
 """
+checkblock(::Block, data) = false
+
 function checkblock(blocks::Tuple, datas::Tuple)
     @assert length(blocks) == length(datas)
     return all(checkblock(block, data) for (block, data) in zip(blocks, datas))
 end
 
 """
-    Label(classes)
+    Label(classes; multi = false) <: Block
 
-`Block` for a categorical label in a single-class context, i.e.
-there is only one correct class.
+`Block` for a categorical label in a single-class or multi-class
+context, depending on `multi`.
+`data` is valid for `Label(classes)` if `data ∈ classes`.
 """
 struct Label{T} <: Block
     classes::AbstractVector{T}
+    multi::Bool
 end
+Label(classes; multi = false) = Label(classes, multi)
+checkblock(label::Label{T}, data::T) where T = data ∈ label.classes
+
 
 """
-    LabelMulti(classes)
+    Image{N}() <: Block
 
-`Block` for a categorical label in a multi-class context, i.e.
-there can be multiple correct classes.
+`Block` for an N-dimensional mask. `data` is valid for `Image{N}()`
+if it is an N-dimensional array with color or number element type.
 """
-struct LabelMulti{T} <: Block
-    classes::AbstractVector{T}
-end
-
-checkblock(block::Label{T}, label::T) where T = label in block.labels
-checkblock(block::LabelMulti{T}, label::T) where T = label in block.labels
-
-
 struct Image{N} <: Block end
 
 """
     Mask{N, T}(classes) <: Block
 
-Block for an N-dimensional categorical mask.
-
+Block for an N-dimensional categorical mask. `data` is valid for
+`Mask{N, T}(classes)`
+if it is an N-dimensional array with every element in `classes`.
 """
 struct Mask{N, T} <: Block
     classes::AbstractVector{T}
