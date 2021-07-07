@@ -161,6 +161,17 @@ end
 
 DLPipelines.methodlossfn(::SingleKeypointRegression) = Flux.mse
 
+"""
+    methodmodel(method::SingleKeypointRegression, backbone)
+
+Construct a model for keypoint regression from `backbone` which should
+be a convolutional feature extractor like a ResNet (without the
+classification head).
+
+The input and output sizes are `(h, w, 3, b)` and `(2, b)` where the
+output corresponds to a single `(y, x)` coordinate for every sample in
+the batch.
+"""
 function DLPipelines.methodmodel(method::SingleKeypointRegression, backbone)
     h, w, ch, b = Flux.outdims(backbone, (method.projections.sz..., 3, 1))
     head = FastAI.Models.visionhead(ch, 2, y_range=(-1, 1))

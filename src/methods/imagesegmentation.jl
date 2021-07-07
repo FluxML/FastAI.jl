@@ -202,7 +202,17 @@ function plotprediction!(f, method::ImageSegmentation, x, ŷ, y)
 end
 
 # ## Training interface
+"""
+    methodmodel(method::ImageClassifiction, backbone)
 
+Construct a model for image classification from `backbone` which should
+be a convolutional feature extractor like a ResNet (without the
+classification head). Uses [`UNetDynamic`](#) to add an upsampling block for
+every downsampling block in the backbone model.
+
+The input and output sizes are `(h, w, 3, b)` and
+`(h', w', length(method.classes), b)` with `(h', w') = (h, w) ./ 2^method.downscale`.
+"""
 function DLPipelines.methodmodel(method::ImageSegmentation, backbone; kwargs...)
     return UNetDynamic(
         backbone,

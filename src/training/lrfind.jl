@@ -1,100 +1,214 @@
 
+"""
+    LRFinderResult(lrs, losses)
 
-struct LRFinderResult{T}
-    losses::Vector{T}
-    lrs::Vector{T}
-    steepest::T
-    mindiv10::T
-end
-
-function LRFinderResult(losses::Vector{T}, lrs) where T
-    return LRFinderResult(losses, lrs, zero(T), zero(T))
-end
-
-
-mutable struct LRFinderPhase <: FluxTraining.Phases.AbstractTrainingPhase
-    startlr
-    endlr
-    steps
-    β
-    divergefactor
-    result
-end
-
-function LRFinderPhase(; startlr = 1e-7, endlr = 10, steps = 100, β = 0.02, divergefactor = 4, result = nothing)
-    return LRFinderPhase(startlr, endlr, steps, β, divergefactor, result)
+Result of the learning rate finder [`lrfind`](#). Use `plot`
+to visualize.
+"""
+struct LRFinderResult
+    losses
+    lrs
+    estimators
+    estimates
 end
 
 
-function FluxTraining.fitepochphase!(
-        learner::Learner,
-        phase::LRFinderPhase)
+"""
+    lrfind(learner[, dataiter; kwargs...]) -> LRFinderResult
 
-    dataiter = FluxTraining.getdataiter(TrainingPhase(), learner)
-    if dataiter === nothing
-        throw(CancelEpochException("No data found for phase $(typeof(phase))"))
-    end
+Run the learning rate finder. Exponentially increases the learning rate from a very
+low value to a very high value and uses the losses to estimate an optimal learning
+rate. Return a [`LRFinderResult`](#).
 
-    metric = SmoothLoss(phase.β)
-    metricscb = Metrics(metric)
-    losses = Float32[]
-    lrs = Float32[]
+## Keyword arguments
+
+- `nsteps = 100`: maximum number of steps to run the learning rate finder for
+- `startlr = 1e-7`: minimum learning rate
+- `endlr = 10`: maximum learning rate
+- `divergefactor`: stop finder early if loss goes higher than lowest loss times
+    this factor
+- `estimators = [Steepest(), MinDivByTen()]`: list of [`LREstimator`](#)s
+"""
+function lrfind(
+        learner,
+        dataiter = learner.data.training;
+        nsteps = 100,
+        startlr = 1e-7,
+        endlr = 10,
+        divergefactor = 4,
+        estimators = [Steepest(), MinDivByTen()])
+    losses = Float64[]
+    lrs = Float64[]
+    bestloss = Inf
+    scheduler = FluxTraining.removecallback!(learner, Scheduler)  # remove current `Scheduler` so it does not interfere
+    modelcheckpoint = deepcopy(cpu(learner.model))
 
     withfields(
         learner,
-        model = (FluxTraining.model!, deepcopy(cpu(learner.model))),
+        model = modelcheckpoint,
+        params = params(modelcheckpoint),
         optimizer = deepcopy(learner.optimizer)
         ) do
 
-        withcallbacks(learner, metricscb, Scheduler(Dict())) do
-            #schedule = Schedule([0, phase.steps], [phase.startlr, phase.endlr], Animations.expin(100000000))
-            #setschedules!(learner, phase, LearningRate => schedule)
-            bestloss = Inf
-
-            handle(EpochBegin(), learner, phase)
-            for (i, batch) in zip(1:phase.steps, dataiter)
-                lr = phase.startlr * (phase.endlr / phase.startlr) ^ (i / phase.steps)
+        FluxTraining.runepoch(learner, TrainingPhase()) do _
+            for (i, batch) in zip(1:nsteps, dataiter)
+                lr = startlr * (endlr / startlr) ^ (i / nsteps)
                 learner.optimizer.eta = lr
-                FluxTraining.fitbatch!(learner, batch, phase)
 
-                loss = FluxTraining.stepvalue(metric)
-                bestloss = min(bestloss, loss)
-                push!(losses, loss)
-                push!(lrs, lr)
+                state = step!(learner, TrainingPhase(), batch)
 
-                # Stop if loss is diverging
-                if loss > bestloss * phase.divergefactor
-                    break
+                push!(losses, state.loss)
+                push!(lrs, learner.optimizer.eta)
+                bestloss = min(state.loss, bestloss)
+                if state.loss > bestloss * divergefactor
+                    throw(FluxTraining.CancelEpochException("Learning rate finder diverged."))
                 end
             end
-            handle(EpochEnd(), learner, phase)
         end
     end
 
-    phase.result = LRFinderResult(losses, lrs)
+    # Restore previous `Learner` state
+    isnothing(scheduler) || FluxTraining.addcallback!(learner, scheduler)
+    FluxTraining.model!(learner, modelcheckpoint)
+    return LRFinderResult(losses, lrs, estimators)
+end
+
+# `LREstimator`s allow giving back different suggestions for a learning rate.
+
+"""
+    abstract type LREstimator
+
+Estimator for an optimal learning rate. Needs to implement [`estimatelr`](#).
+
+See [`Steepest`](#) and [`MinDivByTen`](#).
+"""
+abstract type LREstimator end
+
+"""
+    estimatelr(::LREstimator, losses, lrs)
+
+Estimate the optimal learning rate using `losses` and `lrs`.
+"""
+function estimatelr end
+
+"""
+    Steepest <: LREstimator
+
+Estimate the optimal learning rate to be where the gradient of the loss
+is the steepest, i.e. the decrease is largest.
+"""
+struct Steepest <: LREstimator
+    beta
+end
+Steepest() = Steepest(0.98)
+
+function estimatelr(est::Steepest, losses, lrs)
+    slosses = smoothvalues(losses, est.beta)
+    grads = (slosses[2:end] .- slosses[1:end-1]) ./ log.(lrs[2:end] .- lrs[1:end-1])
+    i = length(lrs) ÷ 3
+    lr = lrs[i:end][argmax(grads[i:end])]
+    return lr
+end
+
+"""
+    MinDivByTen <: LREstimator
+
+Estimate the optimal learning rate to be value at the minimum loss divided by 10.
+"""
+struct MinDivByTen <: LREstimator
+    beta
+end
+MinDivByTen() = MinDivByTen(0.98)
+
+function estimatelr(est::MinDivByTen, losses, lrs)
+    i = length(lrs) ÷ 3
+    lr = lrs[i:end][argmin(smoothvalues(losses, est.beta)[i:end])] / 10
+    return lr
 end
 
 
+LRFinderResult(losses, lrs) = LRFinderResult(losses, lrs, [Steepest(), MinDivByTen()])
+LRFinderResult(losses, lrs, estimators) = LRFinderResult(
+    losses,
+    lrs,
+    estimators,
+    [estimatelr(est, losses, lrs) for est in estimators]
+)
 
-function plotlrfind(lrs, losses)
-    f = Figure(resolution = (700, 400))
-    f[1, 1] = ax = Axis(f)
+# Printing and plotting
 
-    xtickvalues = (10.) .^(-10:10)
-    ax.xlabel = "Learning rate"
-    ax.xticks = log.(xtickvalues)
-    ax.xtickformat[] = vals -> string.(xtickvalues)
-    ax.xticklabelsize = 10.
-
-    ax.ylabel = "Loss"
-    ax.yticks = []
-    ax.ytickformat[] = vals -> string.(log.(vals))
-    ax.yticklabelsize = 10.
-
-
-    Makie.lines!(ax, log.(lrs), log.(losses), axis = (xticks = LinearTicks(10),))
-    return f
+function Base.show(io::IO, lrfindresult::LRFinderResult)
+    println(io, "LRFindResult(")
+    for (est, v) in zip(lrfindresult.estimators, lrfindresult.estimates)
+        println(io, "    ", est, " => ", v)
+    end
+    print(io, ")")
 end
 
-plotlrfind(phase::LRFinderPhase) = plotlrfind(phase.result)
-plotlrfind(lrresult::LRFinderResult) = plotlrfind(lrresult.lrs, lrresult.losses)
+
+function Makie.plot(result::LRFinderResult)
+    ticks = [round((10.)^i, digits=abs(i)) for i in -10:2]
+    fig = Figure()
+    ax = Axis(
+        title = "Learning rate finder",
+        titlesize = 20,
+        fig[1, 1],
+        xscale = log,
+        xticks = (ticks, string.(ticks)),
+        xminorticks = IntervalsBetween(5),
+        xminorgridvisible=true,
+        ygridcolor = :white,
+        xlabelsize = 14,
+        ylabelsize = 14,
+        ylabelcolor = :gray,
+        xtickcolor= :gray,
+        xticklabelcolor= :black,
+        xticklabelsize= 12,
+        ytickcolor= :gray,
+        yticklabelcolor= :gray,
+        yticklabelsize= 12,
+        ylabel = "Loss",
+        xlabel = "Learning rate (log)")
+
+    lines!(
+        result.lrs,
+        smoothvalues(result.losses, 0.98),
+        color = :black,
+    )
+
+    hidespines!(ax)
+
+    # plot suggestions
+    ls = []
+    for (estim, val) in zip(result.estimators, result.estimates)
+        push!(ls, vlines!(ax, [val]))
+
+    end
+
+    leg = Legend(
+        fig[2, 1], ls,
+        ["$(estim): $(round(val, sigdigits=3))" for (estim, val) in zip(result.estimators, result.estimates)],
+        framevisible=false,
+        labelsize=14,
+        orientation = :horizontal,)
+    leg.tellheight[] = true
+    leg.tellwidth[] = false
+    fig
+end
+
+# Utilities
+
+"""
+    smoothvalues(xs, β)
+
+Apply exponential smoothing with parameter `b` to vector `xs`.
+"""
+function smoothvalues(xs, β)
+    res = similar(xs)
+    val = 0
+    for (i, x) in enumerate(xs)
+        val = (val * β) + (x * (1 - β))
+        res[i] = val/((1)-β^i)
+    end
+    res
+end

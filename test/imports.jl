@@ -1,7 +1,7 @@
 
 using Colors: RGB, N0f8
 using FastAI
-using FastAI: ParamGroups, IndexGrouper, getgroup, DiscriminativeLRs
+using FastAI: ParamGroups, IndexGrouper, getgroup, DiscriminativeLRs, decay_optim
 using FilePathsBase
 using FastAI.Datasets
 using DLPipelines

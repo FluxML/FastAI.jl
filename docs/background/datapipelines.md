@@ -26,7 +26,7 @@ using DataLoaders: batchviewcollated
 using FastAI
 using FastAI.Datasets
 
-data = loadtaskdata(datasetpath("imagenette2-320"), ImageClasssification)
+data = loadtaskdata(datasetpath("imagenette2-320"), ImageClassification)
 method = ImageClassification(Datasets.getclassesclassification("imagenette2-320"), (224, 224))
 
 # maps data processing over `data`
@@ -68,7 +68,7 @@ using FastAI
 using FastAI.Datasets
 using FluxTraining: fitbatchphase!
 
-data = loadtaskdata(datasetpath("imagenette2-320"), ImageClasssification)
+data = loadtaskdata(datasetpath("imagenette2-320"), ImageClassification)
 method = ImageClassification(Datasets.getclassesclassification("imagenette2-320"), (224, 224))
 
 learner = methodlearner(method, data, xresnet18())
@@ -100,7 +100,7 @@ using FastAI.Datasets
 
 # Since loading times can vary per observation, we'll average the measurements over multiple observations
 N = 10
-data = datasubset(shuffleobs(loadtaskdata(datasetpath("imagenette2"), ImageClasssification), 1:N))
+data = datasubset(shuffleobs(loadtaskdata(datasetpath("imagenette2"), ImageClassification), 1:N))
 method = ImageClassification(Datasets.getclassesclassification("imagenette2-320"), (224, 224))
 
 # Time it takes to load an `(image, class)` observation
@@ -132,13 +132,13 @@ If the data loading is still slowing down training, you'll probably have to spee
 For many computer vision tasks, you will resize and crop images to a specific size during training for GPU performance reasons. If the images themselves are large, loading them from disk itself can take some time. If your dataset consists of 1920x1080 resolution images but you're resizing them to 256x256 during training, you're wasting a lot of time loading the large images. *Presizing* means saving resized versions of each image to disk once, and then loading these smaller versions during training. We can see the performance difference using ImageNette since it comes in 3 sizes: original, 360px and 180px.
 
 ```julia
-data_orig = loadtaskdata(datasetpath("imagenette2"), ImageClasssification)
+data_orig = loadtaskdata(datasetpath("imagenette2"), ImageClassification)
 @time eachobsparallel(data_orig, buffered = false)
 
-data_320px = loadtaskdata(datasetpath("imagenette2-320"), ImageClasssification)
+data_320px = loadtaskdata(datasetpath("imagenette2-320"), ImageClassification)
 @time eachobsparallel(data_320px, buffered = false)
 
-data_160px = loadtaskdata(datasetpath("imagenette2-160"), ImageClasssification)
+data_160px = loadtaskdata(datasetpath("imagenette2-160"), ImageClassification)
 @time eachobsparallel(data_160px, buffered = false)
 ```
 
