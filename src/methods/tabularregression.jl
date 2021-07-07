@@ -32,13 +32,12 @@ struct TabularRegression <: LearningMethod
     catcols
     targetcols
     catdict
-    embsz_dict
 end
 
 function TabularRegression(
         tfms::TabularTransforms; 
-        contcols, 
-        catcols, 
+        contcols=[], 
+        catcols=[], 
         targetcols, 
         columns, 
         catdict=nothing, 
@@ -49,7 +48,7 @@ end
 # Core Interface
 
 function DLPipelines.encode(method::TabularRegression, context, input)
-    tempinp = (; zip(method.columns, [data for data in input])...)
+    tempinp = (; zip(method.columns, collect(input))...)
     item = DataAugmentation.TabularItem(tempinp, method.columns)
     tfminp = run(method.tfms, context, item)
     x = (
@@ -69,7 +68,7 @@ end
 DLPipelines.methodlossfn(::TabularRegression) = Flux.Losses.mse
 
 # function DLPipelines.methodmodel(method::TabularRegression)
-#     embedszs = Models.get_emb_sz(method.catdict, method.contcols)
+#     embedszs = Models.get_emb_sz(method.catdict, method.catcols)
 #     embedbackbone = Models.embeddingbackbone(embedszs)
 #     contbackbone = Models.continuousbackbone(length(method.contcols))
 #     return Models.TabularModel(
