@@ -38,6 +38,8 @@ include("datablock/block.jl")
 include("datablock/encoding.jl")
 include("datablock/method.jl")
 
+include("encodings/onehot.jl")
+
 #=
 include("./steps/utils.jl")
 include("./steps/step.jl")

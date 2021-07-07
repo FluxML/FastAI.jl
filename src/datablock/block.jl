@@ -32,19 +32,35 @@ function checkblock(blocks::Tuple, datas::Tuple)
     return all(checkblock(block, data) for (block, data) in zip(blocks, datas))
 end
 
-"""
-    Label(classes; multi = false) <: Block
 
-`Block` for a categorical label in a single-class or multi-class
-context, depending on `multi`.
+abstract type AbstractLabel{T} <: Block end
+
+"""
+    Label(classes)
+
+`Block` for a categorical label in a single-class context.
 `data` is valid for `Label(classes)` if `data ∈ classes`.
 """
-struct Label{T} <: Block
+struct Label{T} <: AbstractLabel{T}
     classes::AbstractVector{T}
-    multi::Bool
 end
-Label(classes; multi = false) = Label(classes, multi)
+
 checkblock(label::Label{T}, data::T) where T = data ∈ label.classes
+"""
+    LabelMulti(classes[; thresh = 0.5])
+
+`Block` for a categorical label in a multi-class context.
+`data` is valid for `Label(classes)` if `data ∈ classes`.
+"""
+struct LabelMulti{T} <: AbstractLabel{T}
+    classes::AbstractVector{T}
+    thresh::Float32
+end
+LabelMulti(classes; thresh=0.5f0) = LabelMulti(classes, thresh)
+
+function checkblock(label::LabelMulti{T}, v::AbstractVector{T}) where T
+    return all(map(x -> x ∈ label.classes, v))
+end
 
 
 """
@@ -62,15 +78,16 @@ Block for an N-dimensional categorical mask. `data` is valid for
 `Mask{N, T}(classes)`
 if it is an N-dimensional array with every element in `classes`.
 """
-struct Mask{N, T} <: Block
+struct Mask{N,T} <: Block
     classes::AbstractVector{T}
 end
+Mask{N}(classes::AbstractVector{T}) where {N,T} = Mask{N,T}(classes)
 
 struct ImageTensor{N} <: Block
     nchannels::Int
 end
 
 
-struct OneHotTensor{N, T} <: Block
-    classes::AbstractVector{T}
+function checkblock(block::Mask{N,T}, a::AbstractArray{T,N}) where {N,T}
+    return all(map(x -> x ∈ block.classes, a))
 end

@@ -115,6 +115,7 @@ function decodedblock(encodings::NTuple{N, <:Encoding}, blocks) where N
     return decoded ? blocks : nothing
 end
 
+
 """
     abstract type StatefulEncoding <: Encoding
 
@@ -130,48 +131,6 @@ keyword argument `state` that defaults to the above call.
 """
 abstract type StatefulEncoding <: Encoding end
 
-
-"""
-    ImagePreprocessing(C, T, stats)
-
-Encodes `Image`s by converting them to a common color type `C`,
-expanding the color channels and normalizing the channel values.
-
-Encodes `Image{N}` -> `ImageTensor{N}` and decodes the reverse.
-"""
-struct ImagePreprocessing <: Encoding
-    # intermediate color type to convert to
-    C
-    # number type of output image tensor
-    T
-end
-
-function ImagePreprocessing(; C = RGB{N0f8}, T = Float32)
-
-end
-
-function encodedblock(ip::ImagePreprocessing, ::Image{N}) where N
-    return ImageTensor{N}(colorchannels(ip.C))
-end
-
-decodedblock(::ImagePreprocessing, ::ImageTensor{N}) where N = Image{N}()
-
-function encode(::ImagePreprocessing)
-    # see imagepreprocessing.jl
-end
-
-
-"""
-    OneHot()
-
-One-hot encodes data.
-"""
-
-encodedblock(::OneHot, label::Label{T}) where T = OneHotTensor{1, T}(label.classes)
-decodedblock(::OneHot, onehot::OneHotTensor{1, T}) where T = Label{T}(onehot.classes)
-
-encodedblock(::OneHot, mask::Mask{2, T}) where T = OneHotTensor{3, T}(label.classes)
-decodedblock(::OneHot, onehot::OneHotTensor{3, T}) where T = Mask{2, T}(label.classes)
 
 
 """
@@ -199,3 +158,29 @@ Can also check that every encoding is applied to at least one block.
 
 
 """
+
+"""
+    testencoding(encoding, block, data)
+
+Performs some tests that the encoding interface is set up properly for
+`encoding` and `block`.
+"""
+function testencoding(encoding, block, data)
+    @testset "Encoding `$(typeof(encoding))` for block `$block`" begin
+        # Test that `data` is a valid instance of `block`
+        @test checkblock(block, data)
+        @test !isnothing(encodedblock(encoding, block))
+        outblock = encodedblock(encoding, block)
+        outdata = encode(encoding, Training(), block, data)
+        # The encoded data should be a valid instance for the `encodedblock`
+        @test checkblock(outblock, outdata)
+
+        # Test decoding (if supported) works correctly
+        inblock = decodedblock(encoding, outblock)
+        if !isnothing(inblock)
+            @test block == inblock
+            indata = decode(encoding, Training(), outblock, outdata)
+            @test checkblock(inblock, indata)
+        end
+    end
+end
