@@ -51,3 +51,25 @@ end
 
 checkblock(block::Label{T}, label::T) where T = label in block.labels
 checkblock(block::LabelMulti{T}, label::T) where T = label in block.labels
+
+
+struct Image{N} <: Block end
+
+"""
+    Mask{N, T}(classes) <: Block
+
+Block for an N-dimensional categorical mask.
+
+"""
+struct Mask{N, T} <: Block
+    classes::AbstractVector{T}
+end
+
+struct ImageTensor{N} <: Block
+    nchannels::Int
+end
+
+
+struct OneHotTensor{N, T} <: Block
+    classes::AbstractVector{T}
+end

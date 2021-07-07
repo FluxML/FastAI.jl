@@ -57,7 +57,7 @@ sample or on randomness. The default is to return `nothing`,
 meaning the same block is returned and not changed. Encodings that return the same
 block but change the data (e.g. `ProjectiveTransforms`) should return `block`.
 """
-function encodedblock(::Encoding, ::Block) = nothing
+encodedblock(::Encoding, ::Block) = nothing
 
 """
     decodedblock(encoding, block)
@@ -68,7 +68,7 @@ sample or on randomness. The default is to return `nothing`,
 meaning the same block is returned and not changed. Encodings that return the same
 block but change the data when decoding should return `block`.
 """
-function encodedblock(::Encoding, ::Block) = nothing
+decodedblock(::Encoding, ::Block) = nothing
 
 """
     abstract type StatefulEncoding <: Encoding
@@ -83,7 +83,7 @@ and passed to recursive calls with the keyword argument `state`.
 As a result, you need to implement `encode`, `decode`, `encode!`, `decode!` with a
 keyword argument `state` that defaults to the above call.
 """
-abstract type StatefulEncoding end
+abstract type StatefulEncoding <: Encoding end
 
 
 """
@@ -96,7 +96,13 @@ Encodes `Image{N}` -> `ImageTensor{N}` and decodes the reverse.
 """
 struct ImagePreprocessing <: Encoding
     # intermediate color type to convert to
-    C::
+    C
+    # number type of output image tensor
+    T
+end
+
+function ImagePreprocessing(; C = RGB{N0f8}, T = Float32)
+
 end
 
 function encodedblock(ip::ImagePreprocessing, ::Image{N}) where N
@@ -116,11 +122,11 @@ end
 One-hot encodes data.
 """
 
-encodedblock(::OneHot, label::Label{T}) = OneHotTensor{1}(label.classes)
-decodedblock(::OneHot, onehot::OneHotTensor{1, T}) = Label{T}(onehot.classes)
+encodedblock(::OneHot, label::Label{T}) where T = OneHotTensor{1, T}(label.classes)
+decodedblock(::OneHot, onehot::OneHotTensor{1, T}) where T = Label{T}(onehot.classes)
 
-encodedblock(::OneHot, mask::Mask{T}) = OneHotTensor{3}(label.classes)
-decodedblock(::OneHot, onehot::OneHotTensor{3, T}) = Mask{T}(label.classes)
+encodedblock(::OneHot, mask::Mask{2, T}) where T = OneHotTensor{3, T}(label.classes)
+decodedblock(::OneHot, onehot::OneHotTensor{3, T}) where T = Mask{2, T}(label.classes)
 
 
 """

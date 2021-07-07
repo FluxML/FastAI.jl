@@ -35,6 +35,11 @@ include("plotting.jl")
 include("learner.jl")
 
 # method implementations and helpers
+include("datablock/block.jl")
+include("datablock/encoding.jl")
+include("datablock/method.jl")
+
+#=
 include("./steps/utils.jl")
 include("./steps/step.jl")
 include("./steps/spatial.jl")
@@ -44,14 +49,17 @@ include("./methods/imageclassification.jl")
 include("./methods/imagesegmentation.jl")
 include("./methods/singlekeypointregression.jl")
 include("./methods/checks.jl")
+=#
 
 
+#=
 # submodules
 include("datasets/Datasets.jl")
 using .Datasets
 
 include("models/Models.jl")
 using .Models
+=#
 
 # training
 include("training/paramgroups.jl")
