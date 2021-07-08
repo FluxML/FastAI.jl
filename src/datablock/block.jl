@@ -71,6 +71,8 @@ if it is an N-dimensional array with color or number element type.
 """
 struct Image{N} <: Block end
 
+checkblock(::Image{N}, ::AbstractArray{T, N}) where {T<:Union{Colorant, Number}, N} = true
+
 """
     Mask{N, T}(classes) <: Block
 
@@ -82,11 +84,6 @@ struct Mask{N,T} <: Block
     classes::AbstractVector{T}
 end
 Mask{N}(classes::AbstractVector{T}) where {N,T} = Mask{N,T}(classes)
-
-struct ImageTensor{N} <: Block
-    nchannels::Int
-end
-
 
 function checkblock(block::Mask{N,T}, a::AbstractArray{T,N}) where {N,T}
     return all(map(x -> x ∈ block.classes, a))

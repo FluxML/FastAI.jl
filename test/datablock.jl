@@ -4,6 +4,9 @@ import FastAI: Block, Encoding, encode, decode, checkblock, encodedblock, decode
 using FastAI: Label, LabelMulti, Mask, Image, ImageTensor, testencoding
 using FastAI: OneHot
 using Test
+using StaticArrays
+
+##
 
 
 
@@ -43,4 +46,28 @@ end
     testencoding(enc, Label(1:10), 1)
     testencoding(enc, LabelMulti(1:10), [1])
     testencoding(enc, Mask{2}(1:10), rand(1:10, 50, 50))
+end
+
+@testset "ImagePreprocessing" begin
+    encfns = [
+        () -> ImagePreprocessing(),
+        () -> ImagePreprocessing(buffered=false),
+        () -> ImagePreprocessing(T=Float64),
+        () -> ImagePreprocessing(augmentations=FastAI.augs_lighting()),
+        # need fixes in DataAugmentation.jl
+        # () -> ImagePreprocessing(C = HSV{Float32}, augmentations=FastAI.augs_lighting()),
+        # () -> ImagePreprocessing(C=Gray{N0f8}, means=SVector(0.), stds=SVector(1.)),
+    ]
+    for encfn in encfns
+        enc = encfn()
+        block = Image{2}()
+        img = rand(RGB{N0f8}, 10, 10)
+        testencoding(enc, block, img)
+
+        ctx = Validation()
+        outblock = encodedblock(enc, block)
+        a = encode(enc, ctx, block, img)
+        rimg = decode(enc, ctx, outblock, a)
+        @test img ≈ rimg
+    end
 end

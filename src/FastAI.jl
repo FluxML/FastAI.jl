@@ -39,6 +39,7 @@ include("datablock/encoding.jl")
 include("datablock/method.jl")
 
 include("encodings/onehot.jl")
+include("encodings/imagepreprocessing.jl")
 
 #=
 include("./steps/utils.jl")

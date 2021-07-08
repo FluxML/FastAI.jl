@@ -29,14 +29,3 @@ function augs_projection(;
     push!(tfms, Zoom((1., max_zoom)))
     return DataAugmentation.compose(tfms...)
 end
-
-"""
-    augs_lighting([; intensity = 0.2, p = 0.75])
-
-Helper to create a set of lighting transformations for image data. With
-probability `p`, applies [`AdjustBrightness`](#)`(intensity)` and
-[`AdjustContrast`](#)`(intensity)`.
-"""
-function augs_lighting(;intensity=0.2, p=0.75)
-    return Maybe(AdjustBrightness(intensity), p) |> Maybe(AdjustContrast(intensity), p)
-end
