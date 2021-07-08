@@ -114,5 +114,8 @@ end
         @test imagesmall ≈ encode(enc, Validation(), block, imagesmall)
     end
 
-    testencoding(enc, block, image)
+    @testset "3D" begin
+
+        testencoding(ProjectiveTransforms((16, 16, 16)), Image{3}(), rand(RGB{N0f8}, 32, 24, 24))
+    end
 end
