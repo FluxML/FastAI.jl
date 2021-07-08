@@ -113,7 +113,7 @@ sample or on randomness. The default is to return `nothing`,
 meaning the same block is returned and not changed. Encodings that return the same
 block but change the data (e.g. `ProjectiveTransforms`) should return `block`.
 """
-encodedblock(::Encoding, ::Block) = nothing
+encodedblock(enc, block) = nothing
 function encodedblock(encoding::Encoding, blocks::Tuple)
     Tuple(encodedblock(encoding, block) for block in blocks)
 end
@@ -158,14 +158,38 @@ if it only transforms some of the blocks. This could be random state
 for stochastic augmentations that needs to be the same for every block
 that is encoded.
 
-The state is created by calling `samplestate(encoding, context, blocks, sample)`
+The state is created by calling `encodestate(encoding, context, blocks, sample)`
 and passed to recursive calls with the keyword argument `state`.
 As a result, you need to implement `encode`, `decode`, `encode!`, `decode!` with a
 keyword argument `state` that defaults to the above call.
+
+Same goes for `decode`, which should accept a `state` keyword argument defaulting
+to `decodestate(encoding, context, blocks, sample)`
 """
 abstract type StatefulEncoding <: Encoding end
 
+encodestate(encoding::StatefulEncoding, context, blocks, data) = nothing
+decodestate(encoding::StatefulEncoding, context, blocks, data) = nothing
 
+function encode(encoding::StatefulEncoding, context, blocks::Tuple, datas::Tuple)
+    state = encodestate(encoding, context, blocks, datas)
+    @assert length(blocks) == length(datas)
+    return Tuple(encode(encoding, context, block, data; state = state)
+                    for (block, data) in zip(blocks, datas))
+end
+
+# By default ignores state
+encode(encoding::StatefulEncoding, context, block::Block, data; state = nothing) = data
+
+function decode(encoding::StatefulEncoding, context, blocks::Tuple, datas::Tuple)
+    state = decodestate(encoding, context, blocks, datas)
+    @assert length(blocks) == length(datas)
+    return Tuple(decode(encoding, context, block, data; state = state)
+                    for (block, data) in zip(blocks, datas))
+end
+
+# By default ignores state
+decode(encoding::StatefulEncoding, context, block::Block, data; state = nothing) = data
 
 """
     checkencodings()
