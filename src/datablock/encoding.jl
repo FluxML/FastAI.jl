@@ -32,38 +32,74 @@ abstract type Encoding end
 
 
 """
+
+    fillblock(inblocks, outblocks)
+
+
+Replaces all `nothing`s in outblocks with the corresponding block in `inblocks`.
+`outblocks` may be obtained by
+"""
+fillblock(inblocks, outblocks) = map(fillblock, inblocks, outblocks)
+fillblock(inblock::Block, ::Nothing) = inblock
+fillblock(::Block, outblock::Block) = outblock
+
+function encodedblock(enc, block, fill::Bool)
+    outblock = encodedblock(enc, block)
+    return fill ? fillblock(block, outblock) : outblock
+end
+
+function decodedblock(enc, block, fill::Bool)
+    outblock = decodedblock(enc, block)
+    return fill ? fillblock(block, outblock) : outblock
+end
+
+
+
+# By default, a tuple of encodings encodes by encoding the data one encoding
+# after the other
+"""
     encode(encoding, context, block, data)
     encode(encoding, context, blocks, data)
     encode(encodings, context, blocks, data)
-
-
 """
-function encode(encodings::NTuple{N, <:Encoding}, context, blocks, data) where N
+function encode(encodings::NTuple{N, Encoding}, context, blocks, data) where N
     for encoding in encodings
         data = encode(encoding, context, blocks, data)
-        blocks = encodedblock(encoding, blocks)
+        blocks = encodedblock(encoding, blocks, true)
     end
     return data
 end
 
-function encode(encoding::Encoding, context, blocks::NTuple{N}, datas::NTuple{N}) where N
+# By default, an encoding encodes every element in a tuple separately
+function encode(encoding::Encoding, context, blocks::Tuple, datas::Tuple)
+    @assert length(blocks) == length(datas)
     return Tuple(encode(encoding, context, block, data)
                     for (block, data) in zip(blocks, datas))
 end
 
+# By default an encoding doesn't change the data
+encode(encoding::Encoding, _, ::Block, data) = data
 
-function decode(encodings::NTuple{N, <:Encoding}, context, blocks, data) where N
+# By default, a tuple of encodings decodes by encoding the data one encoding
+# after the other, with encodings iterated in reverse order
+function decode(encodings::NTuple{N, Encoding}, context, blocks, data) where N
     for encoding in Iterators.reverse(encodings)
         data = decode(encoding, context, blocks, data)
-        blocks = decodedblock(encoding, blocks)
+        blocks = decodedblock(encoding, blocks, true)
     end
     return data
 end
 
-function decode(encoding::Encoding, context, blocks::NTuple{N}, datas::NTuple{N}) where N
+
+# By default, an encoding decodes every element in a tuple separately
+function decode(encoding::Encoding, context, blocks::Tuple, datas::Tuple)
+    @assert length(blocks) == length(datas)
     return Tuple(decode(encoding, context, block, data)
                     for (block, data) in zip(blocks, datas))
 end
+
+# By default an encoding doesn't change the data
+decode(encoding::Encoding, _, ::Block, data) = data
 
 
 """
@@ -81,12 +117,11 @@ encodedblock(::Encoding, ::Block) = nothing
 function encodedblock(encoding::Encoding, blocks::Tuple)
     Tuple(encodedblock(encoding, block) for block in blocks)
 end
-function encodedblock(encodings::NTuple{N, <:Encoding}, blocks) where N
+function encodedblock(encodings::NTuple{N, Encoding}, blocks) where N
     encoded = false
     for encoding in encodings
-        outblocks = encodedblock(encoding, blocks)
-        blocks = isnothing(outblocks) ? blocks : outblocks
-        encoded = encoded || !isnothing(outblocks)
+        encoded = encoded || !isnothing(encodedblock(encoding, blocks))
+        blocks = encodedblock(encoding, blocks, true)
     end
     return encoded ? blocks : nothing
 end
@@ -105,12 +140,11 @@ decodedblock(::Encoding, ::Block) = nothing
 function decodedblock(encoding::Encoding, blocks::Tuple)
     Tuple(decodedblock(encoding, block) for block in blocks)
 end
-function decodedblock(encodings::NTuple{N, <:Encoding}, blocks) where N
+function decodedblock(encodings::NTuple{N, Encoding}, blocks) where N
     decoded = false
     for encoding in Iterators.reverse(encodings)
-        outblocks = decodedblock(encoding, blocks)
-        blocks = isnothing(outblocks) ? blocks : outblocks
-        decoded = decoded || !isnothing(outblocks)
+        decoded = decoded || !isnothing(decodedblock(encoding, blocks))
+        blocks = decodedblock(encoding, blocks, true)
     end
     return decoded ? blocks : nothing
 end
@@ -163,7 +197,12 @@ Can also check that every encoding is applied to at least one block.
     testencoding(encoding, block, data)
 
 Performs some tests that the encoding interface is set up properly for
-`encoding` and `block`.
+`encoding` and `block`. Tests that
+
+- `data` is a valid `block`
+- `encode` returns a valid `encodedblock(encoding, block)`
+- `decode` returns a valid `decodedblock(encoding, encodedblock(encoding, block))`
+    and that the block is identical to `block`
 """
 function testencoding(encoding, block, data)
     @testset "Encoding `$(typeof(encoding))` for block `$block`" begin

@@ -55,7 +55,7 @@ end
         () -> ImagePreprocessing(T=Float64),
         () -> ImagePreprocessing(augmentations=FastAI.augs_lighting()),
         # need fixes in DataAugmentation.jl
-        # () -> ImagePreprocessing(C = HSV{Float32}, augmentations=FastAI.augs_lighting()),
+        # () -> ImagePreprocessing(C=HSV{Float32}, augmentations=FastAI.augs_lighting()),
         # () -> ImagePreprocessing(C=Gray{N0f8}, means=SVector(0.), stds=SVector(1.)),
     ]
     for encfn in encfns
@@ -70,4 +70,12 @@ end
         rimg = decode(enc, ctx, outblock, a)
         @test img ≈ rimg
     end
+end
+
+
+@testset "Composition" begin
+    encodings = (ImagePreprocessing(), OneHot())
+    blocks = (Image{2}(), Label(1:10))
+    data = (rand(RGB{N0f8}, 10, 10), 7)
+    testencoding(encodings, blocks, data)
 end
