@@ -57,9 +57,7 @@ end
         () -> ImagePreprocessing(buffered=false),
         () -> ImagePreprocessing(T=Float64),
         () -> ImagePreprocessing(augmentations=FastAI.augs_lighting()),
-        # need fixes in DataAugmentation.jl
-        # () -> ImagePreprocessing(C=HSV{Float32}, augmentations=FastAI.augs_lighting()),
-        # () -> ImagePreprocessing(C=Gray{N0f8}, means=SVector(0.), stds=SVector(1.)),
+        () -> ImagePreprocessing(C=Gray{N0f8}, means=SVector(0.), stds=SVector(1.)),
     ]
     for encfn in encfns
         enc = encfn()
@@ -71,7 +69,21 @@ end
         outblock = encodedblock(enc, block)
         a = encode(enc, ctx, block, img)
         rimg = decode(enc, ctx, outblock, a)
-        @test img ≈ rimg
+        if eltype(rimg) <: RGB
+            @test img ≈ rimg
+        end
+    end
+
+    @testset "3D" begin
+        enc = ImagePreprocessing()
+        block = Image{3}()
+        img = rand(RGB{N0f8}, 10, 10, 10)
+        testencoding(enc, block, img)
+
+        enc = ImagePreprocessing(buffered = false)
+        block = Image{3}()
+        img = rand(RGB{N0f8}, 10, 10, 10)
+        testencoding(enc, block, img)
     end
 end
 

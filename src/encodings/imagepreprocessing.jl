@@ -1,7 +1,7 @@
 
 
-const IMAGENET_MEANS = SVector{3, Float32}(.485, 0.456, 0.406)
-const IMAGENET_STDS = SVector{3, Float32}(0.229, 0.224, 0.225)
+const IMAGENET_MEANS = SVector{3,Float32}(.485, 0.456, 0.406)
+const IMAGENET_STDS = SVector{3,Float32}(0.229, 0.224, 0.225)
 
 
 """
@@ -15,7 +15,7 @@ struct ImageTensor{N} <: Block
     nchannels::Int
 end
 
-function checkblock(block::ImageTensor{N}, a::AbstractArray{T, M}) where {M, N, T}
+function checkblock(block::ImageTensor{N}, a::AbstractArray{T,M}) where {M,N,T}
     # Tensor has dimensionality one higher and color channels need to be the same
     return (N + 1 == M) && (size(a, M) == block.nchannels)
 end
@@ -46,30 +46,27 @@ Encodes
 - `T::Type{<:Real} = Float32`: element type of output
 
 """
-struct ImagePreprocessing{P, N, C<:Color{P, N}, T<:Number} <: Encoding
+struct ImagePreprocessing{P,N,C <: Color{P,N},T <: Number} <: Encoding
     buffered::Bool
     augmentations::DataAugmentation.Transform
-    stats::Tuple{SVector{N}, SVector{N}}
-    tfms::Dict{Context, DataAugmentation.Transform}
+    stats::Tuple{SVector{N},SVector{N}}
+    tfms::Dict{Context,DataAugmentation.Transform}
 end
 
 
 function ImagePreprocessing(;
-        means::SVector{N} = IMAGENET_MEANS,
-        stds::SVector{N} = IMAGENET_STDS,
-        augmentations = Identity(),
-        C::Type{<:Color{U, N}} = RGB{N0f8},
-        T = Float32,
-        buffered = true) where {N, U}
+        means::SVector{N}=IMAGENET_MEANS,
+        stds::SVector{N}=IMAGENET_STDS,
+        augmentations=Identity(),
+        C::Type{<:Color{U,N}}=RGB{N0f8},
+        T=Float32,
+        buffered=true) where {N,U}
     # TODO: tensor of type T
     stats = means, stds
     basetfm = ToEltype(C) |> ImageToTensor{T}() |> Normalize(means, stds)
     if buffered
         tfms = Dict(
-            # TODO: clean up when DataAugmentation.jl sequence composition is fixed
-            Training() => BufferedThreadsafe(
-                augmentations |> ToEltype(C) |> ImageToTensor{T}() |> Normalize(means, stds)
-            ),
+            Training() => BufferedThreadsafe(augmentations |> basetfm),
             Validation() => BufferedThreadsafe(basetfm),
             # Inference transform is not buffered since it can have
             # varying sizes
@@ -83,12 +80,12 @@ function ImagePreprocessing(;
         )
     end
 
-    return ImagePreprocessing{U, N, C, T}(buffered, augmentations, stats, tfms)
+    return ImagePreprocessing{U,N,C,T}(buffered, augmentations, stats, tfms)
 end
 
-colorchannels(C::Type{<:Color{T, N}}) where {T, N} = N
+colorchannels(C::Type{<:Color{T,N}}) where {T,N} = N
 
-function encodedblock(ip::ImagePreprocessing{P, M, C}, ::Image{N}) where {P, M, C, N}
+function encodedblock(ip::ImagePreprocessing{P,M,C}, ::Image{N}) where {P,M,C,N}
     return ImageTensor{N}(colorchannels(C))
 end
 
@@ -120,7 +117,7 @@ end
 
 # Pretty-printing
 
-function Base.show(io::IO, ip::ImagePreprocessing{P, N, C, T}) where {P, N, C, T}
+function Base.show(io::IO, ip::ImagePreprocessing{P,N,C,T}) where {P,N,C,T}
     show(io, ShowTypeOf(ip))
     fields = (
         buffered = ShowLimit(ip.buffered, limit=80),
