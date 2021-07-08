@@ -5,6 +5,9 @@ using FastAI: Label, LabelMulti, Mask, Image, ImageTensor, testencoding
 using FastAI: OneHot
 using Test
 using StaticArrays
+using Images
+using FastAI: grabbounds
+using Images
 
 ##
 
@@ -74,8 +77,30 @@ end
 
 
 @testset "Composition" begin
-    encodings = (ImagePreprocessing(), OneHot())
+    encodings = (ProjectiveTransforms((5, 5)), ImagePreprocessing(), OneHot())
     blocks = (Image{2}(), Label(1:10))
     data = (rand(RGB{N0f8}, 10, 10), 7)
     testencoding(encodings, blocks, data)
+end
+
+
+@testset "ProjectiveTransforms" begin
+    enc = ProjectiveTransforms((32, 32), buffered = false)
+    block = Image{2}()
+    image = rand(RGB, 100, 50)
+
+    testencoding(enc, block, image)
+    @testset "randstate is shared" begin
+        im1, im2 = encode(enc, Training(), (block, block), (image, image))
+        im3 = encode(enc, Training(), block, image)
+        @test im1 ≈ im2
+        @test !(im1 == im3)
+    end
+
+    @testset "don't transform data that doesn't need to be resized" begin
+        imagesmall = rand(RGB, 32, 32)
+        @test imagesmall ≈ encode(enc, Validation(), block, imagesmall)
+    end
+
+    testencoding(enc, block, image)
 end
