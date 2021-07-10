@@ -12,9 +12,20 @@ Represents a kind of data used in machine learning.
 
 ## Interface
 
+Required:
+
 - `checkblock(block, data)` checks if `data` is compatible with `block`. For example
     `checkblock(Image{2}(), img)` checks that `img` is a matrix with numeric or color
     values. Defaults to `false`.
+
+Optional:
+
+- For plotting interface:
+    - `plotblock!(f, block)`. Plot `block` on Makie figure `f`.
+- For testing interface:
+    - `mockblock(block)`. Randomly generate an instance of `block`. Needed
+    to derive the testing interface for `BlockMethod`.
+
 """
 abstract type Block end
 
@@ -33,7 +44,20 @@ function checkblock(blocks::Tuple, datas::Tuple)
 end
 
 
+"""
+    mockblock(block)
+    mockblock(blocks)
+
+Randomly generate an instance of `block`.
+"""
+mockblock(blocks::Tuple) = map(mockblock, blocks)
+
+
+# ## Block implementations
+
 abstract type AbstractLabel{T} <: Block end
+
+# Label
 
 """
     Label(classes)
@@ -46,6 +70,11 @@ struct Label{T} <: AbstractLabel{T}
 end
 
 checkblock(label::Label{T}, data::T) where T = data ∈ label.classes
+mockblock(label::Label) = rand(label.classes)
+
+
+# LabelMulti
+
 """
     LabelMulti(classes[; thresh = 0.5])
 
@@ -62,6 +91,11 @@ function checkblock(label::LabelMulti{T}, v::AbstractVector{T}) where T
     return all(map(x -> x ∈ label.classes, v))
 end
 
+mockblock(label::LabelMulti) =
+    unique([rand(label.classes) for _ in 1:rand(1:length(label.classes))])
+
+
+# Image
 
 """
     Image{N}() <: Block
@@ -72,6 +106,7 @@ if it is an N-dimensional array with color or number element type.
 struct Image{N} <: Block end
 
 checkblock(::Image{N}, ::AbstractArray{T,N}) where {T <: Union{Colorant,Number},N} = true
+mockblock(::Image{N}) where N = rand(RGB{N0f8}, ntuple(_ -> 16, N))
 
 """
     Mask{N, T}(classes) <: Block

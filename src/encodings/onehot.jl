@@ -5,6 +5,7 @@ struct OneHotTensor{N, T} <: Block
 end
 
 checkblock(block::OneHotTensor{N}, a::AbstractArray{T, N}) where {N, T} = true
+mockblock(block::OneHotTensor{1}) = encode(OneHot(), Validation(), Label(block.classes), rand(block.classes))
 
 struct OneHotTensorMulti{N, T} <: Block
     classes::AbstractVector{T}

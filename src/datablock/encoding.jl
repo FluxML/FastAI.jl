@@ -53,7 +53,10 @@ function decodedblock(enc, block, fill::Bool)
     return fill ? fillblock(block, outblock) : outblock
 end
 
+# ## `encode` methods
 
+# By default an encoding doesn't change the data
+encode(encoding::Encoding, _, ::Block, data) = data
 
 # By default, a tuple of encodings encodes by encoding the data one encoding
 # after the other
@@ -77,10 +80,21 @@ function encode(encoding::Encoding, context, blocks::Tuple, datas::Tuple)
                     for (block, data) in zip(blocks, datas))
 end
 
-# By default an encoding doesn't change the data
-encode(encoding::Encoding, _, ::Block, data) = data
+# Named tuples of data are handled like tuples, but the keys are preserved
+function encode(encoding::Encoding, context, blocks::Union{Tuple, NamedTuple}, datas::NamedTuple)
+    @assert length(blocks) == length(datas)
+    return NamedTuple(zip(
+        keys(datas),
+        encode(encoding, context, blocks, values(datas))
+    ))
+end
 
-# By default, a tuple of encodings decodes by encoding the data one encoding
+# ## `decode` methods
+
+# By default an encoding doesn't change the data
+decode(encoding::Encoding, _, ::Block, data) = data
+
+# By default, a tuple of encodings decodes by decoding the data one encoding
 # after the other, with encodings iterated in reverse order
 function decode(encodings::NTuple{N, Encoding}, context, blocks, data) where N
     for encoding in Iterators.reverse(encodings)
@@ -98,8 +112,14 @@ function decode(encoding::Encoding, context, blocks::Tuple, datas::Tuple)
                     for (block, data) in zip(blocks, datas))
 end
 
-# By default an encoding doesn't change the data
-decode(encoding::Encoding, _, ::Block, data) = data
+# Named tuples of data are handled like tuples, but the keys are preserved
+function decode(encoding::Encoding, context, blocks::Union{Tuple, NamedTuple}, datas::NamedTuple)
+    @assert length(blocks) == length(datas)
+    return NamedTuple(zip(
+        keys(datas),
+        decode(encoding, context, blocks, values(datas))
+    ))
+end
 
 
 """
