@@ -13,85 +13,45 @@ function datasetpath(name)
 end
 
 
-
-"""
-    loadtaskdata(dir, Method::Type{LearningMethod})
-
-Load a task data container for a learning method type `Method` stored in `dir`
-in a canonical format.
-"""
-function loadtaskdata end
-
-"""
-    loadtaskdata(dir, ImageClassification; [split = false])
-
-Load a data container for `ImageClassification` with observations
-`(input = image, target = class)`.
-
-If `split` is `true`, returns a tuple of the data containers split by
-the name of the grandparent folder.
-
-`dir` should contain the data in the following canonical format:
-
-- dir
-    - split (e.g. "train", "valid"...)
-        - class (e.g. "cat", "dog"...)
-            - image32434.{jpg/png/...}
-            - ...
-        - ...
-    - ...
-"""
-function loadtaskdata(
-        dir::AbstractPath,
-        ::Type{FastAI.ImageClassification};
-        split=false,
-        filterparent= (!=("test")),
-        kwargs...)
-    data = filterobs(FileDataset(dir)) do path
-        isimagefile(path) && filterparent(filename(parent(path)))
+function loadfolderdata(
+        dir;
+        pattern="**",
+        splitfn = nothing,
+        filterfn = nothing,
+        loadfn = nothing)
+    data = FileDataset(dir, pattern)
+    if filterfn !== nothing
+        data = filterobs(filterfn, data)
     end
-    if split
-        datas = groupobs(data) do path
-            filename(parent(parent(path)))
+    if splitfn !== nothing
+        data = groupobs(splitfn, data)
+    end
+    if loadfn !== nothing
+        if splitfn === nothing
+            data = mapobs(loadfn, data)
+        else
+            data = Dict(zip(keys(data), map(d -> mapobs(loadfn, d), values(data))))
         end
-        return Tuple(mapobs(
-            (input = loadfile, target = path -> filename(parent(path))),
-            data
-        ) for data in datas)
-    else
-        return mapobs(
-            (input = loadfile, target = path -> filename(parent(path))),
-            data
-        )
     end
+    return data
 end
 
-
-"""
-    getclasses(name)
-
-Get the list of classes for classification dataset `name`.
-"""
-function getclassesclassification(dir)
-    data = mapobs(filterobs(isimagefile, FileDataset(dir))) do path
-        return filename(parent(path))
-    end
-    return unique(collect(eachobsparallel(data, useprimary=true, buffered=false)))
-end
-getclassesclassification(name::String) = getclassesclassification(datasetpath(name))
+parentname(f) = f |> pathparent |> pathname
+grandparentname(f) = f |> pathparent |> pathparent |> pathname
+matches(re::Regex) = f -> matches(re, f)
+matches(re::Regex, f) = !isnothing(match(re, f))
+const RE_IMAGEFILE = r".*\.(gif|jpe?g|tiff?|png|webp|bmp)$"
+isimagefile(f) = matches(re, RE_IMAGEFILE)
 
 
-"""
-    getclasses(name)
 
-Get the list of classes for classification dataset `name`.
-"""
 function getclassessegmentation(dir::AbstractPath)
     classes = readlines(open(joinpath(dir, "codes.txt")))
     return classes
 end
 getclassessegmentation(name::String) = getclassessegmentation(datasetpath(name))
 
+#=
 """
     loadtaskdata(dir, ImageSegmentation; [split = false])
 
@@ -111,6 +71,7 @@ function loadtaskdata(
     maskdata = mapobs(maskfromimage ∘ loadfile, filterobs(isimagefile, FileDataset(joinpath(dir, "labels"))))
     return mapobs((input = obs -> obs[1], target = obs -> obs[2]), (imagedata, maskdata))
 end
+=#
 
 
 
@@ -120,3 +81,5 @@ maskfromimage(a::AbstractArray{<:Normed{T}}) where T = maskfromimage(reinterpret
 function maskfromimage(a::AbstractArray{I}) where {I<:Integer}
     return a .+ one(I)
 end
+
+loadmask(f) = f |> loadfile |> maskfromimage

@@ -1,12 +1,13 @@
 
 # mapobs
 
-struct MappedData
-    f
-    data
+struct MappedData{F, D}
+    f::F
+    data::D
 end
 
 Base.show(io::IO, data::MappedData) = print(io, "mapobs($(data.f), $(data.data))")
+Base.show(io::IO, data::MappedData{F, <:AbstractArray}) where F = print(io, "mapobs($(data.f), $(ShowLimit(data.data, limit=80)))")
 LearnBase.nobs(data::MappedData) = nobs(data.data)
 LearnBase.getobs(data::MappedData, idx::Int) = data.f(getobs(data.data, idx))
 LearnBase.getobs(data::MappedData, idxs::AbstractVector) = data.f.(getobs(data.data, idxs))
@@ -25,6 +26,7 @@ getobs(mdata, 8) == -8
 ```
 """
 mapobs(f, data) = MappedData(f, data)
+mapobs(f::typeof(identity), data) = data
 
 
 """
@@ -120,8 +122,7 @@ function groupobs(f, data)
             push!(groups[group], i)
         end
     end
-    return Tuple(datasubset(data, groups[group])
-        for group in sort(collect(keys(groups))))
+    return Dict(group => datasubset(data, idxs) for (group, idxs) in groups)
 end
 
 # joinobs
@@ -158,11 +159,6 @@ getobs(jdata, 15) == 15
 joinobs(datas...) = JoinedData(datas)
 
 
-# TODO: NamedTupleData transformation
-#
-# mdata = mapobs(data, (col1 = f1, col2 = f2))
-# getobs(mdata, 1) == (col1 = f1(getobs(data, 1)), col2 = f2(getobs(data, 1)))
-# getobs(mdata.col1, 1) == f1(getobs(data, 1))
-#
-# Useful for datasets where you want to split off the targets, e.g. to avoid loading the
-# images.
+function collectobs(data, parallel=false)
+    collect()
+end

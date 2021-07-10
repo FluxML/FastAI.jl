@@ -1,24 +1,25 @@
 # FileDataset
 
-struct FileDataset
-    tree::FileTree
-    nodes::Vector{FileTrees.File}
+function FileDataset(dir, pattern="*")
+    return rglob(pattern, string(dir))
 end
 
-function FileDataset(args...; kwargs...)
-    tree = FileTree(args...; kwargs...)
-    return FileDataset(tree, FileTrees.files(tree))
-end
-
-Base.show(io::IO, data::FileDataset) = print(
-    io,
-    "FileDataset(\"", data.tree.name, "\", ", nobs(data), " observations)")
-
-LearnBase.nobs(ds::FileDataset) = length(ds.nodes)
-LearnBase.getobs(ds::FileDataset, idx::Int) = Path(path(ds.nodes[idx]))
-
+pathparent(p::String) = splitdir(p)[1]
+pathname(p::String) = splitdir(p)[2]
 
 # File utilities
+
+function rglob(filepattern = "*", dir = pwd(), depth = 4)
+    patterns = [
+        "*/$filepattern",
+        "*/*/$filepattern",
+        "*/*/*/$filepattern",
+        "*/*/*/*/$filepattern",
+        "*/*/*/*/*/$filepattern",
+    ]
+    return vcat([glob(pattern, dir) for pattern in patterns[1:depth]]...)
+end
+
 
 """
     loadfile(file)
@@ -35,13 +36,11 @@ function loadfile(file::String)
 end
 
 loadfile(file::AbstractPath) = loadfile(string(file))
-loadfile(file::FileTrees.File) = loadfile(path(file))
 
 
 isimagefile(file::AbstractPath) = isimagefile(string(file))
-isimagefile(file::File) = isimagefile(file.name)
 isimagefile(file::String) = occursin(IMAGEFILE_REGEX, lowercase(file))
-const IMAGEFILE_REGEX = r"\.(gif|jpe?g|tiff?|png|webp|bmp)$"
+const IMAGE_REGEX = r"\.(gif|jpe?g|tiff?|png|webp|bmp)$"i
 
 #TableDataset
 
@@ -61,7 +60,7 @@ function LearnBase.getobs(dataset::FastAI.Datasets.TableDataset, idx)
         colnames = Tables.columnnames(dataset.table)
         rowvals = [Tables.getcolumn(dataset.table, i)[idx] for i in 1:length(colnames)]
         return (; zip(colnames, rowvals)...)
-    else 
+    else
         error("The Tables.jl implementation used should have either rowaccess or columnaccess.")
     end
 end
@@ -71,7 +70,7 @@ function LearnBase.nobs(dataset::TableDataset)
         return length(Tables.getcolumn(dataset.table, 1))
     elseif Tables.rowaccess(dataset.table)
         return length(Tables.rows(dataset.table)) # length might not be defined, but has to be for this to work.
-    else 
+    else
         error("The Tables.jl implementation used should have either rowaccess or columnaccess.")
     end
 end

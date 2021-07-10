@@ -12,8 +12,8 @@ using Makie
 using Colors
 using DataAugmentation
 using DataAugmentation: getbounds, Bounds
-using DLPipelines: methoddataset, methodmodel, methodlossfn, methoddataloaders,
-    mockmodel, mocksample, predict, predictbatch
+import DLPipelines: methoddataset, methodmodel, methodlossfn, methoddataloaders,
+    mockmodel, mocksample, predict, predictbatch, mockmodel
 using LearnBase: getobs, nobs
 using FilePathsBase
 using FixedPointNumbers
@@ -43,11 +43,6 @@ include("encodings/imagepreprocessing.jl")
 include("encodings/projective.jl")
 
 #=
-include("./steps/utils.jl")
-include("./steps/step.jl")
-include("./steps/spatial.jl")
-include("augmentation.jl")
-include("./steps/imagepreprocessing.jl")
 include("./methods/imageclassification.jl")
 include("./methods/imagesegmentation.jl")
 include("./methods/singlekeypointregression.jl")
@@ -55,14 +50,13 @@ include("./methods/checks.jl")
 =#
 
 
-#=
 # submodules
 include("datasets/Datasets.jl")
-using .Datasets
+@reexport using .Datasets
+
 
 include("models/Models.jl")
 using .Models
-=#
 
 # training
 include("training/paramgroups.jl")
@@ -105,13 +99,11 @@ export
     plotpredictions,
     makebatch,
 
-    # pipeline steps
-    ProjectiveTransforms, ImagePreprocessing, augs_projection, augs_lighting,
-
-    # methods
-    ImageClassification,
-    ImageSegmentation,
-    SingleKeypointRegression,
+    # encodings
+    ProjectiveTransforms,
+    ImagePreprocessing,
+    OneHot,
+    augs_projection, augs_lighting,
 
     # training
     methodlearner,
