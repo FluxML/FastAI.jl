@@ -13,7 +13,8 @@ using Colors
 using DataAugmentation
 using DataAugmentation: getbounds, Bounds
 import DLPipelines: methoddataset, methodmodel, methodlossfn, methoddataloaders,
-    mockmodel, mocksample, predict, predictbatch, mockmodel
+    mockmodel, mocksample, predict, predictbatch, mockmodel, encode, encodeinput,
+    encodetarget, decodeŷ, decodey
 using LearnBase: getobs, nobs
 using FilePathsBase
 using FixedPointNumbers
@@ -37,10 +38,13 @@ include("learner.jl")
 include("datablock/block.jl")
 include("datablock/encoding.jl")
 include("datablock/method.jl")
+include("datablock/models.jl")
+include("datablock/loss.jl")
 
 include("encodings/onehot.jl")
 include("encodings/imagepreprocessing.jl")
 include("encodings/projective.jl")
+include("encodings/scalepoints.jl")
 
 #=
 include("./methods/imageclassification.jl")
@@ -103,7 +107,10 @@ export
     ProjectiveTransforms,
     ImagePreprocessing,
     OneHot,
+    ScalePoints,
     augs_projection, augs_lighting,
+
+    BlockMethod,
 
     # training
     methodlearner,

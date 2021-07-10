@@ -4,14 +4,25 @@ struct OneHotTensor{N, T} <: Block
     classes::AbstractVector{T}
 end
 
-checkblock(block::OneHotTensor{N}, a::AbstractArray{T, N}) where {N, T} = true
-mockblock(block::OneHotTensor{1}) = encode(OneHot(), Validation(), Label(block.classes), rand(block.classes))
+function checkblock(block::OneHotTensor{N}, a::AbstractArray{T, M}) where {M, N, T}
+    return N + 1 == M && last(size(a)) == length(block.classes)
+end
+
+mockblock(block::OneHotTensor{0}) = encode(
+    OneHot(), Validation(), Label(block.classes), rand(block.classes))
+
+function mockblock(block::OneHotTensor{N}) where N
+    maskblock = Mask{N}(block.classes)
+    return encode(OneHot(), Validation(), maskblock, mockblock(maskblock))
+end
 
 struct OneHotTensorMulti{N, T} <: Block
     classes::AbstractVector{T}
 end
 
-checkblock(block::OneHotTensorMulti{N}, a::AbstractArray{T, N}) where {N, T} = true
+function checkblock(block::OneHotTensorMulti{N}, a::AbstractArray{T, M}) where {M, N, T}
+    return N + 1 == M && last(size(a)) == length(block.classes)
+end
 
 """
     OneHot()
@@ -21,9 +32,9 @@ checkblock(block::OneHotTensorMulti{N}, a::AbstractArray{T, N}) where {N, T} = t
 
 Encodes
 ```
-     `Mask{N, U}` -> `OneHotTensor{N, T}`
-`MaskMulti{N, U}` -> `OneHotTensorMulti{N, T}`
-       `Label{U}` -> `OneHotTensor{N, T}`
+      `Mask{N, U}` -> `OneHotTensor{N, T}`
+`LabelMulti{N, U}` -> `OneHotTensorMulti{N, T}`
+        `Label{U}` -> `OneHotTensor{N, T}`
 ```
 """
 struct OneHot{TT<:Type} <: Encoding
@@ -35,8 +46,8 @@ OneHot() = OneHot(Float32, 0.5f0)
 
 
 # ### `Label` implementation
-encodedblock(::OneHot, block::Label{T}) where T = OneHotTensor{1, T}(block.classes)
-decodedblock(::OneHot, block::OneHotTensor{1}) = Label(block.classes)
+encodedblock(::OneHot, block::Label{T}) where T = OneHotTensor{0, T}(block.classes)
+decodedblock(::OneHot, block::OneHotTensor{0}) = Label(block.classes)
 
 function encode(enc::OneHot, context, block::Label, data)
     idx = findfirst(isequal(data), block.classes)
@@ -45,31 +56,31 @@ function encode(enc::OneHot, context, block::Label, data)
 end
 
 
-function decode(::OneHot, context, block::OneHotTensor{1}, data)
+function decode(::OneHot, context, block::OneHotTensor{0}, data)
     return block.classes[argmax(data)]
 end
 
 # ### `LabelMulti` implementation
 
-encodedblock(::OneHot, block::LabelMulti{T}) where T = OneHotTensorMulti{1, T}(block.classes)
-decodedblock(::OneHot, block::OneHotTensorMulti{1}) = LabelMulti(block.classes)
+encodedblock(::OneHot, block::LabelMulti{T}) where T = OneHotTensorMulti{0, T}(block.classes)
+decodedblock(::OneHot, block::OneHotTensorMulti{0}) = LabelMulti(block.classes)
 
 function encode(enc::OneHot, context, block::LabelMulti, data)
     return collect(enc.T, (c in data for c in block.classes))
 end
 
-function decode(enc::OneHot, context, block::OneHotTensorMulti{1}, data)
+function decode(enc::OneHot, context, block::OneHotTensorMulti{0}, data)
     return block.classes[softmax(data) .> enc.threshold]
 end
 
 # ### `Mask` implementation
 
-encodedblock(::OneHot, block::Mask{N, T}) where {N, T} = OneHotTensor{N+1, T}(block.classes)
-decodedblock(::OneHot, block::OneHotTensor{N, T}) where {N, T} = Mask{N-1, T}(block.classes)
+encodedblock(::OneHot, block::Mask{N, T}) where {N, T} = OneHotTensor{N, T}(block.classes)
+decodedblock(::OneHot, block::OneHotTensor{N, T}) where {N, T} = Mask{N, T}(block.classes)
 
 function encode(enc::OneHot, context, block::Mask, data)
     tfm = DataAugmentation.OneHot{enc.T}()
-    return apply(tfm, DataAugmentation.MaskMulti(data)) |> DataAugmentation.itemdata
+    return apply(tfm, DataAugmentation.MaskMulti(data, block.classes)) |> DataAugmentation.itemdata
 end
 
 function decode(enc::OneHot, context, block::OneHotTensor, data)

@@ -1,38 +1,38 @@
 include("../imports.jl")
 
 
-@testset ExtendedTestSet "`ImageClassification`" begin
-    @testset ExtendedTestSet "Core interface" begin
-        DLPipelines.checkmethod_core(ImageClassification(1:10, (32, 32)))
-        FastAI.checkmethod_plot(ImageClassification(1:10, (32, 32)))
+@testset "ImageClassification" begin
+    method = BlockMethod(
+        (Image{2}(), Label(1:2)),
+        (
+            ProjectiveTransforms((16, 16), inferencefactor=8),
+            ImagePreprocessing(),
+            OneHot()
+        )
+    )
 
-        @testset ExtendedTestSet "`encodeinput`" begin
-            method = ImageClassification(1:10, (32, 32))
-            image = rand(RGB, 64, 96)
+    testencoding(method.encodings, method.blocks)
+    DLPipelines.checkmethod_core(method)
+    @test_nowarn methodlossfn(method)
+    @test_nowarn methodmodel(method, Models.xresnet18())
 
-            xtrain = encodeinput(method, Training(), image)
-            @test size(xtrain) == (32, 32, 3)
-            @test eltype(xtrain) == Float32
+    @testset "`encodeinput`" begin
+        image = rand(RGB, 32, 48)
 
-            xinference = encodeinput(method, Inference(), image)
-            @test size(xinference) == (32, 48, 3)
-            @test eltype(xinference) == Float32
-        end
+        xtrain = encodeinput(method, Training(), image)
+        @test size(xtrain) == (16, 16, 3)
+        @test eltype(xtrain) == Float32
 
-        @testset ExtendedTestSet "`encodetarget`" begin
-            method = ImageClassification(1:2, (32, 32))
-            category = 1
-            y = encodetarget(method, Training(), category)
-            @test y ≈ [1, 0]
-            encodetarget!(y, method, Training(), 2)
-            @test y ≈ [0, 1]
-        end
-
-        @testset ExtendedTestSet "`encode`" begin
-            method = ImageClassification(1:10, (32, 32))
-            image = rand(RGB, 64, 96)
-            category = 1
-            @test_nowarn encode(method, Training(), (image, category))
-        end
+        xinference = encodeinput(method, Inference(), image)
+        @test size(xinference) == (16, 24, 3)
+        @test eltype(xinference) == Float32
+    end
+    @testset "`encodetarget`" begin
+        category = 1
+        y = encodetarget(method, Training(), category)
+        @test y ≈ [1, 0]
+        # depends on buffered interface for `BlockMethod`s and `Encoding`s
+        #encodetarget!(y, method, Training(), 2)
+        #@test y ≈ [0, 1]
     end
 end

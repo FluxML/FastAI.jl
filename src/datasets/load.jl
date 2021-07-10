@@ -20,6 +20,7 @@ function loadfolderdata(
         filterfn = nothing,
         loadfn = nothing)
     data = FileDataset(dir, pattern)
+    @show summary(data)
     if filterfn !== nothing
         data = filterobs(filterfn, data)
     end
@@ -40,8 +41,8 @@ parentname(f) = f |> pathparent |> pathname
 grandparentname(f) = f |> pathparent |> pathparent |> pathname
 matches(re::Regex) = f -> matches(re, f)
 matches(re::Regex, f) = !isnothing(match(re, f))
-const RE_IMAGEFILE = r".*\.(gif|jpe?g|tiff?|png|webp|bmp)$"
-isimagefile(f) = matches(re, RE_IMAGEFILE)
+const RE_IMAGEFILE = r".*\.(gif|jpe?g|tiff?|png|webp|bmp)$"i
+isimagefile(f) = matches(RE_IMAGEFILE, f)
 
 
 

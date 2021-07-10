@@ -248,7 +248,7 @@ Performs some tests that the encoding interface is set up properly for
 - `decode` returns a valid `decodedblock(encoding, encodedblock(encoding, block))`
     and that the block is identical to `block`
 """
-function testencoding(encoding, block, data)
+function testencoding(encoding, block, data = mockblock(block))
     @testset "Encoding `$(typeof(encoding))` for block `$block`" begin
         # Test that `data` is a valid instance of `block`
         @test checkblock(block, data)

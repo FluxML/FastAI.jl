@@ -37,6 +37,18 @@ function decodey(method::BlockMethod, context, y)
     decode(method.encodings, context, encodedblock(encodings, blocks[2]), y)
 end
 
+# Training interface
+
+function methodmodel(method::BlockMethod, backbone)
+    xblock = encodedblock(method.encodings, method.blocks[1])
+    return blockmodel(xblock, method.outputblock, backbone)
+end
+
+function methodlossfn(method::BlockMethod)
+    yblock = encodedblock(method.encodings, method.blocks[2])
+    return blocklossfn(method.outputblock, yblock)
+end
+
 # Testing interface
 
 mocksample(method::BlockMethod) = mockblock(method.blocks)

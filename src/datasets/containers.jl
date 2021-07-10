@@ -9,8 +9,14 @@ pathname(p::String) = splitdir(p)[2]
 
 # File utilities
 
+"""
+    rglob(filepattern, dir = pwd(), depth = 4)
+
+Recursive glob up to 6 layers deep.
+"""
 function rglob(filepattern = "*", dir = pwd(), depth = 4)
     patterns = [
+        "$filepattern",
         "*/$filepattern",
         "*/*/$filepattern",
         "*/*/*/$filepattern",
@@ -37,10 +43,6 @@ end
 
 loadfile(file::AbstractPath) = loadfile(string(file))
 
-
-isimagefile(file::AbstractPath) = isimagefile(string(file))
-isimagefile(file::String) = occursin(IMAGEFILE_REGEX, lowercase(file))
-const IMAGE_REGEX = r"\.(gif|jpe?g|tiff?|png|webp|bmp)$"i
 
 #TableDataset
 

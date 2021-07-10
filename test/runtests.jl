@@ -4,12 +4,12 @@ include("imports.jl")
 ##
 
 @testset ExtendedTestSet "FastAI.jl" begin
-    @testset ExtendedTestSet "steps/" begin
+    @testset ExtendedTestSet "encodings/" begin
         @testset ExtendedTestSet "projective.jl" begin
-            include("steps/projective.jl")
+            include("encodings/projective.jl")
         end
         @testset ExtendedTestSet "imagepreprocessing.jl" begin
-            include("steps/imagepreprocessing.jl")
+            include("encodings/imagepreprocessing.jl")
         end
     end
 

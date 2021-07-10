@@ -53,7 +53,7 @@ end
 function ProjectiveTransforms(
         sz;
         augmentations = Identity(),
-        inferencefactor = 16,
+        inferencefactor = 8,
         buffered = true)
 
     tfms = Dict{Context, DataAugmentation.Transform}(
@@ -71,10 +71,7 @@ end
 
 
 function encodestate(enc::ProjectiveTransforms{N}, context, blocks, datas) where N
-    bounds = grabbounds(blocks, datas, N)
-    isnothing(bounds) && error("Could not detect bounds needed for projective
-        transformations from blocks $(blocks)! Bounds can be grabbed from arrays
-        like `Image` block data.")
+    bounds = getsamplebounds(blocks, datas, N)
     tfm = enc.tfms[context]
     randstate = DataAugmentation.getrandstate(tfm)
     return bounds, randstate
@@ -101,8 +98,8 @@ function encode(
 
     tfm = enc.tfms[context]
     item = ItemType(data, bounds)
-    tdatas = apply(tfm, item; randstate = randstate) |> itemdata
-    return deepcopy(tdatas)
+    tdata = apply(tfm, item; randstate = randstate) |> itemdata
+    return deepcopy(tdata)
 end
 
 # ProjectiveTransforms is not invertible, hence no `decode` method!
@@ -126,7 +123,13 @@ but
 """
 blockitemtype(block::Block, n) = nothing
 blockitemtype(block::Image{N}, n::Int) where N = N == n ? DataAugmentation.Image : nothing
-blockitemtype(block::Mask{N}, n::Int) where N = N == n ? DataAugmentation.MaskMulti : nothing
+function blockitemtype(block::Mask{N}, n::Int) where N
+    return if N == n
+        (data, bounds) -> DataAugmentation.MaskMulti(data, block.classes, bounds)
+    else
+        nothing
+    end
+end
 blockitemtype(block::Keypoints{N}, n::Int) where N = N == n ? DataAugmentation.Keypoints : nothing
 
 
@@ -146,6 +149,14 @@ end
 grabbounds(block::Image{N}, a, n) where N = N == n ? DataAugmentation.Bounds(size(a)) : nothing
 grabbounds(block::Mask{N}, a, n) where N = N == n ? DataAugmentation.Bounds(size(a)) : nothing
 
+
+function getsamplebounds(blocks, datas, N)
+    bounds = grabbounds(blocks, datas, N)
+    isnothing(bounds) && error("Could not detect $N-dimensional bounds needed for projective
+transformations from blocks $(blocks)! Bounds can be grabbed from arrays
+like `Image{$N}` block data.")
+    return bounds
+end
 
 # Augmentation helper
 

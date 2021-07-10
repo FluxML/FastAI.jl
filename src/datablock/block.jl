@@ -124,10 +124,26 @@ function checkblock(block::Mask{N,T}, a::AbstractArray{T,N}) where {N,T}
     return all(map(x -> x ∈ block.classes, a))
 end
 
-struct Keypoints{N} <: Block end
+mockblock(mask::Mask{N}) where N = rand(mask.classes, ntuple(_ -> 16, N))
+
+# Keypoints
+
+"""
+
+    Keypoints{N}(sz) <: Block
+
+A block representing an array of size `sz` filled with keypoints of type
+`SVector{N}`.
+"""
+struct Keypoints{N, M} <: Block
+    sz::NTuple{M, Int}
+end
+Keypoints{N}(n::Int) where N = Keypoints{N, 1}((n,))
 
 function checkblock(
-        block::Mask{N,T},
+        block::Keypoints{N,M},
         a::AbstractArray{<:Union{SVector{N,T},Nothing},M}) where {M,N,T}
-    return all(map(x -> x ∈ block.classes, a))
+    return true
 end
+
+mockblock(block::Keypoints{N}) where N = rand(SVector{N, Float32}, block.sz)
