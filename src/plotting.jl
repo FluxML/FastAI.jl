@@ -97,7 +97,7 @@ Plot an encoded batch of data in a grid.
 plotbatch(method, xs, ys) = plotbatch!(defaultfigure(), method, xs, ys)
 
 function plotbatch!(f, method, xs, ys)
-    n = DataLoaders._batchsize(xs)
+    n = DataLoaders._batchsize(xs, DataLoaders.BatchDimLast())
     nrows = Int(ceil(sqrt(n)))
     is = Iterators.product(1:nrows, 1:nrows)
     for (i, (x, y)) in zip(is, DataLoaders.obsslices((xs, ys)))

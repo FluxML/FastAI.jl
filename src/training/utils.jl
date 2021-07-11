@@ -100,6 +100,6 @@ Useful for inspection and as input to [`plotbatch`](#). Samples are encoded
 in `context` which defaults to `Training`.
 """
 function makebatch(method::LearningMethod, data, idxs = 1:8; context = Training())
-    xys = [encode(method, context, getobs(data, i)) for i in idxs]
+    xys = [deepcopy(encode(method, context, getobs(data, i))) for i in idxs]
     return DataLoaders.collate(xys)
 end
