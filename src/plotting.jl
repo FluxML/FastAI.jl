@@ -161,12 +161,14 @@ imageaxis(f::Makie.FigurePosition; kwargs...) = imageaxis(f.fig; kwargs...)
 
 
 @recipe(PlotImage, image) do scene
-    Attributes()
+    Attributes(
+        alpha = 1
+    )
 end
 
 function Makie.plot!(plot::PlotImage)
     im = plot[:image]
-    rim = @lift copy(rotr90($im))
+    rim = @lift alphacolor.(copy(rotr90($im)), $(plot.attributes[:alpha]))
     image!(plot, rim; plot.attributes...)
     return plot
 end
@@ -184,14 +186,15 @@ function Makie.plot!(plot::PlotMask; kwargs...)
         classes = @lift unique($mask)
     end
     im = @lift maskimage($mask, $classes)
-    plotimage!(plot, im; plot.attributes...)
+    plotimage!(plot, im; alpha = 1, plot.attributes...)
     return plot
 end
 
 
 function maskimage(mask, classes)
+    classtoidx = Dict(class => i for (i, class) in enumerate(classes))
     colors = distinguishable_colors(length(classes), transform=deuteranopic)
-    return map(c -> colors[c], mask)
+    return map(x -> colors[classtoidx[x]], mask)
 end
 
 maskimage(mask::AbstractArray{<:Gray{T}}, args...) where T =

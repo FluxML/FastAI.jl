@@ -15,6 +15,7 @@ using DataAugmentation: getbounds, Bounds
 import DLPipelines: methoddataset, methodmodel, methodlossfn, methoddataloaders,
     mockmodel, mocksample, predict, predictbatch, mockmodel, encode, encodeinput,
     encodetarget, decodeŷ, decodey
+using IndirectArrays: IndirectArray
 using LearnBase: getobs, nobs
 using FilePathsBase
 using FixedPointNumbers
@@ -30,28 +31,26 @@ using StaticArrays
 using ShowCases
 using Test: @testset, @test, @test_nowarn
 
-include("tasks.jl")
 include("plotting.jl")
 include("learner.jl")
 
-# method implementations and helpers
+# Data block API
 include("datablock/block.jl")
 include("datablock/encoding.jl")
 include("datablock/method.jl")
-include("datablock/models.jl")
-include("datablock/loss.jl")
 
+# Encodings
 include("encodings/onehot.jl")
 include("encodings/imagepreprocessing.jl")
 include("encodings/projective.jl")
 include("encodings/scalepoints.jl")
 
-#=
-include("./methods/imageclassification.jl")
-include("./methods/imagesegmentation.jl")
-include("./methods/singlekeypointregression.jl")
-include("./methods/checks.jl")
-=#
+# Training interface
+include("datablock/models.jl")
+include("datablock/loss.jl")
+include("datablock/plot.jl")
+
+include("methods/checks.jl")
 
 
 # submodules
@@ -99,9 +98,16 @@ export
 
     # plotting API
     plotbatch,
+    plotsample,
     plotsamples,
     plotpredictions,
     makebatch,
+
+    # blocks
+    Image,
+    Mask,
+    Label,
+    LabelMulti,
 
     # encodings
     ProjectiveTransforms,

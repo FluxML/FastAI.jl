@@ -20,6 +20,7 @@ using Glob
 using FilePathsBase
 using FilePathsBase: filename
 import FileIO
+using IndirectArrays: IndirectArray
 using MLDataPattern
 using MLDataPattern: splitobs
 import LearnBase

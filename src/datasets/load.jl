@@ -20,7 +20,6 @@ function loadfolderdata(
         filterfn = nothing,
         loadfn = nothing)
     data = FileDataset(dir, pattern)
-    @show summary(data)
     if filterfn !== nothing
         data = filterobs(filterfn, data)
     end
@@ -77,10 +76,18 @@ end
 
 
 
-maskfromimage(a::AbstractArray{<:Gray{T}}) where T = maskfromimage(reinterpret(T, a))
-maskfromimage(a::AbstractArray{<:Normed{T}}) where T = maskfromimage(reinterpret(T, a))
-function maskfromimage(a::AbstractArray{I}) where {I<:Integer}
-    return a .+ one(I)
+maskfromimage(a::AbstractArray{<:Gray{T}}, classes) where T = maskfromimage(reinterpret(T, a), classes)
+maskfromimage(a::AbstractArray{<:Normed{T}}, classes) where T = maskfromimage(reinterpret(T, a), classes)
+function maskfromimage(a::AbstractArray{I}, classes) where {I<:Integer}
+    a .+= one(I)
+    return IndirectArray(a, classes)
 end
 
-loadmask(f) = f |> loadfile |> maskfromimage
+"""
+    loadmask(file, classes)
+
+Load a segmentation mask from an image file. Returns an efficiently stored
+array of type `eltype(classes)`.
+
+"""
+loadmask(file, classes) = maskfromimage(loadfile(file), classes)

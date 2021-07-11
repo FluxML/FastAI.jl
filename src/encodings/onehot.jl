@@ -84,7 +84,9 @@ function encode(enc::OneHot, context, block::Mask, data)
 end
 
 function decode(enc::OneHot, context, block::OneHotTensor, data)
-    return reshape(
-        map(I -> block.classes[I.I[end]], argmax(data; dims=ndims(data))),
+    Tidx = length(block.classes) >= 255 ? UInt16 : UInt8
+    classidxs = reshape(
+        map(I -> Tidx(I.I[end]), argmax(data; dims = ndims(data))),
         size(data)[1:end-1])
+    return IndirectArray(classidxs, block.classes)
 end

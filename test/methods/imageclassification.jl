@@ -35,4 +35,5 @@ include("../imports.jl")
         #encodetarget!(y, method, Training(), 2)
         #@test y ≈ [0, 1]
     end
+    FastAI.checkmethod_plot(method)
 end
