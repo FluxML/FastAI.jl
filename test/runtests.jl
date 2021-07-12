@@ -55,4 +55,10 @@ include("imports.jl")
         end
         # TODO: test learning rate finder
     end
+
+    @testset ExtendedTestSet "models/" begin
+        @testset ExtendedTestSet "tabularmodel.jl" begin
+            include("models/tabularmodel.jl")
+        end
+    end
 end

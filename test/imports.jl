@@ -6,6 +6,7 @@ using FastAI: Image, Keypoints, Mask, testencoding, Label, OneHot, ProjectiveTra
     encodedblock, decodedblock, encode, decode, mockblock
 using FilePathsBase
 using FastAI.Datasets
+using FastAI.Models
 using DLPipelines
 import DataAugmentation
 import DataAugmentation: getbounds

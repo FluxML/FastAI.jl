@@ -18,8 +18,12 @@ end
 # 	[_one_emb_sz(catdict, catcol, sz_dict) for catcol in cols]
 # end
 
-function embeddingbackbone(embedding_sizes, dropoutprob)
-    embedslist = [Embedding(ni, nf) for (ni, nf) in embedding_sizes]
+function sigmoidrange(x, low, high)
+	@. Flux.sigmoid(x) * (high - low) + low
+end
+
+function embeddingbackbone(embedding_sizes, dropoutprob=0.)
+    embedslist = [Embedding(ni => nf) for (ni, nf) in embedding_sizes]
     emb_drop = Dropout(dropoutprob)
     Chain(
         x -> tuple(eachrow(x)...), 
@@ -35,7 +39,7 @@ end
 function TabularModel(
         catbackbone,
         contbackbone,    
-        layers; 
+        layers=[200, 100]; 
         n_cat,
         n_cont,
         out_sz,
