@@ -93,7 +93,7 @@ end
 
 
 """
-    makebatch(method, data, idxs[; context]) -> (xs, ys)
+    makebatch(method, data, [idxs; context]) -> (xs, ys)
 
 Create a batch of encoded data by loading `idxs` from data container `data`.
 Useful for inspection and as input to [`plotbatch`](#). Samples are encoded

@@ -6,8 +6,6 @@
 
 From a `backbone` model, construct a model suitable for learning
 a mapping from `inblock` to `outblock`.
-
-
 """
 function blockmodel end
 

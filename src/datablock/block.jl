@@ -25,6 +25,9 @@ Optional:
 - For testing interface:
     - `mockblock(block)`. Randomly generate an instance of `block`. Needed
     to derive the testing interface for `BlockMethod`.
+- For training interface:
+    - [`blocklossfn`](#)`(pred_block, true_block)`
+    - [`blockmodel`](#)`(inblock, outblock, backbone)`
 
 """
 abstract type Block end

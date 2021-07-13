@@ -97,11 +97,11 @@ function plotprediction!(
     ax1 = f[1, 1] = imageaxis(f)
     ax1.title[] = "True"
     plotblock!(ax1, blocks[3], datas[3])
-    plotblock!(ax1, blocks[1], datas[1], alpha=0.6)
+    plotblock!(ax1, blocks[1], datas[1], alpha=0.4)
 
 
     ax2 = f[1, 2] = imageaxis(f)
     ax2.title[] = "Prediction"
     plotblock!(ax2, blocks[2], datas[2])
-    plotblock!(ax2, blocks[1], datas[1], alpha=0.6)
+    plotblock!(ax2, blocks[1], datas[1], alpha=0.4)
 end

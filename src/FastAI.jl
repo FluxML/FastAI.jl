@@ -25,8 +25,10 @@ import Flux.Optimise: apply!, Optimiser, WeightDecay
 using FluxTraining: Learner, handle
 using FluxTraining.Events
 using JLD2: jldsave, jldopen
+using Markdown
 using MLDataPattern
 using Parameters
+using PrettyTables
 using StaticArrays
 using ShowCases
 using Test: @testset, @test, @test_nowarn
@@ -38,6 +40,7 @@ include("learner.jl")
 include("datablock/block.jl")
 include("datablock/encoding.jl")
 include("datablock/method.jl")
+include("datablock/describe.jl")
 
 # Encodings
 include("encodings/onehot.jl")
@@ -117,6 +120,8 @@ export
     augs_projection, augs_lighting,
 
     BlockMethod,
+    describemethod,
+    checkblock,
 
     # training
     methodlearner,

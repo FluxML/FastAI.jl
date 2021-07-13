@@ -222,22 +222,6 @@ function checkencodings(encodings, blocks)
 end
 
 """
-Some printing of the steps taken in a full pipeline would be nice. Should
-highlight which blocks change.
-Can also check that every encoding is applied to at least one block.
-
-
-- INPUT:                (Image{2}(),           Label(classes))
-
-- ImagePreprocessing:   (**ImageTensor{2}()**, Label(classes))
-- OneHot:               (ImageTensor{2}(),     **OneHot{1}(classes)**)
-
-- OUTPUT:               (ImageTensor{2}(),     OneHot{1}(classes))
-
-
-"""
-
-"""
     testencoding(encoding, block, data)
 
 Performs some tests that the encoding interface is set up properly for
@@ -266,4 +250,27 @@ function testencoding(encoding, block, data = mockblock(block))
             @test checkblock(inblock, indata)
         end
     end
+end
+
+
+
+"""
+Some printing of the steps taken in a full pipeline would be nice. Should
+highlight which blocks change.
+Can also check that every encoding is applied to at least one block.
+
+
+- INPUT:                (Image{2}(),           Label(classes))
+
+- ImagePreprocessing:   (**ImageTensor{2}()**, Label(classes))
+- OneHot:               (ImageTensor{2}(),     **OneHot{1}(classes)**)
+
+- OUTPUT:               (ImageTensor{2}(),     OneHot{1}(classes))
+
+
+"""
+
+
+function explainencoding(encoding, blocks)
+
 end

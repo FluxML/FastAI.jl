@@ -28,14 +28,17 @@ Let's unpack each line.
 {cell=main}
 ```julia
 path = datasetpath("imagenette2-160")
-dataset = loadtaskdata(path, ImageClassification)
+data = Datasets.loadfolderdata(
+    path,
+    filterfn=isimagefile,
+    loadfn=(loadfile, parentname))
 ```
 
-These two lines download and load the [ImageNette](https://github.com/fastai/imagenette) image classification dataset, a small subset of ImageNet with 10 different classes. `dataset` is a [data container](data_containers.md) that can be used to load individual observations, here of images and the corresponding labels. We can use `getobs(dataset, i)` to load the `i`-th observation and `nobs` to find out how many observations there are.
+These two lines download and load the [ImageNette](https://github.com/fastai/imagenette) image classification dataset, a small subset of ImageNet with 10 different classes. `data` is a [data container](data_containers.md) that can be used to load individual observations, here of images and the corresponding labels. We can use `getobs(data, i)` to load the `i`-th observation and `nobs` to find out how many observations there are.
 
 {cell=main }
 ```julia
-image, class = getobs(dataset, 1000)
+image, class = getobs(data, 1000)
 @show class
 image
 ```
@@ -51,19 +54,26 @@ To train on a different dataset, you could replace `dataset` with other data con
 
 {cell=main}
 ```julia
-classes = Datasets.getclassesclassification("imagenette2-160")
-method = ImageClassification(classes, (160, 160))
+classes = unique(eachobs(data[2]))
+method = BlockMethod(
+    (Image{2}(), Label(classes)),
+    (
+        ProjectiveTransforms((128, 128), augmentations=augs_projection()),
+        ImagePreprocessing(),
+        OneHot()
+    )
+)
 ```
 
-Here we define an instance of the learning method [`ImageClassification`](#) which defines how data is processed before being fed to the model and how model outputs are turned into predictions. `classes` is a vector of strings naming each class, and `(224, 224)` the size of the images that are input to the model.
+Here we define a learning method for image classification which defines how data is processed before being fed to the model and how model outputs are turned into predictions. `classes` is a vector of strings naming each class, and `(224, 224)` the size of the images that are input to the model.
 
-`ImageClassification` is a `LearningMethod`, an abstraction that encapsulates the logic and configuration for training models on a specific learning task. See [learning methods](learning_methods.md) to find out more about how they can be used and how to create custom learning methods.
+A `LearningMethod` is an abstraction that encapsulates the logic and configuration for training models on a specific learning task. See [learning methods](learning_methods.md) to find out more.
 
 ## Data loaders
 
 {cell=main}
 ```julia
-dls = methoddataloaders(dataset, method, 16)
+dls = methoddataloaders(data, method, 16)
 ```
 
 Next we turn the data container into training and validation data loaders. These take care of efficiently loading batches of data (by default in parallel). The observations are already preprocessed using the information in `method` and then batched together. Let's look at a single batch:
@@ -76,6 +86,12 @@ summary.((xs, ys))
 ```
 
 `xs` is a batch of cropped and normalized images with dimensions `(height, width, color channels, batch size)` and `ys` a batch of one-hot encoded classes with dimensions `(classes, batch size)`.
+We can visualize a batch of encoded data using [`plotbatch`](#):
+
+{cell=main}
+```julia
+plotbatch(method, xs, ys)
+```
 
 ## Model
 
@@ -84,7 +100,7 @@ summary.((xs, ys))
 model = methodmodel(method, Models.xresnet18())
 ```
 
-Now we create a Flux.jl model. [`methodmodel`](#) is a part of the learning method interface that knows how to smartly construct an image classification model from different backbone architectures. Here a classificiation head with the appropriate number of classes is stacked on a slightly modified version of the ResNet architecture.
+Now we create a Flux.jl model. [`methodmodel`](#) is a part of the learning method interface that knows how to smartly construct a model based on the input and output blocks passed to the learning method. It can adapt different backbone architectures to a task. Here a classificiation head with the appropriate number of classes is stacked on a slightly modified version of the ResNet architecture.
 
 ## Learner
 

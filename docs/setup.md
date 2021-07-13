@@ -17,3 +17,5 @@ To use pretrained vision models, you currently have to install a WIP branch of M
 ```julia
 pkg> add https://github.com/darsnack/Metalhead.jl#darsnack/vision-refactor
 ```
+
+To make use of multi-threaded data loading, you need to start Julia with multiple threads, either with the `-t auto` commandline flag or by setting the environment variable `JULIA_NUM_THREADS`. See the [IJulia.jl documentation](https://julialang.github.io/IJulia.jl/dev/manual/installation/#Installing-additional-Julia-kernels) for instructions on setting these for Jupyter notebook kernels.
