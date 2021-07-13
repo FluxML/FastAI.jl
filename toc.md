@@ -20,8 +20,9 @@
     - [Log to TensorBoard](docs/howto/logtensorboard.md)
 - Reference
     - [Docstrings](REFERENCE)
-    - [Interfaces](docs/interfaces.md)
+    - [fastai API comparison](docs/fastai_api_comparison.md)
     - [API](docs/api.md)
+    - [Extension APIs](docs/interfaces.md)
     - [Glossary](docs/glossary.md)
 - Background
     - [Performant data pipelines](docs/background/datapipelines.md)
