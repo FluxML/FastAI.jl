@@ -4,6 +4,7 @@ include("../imports.jl")
 @testset ExtendedTestSet "`ImageClassification`" begin
     @testset ExtendedTestSet "Core interface" begin
         DLPipelines.checkmethod_core(ImageClassification(1:10, (32, 32)))
+        FastAI.checkmethod_plot(ImageClassification(1:10, (32, 32)))
 
         @testset ExtendedTestSet "`encodeinput`" begin
             method = ImageClassification(1:10, (32, 32))

@@ -4,18 +4,30 @@ When doing image classification, we want to train a model to classify a given im
 
 ## Single-label classification
 
-In the simple case, every image will have one class from a list associated with it. For example, the Cats&Dogs dataset contains pictures of cats and dogs (duh). . The learning method [`ImageClassification`](#) handles single-label image classification. Let's load some samples and visualize them:
+In the simple case, every image will have one class from a list associated with it. For example, the Cats&Dogs dataset contains pictures of cats and dogs. The learning method [`ImageClassification`](#) handles single-label image classification. Let's load some samples and visualize them:
 
-{cell=main}
+{cell=main output=false result=false style="display:none;"}
+```julia
+using Images: load
+function showfig(f)
+    save("fig.png", f)
+    load("fig.png")
+end
+```
+{cell=main result=false output=false}
 ```julia
 using CairoMakie
 using FastAI
 dir = joinpath(datasetpath("dogscats"), "train")
-data = loadtaskdata(dir, ImageClassificationTask)
+data = loadtaskdata(dir, ImageClassification)
 samples = [getobs(data, i) for i in rand(1:nobs(data), 9)]
 classes = Datasets.getclassesclassification(dir)
 method = ImageClassification(classes, (128, 128))
-plotsamples(method, samples)
+f = plotsamples(method, samples)
+```
+{cell=main output=false style="display:none;"}
+```julia
+showfig(f)
 ```
 
 With a method and a data container, we can easily construct a [`Learner`](#):

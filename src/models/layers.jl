@@ -40,3 +40,15 @@ PixelShuffle(scale::Int, k_in, k_out = k_in) = PixelShuffle((scale, scale), k_in
 function (ps::PixelShuffle)(x)
     pixelshuffle(ps.conv(x), ps.scales)
 end
+
+
+
+function AdaptiveConcatPool(k_out)
+    return Parallel(
+        vcat,
+        AdaptiveMeanPool(k_out),
+        AdaptiveMaxPool(k_out),
+    )
+end
+
+AdaptiveConcatPool() = AdaptiveConcatPool((1, 1))

@@ -7,5 +7,5 @@ end
 @testset ExtendedTestSet "loaddataset" begin
     @test_nowarn Datasets.loadtaskdata(
         Datasets.datasetpath("mnist_var_size_tiny"),
-        ImageClassificationTask)
+        ImageClassification)
 end

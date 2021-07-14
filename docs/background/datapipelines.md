@@ -1,6 +1,6 @@
 # Performant data pipelines
 
-*Explainer on how data pipelines in FastAI.jl are made fast and how to make yours fast.*
+*Bottlenecks in data pipelines and how to measure and fix them*
 
 When training large deep learning models on a GPU we clearly want wait as short as possible for the training to complete. The hardware bottleneck is usually the GPU power you have available to you. This means that data pipelines need to be fast enough to keep the GPU at 100% utilization, that is, keep it from "starving". Reducing the time the GPU has to wait for the next batch of data directly lowers the training time until the GPU is fully utilized. There are other ways to reduce training time like using hyperparameter schedules and different optimizers for faster convergence, but we'll only talk about improving GPU utilization here.
 
@@ -26,7 +26,7 @@ using DataLoaders: batchviewcollated
 using FastAI
 using FastAI.Datasets
 
-data = loadtaskdata(datasetpath("imagenette2-320"), ImageClassificationTask)
+data = loadtaskdata(datasetpath("imagenette2-320"), ImageClassification)
 method = ImageClassification(Datasets.getclassesclassification("imagenette2-320"), (224, 224))
 
 # maps data processing over `data`
@@ -68,7 +68,7 @@ using FastAI
 using FastAI.Datasets
 using FluxTraining: fitbatchphase!
 
-data = loadtaskdata(datasetpath("imagenette2-320"), ImageClassificationTask)
+data = loadtaskdata(datasetpath("imagenette2-320"), ImageClassification)
 method = ImageClassification(Datasets.getclassesclassification("imagenette2-320"), (224, 224))
 
 learner = methodlearner(method, data, xresnet18())
@@ -100,7 +100,7 @@ using FastAI.Datasets
 
 # Since loading times can vary per observation, we'll average the measurements over multiple observations
 N = 10
-data = datasubset(shuffleobs(loadtaskdata(datasetpath("imagenette2"), ImageClassificationTask), 1:N))
+data = datasubset(shuffleobs(loadtaskdata(datasetpath("imagenette2"), ImageClassification), 1:N))
 method = ImageClassification(Datasets.getclassesclassification("imagenette2-320"), (224, 224))
 
 # Time it takes to load an `(image, class)` observation
@@ -127,25 +127,25 @@ So, you've identified the data pipeline as a performance bottleneck. What now? B
 
 If the data loading is still slowing down training, you'll probably have to speed up the loading of each observation. As mentioned above, this can be broken down into observation loading and encoding. The exact strategy will depend on your use case, but here are some examples.
 
-- Reduce loading time of image datasets by presizing 
+### Reduce loading time of image datasets by presizing 
 
-    For many computer vision tasks, you will resize and crop images to a specific size during training for GPU performance reasons. If the images themselves are large, loading them from disk itself can take some time. If your dataset consists of 1920x1080 resolution images but you're resizing them to 256x256 during training, you're wasting a lot of time loading the large images. *Presizing* means saving resized versions of each image to disk once, and then loading these smaller versions during training. We can see the performance difference using ImageNette since it comes in 3 sizes: original, 360px and 180px.
+For many computer vision tasks, you will resize and crop images to a specific size during training for GPU performance reasons. If the images themselves are large, loading them from disk itself can take some time. If your dataset consists of 1920x1080 resolution images but you're resizing them to 256x256 during training, you're wasting a lot of time loading the large images. *Presizing* means saving resized versions of each image to disk once, and then loading these smaller versions during training. We can see the performance difference using ImageNette since it comes in 3 sizes: original, 360px and 180px.
 
-    ```julia
-    data_orig = loadtaskdata(datasetpath("imagenette2"), ImageClassificationTask)
-    @time eachobsparallel(data_orig, buffered = false)
+```julia
+data_orig = loadtaskdata(datasetpath("imagenette2"), ImageClassification)
+@time eachobsparallel(data_orig, buffered = false)
 
-    data_320px = loadtaskdata(datasetpath("imagenette2-320"), ImageClassificationTask)
-    @time eachobsparallel(data_320px, buffered = false)
+data_320px = loadtaskdata(datasetpath("imagenette2-320"), ImageClassification)
+@time eachobsparallel(data_320px, buffered = false)
 
-    data_160px = loadtaskdata(datasetpath("imagenette2-160"), ImageClassificationTask)
-    @time eachobsparallel(data_160px, buffered = false)
-    ```
+data_160px = loadtaskdata(datasetpath("imagenette2-160"), ImageClassification)
+@time eachobsparallel(data_160px, buffered = false)
+```
 
-- Reducing allocations with inplace operations
+### Reducing allocations with inplace operations
 
-    When implementing the `LearningMethod` interface, you have the option to implement `encode!(buf, method, context, sample)`, an inplace version of `encode` that reuses a buffer to avoid allocations. Reducing allocations often speeds up the encoding step and can also reduce the frequency of garbage collector pauses during training which can reduce GPU utilization.
+When implementing the `LearningMethod` interface, you have the option to implement `encode!(buf, method, context, sample)`, an inplace version of `encode` that reuses a buffer to avoid allocations. Reducing allocations often speeds up the encoding step and can also reduce the frequency of garbage collector pauses during training which can reduce GPU utilization.
 
-- Using efficient data augmentation
+### Using efficient data augmentation
 
-    Many kinds of augmentation can be composed efficiently. A prime example of this are image transformations like resizing, scaling and cropping which are powered by [DataAugmentation.jl](https://github.com/lorenzoh/DataAugmentation.jl). See [its documentation](https://lorenzoh.github.io/DataAugmentation.jl/dev/docs/literate/intro.html) to find out how to implement efficient, composable data transformations.
+Many kinds of augmentation can be composed efficiently. A prime example of this are image transformations like resizing, scaling and cropping which are powered by [DataAugmentation.jl](https://github.com/lorenzoh/DataAugmentation.jl). See [its documentation](https://lorenzoh.github.io/DataAugmentation.jl/dev/docs/literate/intro.html) to find out how to implement efficient, composable data transformations.

@@ -15,20 +15,17 @@ end
 
 
 """
-    loadtaskdata(dir, Task)
-    loadtaskdata(dir, method::LearningMethod{Task})
+    loadtaskdata(dir, Method::Type{LearningMethod})
 
-Load a task data container for `LearningTask` `Task` stored in `dir`
+Load a task data container for a learning method type `Method` stored in `dir`
 in a canonical format.
 """
-function loadtaskdata(dir, ::DLPipelines.LearningMethod{T}) where T
-    return loadtaskdata(dir, T)
-end
+function loadtaskdata end
 
 """
-    loadtaskdata(dir, ImageClassificationTask; [split = false])
+    loadtaskdata(dir, ImageClassification; [split = false])
 
-Load a data container for `ImageClassificationTask` with observations
+Load a data container for `ImageClassification` with observations
 `(input = image, target = class)`.
 
 If `split` is `true`, returns a tuple of the data containers split by
@@ -45,8 +42,8 @@ the name of the grandparent folder.
     - ...
 """
 function loadtaskdata(
-        dir,
-        Task::Type{FastAI.ImageClassificationTask};
+        dir::AbstractPath,
+        ::Type{FastAI.ImageClassification};
         split=false,
         filterparent= (!=("test")),
         kwargs...)
@@ -96,9 +93,9 @@ end
 getclassessegmentation(name::String) = getclassessegmentation(datasetpath(name))
 
 """
-    loadtaskdata(dir, ImageSegmentationTask; [split = false])
+    loadtaskdata(dir, ImageSegmentation; [split = false])
 
-Load a data container for `ImageSegmentationTask` with observations
+Load a data container for `ImageSegmentation` with observations
 `(input = image, target = mask)`.
 
 If `split` is `true`, returns a tuple of the data containers split by
@@ -107,7 +104,7 @@ the name of the grandparent folder.
 """
 function loadtaskdata(
         dir,
-        Task::Type{FastAI.ImageSegmentationTask};
+        ::Type{FastAI.ImageSegmentation};
         split=false,
         kwargs...)
     imagedata = mapobs(loadfile, filterobs(isimagefile, FileDataset(joinpath(dir, "images"))))
