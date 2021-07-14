@@ -15,7 +15,6 @@ In many docstrings, generic types are abbreviated with the following symbols. Ma
 
 Some examples of these in use:
 
-- `LearningTask` represents the task of learning to predict `T` from `I`.
 - `LearningMethod` is a concrete approach to learning to predict `T` from `I` by using the encoded representations `X` and `Y`.
 - `encodeinput : (method, context, I) -> X` encodes an input so that a prediction can be made by a model.
 - A task dataset is a `DC{(I, T)}`, i.e. a data container where each observation is a 2-tuple of an input and a target.
@@ -31,10 +30,6 @@ A data structure that is used to load a number of data observations separately a
 An instance of `DLPipelines.LearningMethod`. A concrete approach to solving a learning task. Encapsulates the logic and configuration for processing data to train a model and make predictions.
 
 See the DLPipelines.jl documentation for more information. 
-
-### Learning task
-
-An abstract subtype of `DLPipelines.LearningTask` that represents the problem of learning a mapping from some input type `I` to a target type `T`. For example, `ImageClassificationTask` represents the task of learning to map an image to a class. See [learning method](#learning-method)
 
 ### Task data container / dataset
 

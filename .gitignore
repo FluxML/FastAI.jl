@@ -1,5 +1,6 @@
-**/.ipynb_checkpoints
+**/.ipynb_checkpoints/**
 test/Manifest.toml
 docs/Manifest.toml
 development/**
 Manifest.toml
+**/*.jld2

@@ -30,7 +30,6 @@ Quickly get started training and finetuning models using already implemented lea
 
 {.tight}
 - [`LearningMethod`](#)
-- [`LearningTask`](#)
 - [`encode`](#)
 - [`encodeinput`](#)
 - `decodey`

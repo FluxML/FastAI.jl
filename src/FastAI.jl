@@ -2,27 +2,32 @@ module FastAI
 
 
 using Reexport
-
 @reexport using DLPipelines
 @reexport using FluxTraining
 @reexport using DataLoaders
 @reexport using Flux
 
 using Animations
-using AbstractPlotting
+using Makie
 using Colors
 using DataAugmentation
-using DataAugmentation: getbounds, makebounds
-using DLPipelines: methoddataset, methodmodel, methodlossfn, methoddataloaders
+using DataAugmentation: getbounds, Bounds
+using DLPipelines: methoddataset, methodmodel, methodlossfn, methoddataloaders,
+    mockmodel, mocksample, predict, predictbatch
 using LearnBase: getobs, nobs
 using FilePathsBase
 using FixedPointNumbers
 using Flux
+using Flux.Optimise
+import Flux.Optimise: apply!, Optimiser, WeightDecay
 using FluxTraining: Learner, handle
 using FluxTraining.Events
+using JLD2: jldsave, jldopen
 using MLDataPattern
 using Parameters
 using StaticArrays
+using ShowCases
+using Test: @testset, @test, @test_nowarn
 
 include("tasks.jl")
 include("plotting.jl")
@@ -36,6 +41,8 @@ include("augmentation.jl")
 include("./steps/imagepreprocessing.jl")
 include("./methods/imageclassification.jl")
 include("./methods/imagesegmentation.jl")
+include("./methods/singlekeypointregression.jl")
+include("./methods/checks.jl")
 
 
 # submodules
@@ -46,12 +53,16 @@ include("models/Models.jl")
 using .Models
 
 # training
+include("training/paramgroups.jl")
+include("training/discriminativelrs.jl")
 include("training/utils.jl")
 include("training/onecycle.jl")
 include("training/finetune.jl")
 include("training/lrfind.jl")
 
-export methodlossfn
+include("serialization.jl")
+
+
 
 
 export
@@ -64,6 +75,7 @@ export
     groupobs,
     filterobs,
     shuffleobs,
+    datasubset,
 
     # method API
     methodmodel,
@@ -72,21 +84,22 @@ export
     methodlossfn,
     getobs,
     nobs,
+    predict,
+    predictbatch,
 
     # plotting API
     plotbatch,
     plotsamples,
+    plotpredictions,
+    makebatch,
 
     # pipeline steps
     ProjectiveTransforms, ImagePreprocessing, augs_projection, augs_lighting,
 
-    # tasks
-    ImageClassificationTask,
-    ImageSegmentationTask,
-
     # methods
     ImageClassification,
     ImageSegmentation,
+    SingleKeypointRegression,
 
     # training
     methodlearner,
@@ -94,8 +107,12 @@ export
     fit!,
     fitonecycle!,
     finetune!,
+    lrfind,
+    savemethodmodel,
+    loadmethodmodel,
 
-    gpu
+    gpu,
+    plot
 
 
 

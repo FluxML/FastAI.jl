@@ -614,9 +614,9 @@ version = "0.8.11"
 
 [[Images]]
 deps = ["AxisArrays", "Base64", "ColorVectorSpace", "FileIO", "Graphics", "ImageAxes", "ImageContrastAdjustment", "ImageCore", "ImageDistances", "ImageFiltering", "ImageIO", "ImageMagick", "ImageMetadata", "ImageMorphology", "ImageQualityIndexes", "ImageShow", "ImageTransformations", "IndirectArrays", "OffsetArrays", "Random", "Reexport", "SparseArrays", "StaticArrays", "Statistics", "StatsBase", "TiledIteration"]
-git-tree-sha1 = "7e5db157c69f6aaa596c43611d45589b1f5e5078"
+git-tree-sha1 = "8b714d5e11c91a0d945717430ec20f9251af4bd2"
 uuid = "916415d5-f1e6-5110-898d-aaa5f9f070e0"
-version = "0.24.0"
+version = "0.24.1"
 
 [[IndirectArrays]]
 git-tree-sha1 = "c2a145a145dc03a7620af1444e0264ef907bd44f"
@@ -1207,6 +1207,12 @@ git-tree-sha1 = "30cd8c360c54081f806b1ee14d2eecbef3c04c49"
 uuid = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
 version = "0.9.8"
 
+[[StringDistances]]
+deps = ["Distances"]
+git-tree-sha1 = "a4c05337dfe6c4963253939d2acbdfa5946e8e31"
+uuid = "88034a9c-02f8-509d-84a9-84ec65e18404"
+version = "0.10.0"
+
 [[StructArrays]]
 deps = ["Adapt", "DataAPI", "Tables"]
 git-tree-sha1 = "44b3afd37b17422a62aea25f04c1f7e09ce6b07f"
@@ -1252,6 +1258,12 @@ version = "0.1.15"
 [[Test]]
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
 uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[[TestImages]]
+deps = ["AxisArrays", "ColorTypes", "FileIO", "OffsetArrays", "Pkg", "StringDistances"]
+git-tree-sha1 = "883a8dbc6500302e39a4a40f47dac475e46dd988"
+uuid = "5e47fb64-e119-507b-a336-dd2b206d9990"
+version = "1.5.0"
 
 [[ThreadPools]]
 deps = ["Printf", "RecipesBase", "Statistics"]
