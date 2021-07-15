@@ -11,6 +11,9 @@ include("imports.jl")
         @testset ExtendedTestSet "imagepreprocessing.jl" begin
             include("encodings/imagepreprocessing.jl")
         end
+        @testset ExtendedTestSet "keypointpreprocessing.jl" begin
+            include("encodings/keypointpreprocessing.jl")
+        end
     end
 
     @testset ExtendedTestSet "methods/" begin
