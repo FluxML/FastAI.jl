@@ -44,7 +44,9 @@ function describeencodings(
         inname="Input",
         outname="Output",
         blocknames=repeat([""], length(blocks)),
-        decode=false)
+        decode=false,
+        markdown=false,
+        tf=tf_markdown)
     namescol = reshape([inname, ["" for _ in 2:length(encodings)]..., outname], :, 1)
 
     data = hcat(
@@ -58,9 +60,9 @@ function describeencodings(
         data,
         header=[decode ? "Decoding" : "Encoding", "Name", blocknames...],
         alignment=[:r, :r, [:l for _ in 1:length(blocknames)]...],
-        tf=tf_markdown,
+        tf=tf,
         )
-    return Markdown.parse(s)
+    return markdown ? Markdown.parse(s) : s
 end
 
 
@@ -73,19 +75,21 @@ function describemethod(method::BlockMethod)
     - Model blocks: `$(typeof(xblock)) -> $(typeof(method.outputblock))`
 
     Encoding a sample (`encode(method, context, sample)`)
-    """
-    display(Markdown.parse(s))
-    display(describeencodings(
+
+    $(describeencodings(
         method.encodings,
         method.blocks,
         blocknames=["`method.blocks[1]`", "`method.blocks[2]`"],
         inname="`(input, target)`", outname="`(x, y)`"))
-    display(Markdown.parse("Decoding a model output (`decode(method, context, ŷ)`)"))
-    display(describeencodings(
+
+    Decoding a model output (`decode(method, context, ŷ)`)
+
+    $(describeencodings(
         method.encodings,
         (method.outputblock,),
         blocknames=["`method.outputblock`"],
         inname="`ŷ`", outname="`target_pred`", decode=true))
+    """
 
-
+    return Markdown.parse(s)
 end

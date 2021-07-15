@@ -39,7 +39,7 @@ abstract type Encoding end
 Replaces all `nothing`s in outblocks with the corresponding block in `inblocks`.
 `outblocks` may be obtained by
 """
-fillblock(inblocks, outblocks) = map(fillblock, inblocks, outblocks)
+fillblock(inblocks::Tuple, outblocks::Tuple) = map(fillblock, inblocks, outblocks)
 fillblock(inblock::Block, ::Nothing) = inblock
 fillblock(::Block, outblock::Block) = outblock
 
@@ -191,8 +191,13 @@ abstract type StatefulEncoding <: Encoding end
 encodestate(encoding::StatefulEncoding, context, blocks, data) = nothing
 decodestate(encoding::StatefulEncoding, context, blocks, data) = nothing
 
-function encode(encoding::StatefulEncoding, context, blocks::Tuple, datas::Tuple)
-    state = encodestate(encoding, context, blocks, datas)
+function encode(
+        encoding::StatefulEncoding,
+        context,
+        blocks::Tuple,
+        datas::Tuple;
+        state = encodestate(encoding, context, blocks, datas))
+
     @assert length(blocks) == length(datas)
     return Tuple(encode(encoding, context, block, data; state = state)
                     for (block, data) in zip(blocks, datas))

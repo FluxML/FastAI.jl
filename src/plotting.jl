@@ -201,3 +201,14 @@ maskimage(mask::AbstractArray{<:Gray{T}}, args...) where T =
     maskimage(reinterpret(T, mask), args...)
 maskimage(mask::AbstractArray{<:Normed{T}}, args...) where T =
     maskimage(reinterpret(T, mask), args...)
+
+
+_toindex(v) = CartesianIndex(Tuple(round.(Int, v)))
+_boxIs(I, r) = I-(r*CartesianIndex(1, 1)):I+(r*CartesianIndex(1, 1))
+function _drawkeypoint!(img, v; r = 2, c = RGB(0, 0, 1))
+    Is = _boxIs(_toindex(v), r)
+    for I in Is
+        checkbounds(Bool, img, I) && (img[I] = c)
+    end
+    return img
+end

@@ -70,7 +70,7 @@ export
 
     # datasets
     DATASETS,
-    loadtaskdata,
+    loadfolderdata,
     datasetpath
 
 end  # module

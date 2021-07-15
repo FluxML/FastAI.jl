@@ -46,7 +46,7 @@ include("datablock/describe.jl")
 include("encodings/onehot.jl")
 include("encodings/imagepreprocessing.jl")
 include("encodings/projective.jl")
-include("encodings/scalepoints.jl")
+include("encodings/keypointpreprocessing.jl")
 
 # Training interface
 include("datablock/models.jl")
@@ -111,12 +111,15 @@ export
     Mask,
     Label,
     LabelMulti,
+    Keypoints,
 
     # encodings
+    encode,
+    decode,
     ProjectiveTransforms,
     ImagePreprocessing,
     OneHot,
-    ScalePoints,
+    KeypointPreprocessing,
     augs_projection, augs_lighting,
 
     BlockMethod,

@@ -21,7 +21,7 @@ end
 
 function visionhead(
         k_in,
-        k_out;
+        outsz::Tuple;
         ks_dense=[512],
         p=0.,
         concat_pool=true,
@@ -30,6 +30,7 @@ function visionhead(
         y_range=nothing,
         act=relu)
 
+    k_out = prod(outsz)
     hs = vcat([concat_pool ? 2k_in : k_in], ks_dense, [k_out])
     n = length(hs)
     bns = trues(n)
@@ -47,8 +48,13 @@ function visionhead(
         min, max = y_range
         push!(layers, x -> Flux.σ.(x) .* (max - min) .- max)
     end
+    # reshape to multi-dimensional output if wanted
+    if length(outsz) > 1
+        push!(layers, xs -> reshape(xs, (outsz..., last(size(xs)))))
+    end
     return Chain(layers...)
 end
+visionhead(k_in, k_out::Int; kwargs...) = visionhead(k_in, (k_out,); kwargs...)
 
 
 function linbndrop(h_in, h_out; use_bn=true, p=0., act=identity, lin_first=false)

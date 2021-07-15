@@ -142,6 +142,7 @@ struct Keypoints{N, M} <: Block
     sz::NTuple{M, Int}
 end
 Keypoints{N}(n::Int) where N = Keypoints{N, 1}((n,))
+Keypoints{N}(t::NTuple{M, Int}) where {N, M} = Keypoints{N, M}(t)
 
 function checkblock(
         block::Keypoints{N,M},

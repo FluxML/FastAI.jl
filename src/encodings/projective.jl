@@ -99,7 +99,7 @@ function encode(
     tfm = enc.tfms[context]
     item = ItemType(data, bounds)
     tdata = apply(tfm, item; randstate = randstate) |> itemdata
-    return deepcopy(tdata)
+    return copy(tdata)
 end
 
 # ProjectiveTransforms is not invertible, hence no `decode` method!

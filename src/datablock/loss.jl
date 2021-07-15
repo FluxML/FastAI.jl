@@ -33,3 +33,8 @@ function segmentationloss(ypreds, ys; kwargs...)
     ys = reshape(ys, :, size(ys, 3), size(ys, 4))
     Flux.Losses.logitcrossentropy(ypreds, ys; dims = 2, kwargs...)
 end
+
+function blocklossfn(outblock::KeypointTensor{N}, yblock::KeypointTensor{N}) where N
+    outblock.sz == yblock.sz || error("Sizes of $outblock and $yblock differ!")
+    return Flux.Losses.mse
+end
