@@ -61,6 +61,7 @@ include("datablock/plot.jl")
 # method implementations and helpers
 include("./steps/tabularpreprocessing.jl")
 include("./methods/tabularregression.jl")
+include("./methods/tabularclassification.jl")
 
 # submodules
 include("datasets/Datasets.jl")
@@ -146,6 +147,7 @@ export
 
     # methods
     TabularRegression,
+    TabularClassification,
 
     # learning methods
     findlearningmethods,
