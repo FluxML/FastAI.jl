@@ -11,14 +11,22 @@ On the [quickstart page](../notebooks/quickstart.ipynb), we showed how to train 
 
 ```julia
 using FastAI
-
 path = datasetpath("imagenette2-160")
-dataset = loadtaskdata(path, ImageClassification)
-method = ImageClassification(Datasets.getclassesclassification("imagenette2-160"), (160, 160))
-dls = methoddataloaders(dataset, method, 16)
-model = methodmodel(method, Models.xresnet18())
-learner = Learner(model, dls, ADAM(), methodlossfn(method), ToGPU(), Metrics(accuracy))
-fitonecycle!(learner, 5)
+data = Datasets.loadfolderdata(
+    path,
+    filterfn=isimagefile,
+    loadfn=(loadfile, parentname))
+classes = unique(eachobs(data[2]))
+method = BlockMethod(
+    (Image{2}(), Label(classes)),
+    (
+        ProjectiveTransforms((128, 128), augmentations=augs_projection()),
+        ImagePreprocessing(),
+        OneHot()
+    )
+)
+learner = methodlearner(method, data)
+fitonecycle!(learner, 10)
 ```
 
 Let's unpack each line.
@@ -45,7 +53,7 @@ image
 
 {cell=main}
 ```julia
-nobs(dataset)
+nobs(data)
 ```
 
 To train on a different dataset, you could replace `dataset` with other data containers made up of pairs of images and classes.

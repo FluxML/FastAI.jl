@@ -28,12 +28,14 @@ There is no integration (yet!) for text and collaborative filtering applications
 
 FastAI.jl also has a data block API but it differs from fastai's in a number of ways. In the Julia package it only handles the data encoding and decoding part, and doesn't concern itself with creating datasets. For dataset loading, see the [data container API](data_containers.md). As mentioned above, the high-level application-specific logic is also derived from the data block API. To use it you need to specify a tuple of input and target blocks as well as a tuple of encodings that are applied to the data. The encodings  are invertible data-specific data processing steps which correspond to `fastai.Transform`s. As in fastai, dispatch is used to transform applicable data and pass other data through unchanged. Unlike in fastai, there are no default steps associated with a block, allowing greater flexibility.
 
-We can create a `BlockMethod` (corresponding to `fastai.DataBlock`) and get information about the representations the data goes through. Blocks that are transformed by an encoding are **bold**. 
+We can create a `BlockMethod` (corresponding to `fastai.DataBlock`) and get information about the representations the data goes through. 
 
 {cell=main}
 ```julia
+using FastAI
+
 method = BlockMethod(
-    (Image{2}(), Mask{2}()),
+    (Image{2}(), Mask{2}(["foreground", "background"])),
     (
         ProjectiveTransforms((128, 128)),
         ImagePreprocessing(),
@@ -53,7 +55,6 @@ From this short definition, many things can be derived:
 
 Together with a [data container](data_container) `data`, we can quickly create a `Learner` using [`methodlearner`](#) which, like in fastai, handles the training for us. There are no application-specific `Learner` constructors like `cnn_learner` or `unet_learner` in FastAI.jl.
 
-{cell=main}
 ```julia
 learner = methodlearner(method, data)
 ```
@@ -143,7 +144,7 @@ Due to the nature of the Julia language and its design around multiple dispatch,
 
 ### PyTorch foundations
 
-Unlike Python, Julia has native support for N-dimensional regular arrays. As such, there is a standard interface for arrays and libraries don't need to implement their own. Consider that every deep learning framework in Python implements their own CPU and GPU arrays, which is part of the reason they are *frameworks*, not *libraries* (with the latter being vastly preferable). Julia's standard libraries implements the standard CPU `Array` type. GPU arrays are implemented through [CUDA.jl](#) `CuArray` type (with unified support for GPU vendors other than nvidia in the works). As a result, Flux.jl, the deep learning library of choice for FastAI.jl, does not need to reimplement their own CPU and GPU array versions. This kind of composability in general largely benefits what can be accomplished in Julia.
+Unlike Python, Julia has native support for N-dimensional regular arrays. As such, there is a standard interface for arrays and libraries don't need to implement their own. Consider that every deep learning framework in Python implements their own CPU and GPU arrays, which is part of the reason they are *frameworks*, not *libraries* (with the latter being vastly preferable). Julia's standard libraries implements the standard CPU `Array` type. GPU arrays are implemented through [CUDA.jl](https://github.com/JuliaGPU/CUDA.jl) `CuArray` type (with unified support for GPU vendors other than nvidia in the works). As a result, Flux.jl, the deep learning library of choice for FastAI.jl, does not need to reimplement their own CPU and GPU array versions. This kind of composability in general largely benefits what can be accomplished in Julia.
 
 Some other libraries which are used under the hood: for image processing, the [Images.jl](https://juliaimages.org/) ecosystem of packages is used; for reading and processing tabular data [DataFrames.jl](https://github.com/JuliaData/DataFrames.jl) and [Tables.jl](https://github.com/JuliaData/Tables.jl); for plotting [Makie.jl](https://github.com/JuliaPlots/Makie.jl).
 

@@ -3,12 +3,12 @@ using Pollen
 using FastAI
 using FluxTraining
 using DLPipelines
-using DataAugmentation
+import DataAugmentation
 using FilePathsBase
 using Colors
 
 function serve(lazy=true)
-    refmodules = [FastAI, FluxTraining, DLPipelines, DataAugmentation, FastAI.Datasets]
+    refmodules = [FastAI, FluxTraining, DLPipelines, DataAugmentation, DataLoaders, FastAI.Datasets]
     project = Pollen.documentationproject(FastAI; refmodules, watchpackage=true)
     Pollen.serve(project, lazy=lazy)
 end

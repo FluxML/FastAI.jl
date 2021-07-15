@@ -13,12 +13,13 @@ ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 {cell=main}
 ```julia
 using FastAI
-using FastAI.Datasets
-using FastAI.Datasets: datasetpath, loadtaskdata
 
 NAME = "imagenette2-160"
 dir = datasetpath(NAME)
-data = loadtaskdata(dir, ImageClassification)
+data = Datasets.loadfolderdata(
+    dir,
+    filterfn=isimagefile,
+    loadfn=(loadfile, parentname))
 ```
 
 A data container is any type that holds observations of data and allows us to load them with `getobs` and query the number of observations with `nobs`:
@@ -42,7 +43,7 @@ image, class = obs
 image
 ```
 
-As you saw above, the `Datasets` submodule provides functions for loading and creating data containers. We used [`Datasets.datasetpath`](#) to download a dataset if it wasn't yet and get the folder it was downloaded to. Then, [`Datasets.loadtaskdata`](#) took the folder and loaded a data container suitable for image classification. FastAI.jl makes it easy to download the datasets from fastai's collection on AWS Open Datasets. For the full list, see [`Datasets.DATASETS`](#)
+As you saw above, the `Datasets` submodule provides functions for loading and creating data containers. We used [`Datasets.datasetpath`](#) to download a dataset if it wasn't yet and get the folder it was downloaded to. Then, [`loadfolderdata`](#) took the folder and loaded a data container suitable for image classification. FastAI.jl makes it easy to download the datasets from fastai's collection on AWS Open Datasets. For the full list, see `Datasets.DATASETS`.
 
 
 ### Exercises
@@ -52,33 +53,29 @@ As you saw above, the `Datasets` submodule provides functions for loading and cr
 
 ## Creating data containers from files
 
-`loadtaskdata` makes it easy to get started when your dataset already comes in the correct format, but alas, datasets come in all different shapes and sizes. Let's create the same data container, but now using more general functions FastAI.jl provides to get a look behind the scenes. If each observation in your dataset is a file in a folder, [`FileDataset`](#) conveniently creates a data container given a path. We'll use the path of the downloaded dataset:
+Now let's create the same data container, but using more general functions FastAI.jl provides to get a look behind the scenes. We'll start with [`FileDataset`](#) which creates a data container (here a `Vector`) of files given a path. We'll use the path of the downloaded dataset:
 
 {cell=main}
 ```julia
-using FastAI.Datasets: FileDataset
-
-filedata = FileDataset(dir)
+files = FileDataset(dir)
 ```
 
-`filedata` is a data container where each observation is a path to a file. We'll confirm that using `getobs`:
+`files` is a data container where each observation is a path to a file. We'll confirm that using `getobs`:
 
 
 {cell=main}
 ```julia
-p = getobs(filedata, 100)
+p = getobs(files, 100)
 ```
 
 Next we need to load an image and the corresponding class from the path. If you have a look at the folder structure of `dir` you can see that the parent folder of each file gives the name of class. So we can use the following function to load the `(image, class)` pair from a path:
 
 {cell=main}
 ```julia
-using FastAI.Datasets: loadfile, filename
-
 function loadimageclass(p)
     return (
-        Datasets.loadfile(p),
-        filename(parent(p)),
+        loadfile(p),
+        pathname(pathparent(p)),
     )
 end
 
@@ -91,7 +88,7 @@ Finally, we use [`mapobs`](#) to lazily transform each observation and have a da
 
 {cell=main}
 ```julia
-data = mapobs(loadimageclass, filedata);
+data = mapobs(loadimageclass, files);
 ```
 
 ### Exercises
@@ -101,7 +98,7 @@ data = mapobs(loadimageclass, filedata);
 
 ## Splitting a data container into subsets
 
-Until now, we've only created a single data container containing all observations in a dataset. In practice, though, you'll want to have at least a training and validation split. The easiest way to get these is to randomly split your data container into two parts. Here we split `data` into 80% training and 20% validation data. Note the use of `shuffleobs` to make sure each split has approximately the same class distribution.
+Until now, we've only created a single data container containing all observations in a dataset. In practice, though, you'll want to have at least a training and validation split. The easiest way to get these is to randomly split your data container into two parts. Here we split `data` into 80% training and 20% validation data. Note the use of [`shuffleobs`](#) to make sure each split has approximately the same class distribution.
 
 {cell=main}
 ```julia
@@ -129,10 +126,10 @@ As you can see, the grandparent folder of each image indicates which split it is
 
 {cell=main}
 ```julia
-trainfiledata, validfiledata = groupobs(filedata) do p
-    filename(parent(parent(p)))
+datagroups = groupobs(files) do p
+    pathname(pathparent(pathparent(p)))  # equivalent to `grandparentname(p)`
 end
-nobs(trainfiledata), nobs(validfiledata)
+trainfiles, validfiles = datagroups["train"], datagroups["val"]
 ```
 
 Using this official split, it will be easier to compare the performance of your results with those of others'. 
