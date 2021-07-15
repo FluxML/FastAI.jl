@@ -1,3 +1,7 @@
+abstract type AbstractBlock end
+
+
+
 """
     abstract type Block
 
@@ -30,7 +34,7 @@ Optional:
     - [`blockmodel`](#)`(inblock, outblock, backbone)`
 
 """
-abstract type Block end
+abstract type Block <: AbstractBlock end
 
 
 """

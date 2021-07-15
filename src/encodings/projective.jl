@@ -39,6 +39,8 @@ are 2D only so `augs_projection` cannot be used for 3D data.
 - `augmentations::`[`DataAugmentation.Transform`](#)` = Identity()`: Projective
     augmentation to apply during training. See [`augs_projection`](#).
 - `buffered = true`: Whether to use inplace transformations. Reduces memory usage.
+- `sharestate = true`: Whether to use the same random state and bounds for all blocks
+    in a sample
 
 """
 @with_kw_noshow struct ProjectiveTransforms{N} <: StatefulEncoding
@@ -46,6 +48,7 @@ are 2D only so `augs_projection` cannot be used for 3D data.
     buffered::Bool
     augmentations
     tfms::Dict{Context, DataAugmentation.Transform}
+    sharestate::Bool
 end
 
 
@@ -54,7 +57,8 @@ function ProjectiveTransforms(
         sz;
         augmentations = Identity(),
         inferencefactor = 8,
-        buffered = true)
+        buffered = true,
+        sharestate = true)
 
     tfms = Dict{Context, DataAugmentation.Transform}(
         Training() => ScaleKeepAspect(sz) |> augmentations |> RandomCrop(sz) |> PinOrigin(),
@@ -66,7 +70,7 @@ function ProjectiveTransforms(
         tfms[Validation()] = BufferedThreadsafe(tfms[Validation()])
     end
 
-    return ProjectiveTransforms(sz, buffered, augmentations, tfms)
+    return ProjectiveTransforms(sz, buffered, augmentations, tfms, sharestate)
 end
 
 
@@ -92,7 +96,7 @@ function encode(
     ItemType = blockitemtype(block, N)
     isnothing(ItemType) && return data
     # only init state if block is encoded
-    bounds, randstate = isnothing(state) ? encodestate(enc, context, block, data) : state
+    bounds, randstate = (isnothing(state) || !enc.sharestate) ? encodestate(enc, context, block, data) : state
     # don't encode if bounds have wrong dimensionality
     bounds isa DataAugmentation.Bounds{N} || return data
 

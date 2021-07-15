@@ -13,12 +13,16 @@ function blockmodel end
 
 """
     blockmodel(inblock::ImageTensor{N}, outblock::OneHotTensor{0}, backbone)
+    blockmodel(inblock::ImageTensor{N}, outblock::OneHotTensorMulti{0}, backbone)
 
 Construct a model for N-dimensional image classification. `backbone` should
 be a convolutional feature extractor taking in batches of image tensors with
 `inblock.nch` color channels.
 """
-function blockmodel(inblock::ImageTensor{N}, outblock::OneHotTensor{0}, backbone) where N
+function blockmodel(
+        inblock::ImageTensor{N},
+        outblock::Union{OneHotTensor{0}, OneHotTensorMulti{0}},
+        backbone) where N
     outsz = Flux.outputsize(backbone, (ntuple(_ -> 256, N)..., inblock.nchannels, 1))
     outch = outsz[end-1]
     head = Models.visionhead(outch, length(outblock.classes), p = 0.)

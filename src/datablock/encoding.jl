@@ -1,5 +1,4 @@
 
-
 """
     abstract type Encoding
 
@@ -56,7 +55,8 @@ end
 # ## `encode` methods
 
 # By default an encoding doesn't change the data
-encode(encoding::Encoding, _, ::Block, data) = data
+encode(encoding::Encoding, ctx, block::Block, data; kwargs...) =
+    isempty(kwargs) ? data : encode(encoding, ctx, block, data)
 
 # By default, a tuple of encodings encodes by encoding the data one encoding
 # after the other
@@ -92,7 +92,8 @@ end
 # ## `decode` methods
 
 # By default an encoding doesn't change the data
-decode(encoding::Encoding, _, ::Block, data) = data
+decode(encoding::Encoding, ctx, block::Block, data; kwargs...) =
+    isempty(kwargs) ? data : decode(encoding, ctx, block, data)
 
 # By default, a tuple of encodings decodes by decoding the data one encoding
 # after the other, with encodings iterated in reverse order
@@ -188,8 +189,8 @@ to `decodestate(encoding, context, blocks, sample)`
 """
 abstract type StatefulEncoding <: Encoding end
 
-encodestate(encoding::StatefulEncoding, context, blocks, data) = nothing
-decodestate(encoding::StatefulEncoding, context, blocks, data) = nothing
+encodestate(encoding, context, blocks, data) = nothing
+decodestate(encoding, context, blocks, data) = nothing
 
 function encode(
         encoding::StatefulEncoding,
@@ -203,18 +204,17 @@ function encode(
                     for (block, data) in zip(blocks, datas))
 end
 
-# By default ignores state
-encode(encoding::StatefulEncoding, context, block::Block, data; state = nothing) = data
+function decode(
+        encoding::StatefulEncoding,
+        context,
+        blocks::Tuple,
+        datas::Tuple;
+        state = decodestate(encoding, context, blocks, datas))
 
-function decode(encoding::StatefulEncoding, context, blocks::Tuple, datas::Tuple)
-    state = decodestate(encoding, context, blocks, datas)
     @assert length(blocks) == length(datas)
     return Tuple(decode(encoding, context, block, data; state = state)
                     for (block, data) in zip(blocks, datas))
 end
-
-# By default ignores state
-decode(encoding::StatefulEncoding, context, block::Block, data; state = nothing) = data
 
 """
     checkencodings()
@@ -222,9 +222,7 @@ decode(encoding::StatefulEncoding, context, block::Block, data; state = nothing)
 Check that `encodings` can be sequenced, i.e. given input `blocks`, the
 `encodedblock`s of every encoding can be fed into the next.
 """
-function checkencodings(encodings, blocks)
-
-end
+function checkencodings end
 
 """
     testencoding(encoding, block, data)
@@ -242,40 +240,17 @@ function testencoding(encoding, block, data = mockblock(block))
         # Test that `data` is a valid instance of `block`
         @test checkblock(block, data)
         @test !isnothing(encodedblock(encoding, block))
-        outblock = encodedblock(encoding, block)
+        outblock = encodedblock(encoding, block, true)
         outdata = encode(encoding, Training(), block, data)
         # The encoded data should be a valid instance for the `encodedblock`
         @test checkblock(outblock, outdata)
 
         # Test decoding (if supported) works correctly
-        inblock = decodedblock(encoding, outblock)
+        inblock = decodedblock(encoding, outblock, true)
         if !isnothing(inblock)
             @test block == inblock
             indata = decode(encoding, Training(), outblock, outdata)
             @test checkblock(inblock, indata)
         end
     end
-end
-
-
-
-"""
-Some printing of the steps taken in a full pipeline would be nice. Should
-highlight which blocks change.
-Can also check that every encoding is applied to at least one block.
-
-
-- INPUT:                (Image{2}(),           Label(classes))
-
-- ImagePreprocessing:   (**ImageTensor{2}()**, Label(classes))
-- OneHot:               (ImageTensor{2}(),     **OneHot{1}(classes)**)
-
-- OUTPUT:               (ImageTensor{2}(),     OneHot{1}(classes))
-
-
-"""
-
-
-function explainencoding(encoding, blocks)
-
 end

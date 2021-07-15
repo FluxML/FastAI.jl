@@ -29,12 +29,18 @@ function encodetarget(method::BlockMethod, context, target)
     encode(method.encodings, context, method.blocks[2], target)
 end
 
+function decode(method::BlockMethod, context, xy)
+    xyblock = encodedblock(method.encodings, method.blocks)
+    decode(method.encodings, context, xyblock, xy)
+end
+
 function decodeŷ(method::BlockMethod, context, ŷ)
     decode(method.encodings, context, method.outputblock, ŷ)
 end
 
 function decodey(method::BlockMethod, context, y)
-    decode(method.encodings, context, encodedblock(encodings, blocks[2]), y)
+    yblock = encodedblock(method.encodings, method.blocks[2])
+    decode(method.encodings, context, yblock, y)
 end
 
 # Training interface

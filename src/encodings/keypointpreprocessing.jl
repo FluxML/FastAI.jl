@@ -2,6 +2,8 @@ struct KeypointTensor{N, T, M} <: Block
     sz::NTuple{M, Int}
 end
 
+
+mockblock(block::KeypointTensor{N}) where N = rand(SVector{N, Float32}, block.sz)
 function checkblock(block::KeypointTensor{N, T}, data::AbstractArray{T}) where {N, T}
     return length(data) == (prod(block.sz) * N)
 end

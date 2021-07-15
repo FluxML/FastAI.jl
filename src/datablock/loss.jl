@@ -18,6 +18,10 @@ function blocklossfn(outblock::OneHotTensor{0}, yblock::OneHotTensor{0})
     return Flux.Losses.logitcrossentropy
 end
 
+function blocklossfn(outblock::OneHotTensorMulti{0}, yblock::OneHotTensorMulti{0})
+    outblock.classes == yblock.classes || error("Classes of $outblock and $yblock differ!")
+    return Flux.Losses.logitbinarycrossentropy
+end
 
 function blocklossfn(outblock::OneHotTensor{N}, yblock::OneHotTensor{N}) where N
     outblock.classes == yblock.classes || error("Classes of $outblock and $yblock differ!")

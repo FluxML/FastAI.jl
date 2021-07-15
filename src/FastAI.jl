@@ -31,6 +31,7 @@ using Parameters
 using PrettyTables
 using StaticArrays
 using ShowCases
+using Statistics: mean
 using Test: @testset, @test, @test_nowarn
 
 include("plotting.jl")
@@ -41,6 +42,8 @@ include("datablock/block.jl")
 include("datablock/encoding.jl")
 include("datablock/method.jl")
 include("datablock/describe.jl")
+include("datablock/checks.jl")
+include("datablock/wrappers.jl")
 
 # Encodings
 include("encodings/onehot.jl")
@@ -53,7 +56,6 @@ include("datablock/models.jl")
 include("datablock/loss.jl")
 include("datablock/plot.jl")
 
-include("methods/checks.jl")
 
 
 # submodules
@@ -71,6 +73,7 @@ include("training/utils.jl")
 include("training/onecycle.jl")
 include("training/finetune.jl")
 include("training/lrfind.jl")
+include("training/metrics.jl")
 
 include("serialization.jl")
 
@@ -120,6 +123,8 @@ export
     ImagePreprocessing,
     OneHot,
     KeypointPreprocessing,
+    Only,
+    Named,
     augs_projection, augs_lighting,
 
     BlockMethod,
@@ -135,6 +140,7 @@ export
     lrfind,
     savemethodmodel,
     loadmethodmodel,
+    accuracy_thresh,
 
     gpu,
     plot

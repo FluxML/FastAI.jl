@@ -74,7 +74,7 @@ function ImagePreprocessing(;
         )
     else
         tfms = Dict(
-            Training() => augmentations |> ToEltype(C) |> ImageToTensor{T}() |> Normalize(means, stds),
+            Training() => augmentations |> basetfm,
             Validation() => basetfm,
             Inference() => basetfm,
         )
@@ -90,14 +90,14 @@ function encodedblock(ip::ImagePreprocessing{P,M,C}, ::Image{N}) where {P,M,C,N}
 end
 
 function encode(ip::ImagePreprocessing, context, block::Image, data)
-    return apply(ip.tfms[context], DataAugmentation.Image(data)) |> itemdata
+    return copy(apply(ip.tfms[context], DataAugmentation.Image(data)) |> itemdata)
 end
 
 decodedblock(::ImagePreprocessing, ::ImageTensor{N}) where N = Image{N}()
 
 function decode(ip::ImagePreprocessing, context, block::ImageTensor, data)
     means, stds = ip.stats
-    return DataAugmentation.tensortoimage(DataAugmentation.denormalize(data, means, stds))
+    return copy(DataAugmentation.tensortoimage(DataAugmentation.denormalize(data, means, stds)))
 end
 
 

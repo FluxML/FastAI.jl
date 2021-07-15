@@ -7,9 +7,9 @@ include("../imports.jl")
         (
             ProjectiveTransforms((16, 16), inferencefactor=8),
             ImagePreprocessing(),
-            ScalePoints((16, 16)),
+            KeypointPreprocessing((16, 16)),
         )
     )
     DLPipelines.checkmethod_core(method)
-    #FastAI.checkmethod_plot(method)
+    FastAI.checkmethod_plot(method)
 end

@@ -155,7 +155,7 @@ function imageaxis(f; kwargs...)
 end
 
 
-imageaxis(f::Makie.FigurePosition; kwargs...) = imageaxis(f.fig; kwargs...)
+#imageaxis(f::Makie.GridPosition; kwargs...) = imageaxis(f.fig; kwargs...)
 
 # ## Plot recipes
 

@@ -36,6 +36,8 @@ function loadfile(file::String)
     if isimagefile(file)
         # faster image loading
         return FileIO.load(file, view = true)
+    elseif endswith(file, ".csv")
+        return DataFrame(CSV.File(file))
     else
         return FileIO.load(file)
     end
