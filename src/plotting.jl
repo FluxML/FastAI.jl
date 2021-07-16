@@ -97,7 +97,7 @@ Plot an encoded batch of data in a grid.
 plotbatch(method, xs, ys) = plotbatch!(defaultfigure(), method, xs, ys)
 
 function plotbatch!(f, method, xs, ys)
-    n = DataLoaders._batchsize(xs)
+    n = DataLoaders._batchsize(xs, DataLoaders.BatchDimLast())
     nrows = Int(ceil(sqrt(n)))
     is = Iterators.product(1:nrows, 1:nrows)
     for (i, (x, y)) in zip(is, DataLoaders.obsslices((xs, ys)))
@@ -155,18 +155,20 @@ function imageaxis(f; kwargs...)
 end
 
 
-imageaxis(f::Makie.FigurePosition; kwargs...) = imageaxis(f.fig; kwargs...)
+#imageaxis(f::Makie.GridPosition; kwargs...) = imageaxis(f.fig; kwargs...)
 
 # ## Plot recipes
 
 
 @recipe(PlotImage, image) do scene
-    Attributes()
+    Attributes(
+        alpha = 1
+    )
 end
 
 function Makie.plot!(plot::PlotImage)
     im = plot[:image]
-    rim = @lift copy(rotr90($im))
+    rim = @lift alphacolor.(copy(rotr90($im)), $(plot.attributes[:alpha]))
     image!(plot, rim; plot.attributes...)
     return plot
 end
@@ -184,17 +186,29 @@ function Makie.plot!(plot::PlotMask; kwargs...)
         classes = @lift unique($mask)
     end
     im = @lift maskimage($mask, $classes)
-    plotimage!(plot, im; plot.attributes...)
+    plotimage!(plot, im; alpha = 1, plot.attributes...)
     return plot
 end
 
 
 function maskimage(mask, classes)
+    classtoidx = Dict(class => i for (i, class) in enumerate(classes))
     colors = distinguishable_colors(length(classes), transform=deuteranopic)
-    return map(c -> colors[c], mask)
+    return map(x -> colors[classtoidx[x]], mask)
 end
 
 maskimage(mask::AbstractArray{<:Gray{T}}, args...) where T =
     maskimage(reinterpret(T, mask), args...)
 maskimage(mask::AbstractArray{<:Normed{T}}, args...) where T =
     maskimage(reinterpret(T, mask), args...)
+
+
+_toindex(v) = CartesianIndex(Tuple(round.(Int, v)))
+_boxIs(I, r) = I-(r*CartesianIndex(1, 1)):I+(r*CartesianIndex(1, 1))
+function _drawkeypoint!(img, v; r = 2, c = RGB(0, 0, 1))
+    Is = _boxIs(_toindex(v), r)
+    for I in Is
+        checkbounds(Bool, img, I) && (img[I] = c)
+    end
+    return img
+end

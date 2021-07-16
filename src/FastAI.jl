@@ -12,8 +12,10 @@ using Makie
 using Colors
 using DataAugmentation
 using DataAugmentation: getbounds, Bounds
-using DLPipelines: methoddataset, methodmodel, methodlossfn, methoddataloaders,
-    mockmodel, mocksample, predict, predictbatch
+import DLPipelines: methoddataset, methodmodel, methodlossfn, methoddataloaders,
+    mockmodel, mocksample, predict, predictbatch, mockmodel, encode, encodeinput,
+    encodetarget, decodeŷ, decodey
+using IndirectArrays: IndirectArray
 using LearnBase: getobs, nobs
 using FilePathsBase
 using FixedPointNumbers
@@ -23,31 +25,43 @@ import Flux.Optimise: apply!, Optimiser, WeightDecay
 using FluxTraining: Learner, handle
 using FluxTraining.Events
 using JLD2: jldsave, jldopen
+using Markdown
 using MLDataPattern
 using Parameters
+using PrettyTables
 using StaticArrays
 using ShowCases
+using Statistics: mean
 using Test: @testset, @test, @test_nowarn
 
-include("tasks.jl")
 include("plotting.jl")
 include("learner.jl")
 
-# method implementations and helpers
-include("./steps/utils.jl")
-include("./steps/step.jl")
-include("./steps/spatial.jl")
-include("augmentation.jl")
-include("./steps/imagepreprocessing.jl")
-include("./methods/imageclassification.jl")
-include("./methods/imagesegmentation.jl")
-include("./methods/singlekeypointregression.jl")
-include("./methods/checks.jl")
+# Data block API
+include("datablock/block.jl")
+include("datablock/encoding.jl")
+include("datablock/method.jl")
+include("datablock/describe.jl")
+include("datablock/checks.jl")
+include("datablock/wrappers.jl")
+
+# Encodings
+include("encodings/onehot.jl")
+include("encodings/imagepreprocessing.jl")
+include("encodings/projective.jl")
+include("encodings/keypointpreprocessing.jl")
+
+# Training interface
+include("datablock/models.jl")
+include("datablock/loss.jl")
+include("datablock/plot.jl")
+
 
 
 # submodules
 include("datasets/Datasets.jl")
-using .Datasets
+@reexport using .Datasets
+
 
 include("models/Models.jl")
 using .Models
@@ -59,6 +73,7 @@ include("training/utils.jl")
 include("training/onecycle.jl")
 include("training/finetune.jl")
 include("training/lrfind.jl")
+include("training/metrics.jl")
 
 include("serialization.jl")
 
@@ -89,17 +104,32 @@ export
 
     # plotting API
     plotbatch,
+    plotsample,
     plotsamples,
     plotpredictions,
     makebatch,
 
-    # pipeline steps
-    ProjectiveTransforms, ImagePreprocessing, augs_projection, augs_lighting,
+    # blocks
+    Image,
+    Mask,
+    Label,
+    LabelMulti,
+    Keypoints,
 
-    # methods
-    ImageClassification,
-    ImageSegmentation,
-    SingleKeypointRegression,
+    # encodings
+    encode,
+    decode,
+    ProjectiveTransforms,
+    ImagePreprocessing,
+    OneHot,
+    KeypointPreprocessing,
+    Only,
+    Named,
+    augs_projection, augs_lighting,
+
+    BlockMethod,
+    describemethod,
+    checkblock,
 
     # training
     methodlearner,
@@ -110,6 +140,7 @@ export
     lrfind,
     savemethodmodel,
     loadmethodmodel,
+    accuracy_thresh,
 
     gpu,
     plot

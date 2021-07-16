@@ -7,12 +7,22 @@ By default, the only augmentation that will be used in computer vision tasks is 
 {cell=main result=false output=false}
 ```julia
 using FastAI
-using CairoMakie; CairoMakie.activate!(type="png")
+import CairoMakie; CairoMakie.activate!(type="png")
 
-dir = joinpath(datasetpath("dogscats"), "train")
-data = loadtaskdata(dir, ImageClassification)
-classes = Datasets.getclassesclassification(dir)
-method = ImageClassification(classes, (100, 128))
+path = datasetpath("imagenette2-160")
+data = Datasets.loadfolderdata(
+    path,
+    filterfn=isimagefile,
+    loadfn=(loadfile, parentname))
+classes = unique(eachobs(data[2]))
+method = BlockMethod(
+    (Image{2}(), Label(classes)),
+    (
+        ProjectiveTransforms((128, 128)),
+        ImagePreprocessing(),
+        OneHot()
+    )
+)
 xs, ys = FastAI.makebatch(method, data, fill(4, 9))
 FastAI.plotbatch(method, xs, ys)
 ```
@@ -22,7 +32,14 @@ Most learning methods let you pass additional augmentations as keyword arguments
 
 {cell=main}
 ```julia
-method2 = ImageClassification(classes, (100, 128), aug_projection=augs_projection())
+method2 = BlockMethod(
+    (Image{2}(), Label(classes)),
+    (
+        ProjectiveTransforms((128, 128), augmentations=augs_projection()),
+        ImagePreprocessing(),
+        OneHot()
+    )
+)
 xs2, ys2 = FastAI.makebatch(method2, data, fill(4, 9))
 f = FastAI.plotbatch(method2, xs2, ys2)
 ```
@@ -32,13 +49,14 @@ Likewise, there is an [`augs_lighting`](#) helper that adds contrast and brightn
 
 {cell=main}
 ```julia
-method3 = ImageClassification(
-    classes, (100, 128),
-    aug_projection=augs_projection(), aug_image=augs_lighting())
+method3 = BlockMethod(
+    (Image{2}(), Label(classes)),
+    (
+        ProjectiveTransforms((128, 128), augmentations=augs_projection()),
+        ImagePreprocessing(augmentations=augs_lighting()),
+        OneHot()
+    )
+)
 xs3, ys3 = FastAI.makebatch(method3, data, fill(4, 9))
 FastAI.plotbatch(method3, xs3, ys3)
 ```
-
-## Augmentation in custom learning methods
-
-To use projective and image augmentations in custom learning methods for computer vision tasks, see [`ProjectiveTransforms`](#) and [`ImagePreprocessing`](#), two helpers that every vision method in FastAI.jl uses.

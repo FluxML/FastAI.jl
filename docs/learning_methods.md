@@ -1,8 +1,10 @@
-# Learning methods
+# Custom learning methods
 
-*This tutorial explains what learning tasks and methods are and how to create your own.*
+*This tutorial explains the low-level interface behind `BlockMethod`s and how to use it to create your custom learning methods without the data block interface.*
 
-In the [quickstart](quickstart.md) section, you've already seen a learning method in action: [`ImageClassification`](#). The learning method abstraction powers FastAI.jl's high-level interface allowing you to make training models for a task simple. In this tutorial we'll implement our own version of the image classification learning method. You're encouraged to follow along in a REPL or notebook. This tutorial can also serve as a template for implementing a custom learning method for your own project.
+In the [quickstart](quickstart.md) section, you've already seen a learning method in action: [`BlockMethod`](#). The learning method abstraction powers FastAI.jl's high-level interface allowing you to make training models for a task simple. `BlockMethod` is a particularly convenient and composable interface for creating learning methods and should be preferred for most use cases.
+
+However, to get a look behind the scenes, in this tutorial we'll use the lower-level learning method interface to implement our own version of an image classification learning method. You're encouraged to follow along in a REPL or notebook. This tutorial can also serve as a template for implementing a custom learning method for your own project.
 
 A learning method describes how we need to process data so we can train a model for some task. In our case, the task we want to solve is to classify an image. The task defines what kind of data we need, here pairs of images and class labels. That alone, however, isn't enough to train a model since we can't just throw an image in any format into a model and get a class out. Almost always the input data needs to be processed in some way before it is input to a model (we call this **encoding**) and the same goes for the model outputs (we call this **decoding**).
 
@@ -10,48 +12,38 @@ So let's say we have an image and a trained model. How do we make a prediction? 
 
 In essence, the learning method interface allows us to implement these steps and derive useful functionality from it, like training and evaluating models. Later we'll also cover some optional interfaces that allow us to define other parts of a deep learning project.
 
-## Setup
-
-Next to FastAI.jl, you'll need to install
-
-```juliarepl
-] add DataAugmentation DLPipelines Colors
-```
-
 ## Datasets
 
 Before we get started, let's load up a [data container](data_containers.md) that we can test our code on as we go. It's always a good idea to interactively test your code! Since we'll be implementing a method for image classification, the observations in our data container will of course have to be pairs of images and classes. We'll use one of the many image classification datasets available from the fastai dataset repository. I'll use ImageNette, but you can use any of the datasets listed in `FastAI.Datasets.DATASETS_IMAGECLASSIFICATION`. The way the interface is built allows you to easily swap out the dataset you're using.
 
 {cell=main}
 ```julia
-using FastAI
-using FastAI.Datasets
-DATASET = "imagenette2-160"
-data = Datasets.loadtaskdata(Datasets.datasetpath(DATASET), ImageClassification)
-image, class = getobs(data, 1)
-image
+using FastAI, FastAI.DataAugmentation, FastAI.DLPipelines, FastAI.Colors
+data = Datasets.loadfolderdata(
+    datasetpath("imagenette2-160"),
+    filterfn=isimagefile,
+    loadfn=(loadfile, parentname))
 ```
 
 We'll also collect the unique class names:
 
 {cell=main}
 ```julia
-classes = unique([getobs(data.target, i) for i in 1:nobs(data.target)])
+images, targets = data
+classes = unique(eachobs(targets))
 ```
-
-
 
 ## Implementation
 
 ### Learning method struct
 
-Now let's get to it! The first thing we need to do is to create a [`DLPipelines.LearningMethod`](#) struct. The `LearningMethod` `struct` should contain all the configuration needed for encoding and decoding the data. We'll keep it simple here and include a list of the classes and the image dimensions input to the model. The reference implementation [`ImageClassification`](#) of course has many more parameters that can be configured.
+Now let's get to it! The first thing we need to do is to create a [`DLPipelines.LearningMethod`](#) struct. The `LearningMethod` `struct` should contain all the configuration needed for encoding and decoding the data. We'll keep it simple here and include a list of the classes and the image dimensions input to the model.
 
 {cell=main}
 ```julia
 using FastAI: DLPipelines
 
-struct MyImageClassification <: DLPipelines.LearningMethod
+struct ImageClassification <: DLPipelines.LearningMethod
     classes
     size
 end
@@ -59,18 +51,18 @@ end
 
 Now we can create an instance of it, though of course it can't do anything (yet!).
 
-{cell=main, result=false}
+{cell=main, result=true}
 ```julia
-method = MyImageClassification(classes, (128, 128))
+method = ImageClassification(classes, (128, 128))
 ```
 
 ### Encoding and decoding
 
 There are 3 methods we need to define before we can use our learning method to train models and make predictions:
 
-- `DLPipelines.encodeinput` will encode an image so it can be input to a model;
-- `DLPipelines.encodetarget` encodes a class so we can compare it with a model output; and
-- `DLPipelines.decodeŷ` (write `\hat<TAB>` for  ` ̂`) decodes a model output into a class label
+- [`DLPipelines.encode`](#) which encodes an image and a class
+- [`DLPipelines.encodeinput`](#) will encode an image so it can be input to a model
+- [`DLPipelines.decodeŷ`](#) (write `\hat<TAB>` for  ` ̂`) decodes a model output into a class label
 
 Note: These functions always operate on *single* images and classes, even if we want to pass batches to the model later on.
 
@@ -87,8 +79,6 @@ We implement [`encodeinput`](#) using [DataAugmentation.jl](https://github.com/l
 
 {cell=main}
 ```julia
-using DataAugmentation
-using Colors: RGB
 using FastAI: IMAGENET_MEANS, IMAGENET_STDS  # color statistics for normalization
 
 # Helper for crop based on context
@@ -97,7 +87,7 @@ getresizecrop(context::Validation, sz) = CenterResizeCrop(sz)
 getresizecrop(context::Inference, sz) = ResizePadDivisible(sz, 32)
 
 function DLPipelines.encodeinput(
-        method::MyImageClassification,
+        method::ImageClassification,
         context::Context,
         image)
     tfm = DataAugmentation.compose(
@@ -106,7 +96,7 @@ function DLPipelines.encodeinput(
         ImageToTensor(),
         Normalize(IMAGENET_MEANS, IMAGENET_STDS);
     )
-    return apply(tfm, Image(image)) |> itemdata
+    return apply(tfm, DataAugmentation.Image(image)) |> itemdata
 end
 ```
 
@@ -114,6 +104,7 @@ If we test this out on an image, it should give us a 3D array of size `(128, 128
 
 {cell=main}
 ```julia
+sample = image, class = getobs(data, 1)
 x = encodeinput(method, Training(), image)
 summary(x)
 ```
@@ -125,7 +116,7 @@ summary(x)
 {cell=main}
 ```julia
 function DLPipelines.encodetarget(
-        method::MyImageClassification,
+        method::ImageClassification,
         ::Context,
         class)
     idx = findfirst(isequal(class), method.classes)
@@ -133,6 +124,13 @@ function DLPipelines.encodetarget(
     v[idx] = 1.
     return v
 end
+
+DLPipelines.encode(method::ImageClassification, ctx, (input, target)) = (
+    encodeinput(method, ctx, input),
+    encodetarget(method, ctx, target),
+)
+
+
 ```
 
 {cell=main}
@@ -144,7 +142,7 @@ The same goes for the decoding step:
 
 {cell=main}
 ```julia
-function DLPipelines.decodeŷ(method::MyImageClassification, ::Context, ŷ)
+function DLPipelines.decodeŷ(method::ImageClassification, ::Context, ŷ)
     return method.classes[argmax(ŷ)]
 end
 ```
@@ -186,3 +184,37 @@ learner = Learner(model, (traindl, valdl), opt, lossfn)
 ```
 
 From here, you're free to start training using  [`fit!`](#) or [`fitonecycle!`](#).
+
+These methods are also enough to use [`predict`](#) and [`predictbatch`](#) once you've trained a model.
+
+## Additional interfaces
+
+### Training interface
+
+We can implement some additional methods to make our life easier. Specifically, let's implement every method needed to use [`methodlearner`](#):
+
+- [`methodlossfn`](#): return a loss function `lossfn(ys, ys)` comparing a batch of model outputs and encoded targets
+- [`methodmodel`](#): from a backbone, construct a model suitable for the task
+
+Let's start with the loss function. We want to compare two one-hot encoded categorical variables, for which categorical cross entropy is the most commonly used loss function.
+
+{cell=main}
+```
+DLPipelines.methodlossfn(method::ImageClassification) = Flux.Losses.logitcrossentropy
+```
+
+For the model, we'll assume we're getting a convolutional feature extractor passed in as a backbone so its output will be of size (height, width, channels, batch size). [`Flux.outputsize`](#) can be used to calculate the output size of arbitrary models without having to evaluate the model. We'll use it to check the number of output channels of the backbone. Then we add a global pooling layer and some dense layers on top to get a classification output. 
+
+{cell=main}
+```julia
+function DLPipelines.methodmodel(method::ImageClassification, backbone)
+    h, w, outch, b = Flux.outputsize(backbone, (256, 256, inblock.nchannels, 1))
+    head = Chain(
+        AdaptiveMeanPool((1, 1)),
+        Dense(outch, 512),
+        BatchNorm(512),
+        Dense(512, length(method.classes))
+    )
+    return Chain(backbone, head)
+end
+```

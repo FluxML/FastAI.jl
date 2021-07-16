@@ -2,7 +2,14 @@ include("../imports.jl")
 
 
 @testset ExtendedTestSet "SingleKeypointRegression" begin
-    method = SingleKeypointRegression((64, 64))
+    method = BlockMethod(
+        (Image{2}(), FastAI.Keypoints{2}(10)),
+        (
+            ProjectiveTransforms((16, 16), inferencefactor=8),
+            ImagePreprocessing(),
+            KeypointPreprocessing((16, 16)),
+        )
+    )
     DLPipelines.checkmethod_core(method)
     FastAI.checkmethod_plot(method)
 end

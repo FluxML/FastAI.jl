@@ -69,7 +69,7 @@ end
 
 
 function defaultgrouper(model)
-    if !(model isa Chain) && length(model) == 2
+    if !((model isa Chain) && length(model) == 2)
         error(
             "Cannot freeze `learner.model` automatically since it is not a `Chain`.
             Please provide a `ParamGrouper` with the `grouper` keyword argument.

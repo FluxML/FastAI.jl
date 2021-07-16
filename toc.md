@@ -1,16 +1,17 @@
 - [README](README.md)
 - [Setup](docs/setup.md)
-- [Quickstart](docs/quickstart.md)
 - Tutorials
     - [Introduction](docs/introduction.md)
-    - [Data containers](docs/data_containers.md)
-    - [Learning methods](docs/learning_methods.md)
-    - [Saving and loading models](notebooks/serialization.ipynb)
-    - [Presizing vision datasets](tutorials/presizing.ipynb)
-- Learning tasks
-    - [Image classification](docs/methods/imageclassification.md)
-    - [Image segmentation](notebooks/imagesegmentation.ipynb)
-    - [Keypoint regression](notebooks/keypointregression.ipynb)
+    - [Quickstart](notebooks/quickstart.ipynb)
+    - Vision
+        - [Image segmentation](notebooks/imagesegmentation.ipynb)
+        - [Keypoint regression](notebooks/keypointregression.ipynb)
+    - Intermediate
+        - [Data containers](docs/data_containers.md)
+        - [Saving and loading models](notebooks/serialization.ipynb)
+    - Advanced
+        - [Presizing vision datasets](notebooks/presizing.ipynb)
+        - [Custom Learning methods](docs/learning_methods.md)
 - How To
     - [Train a model from scratch](notebooks/fitonecycle.ipynb)
     - [Finetune a pretrained model](notebooks/finetune.ipynb)
@@ -20,8 +21,9 @@
     - [Log to TensorBoard](docs/howto/logtensorboard.md)
 - Reference
     - [Docstrings](REFERENCE)
-    - [Interfaces](docs/interfaces.md)
+    - [fastai API comparison](docs/fastai_api_comparison.md)
     - [API](docs/api.md)
+    - [Extension APIs](docs/interfaces.md)
     - [Glossary](docs/glossary.md)
 - Background
     - [Performant data pipelines](docs/background/datapipelines.md)

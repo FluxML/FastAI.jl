@@ -33,8 +33,8 @@ callbacks = [
     Metrics(accuracy)
 ]
 
-data = Datasets.loadtaskdata(Datasets.datasetpath("imagenette2-160"), ImageClassification)
-method = ImageClassification(Datasets.getclassesclassification("imagenette2-160"), (160, 160))
+data = ...
+method = ...
 learner = methodlearner(method, data, Models.xresnet18(), callbacks...)
 fitonecycle!(learner, 5)
 ```

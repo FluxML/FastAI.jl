@@ -16,10 +16,11 @@ module Datasets
 using ..FastAI
 
 using DataDeps
+using Glob
 using FilePathsBase
 using FilePathsBase: filename
 import FileIO
-using FileTrees
+using IndirectArrays: IndirectArray
 using MLDataPattern
 using MLDataPattern: splitobs
 import LearnBase
@@ -28,6 +29,7 @@ using FixedPointNumbers
 using DataFrames
 using Tables
 using CSV
+using ShowCases
 
 include("fastaidatasets.jl")
 
@@ -50,6 +52,7 @@ export
     filterobs,
     groupobs,
     joinobs,
+    eachobs,
 
     # primitive containers
     FileDataset,
@@ -57,12 +60,17 @@ export
 
     # utilities
     isimagefile,
+    matches,
     loadfile,
-    filename,
+    loadmask,
+    pathname,
+    pathparent,
+    parentname,
+    grandparentname,
 
     # datasets
     DATASETS,
-    loadtaskdata,
+    loadfolderdata,
     datasetpath
 
 end  # module
