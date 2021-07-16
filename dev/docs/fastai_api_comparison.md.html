@@ -9,36 +9,28 @@ method = BlockMethod(
     )
 )
 describemethod(method)
-</code></pre><div class=coderesult >\paragraph{\texttt{LearningMethod} summary}
-\begin{itemize}
-\item Task: \texttt{FastAI.Image\{2\} -> Mask\{2, String\}}
+</code></pre><div class=coderesult >#### `LearningMethod` summary
 
+  * Task: `FastAI.Image{2} -> Mask{2, String}`
+  * Model blocks: `FastAI.ImageTensor{2} -> FastAI.OneHotTensor{2, String}`
 
-\item Model blocks: \texttt{FastAI.ImageTensor\{2\} -> FastAI.OneHotTensor\{2, String\}}
+Encoding a sample (`encode(method, context, sample)`)
 
-\end{itemize}
-Encoding a sample (\texttt{encode(method, context, sample)})
+|               Encoding |              Name |          `method.blocks[1]` |                   `method.blocks[2]` |
+| ----------------------:| -----------------:| ---------------------------:| ------------------------------------:|
+|                        | `(input, target)` |           `FastAI.Image{2}` |                    `Mask{2, String}` |
+| `ProjectiveTransforms` |                   |       **`FastAI.Image{2}`** |                **`Mask{2, String}`** |
+|   `ImagePreprocessing` |                   | **`FastAI.ImageTensor{2}`** |                    `Mask{2, String}` |
+|               `OneHot` |          `(x, y)` |     `FastAI.ImageTensor{2}` | **`FastAI.OneHotTensor{2, String}`** |
 
-\begin{tabular}
-{r | r | r | r}
-Encoding & Name & \texttt{method.blocks[1]} & \texttt{method.blocks[2]} \\
-\hline
- & \texttt{(input, target)} & \texttt{FastAI.Image\{2\}} & \texttt{Mask\{2, String\}} \\
-\texttt{ProjectiveTransforms} &  & \textbf{\texttt{FastAI.Image\{2\}}} & \textbf{\texttt{Mask\{2, String\}}} \\
-\texttt{ImagePreprocessing} &  & \textbf{\texttt{FastAI.ImageTensor\{2\}}} & \texttt{Mask\{2, String\}} \\
-\texttt{OneHot} & \texttt{(x, y)} & \texttt{FastAI.ImageTensor\{2\}} & \textbf{\texttt{FastAI.OneHotTensor\{2, String\}}} \\
-\end{tabular}
-Decoding a model output (\texttt{decode(method, context, ŷ)})
+Decoding a model output (`decode(method, context, ŷ)`)
 
-\begin{tabular}
-{r | r | r}
-Decoding & Name & \texttt{method.outputblock} \\
-\hline
- & \texttt{ŷ} & \texttt{FastAI.OneHotTensor\{2, String\}} \\
-\texttt{OneHot} &  & \textbf{\texttt{Mask\{2, String\}}} \\
-\texttt{ImagePreprocessing} &  & \texttt{Mask\{2, String\}} \\
-\texttt{ProjectiveTransforms} & \texttt{target\_pred} & \texttt{Mask\{2, String\}} \\
-\end{tabular}
+|               Decoding |          Name |             `method.outputblock` |
+| ----------------------:| -------------:| --------------------------------:|
+|                        |          `ŷ` | `FastAI.OneHotTensor{2, String}` |
+|               `OneHot` |               |            **`Mask{2, String}`** |
+|   `ImagePreprocessing` |               |                `Mask{2, String}` |
+| `ProjectiveTransforms` | `target_pred` |                `Mask{2, String}` |
 </div></div><p>From this short definition, many things can be derived:</p><ul><li><p>data encoding</p></li><li><p>model output decoding</p></li><li><p>how to create a model from a backbone</p></li><li><p>the loss function to use</p></li><li><p>how to visualize samples and predictions</p></li></ul><p>Together with a <a href=./data_container.html title= >data container</a> <code>data</code>, we can quickly create a <code>Learner</code> using <a href=../REFERENCE/FastAI.methodlearner.html ><code>methodlearner</code></a> which, like in fastai, handles the training for us. There are no application-specific <code>Learner</code> constructors like <code>cnn_learner</code> or <code>unet_learner</code> in FastAI.jl.</p><pre lang=julia ><code>learner = methodlearner(method, data)
 </code></pre><p>High-level training protocols like the <a href=../notebooks/fitonecycle.ipynb.html title= >one-cycle learning rate schedule</a>, <a href=../notebooks/finetune.ipynb.html title= >fine-tuning</a> and the <a href=../notebooks/lrfind.ipynb.html title= >learning rate finder</a> are then available to us:</p><pre lang=julia ><code>fit!(learner, 10)                  # Basic training for 10 epochs
 finetune!(learner, 5, 1e-3)        # Finetuning regimen for 1+5 epochs with lr=1e-3

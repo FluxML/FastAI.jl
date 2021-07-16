@@ -71,36 +71,28 @@ validdl = DataLoader(validdata, 32)
         ImagePreprocessing(buffered=false),
         OneHot(),
     )
-)</code></pre><pre class=coderesult ><code>BlockMethod(Tuple{Image{2}, Image{2}} -> Label{Bool})</code></pre><p>We can get a better understanding of the representations the data goes through using <a href=../REFERENCE/FastAI.describemethod.html ><code>describemethod</code></a>:</p><pre lang=julia ><code>describemethod(method)</code></pre><div class=coderesult >\paragraph{\texttt{LearningMethod} summary}
-\begin{itemize}
-\item Task: \texttt{Tuple\{Image\{2\}, Image\{2\}\} -> Label\{Bool\}}
+)</code></pre><pre class=coderesult ><code>BlockMethod(Tuple{Image{2}, Image{2}} -> Label{Bool})</code></pre><p>We can get a better understanding of the representations the data goes through using <a href=../REFERENCE/FastAI.describemethod.html ><code>describemethod</code></a>:</p><pre lang=julia ><code>describemethod(method)</code></pre><div class=coderesult >#### `LearningMethod` summary
 
+  * Task: `Tuple{Image{2}, Image{2}} -> Label{Bool}`
+  * Model blocks: `Tuple{FastAI.ImageTensor{2}, FastAI.ImageTensor{2}} -> FastAI.OneHotTensor{0, Bool}`
 
-\item Model blocks: \texttt{Tuple\{FastAI.ImageTensor\{2\}, FastAI.ImageTensor\{2\}\} -> FastAI.OneHotTensor\{0, Bool\}}
+Encoding a sample (`encode(method, context, sample)`)
 
-\end{itemize}
-Encoding a sample (\texttt{encode(method, context, sample)})
+|               Encoding |              Name |                                       `method.blocks[1]` |                 `method.blocks[2]` |
+| ----------------------:| -----------------:| --------------------------------------------------------:| ----------------------------------:|
+|                        | `(input, target)` |                                   `Image{2}`, `Image{2}` |                      `Label{Bool}` |
+| `ProjectiveTransforms` |                   |                           **`Image{2}`**, **`Image{2}`** |                      `Label{Bool}` |
+|   `ImagePreprocessing` |                   | **`FastAI.ImageTensor{2}`**, **`FastAI.ImageTensor{2}`** |                      `Label{Bool}` |
+|               `OneHot` |          `(x, y)` |         `FastAI.ImageTensor{2}`, `FastAI.ImageTensor{2}` | **`FastAI.OneHotTensor{0, Bool}`** |
 
-\begin{tabular}
-{r | r | r | r}
-Encoding & Name & \texttt{method.blocks[1]} & \texttt{method.blocks[2]} \\
-\hline
- & \texttt{(input, target)} & \texttt{Image\{2\}}, \texttt{Image\{2\}} & \texttt{Label\{Bool\}} \\
-\texttt{ProjectiveTransforms} &  & \textbf{\texttt{Image\{2\}}}, \textbf{\texttt{Image\{2\}}} & \texttt{Label\{Bool\}} \\
-\texttt{ImagePreprocessing} &  & \textbf{\texttt{FastAI.ImageTensor\{2\}}}, \textbf{\texttt{FastAI.ImageTensor\{2\}}} & \texttt{Label\{Bool\}} \\
-\texttt{OneHot} & \texttt{(x, y)} & \texttt{FastAI.ImageTensor\{2\}}, \texttt{FastAI.ImageTensor\{2\}} & \textbf{\texttt{FastAI.OneHotTensor\{0, Bool\}}} \\
-\end{tabular}
-Decoding a model output (\texttt{decode(method, context, ŷ)})
+Decoding a model output (`decode(method, context, ŷ)`)
 
-\begin{tabular}
-{r | r | r}
-Decoding & Name & \texttt{method.outputblock} \\
-\hline
- & \texttt{ŷ} & \texttt{FastAI.OneHotTensor\{0, Bool\}} \\
-\texttt{OneHot} &  & \textbf{\texttt{Label\{Bool\}}} \\
-\texttt{ImagePreprocessing} &  & \texttt{Label\{Bool\}} \\
-\texttt{ProjectiveTransforms} & \texttt{target\_pred} & \texttt{Label\{Bool\}} \\
-\end{tabular}
+|               Decoding |          Name |           `method.outputblock` |
+| ----------------------:| -------------:| ------------------------------:|
+|                        |          `ŷ` | `FastAI.OneHotTensor{0, Bool}` |
+|               `OneHot` |               |              **`Label{Bool}`** |
+|   `ImagePreprocessing` |               |                  `Label{Bool}` |
+| `ProjectiveTransforms` | `target_pred` |                  `Label{Bool}` |
 </div><p>We can reuse all the code above for creating the data container, we just omit the preprocessing function. <code>methoddataloaders</code> constructs training and validation data loaders from data containers by mapping the method encoding over the data containers:</p><pre lang=julia ><code>traindata = siamesedata(trainfiles, valid = true)
 validdata = siamesedata(validfiles; valid = true);
 traindl, valdl = methoddataloaders(traindata, validdata, method, 32)</code></pre><pre class=coderesult ><code>(eachobsparallel(batchviewcollated() with 185 batches of size 32), eachobsparallel(batchviewcollated() with 24 batches of size 64))</code></pre><p>The above is equivalent to lazily mapping the encoding over the data containers and creating a <code>DataLoader</code> from them.</p><pre lang=julia ><code>

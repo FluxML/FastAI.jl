@@ -73,18 +73,7 @@ fitonecycle!(learner, 5)</code></pre><pre class=codeoutput ><code><span class="s
 └─────────────────┴───────┴─────────┴──────────┘
 </code></pre><h4 id=multi-label-classification >Multi-label classification</h4><p>We can also classify images in a multi-label setting, meaning there are multiple valid labels. We’ll use the Pascal dataset which has multiple labels for every image stored in a .csv file.</p><pre lang=julia ><code>path = datasetpath(&quot;pascal_2007&quot;)
 df = loadfile(joinpath(path, &quot;train.csv&quot;))
-first(df, 5)</code></pre><div class=coderesult >\begin{tabular}{r|ccc}
-	& fname & labels & is\_valid\\
-	\hline
-	& String & String & Bool\\
-	\hline
-	1 & 000005.jpg & chair & 1 \\
-	2 & 000007.jpg & car & 1 \\
-	3 & 000009.jpg & horse person & 1 \\
-	4 & 000012.jpg & car & 0 \\
-	5 & 000016.jpg & bicycle & 1 \\
-\end{tabular}
-</div><pre lang=julia ><code>data = (
+first(df, 5)</code></pre><div class=coderesult ><div class="data-frame"><p>5 rows × 3 columns</p><table class="data-frame"><thead><tr><th></th><th>fname</th><th>labels</th><th>is_valid</th></tr><tr><th></th><th title="String">String</th><th title="String">String</th><th title="Bool">Bool</th></tr></thead><tbody><tr><th>1</th><td>000005.jpg</td><td>chair</td><td>1</td></tr><tr><th>2</th><td>000007.jpg</td><td>car</td><td>1</td></tr><tr><th>3</th><td>000009.jpg</td><td>horse person</td><td>1</td></tr><tr><th>4</th><td>000012.jpg</td><td>car</td><td>0</td></tr><tr><th>5</th><td>000016.jpg</td><td>bicycle</td><td>1</td></tr></tbody></table></div></div><pre lang=julia ><code>data = (
     mapobs(f -&gt; loadfile(joinpath(path, &quot;train&quot;, f)), df.fname),  # images
     map(labelstr -&gt; split(labelstr, &#39; &#39;), df.labels),              # labels
 )
