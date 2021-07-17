@@ -12,10 +12,13 @@ or a sequence of these transformations.
 
 struct TabularTransforms <: PipelineStep
     tfms
+    columns
 end
 
 function run(tt::TabularTransforms, _, sample)
-    DataAugmentation.apply(tt.tfms, sample)
+    tempinp = (; zip(tt.columns, collect(sample))...)
+    item = DataAugmentation.TabularItem(tempinp, tt.columns)
+    DataAugmentation.apply(tt.tfms, item).data
 end
 
 """

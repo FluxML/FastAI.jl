@@ -48,14 +48,12 @@ end
 # Core Interface
 
 function DLPipelines.encode(method::TabularRegression, context, input)
-    tempinp = (; zip(method.columns, collect(input))...)
-    item = DataAugmentation.TabularItem(tempinp, method.columns)
-    tfminp = run(method.tfms, context, item)
+    tfminp = run(method.tfms, context, input)
     x = (
-            [Int32(tfminp.data[col]) for col in method.catcols], 
-            [tfminp.data[col] for col in method.contcols]
+            [Int32(tfminp[col]) for col in method.catcols], 
+            [tfminp[col] for col in method.contcols]
     )
-    y = [tfminp.data[col] for col in method.targetcols]
+    y = [tfminp[col] for col in method.targetcols]
     (x, y)
 end
 
