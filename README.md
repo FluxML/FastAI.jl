@@ -22,7 +22,7 @@ method = BlockMethod(
         OneHot()
     )
 )
-learner = methodlearner(method, data)
+learner = methodlearner(method, data, Models.xresnet18())
 fitonecycle!(learner, 10)
 ```
 
