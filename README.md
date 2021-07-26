@@ -22,7 +22,7 @@ method = BlockMethod(
         OneHot()
     )
 )
-learner = methodlearner(method, data, Models.xresnet18())
+learner = methodlearner(method, data, Models.xresnet18(), ToGPU(), Metrics(accuracy))
 fitonecycle!(learner, 10)
 ```
 
