@@ -157,8 +157,3 @@ getobs(jdata, 15) == 15
 ```
 """
 joinobs(datas...) = JoinedData(datas)
-
-
-function collectobs(data, parallel=false)
-    collect()
-end

@@ -1,8 +1,6 @@
 # Setup
 
-FastAI.jl is a **Julia** package. You can download Julia from the [official website](http://localhost:8000/docs/setup.md.html).
-
-**FastAI.jl** is not registered yet, but you can try it out by installing it manually. You should be able to install FastAI.jl using the REPL as follows (The package mode in the REPL can be entered by typing `]`).
+FastAI.jl is a **Julia** package. You can download Julia from the [official website](http://localhost:8000/docs/setup.md.html). You can install FastAI.jl like any other Julia package using the REPL as follows (The package mode in the REPL can be entered by typing `]`).
 
 ```julia
 pkg> add https://github.com/FluxML/FastAI.jl
@@ -13,6 +11,8 @@ pkg> add https://github.com/FluxML/FastAI.jl
 ```julia
 pkg> add CairoMakie
 ```
+
+**Colab** If you don't have access to a GPU or want to try out FastAI.jl without installing Julia, try out [this FastAI.jl Colab notebook](https://colab.research.google.com/gist/lorenzoh/2fdc91f9e42a15e633861c640c68e5e8). We're working on adding a "Launch Colab" button to every documentation page based off a notebook file, but for now you can copy the code over manually.
 
 **Pretrained models** To use pretrained vision models, you currently have to install a WIP branch of Metalhead.jl:
 

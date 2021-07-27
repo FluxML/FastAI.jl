@@ -12,16 +12,6 @@ defaultfigure(;kwargs...) = Figure(
 Plot a `sample` of a `method`.
 
 Learning methods should implement [`plotsample!`](#) to make this work.
-
-## Examples
-
-```julia
-using FastAI, Colors
-
-sample = (rand(Gray, 28, 28), 1)
-method = ImageClassification(1:10, (16, 16))
-plotsample(method, sample)
-```
 """
 function plotsample(method, sample; figkwargs...)
     f = defaultfigure(; figkwargs...)
@@ -40,7 +30,10 @@ Part of the plotting interface for learning methods.
 function plotsample! end
 
 """
-    plotxy(method, (x, y))
+    plotxy(method, x, y)
+
+Plot a single pair of encoded input `x` and encoded target `y`.
+Requires [`plotxy!`](#) to be implemented.
 """
 function plotxy(method, x, y; figkwargs...)
     f = defaultfigure(; figkwargs...)

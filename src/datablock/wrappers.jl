@@ -1,5 +1,8 @@
 abstract type WrapperBlock <: Block end
 
+wrapped(w::WrapperBlock) = w.block
+mockblock(w::WrapperBlock) = mockblock(wrapped(w))
+checkblock(w::WrapperBlock, data) = checkblock(wrapped(w), data)
 
 # If not overwritten, encodings are applied to the wrapped block
 function encode(enc::Encoding, ctx, wrapper::WrapperBlock, data; kwargs...)
@@ -21,17 +24,15 @@ struct Named{Name, B<:Block} <: WrapperBlock
 end
 Named(name::Symbol, block::B) where {B<:Block} = Named{name, B}(block)
 
-mockblock(named::Named) = mockblock(named.block)
-checkblock(named::Named, data) = checkblock(named.block, data)
 
 # the name is preserved through encodings and decodings
 function encodedblock(enc::Encoding, named::Named{Name}) where Name
-    outblock = encodedblock(enc, named.block)
+    outblock = encodedblock(enc, wrapped(named))
     return isnothing(outblock) ? nothing : Named(Name, outblock)
 end
 
 function decodedblock(enc::Encoding, named::Named{Name}) where Name
-    outblock = decodedblock(enc, named.block)
+    outblock = decodedblock(enc, wrapped(named))
     return isnothing(outblock) ? nothing : Named(Name, outblock)
 end
 

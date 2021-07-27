@@ -25,7 +25,7 @@ function fitonecycle!(
         maxlr;
         kwargs...))
 
-    wdoptim = wd > 0 ? decay_optim(learner.optimizer) : learner.optimizer
+    wdoptim = wd > 0 ? decay_optim(learner.optimizer, wd) : learner.optimizer
     withfields(learner, optimizer=wdoptim) do
         withcallbacks(learner, scheduler) do
             fit!(learner, nepochs, dataiters)
