@@ -112,7 +112,8 @@ function plotprediction!(f, method::BlockMethod, x, ŷ, y)
 end
 
 function plotprediction!(
-        f, ::Tuple{NDContext{2}, TextContext, TextContext},
+        f,
+        ::Tuple{NDContext{2}, TextContext, TextContext},
         blocks,
         datas)
 
@@ -128,8 +129,8 @@ end
 function plotprediction!(
         f,
         ::Tuple{NDContext{2}, NDOverlayContext{2}, NDOverlayContext{2}},
-        blocks::NTuple{3},
-        datas::NTuple{3})
+        blocks,
+        datas)
 
     # image with title showing ground truth and prediction
     ax1 = f[1, 1] = imageaxis(f)
