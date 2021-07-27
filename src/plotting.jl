@@ -30,7 +30,10 @@ Part of the plotting interface for learning methods.
 function plotsample! end
 
 """
-    plotxy(method, (x, y))
+    plotxy(method, x, y)
+
+Plot a single pair of encoded input `x` and encoded target `y`.
+Requires [`plotxy!`](#) to be implemented.
 """
 function plotxy(method, x, y; figkwargs...)
     f = defaultfigure(; figkwargs...)
