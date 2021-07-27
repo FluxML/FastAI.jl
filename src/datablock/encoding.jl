@@ -81,11 +81,11 @@ function encode(encoding::Encoding, context, blocks::Tuple, datas::Tuple)
 end
 
 # Named tuples of data are handled like tuples, but the keys are preserved
-function encode(encoding::Encoding, context, blocks::Union{Tuple, NamedTuple}, datas::NamedTuple)
+function encode(encoding::Encoding, context, blocks::NamedTuple, datas::NamedTuple)
     @assert length(blocks) == length(datas)
     return NamedTuple(zip(
         keys(datas),
-        encode(encoding, context, blocks, values(datas))
+        encode(encoding, context, values(blocks), values(datas))
     ))
 end
 
@@ -114,11 +114,11 @@ function decode(encoding::Encoding, context, blocks::Tuple, datas::Tuple)
 end
 
 # Named tuples of data are handled like tuples, but the keys are preserved
-function decode(encoding::Encoding, context, blocks::Union{Tuple, NamedTuple}, datas::NamedTuple)
+function decode(encoding::Encoding, context, blocks::NamedTuple, datas::NamedTuple)
     @assert length(blocks) == length(datas)
     return NamedTuple(zip(
         keys(datas),
-        decode(encoding, context, blocks, values(datas))
+        decode(encoding, context, values(blocks), values(datas))
     ))
 end
 
