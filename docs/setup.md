@@ -1,9 +1,10 @@
 # Setup
 
-FastAI.jl is a **Julia** package. You can download Julia from the [official website](http://localhost:8000/docs/setup.md.html). You can install FastAI.jl like any other Julia package using the REPL as follows (The package mode in the REPL can be entered by typing `]`).
+FastAI.jl is a **Julia** package. You can download Julia from the [official website](http://localhost:8000/docs/setup.md.html). You can install FastAI.jl like any other Julia package using the REPL as follows.
 
 ```julia
-pkg> add https://github.com/FluxML/FastAI.jl
+using Pkg
+Pkg.add(Pkg.PackageSpec(url="https://github.com/FluxML/FastAI.jl"))
 ```
 
 **Plotting** FastAI.jl also defines [Makie.jl](https://github.com/JuliaPlots/Makie.jl) plotting recipes to visualize data. If you want to use them, you'll have to install and one of the Makie.jl backends [CairoMakie.jl](https://github.com/JuliaPlots/CairoMakie.jl), [GLMakie.jl](https://github.com/JuliaPlots/GLMakie.jl) or [WGLMakie.jl](https://github.com/JuliaPlots/WGLMakie.jl). For example:

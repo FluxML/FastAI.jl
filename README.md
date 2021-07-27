@@ -4,7 +4,19 @@
 
 FastAI.jl is inspired by [fastai](https://github.com/fastai/fastai), and is a repository of best practices for deep learning in Julia. Its goal is to easily enable creating state-of-the-art models. FastAI enables the design, training, and delivery of deep learning models that compete with the best in class, using few lines of code.
 
-As an example, training an image classification model from scratch is as simple as
+Install with
+
+```julia
+using Pkg
+Pkg.add(Pkg.PackageSpec(url="https://github.com/FluxML/FastAI.jl"))
+```
+
+or try it out with this [Google Colab template](https://colab.research.google.com/gist/lorenzoh/2fdc91f9e42a15e633861c640c68e5e8).
+
+
+## Example
+
+Training an image classification model:
 
 ```julia
 using FastAI
