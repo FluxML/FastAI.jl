@@ -452,16 +452,21 @@ article ul.tight li p {
     display: none;
 }
 
-@media (max-width: 46rem) {
+@media screen and (max-width: 767px) {
     .container {
         display: block;
+    }
+    .doctree {
+        overflow-y: scroll;
+        max-height: 500px;
+        width: 100%;
     }
     .book-toc .book-toc-content {
         display: none;
     }
 }
 
-@media (min-width: 46rem) {
+@media (min-width: 767px) {
     .doctree {
         opacity: 60%;
     }
