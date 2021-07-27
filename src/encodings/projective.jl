@@ -135,6 +135,7 @@ function blockitemtype(block::Mask{N}, n::Int) where N
     end
 end
 blockitemtype(block::Keypoints{N}, n::Int) where N = N == n ? DataAugmentation.Keypoints : nothing
+blockitemtype(block::WrapperBlock, n::Int) = blockitemtype(wrapped(block), n)
 
 
 """
@@ -152,6 +153,7 @@ end
 
 grabbounds(block::Image{N}, a, n) where N = N == n ? DataAugmentation.Bounds(size(a)) : nothing
 grabbounds(block::Mask{N}, a, n) where N = N == n ? DataAugmentation.Bounds(size(a)) : nothing
+grabbounds(block::WrapperBlock, a, n) = grabbounds(wrapped(block), a, n)
 
 
 function getsamplebounds(blocks, datas, N)
