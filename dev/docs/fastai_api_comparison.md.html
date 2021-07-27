@@ -9,29 +9,18 @@ method = BlockMethod(
     )
 )
 describemethod(method)
-</code></pre><div class=coderesult >#### `LearningMethod` summary
-
-  * Task: `FastAI.Image{2} -> Mask{2, String}`
-  * Model blocks: `FastAI.ImageTensor{2} -> FastAI.OneHotTensor{2, String}`
-
-Encoding a sample (`encode(method, context, sample)`)
-
-|               Encoding |              Name |          `method.blocks[1]` |                   `method.blocks[2]` |
-| ----------------------:| -----------------:| ---------------------------:| ------------------------------------:|
-|                        | `(input, target)` |           `FastAI.Image{2}` |                    `Mask{2, String}` |
-| `ProjectiveTransforms` |                   |       **`FastAI.Image{2}`** |                **`Mask{2, String}`** |
-|   `ImagePreprocessing` |                   | **`FastAI.ImageTensor{2}`** |                    `Mask{2, String}` |
-|               `OneHot` |          `(x, y)` |     `FastAI.ImageTensor{2}` | **`FastAI.OneHotTensor{2, String}`** |
-
-Decoding a model output (`decode(method, context, ŷ)`)
-
-|               Decoding |          Name |             `method.outputblock` |
-| ----------------------:| -------------:| --------------------------------:|
-|                        |          `ŷ` | `FastAI.OneHotTensor{2, String}` |
-|               `OneHot` |               |            **`Mask{2, String}`** |
-|   `ImagePreprocessing` |               |                `Mask{2, String}` |
-| `ProjectiveTransforms` | `target_pred` |                `Mask{2, String}` |
-</div></div><p>From this short definition, many things can be derived:</p><ul><li><p>data encoding</p></li><li><p>model output decoding</p></li><li><p>how to create a model from a backbone</p></li><li><p>the loss function to use</p></li><li><p>how to visualize samples and predictions</p></li></ul><p>Together with a <a href=./data_container.html title= >data container</a> <code>data</code>, we can quickly create a <code>Learner</code> using <a href=../REFERENCE/FastAI.methodlearner.html ><code>methodlearner</code></a> which, like in fastai, handles the training for us. There are no application-specific <code>Learner</code> constructors like <code>cnn_learner</code> or <code>unet_learner</code> in FastAI.jl.</p><pre lang=julia ><code>learner = methodlearner(method, data)
+</code></pre><div class=coderesult ><div class="markdown"><h4><code>LearningMethod</code> summary</h4>
+<ul>
+<li><p>Task: <code>FastAI.Image&#123;2&#125; -&gt; Mask&#123;2, String&#125;</code></p>
+</li>
+<li><p>Model blocks: <code>FastAI.ImageTensor&#123;2&#125; -&gt; FastAI.OneHotTensor&#123;2, String&#125;</code></p>
+</li>
+</ul>
+<p>Encoding a sample &#40;<code>encode&#40;method, context, sample&#41;</code>&#41;</p>
+<table><tr><th align="right">Encoding</th><th align="right">Name</th><th align="right"><code>method.blocks&#91;1&#93;</code></th><th align="right"><code>method.blocks&#91;2&#93;</code></th></tr><tr><td align="right"></td><td align="right"><code>&#40;input, target&#41;</code></td><td align="right"><code>FastAI.Image&#123;2&#125;</code></td><td align="right"><code>Mask&#123;2, String&#125;</code></td></tr><tr><td align="right"><code>ProjectiveTransforms</code></td><td align="right"></td><td align="right"><strong><code>FastAI.Image&#123;2&#125;</code></strong></td><td align="right"><strong><code>Mask&#123;2, String&#125;</code></strong></td></tr><tr><td align="right"><code>ImagePreprocessing</code></td><td align="right"></td><td align="right"><strong><code>FastAI.ImageTensor&#123;2&#125;</code></strong></td><td align="right"><code>Mask&#123;2, String&#125;</code></td></tr><tr><td align="right"><code>OneHot</code></td><td align="right"><code>&#40;x, y&#41;</code></td><td align="right"><code>FastAI.ImageTensor&#123;2&#125;</code></td><td align="right"><strong><code>FastAI.OneHotTensor&#123;2, String&#125;</code></strong></td></tr></table>
+<p>Decoding a model output &#40;<code>decode&#40;method, context, ŷ&#41;</code>&#41;</p>
+<table><tr><th align="right">Decoding</th><th align="right">Name</th><th align="right"><code>method.outputblock</code></th></tr><tr><td align="right"></td><td align="right"><code>ŷ</code></td><td align="right"><code>FastAI.OneHotTensor&#123;2, String&#125;</code></td></tr><tr><td align="right"><code>OneHot</code></td><td align="right"></td><td align="right"><strong><code>Mask&#123;2, String&#125;</code></strong></td></tr><tr><td align="right"><code>ImagePreprocessing</code></td><td align="right"></td><td align="right"><code>Mask&#123;2, String&#125;</code></td></tr><tr><td align="right"><code>ProjectiveTransforms</code></td><td align="right"><code>target_pred</code></td><td align="right"><code>Mask&#123;2, String&#125;</code></td></tr></table>
+</div></div></div><p>From this short definition, many things can be derived:</p><ul><li><p>data encoding</p></li><li><p>model output decoding</p></li><li><p>how to create a model from a backbone</p></li><li><p>the loss function to use</p></li><li><p>how to visualize samples and predictions</p></li></ul><p>Together with a <a href=./data_container.html title= >data container</a> <code>data</code>, we can quickly create a <code>Learner</code> using <a href=../REFERENCE/FastAI.methodlearner.html ><code>methodlearner</code></a> which, like in fastai, handles the training for us. There are no application-specific <code>Learner</code> constructors like <code>cnn_learner</code> or <code>unet_learner</code> in FastAI.jl.</p><pre lang=julia ><code>learner = methodlearner(method, data)
 </code></pre><p>High-level training protocols like the <a href=../notebooks/fitonecycle.ipynb.html title= >one-cycle learning rate schedule</a>, <a href=../notebooks/finetune.ipynb.html title= >fine-tuning</a> and the <a href=../notebooks/lrfind.ipynb.html title= >learning rate finder</a> are then available to us:</p><pre lang=julia ><code>fit!(learner, 10)                  # Basic training for 10 epochs
 finetune!(learner, 5, 1e-3)        # Finetuning regimen for 1+5 epochs with lr=1e-3
 fitonecycle!(learner, 10)          # One-cycle learning rate regimen

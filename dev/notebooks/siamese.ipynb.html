@@ -71,29 +71,31 @@ validdl = DataLoader(validdata, 32)
         ImagePreprocessing(buffered=false),
         OneHot(),
     )
-)</code></pre><pre class=coderesult ><code>BlockMethod(Tuple{Image{2}, Image{2}} -> Label{Bool})</code></pre><p>We can get a better understanding of the representations the data goes through using <a href=../REFERENCE/FastAI.describemethod.html ><code>describemethod</code></a>:</p><pre lang=julia ><code>describemethod(method)</code></pre><div class=coderesult >#### `LearningMethod` summary
+)</code></pre><pre class=coderesult ><code>BlockMethod(Tuple{Image{2}, Image{2}} -> Label{Bool})</code></pre><p>We can get a better understanding of the representations the data goes through using <a href=../REFERENCE/FastAI.describemethod.html ><code>describemethod</code></a>:</p><pre lang=julia ><code>describemethod(method)</code></pre><pre class=coderesult ><code>[1m  [36mLearningMethod[39m summary[22m
+[1m  ------------------------[22m
 
-  * Task: `Tuple{Image{2}, Image{2}} -> Label{Bool}`
-  * Model blocks: `Tuple{FastAI.ImageTensor{2}, FastAI.ImageTensor{2}} -> FastAI.OneHotTensor{0, Bool}`
+    •  Task: [36mTuple{Image{2}, Image{2}} -> Label{Bool}[39m
 
-Encoding a sample (`encode(method, context, sample)`)
+    •  Model blocks: [36mTuple{FastAI.ImageTensor{2}, FastAI.ImageTensor{2}} ->
+       FastAI.OneHotTensor{0, Bool}[39m
 
-|               Encoding |              Name |                                       `method.blocks[1]` |                 `method.blocks[2]` |
-| ----------------------:| -----------------:| --------------------------------------------------------:| ----------------------------------:|
-|                        | `(input, target)` |                                   `Image{2}`, `Image{2}` |                      `Label{Bool}` |
-| `ProjectiveTransforms` |                   |                           **`Image{2}`**, **`Image{2}`** |                      `Label{Bool}` |
-|   `ImagePreprocessing` |                   | **`FastAI.ImageTensor{2}`**, **`FastAI.ImageTensor{2}`** |                      `Label{Bool}` |
-|               `OneHot` |          `(x, y)` |         `FastAI.ImageTensor{2}`, `FastAI.ImageTensor{2}` | **`FastAI.OneHotTensor{0, Bool}`** |
+  Encoding a sample ([36mencode(method, context, sample)[39m)
 
-Decoding a model output (`decode(method, context, ŷ)`)
+              Encoding            Name                             [36mmethod.blocks[1][39m             [36mmethod.blocks[2][39m
+  –––––––––––––––––––– ––––––––––––––– –––––––––––––––––––––––––––––––––––––––––––– ––––––––––––––––––––––––––––
+                       [36m(input, target)[39m                           [36mImage{2}[39m, [36mImage{2}[39m                  [36mLabel{Bool}[39m
+  [36mProjectiveTransforms[39m                                           [1m[36mImage{2}[39m[22m, [1m[36mImage{2}[39m[22m                  [36mLabel{Bool}[39m
+    [36mImagePreprocessing[39m                 [1m[36mFastAI.ImageTensor{2}[39m[22m, [1m[36mFastAI.ImageTensor{2}[39m[22m                  [36mLabel{Bool}[39m
+                [36mOneHot[39m          [36m(x, y)[39m [36mFastAI.ImageTensor{2}[39m, [36mFastAI.ImageTensor{2}[39m [1m[36mFastAI.OneHotTensor{0, Bool}[39m[22m
 
-|               Decoding |          Name |           `method.outputblock` |
-| ----------------------:| -------------:| ------------------------------:|
-|                        |          `ŷ` | `FastAI.OneHotTensor{0, Bool}` |
-|               `OneHot` |               |              **`Label{Bool}`** |
-|   `ImagePreprocessing` |               |                  `Label{Bool}` |
-| `ProjectiveTransforms` | `target_pred` |                  `Label{Bool}` |
-</div><p>We can reuse all the code above for creating the data container, we just omit the preprocessing function. <code>methoddataloaders</code> constructs training and validation data loaders from data containers by mapping the method encoding over the data containers:</p><pre lang=julia ><code>traindata = siamesedata(trainfiles, valid = true)
+  Decoding a model output ([36mdecode(method, context, ŷ)[39m)
+
+              Decoding        Name           [36mmethod.outputblock[39m
+  –––––––––––––––––––– ––––––––––– ––––––––––––––––––––––––––––
+                                [36mŷ[39m [36mFastAI.OneHotTensor{0, Bool}[39m
+                [36mOneHot[39m                              [1m[36mLabel{Bool}[39m[22m
+    [36mImagePreprocessing[39m                              [36mLabel{Bool}[39m
+  [36mProjectiveTransforms[39m [36mtarget_pred[39m                  [36mLabel{Bool}[39m</code></pre><p>We can reuse all the code above for creating the data container, we just omit the preprocessing function. <code>methoddataloaders</code> constructs training and validation data loaders from data containers by mapping the method encoding over the data containers:</p><pre lang=julia ><code>traindata = siamesedata(trainfiles, valid = true)
 validdata = siamesedata(validfiles; valid = true);
 traindl, valdl = methoddataloaders(traindata, validdata, method, 32)</code></pre><pre class=coderesult ><code>(eachobsparallel(batchviewcollated() with 185 batches of size 32), eachobsparallel(batchviewcollated() with 24 batches of size 64))</code></pre><p>The above is equivalent to lazily mapping the encoding over the data containers and creating a <code>DataLoader</code> from them.</p><pre lang=julia ><code>
 traindl = DataLoader(
