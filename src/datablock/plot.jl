@@ -68,11 +68,15 @@ function plotsample!(f, ctxs::Tuple{NDContext{2}, NDOverlayContext{2}}, blocks, 
     plotblock!(ax, blocks[1], datas[1], alpha = 0.6)  # plots an N-D image
 end
 
-function plotsample!(f, ctxs::Tuple{NDContext{2}, NDContext{2}}, blocks, datas)
-    f[1, 1] = ax1 = imageaxis(f)
-    plotblock!(ax1, blocks[1], datas[1])  # plots an image
-    f[1, 2] = ax2 = imageaxis(f)
-    plotblock!(ax, blocks[2], datas[2])  # plots an image
+function plotsample!(
+        f,
+        ctxs::NTuple{N, NDContext{2}},
+        blocks::NTuple{N},
+        datas::NTuple{N}) where N
+    for i in 1:N
+        f[1, i] = ax = imageaxis(f)
+        plotblock!(ax, blocks[i], datas[i])  # plots an image
+    end
 end
 
 function plotsample!(
@@ -102,7 +106,7 @@ function plotprediction!(f, method::BlockMethod, x, ŷ, y)
     ŷblock = method.outputblock
     blocks = (xblock, ŷblock, yblock)
     input, target_pred, target = decode(method.encodings, Validation(), blocks, (x, ŷ, y))
-    inblocks = decodedblock(method.encodings, blocks)
+    inblocks = decodedblock(method.encodings, blocks, true)
     contexts = plotcontext(inblocks)
     plotprediction!(f, contexts, inblocks, (input, target_pred, target))
 end
@@ -124,8 +128,8 @@ end
 function plotprediction!(
         f,
         ::Tuple{NDContext{2}, NDOverlayContext{2}, NDOverlayContext{2}},
-        blocks,
-        datas)
+        blocks::NTuple{3},
+        datas::NTuple{3})
 
     # image with title showing ground truth and prediction
     ax1 = f[1, 1] = imageaxis(f)
