@@ -12,16 +12,6 @@ defaultfigure(;kwargs...) = Figure(
 Plot a `sample` of a `method`.
 
 Learning methods should implement [`plotsample!`](#) to make this work.
-
-## Examples
-
-```julia
-using FastAI, Colors
-
-sample = (rand(Gray, 28, 28), 1)
-method = ImageClassification(1:10, (16, 16))
-plotsample(method, sample)
-```
 """
 function plotsample(method, sample; figkwargs...)
     f = defaultfigure(; figkwargs...)
