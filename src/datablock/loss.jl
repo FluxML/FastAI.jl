@@ -11,7 +11,7 @@ For example for `block = OneHotTensor{1}(classes)` (i.e. an encoded
 function blocklossfn end
 
 
-blocklossfn(predblock) = blocklossfn(predblock, targetblock)
+blocklossfn(predblock) = blocklossfn(predblock, predblock)
 
 function blocklossfn(outblock::OneHotTensor{0}, yblock::OneHotTensor{0})
     outblock.classes == yblock.classes || error("Classes of $outblock and $yblock differ!")
