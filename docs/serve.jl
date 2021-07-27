@@ -7,9 +7,9 @@ import DataAugmentation
 using FilePathsBase
 using Colors
 
-function serve(lazy=true)
+function serve(lazy=true; kwargs...)
     refmodules = [FastAI, FluxTraining, DLPipelines, DataAugmentation, DataLoaders, FastAI.Datasets]
-    project = Pollen.documentationproject(FastAI; refmodules, watchpackage=true)
+    project = Pollen.documentationproject(FastAI; refmodules, watchpackage=true, kwargs...)
     Pollen.serve(project, lazy=lazy)
 end
 serve()
