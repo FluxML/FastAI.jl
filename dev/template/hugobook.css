@@ -423,24 +423,24 @@ article ul.tight li p {
 
 @font-face {
     font-family: 'VeraMono';
-    src: URL('/fonts/VeraMono.ttf') format('truetype');
+    src: URL('../fonts/VeraMono.ttf') format('truetype');
 }
 
 @font-face {
     font-family: 'Charter';
-    src: URL('/fonts/Charter Regular.otf') format('opentype');
+    src: URL('../fonts/Charter Regular.otf') format('opentype');
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Charter';
-    src: URL('/fonts/Charter Bold.otf') format('opentype');
+    src: URL('../fonts/Charter Bold.otf') format('opentype');
     font-weight: bold;
 }
 
 @font-face {
     font-family: 'Charter';
-    src: URL('/fonts/Charter Italic.otf') format('opentype');
+    src: URL('../fonts/Charter Italic.otf') format('opentype');
     font-style: italic;
 }
 
