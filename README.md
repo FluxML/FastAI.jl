@@ -8,7 +8,7 @@ Install with
 
 ```julia
 using Pkg
-Pkg.add(Pkg.PackageSpec(url="https://github.com/FluxML/FastAI.jl"))
+Pkg.add("FastAI")
 ```
 
 or try it out with this [Google Colab template](https://colab.research.google.com/gist/lorenzoh/2fdc91f9e42a15e633861c640c68e5e8).
