@@ -10,7 +10,7 @@ You'll have to do the following:
 
 ```julia
 using Pkg
-Pkg.develop("https://github.com/<myusername>/FastAI.jl")
+Pkg.develop(url="https://github.com/<myusername>/FastAI.jl.git")
 ```
 
 **Activate the documentation environment and install the dependencies.** You can find the folder that FastAI.jl was cloned to using `using FastAI; pkgdir(FastAI)`. In a Julia session, change the current directory to that path, activate the `docs/` environment and install unregistered dependencies:
@@ -20,8 +20,8 @@ using FastAI, Pkg
 
 cd(pkgdir(FastAI))
 Pkg.activate("./docs/")
-Pkg.add("https://github.com/lorenzoh/Pollen.jl")
-Pkg.add("https://github.com/lorenzoh/LiveServer.jl")
+Pkg.add(url="https://github.com/lorenzoh/Pollen.jl")
+Pkg.add(url="https://github.com/lorenzoh/LiveServer.jl")
 Pkg.instantiate()
 ```
 
