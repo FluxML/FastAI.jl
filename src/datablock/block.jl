@@ -162,3 +162,68 @@ function checkblock(
 end
 
 mockblock(block::Keypoints{N}) where N = rand(SVector{N, Float32}, block.sz)
+
+
+# TableRow
+
+# struct TableRow <: Block
+#     columns
+#     catcols
+#     contcols
+#     categorydict
+# end
+
+# function checkblock(block::TableRow, x)
+#     (length(x) == block.columns) && 
+#     (all(val->val isa Number, [x[col] for col in block.contcols])) &&
+#     (block.catcols + block.contcols <= block.columns) &&
+#     (all(col->col in block.categorydict.keys, catcols))
+# end
+
+# struct RegressionBlock <:Block 
+#     columns
+# end
+
+# function checkblock(::RegressionBlock, y)
+#     all(val->val isa Number, y)
+# end
+
+# struct ClassificationBlock <: Block
+#     column
+#     classes
+# end
+
+# function checkblock(block::ClassificationBlock, y)
+#     y ∈ block.classes
+# end
+
+struct ContinuousBlock{N, T, M} <: Block
+    columns::AbstractVector{T}
+    allcols::AbstractVector{T}
+end
+
+function ContinuousBlock(columns::AbstractVector, allcols::AbstractVector)
+    @assert eltype(columns) == eltype(allcols)
+    ContinuousBlock{length(columns), eltype(columns), length(allcols)}(columns, allcols)
+end
+
+function checkblock(block::ContinuousBlock{N, T, M}, x) where {N, T, M}
+    (length(x) == M) && 
+    (all(map(col->x[col] isa Number, block.columns)))
+end
+
+struct CategoricalBlock{N, T, M} <: Block
+    columns
+    allcols
+    categorydict
+end
+
+function CategoricalBlock(columns::AbstractVector, allcols::AbstractVector, categorydict)
+    @assert eltype(columns) == eltype(allcols)
+    CategoricalBlock{length(columns), eltype(columns), length(allcols)}(columns, allcols, categorydict)
+end
+
+function checkblock(block::CategoricalBlock, x)
+    (length(x) == length(block.allcols)) && 
+    (all(col -> x[col] ∈ block.categorydict[col], block.columns))
+end

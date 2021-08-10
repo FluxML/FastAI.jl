@@ -1,6 +1,8 @@
 module FastAI
 
 
+using Base: NamedTuple
+using Colors: colormaps_sequential
 using Reexport
 @reexport using DLPipelines
 @reexport using FluxTraining
@@ -48,6 +50,7 @@ include("datablock/checks.jl")
 include("datablock/wrappers.jl")
 
 # Encodings
+include("encodings/tabularpreprocessing.jl")
 include("encodings/onehot.jl")
 include("encodings/imagepreprocessing.jl")
 include("encodings/projective.jl")
@@ -126,6 +129,11 @@ export
     LabelMulti,
     Keypoints,
     Many,
+    # TableRow,
+    # RegressionBlock,
+    # ClassificationBlock,
+    ContinuousBlock,
+    CategoricalBlock,
 
     # encodings
     encode,
@@ -137,6 +145,7 @@ export
     Only,
     Named,
     augs_projection, augs_lighting,
+    TabularTransform,
 
     BlockMethod,
     describemethod,

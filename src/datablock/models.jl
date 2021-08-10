@@ -59,3 +59,37 @@ function blockmodel(inblock::ImageTensor{N}, outblock::KeypointTensor{N}, backbo
     head = Models.visionhead(outch, prod(outblock.sz)*N, p = 0.)
     return Chain(backbone, head)
 end
+
+
+function blockmodel(
+        inblock::RawCategoricalBlock, 
+        ::Union{RawContinuousBlock, OneHotCols},
+        embszs=nothing)
+    embszs = isnothing(embszs) ? Models.get_emb_sz(inblock.categorydict, inblock.columns; sz_dict=nothing) : embszs
+    Models.embeddingbackbone(embszs)
+end
+
+function blockmodel(
+        ::RawContinuousBlock{N, T, M}, 
+        ::Union{RawContinuousBlock, OneHotCols},
+        backbone=nothing) where {N, T, M}
+    Models.continuousbackbone(N)
+end
+
+function blockmodel(
+        inblock::Tuple{RawCategoricalBlock{N, T, M}, RawContinuousBlock{O, T, M}},
+        outblock::Union{RawContinuousBlock{P, T, M}, OneHotCols{P, T, M}},
+        backbone;
+        embszs = nothing) where {N, O, P, T, M}
+    catbackbone = blockmodel(inblock[1], outblock, embszs)
+    contbackbone = blockmodel(inblock[2], outblock, nothing)
+    Models.TabularModel(
+        catbackbone, 
+        contbackbone, 
+        n_cat=N,
+        n_cont=O,
+        out_sz=outblock isa OneHotCols ? P+1 : P)
+end
+
+
+
