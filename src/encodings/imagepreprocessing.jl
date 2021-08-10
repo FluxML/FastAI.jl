@@ -86,14 +86,14 @@ end
 colorchannels(C::Type{<:Color{T,N}}) where {T,N} = N
 
 function encodedblock(ip::ImagePreprocessing{P,M,C}, ::Image{N}) where {P,M,C,N}
-    return ImageTensor{N}(colorchannels(C))
+    return ImageTensor{N+1}(colorchannels(C))
 end
 
 function encode(ip::ImagePreprocessing, context, block::Image, data)
     return copy(apply(ip.tfms[context], DataAugmentation.Image(data)) |> itemdata)
 end
 
-decodedblock(::ImagePreprocessing, ::ImageTensor{N}) where N = Image{N}()
+decodedblock(::ImagePreprocessing, ::ImageTensor{N}) where N = Image{N-1}()
 
 function decode(ip::ImagePreprocessing, context, block::ImageTensor, data)
     means, stds = ip.stats
