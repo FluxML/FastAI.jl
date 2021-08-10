@@ -115,10 +115,3 @@ function blocksmatch(recipe::DatasetRecipe, TBlocks)
     @show recipeblocks(recipe), TBlocks
 	return recipeblocks(recipe) <: TBlocks
 end
-
-
-## Utilities
-
-typify(T::Type) = T
-typify(t::Tuple) = Tuple{map(typify, t)...}
-typify(block::FastAI.AbstractBlock) = typeof(block)
