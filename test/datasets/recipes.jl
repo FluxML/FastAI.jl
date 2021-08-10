@@ -44,5 +44,29 @@ end
         end
     end
 
+end
 
+
+@testset ExtendedTestSet "ImageSegmentationFolders" begin
+    path = datasetpath("camvid_tiny")
+
+    @testset ExtendedTestSet "Basic configuration" begin
+        recipe = Datasets.ImageSegmentationFolders()
+        data, blocks = loadrecipe(recipe, path)
+        testrecipe(recipe, data, blocks)
+        @test blocks[1] isa Image
+        @test blocks[2] isa Mask
+    end
+
+    @testset ExtendedTestSet "Error cases" begin
+        @testset ExtendedTestSet "Empty directory" begin
+            recipe = Datasets.ImageSegmentationFolders()
+            @test_throws ErrorException loadrecipe(recipe, mktempdir())
+        end
+
+        @testset ExtendedTestSet "Only one label" begin
+            recipe = Datasets.ImageSegmentationFolders(labelfile="idontexist")
+            @test_throws ErrorException loadrecipe(recipe, path)
+        end
+    end
 end
