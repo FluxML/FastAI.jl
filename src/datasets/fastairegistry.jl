@@ -19,6 +19,6 @@ The default `DataRegistry` containing every dataset in
 the fastai dataset collection.
 """
 const FASTAI_DATA_REGISTRY = DatasetRegistry(
-    Dict(d => () -> datasetpath(d) for d in FastAI.DATASETS),
+    Dict(d => () -> datasetpath(d) for d in DATASETS),
     FASTAI_DATA_RECIPES,
 )
