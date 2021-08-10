@@ -57,7 +57,6 @@ include("datablock/loss.jl")
 include("datablock/plot.jl")
 
 
-
 # submodules
 include("datasets/Datasets.jl")
 @reexport using .Datasets
@@ -77,7 +76,10 @@ include("training/metrics.jl")
 
 include("serialization.jl")
 
-include("fasterai.jl")
+
+include("fasterai/methodregistry.jl")
+include("fasterai/learningmethods.jl")
+include("fasterai/defaults.jl")
 
 
 
