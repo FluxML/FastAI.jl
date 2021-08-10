@@ -135,6 +135,14 @@ export
     describemethod,
     checkblock,
 
+    # learning methods
+    findlearningmethods,
+    ImageClassificationSingle,
+    ImageClassificationMulti,
+    ImageSegmentation,
+    ImageKeypointRegression,
+
+
     # training
     methodlearner,
     Learner,

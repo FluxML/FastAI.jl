@@ -14,6 +14,7 @@ module Datasets
 
 
 using ..FastAI
+using ..FastAI: typify
 
 using DataDeps
 using Glob

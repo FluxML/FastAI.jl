@@ -42,9 +42,27 @@ Return a vector of `Pair`s `datasetname => recipe`
 
 #### Examples
 
+Loading a result
+
 ```julia
 datasetname, recipe = finddatasets(blocks=(Image, Label))[1]
-data, blocks = recipe(datasetpath(datasetname))
+data, blocks = loadrecipe(recipe, datasetpath(datasetname))
+```
+
+Example searches
+
+```
+# Single-label image classification
+finddatasets(blocks=(Image, Label))
+
+# Single-label classification from any data
+finddatasets(blocks=(Any, Label))
+
+# Datasets with images as input data
+finddatasets(blocks=(Image, Any))
+
+# All ways to load `pascal2007`
+finddatasets(name="pascal2007")
 ```
 """
 function finddatasets(reg::DatasetRegistry; name=nothing, blocks=Any)::Vector{Pair{String,DatasetRecipe}}

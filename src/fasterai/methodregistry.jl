@@ -36,7 +36,7 @@ julia> findlearningmethods((Image, Any))
 ```
 """
 function findlearningmethods(reg::LearningMethodRegistry, blocktypes=Any)
-	return [methodfn for (methodfn, methodblocks) in reg.methods if typify(blocks) <: methodblocks]
+	return [methodfn for (methodfn, methodblocks) in reg.methods if typify(blocktypes) <: methodblocks]
 end
 
 

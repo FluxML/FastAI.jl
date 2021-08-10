@@ -3,14 +3,7 @@ include("../imports.jl")
 
 @testset ExtendedTestSet "ImageSegmentation" begin
     @testset ExtendedTestSet "2D" begin
-        method = BlockMethod(
-            (Image{2}(), Mask{2}(1:4)),
-            (
-                ProjectiveTransforms((16, 16), inferencefactor=8),
-                ImagePreprocessing(),
-                FastAI.OneHot()
-            )
-        )
+        method = ImageSegmentation((16, 16), 1:4)
         testencoding(method.encodings, method.blocks)
         DLPipelines.checkmethod_core(method)
         @test_nowarn methodlossfn(method)
