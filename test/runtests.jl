@@ -35,6 +35,12 @@ include("imports.jl")
         @testset ExtendedTestSet "containers.jl" begin
             include("datasets/containers.jl")
         end
+        @testset ExtendedTestSet "recipes.jl" begin
+            include("datasets/recipes.jl")
+        end
+        @testset ExtendedTestSet "registry.jl" begin
+            include("datasets/registry.jl")
+        end
     end
 
     @testset ExtendedTestSet "training/" begin

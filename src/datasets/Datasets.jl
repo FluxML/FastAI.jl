@@ -41,6 +41,9 @@ include("containers.jl")
 include("transformations.jl")
 
 include("load.jl")
+include("recipes.jl")
+include("registry.jl")
+include("fastairegistry.jl")
 
 
 export
@@ -71,6 +74,10 @@ export
     # datasets
     DATASETS,
     loadfolderdata,
-    datasetpath
+    datasetpath,
+
+    # recipes
+    loadrecipe,
+    finddatasets
 
 end  # module
