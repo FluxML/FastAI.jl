@@ -82,3 +82,45 @@ function loadrecipe(recipe::ImageClassificationFolders, path)
 end
 
 recipeblocks(::Type{ImageClassificationFolders}) = Tuple{Image{2}, Label}
+
+
+# ImageSegmentationFolders
+
+
+"""
+    ImageSegmentationFolders(; imagefolder="images", maskfolder="labels", labelfile="codes.txt")
+
+Dataset recipe for loading 2D image segmentation datasets from a common format
+where images and masks are stored as images in two different subfolders
+"<root>/<imagefolder>" and "<root>/<maskfolder>"
+The class labels should be in a newline-delimited file "<root>/<labelfile>".
+"""
+Base.@kwdef struct ImageSegmentationFolders <: DatasetRecipe
+    imagefolder::String = "images"
+    maskfolder::String = "labels"
+    labelfile::String = "codes.txt"
+end
+
+function loadrecipe(recipe::ImageSegmentationFolders, path)
+    isdir(path) || error("$path is not a directory")
+    imagepath = joinpath(path, recipe.imagefolder)
+    maskpath = joinpath(path, recipe.maskfolder)
+    classespath = joinpath(path, recipe.labelfile)
+
+    isdir(imagepath) || error("Image folder $imagepath is not a directory")
+    isdir(maskpath) || error("Mask folder $maskpath is not a directory")
+
+    isfile(classespath) || error("Classes file $classespath does not exist")
+    classes = readlines(open(joinpath(path, recipe.labelfile)))
+    length(classes) > 1 || error("Expected multiple different labels, got: $(blocks[2].classes))")
+
+    images = loadfolderdata(imagepath, filterfn=isimagefile, loadfn=loadfile)
+    masks = loadfolderdata(maskpath, filterfn=isimagefile, loadfn=f -> loadmask(f, classes))
+    nobs(images) == nobs(masks) || error("Expected the same number of images and masks, but found $(nobs(images)) images and $(nobs(masks)) masks")
+    nobs(images) > 0 || error("No images or masks found in folders $imagepath and $maskpath")
+
+    blocks = Image{2}(), Mask{2}(classes)
+    return (images, masks), blocks
+end
+
+recipeblocks(::Type{ImageSegmentationFolders}) = Tuple{Image{2}, Mask{2}}

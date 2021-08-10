@@ -32,30 +32,55 @@ Use [`listdatasources`](#) for a list of all dataset sources.
 datasetpath(reg::DatasetRegistry, name::String) = reg.datasets[name]()
 
 """
-    finddatasets(; name, blocks)
+    finddatasets([registry]; name=nothing, blocks=Any)
 
 Find preconfigured dataset recipes for datasets that match block
 types `blocks` in all data sources (if `name == nothing`) or dataset source
-with `name`.
+with `name`. `blocks` can be given as a type or a nested tuple of block types.
 
 Return a vector of `Pair`s `datasetname => recipe`
 
 #### Examples
 
 ```julia
-TBlocks = Tuple{Image, Label}
 datasetname, recipe = finddatasets(blocks=(Image, Label))[1]
 data, blocks = recipe(datasetpath(datasetname))
 ```
 """
-function finddatasets(reg::DatasetRegistry; name=nothing, blocks=Any)
+function finddatasets(reg::DatasetRegistry; name=nothing, blocks=Any)::Vector{Pair{String,DatasetRecipe}}
     results = collect(Iterators.flatten(((k => v) for v in vs) for (k, vs) in reg.recipes))
-
     results = filter(((d, recipe),) -> recipeblocks(recipe) <: typify(blocks), results)
     if !isnothing(name)
         results = filter(((d, r),) -> d == name, results)
     end
     return results
+end
+
+
+"""
+    loaddataset(name[, blocks = Any]) -> (data, blocks)
+
+Load dataset `name` with a recipe that matches block types
+`blocks`. The first matching recipe is selected and loaded.
+
+## Examples
+
+Load a data container suitable for single-label image classification:
+```julia
+data, blocks = loaddataset("imagenette2-160", (Image, Label))
+```
+
+Load dataset with any recipe:
+```julia
+data, blocks = loaddataset(name)
+```
+"""
+function loaddataset(reg::DatasetRegistry, name::String, blocks=Any)
+    results = finddatasets(reg; name=name, blocks=blocks)
+    isempty(results) && error("Could not find a recipe for dataset \"$name\" that matches block types `$blocks`")
+    name_, recipe = results[1]
+    @assert name == name_
+    return loadrecipe(recipe, datasetpath(reg, name))
 end
 
 ## Registration

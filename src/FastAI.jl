@@ -77,6 +77,8 @@ include("training/metrics.jl")
 
 include("serialization.jl")
 
+include("fasterai.jl")
+
 
 
 

@@ -78,6 +78,8 @@ export
 
     # recipes
     loadrecipe,
-    finddatasets
+    finddatasets,
+    listdatasources,
+    loaddataset
 
 end  # module
