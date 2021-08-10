@@ -1,4 +1,4 @@
-abstract type WrapperBlock <: Block end
+abstract type WrapperBlock <: AbstractBlock end
 
 wrapped(w::WrapperBlock) = w.block
 mockblock(w::WrapperBlock) = mockblock(wrapped(w))
