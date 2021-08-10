@@ -40,3 +40,15 @@ function methodlearner(
     end
     return Learner(model, dls, optimizer, lossfn, callbacks...)
 end
+
+
+function plotpredictions(method::LearningMethod, learner::Learner; n = 4)
+    cb = FluxTraining.getcallback(learner, ToDevice)
+    devicefn = isnothing(cb) ? identity : cb.movedatafn
+    backfn = isnothing(cb) ? identity : cpu
+    xs, ys = first(learner.data.validation)
+    b = last(size(xs))
+    xs, ys = DataLoaders.collate([s for (s, _) in zip(DataLoaders.obsslices((xs, ys)), 1:min(n, b))])
+    ŷs = learner.model(devicefn(xs)) |> backfn
+    return plotpredictions(method, xs, ŷs, ys)
+end
