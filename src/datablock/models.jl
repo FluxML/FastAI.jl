@@ -69,17 +69,17 @@ and a classifierbackbone, with the first two taking in batches of corresponding
 row value matrices.
 """
 
-function blockmodel(
-        inblock::EncodedTableRow{M, N}, 
-        outblock::Union{Continuous, OneHotTensor{0}}, 
-        backbone=nothing;) where {M, N}
-    outsz = outblock isa Continuous ? outblock.n : length(outblock.classes)
-    if isnothing(backbone)
-        TabularModel(inblock.catcols, N, outsz; catdict = inblock.categorydict)
-    else
-        TabularModel(backbone[1], backbone[2], backbone[3])
-    end
-end
+# function blockmodel(
+#         inblock::EncodedTableRow{M, N}, 
+#         outblock::Union{Continuous, OneHotTensor{0}}, 
+#         backbone=nothing;) where {M, N}
+#     outsz = outblock isa Continuous ? outblock.size : length(outblock.classes)
+#     if isnothing(backbone)
+#         TabularModel(inblock.catcols, N, outsz; catdict = inblock.categorydict)
+#     else
+#         TabularModel(backbone[1], backbone[2], backbone[3])
+#     end
+# end
 
 
 

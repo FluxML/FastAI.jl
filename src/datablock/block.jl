@@ -204,5 +204,5 @@ struct Continuous <: Block
 end
 
 function checkblock(block::Continuous, x)
-    block.n == length(x) && eltype(x) <: Number
+    block.size == length(x) && eltype(x) <: Number
 end

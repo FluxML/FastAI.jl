@@ -44,6 +44,6 @@ function blocklossfn(outblock::KeypointTensor{N}, yblock::KeypointTensor{N}) whe
 end
 
 function blocklossfn(outblock::Continuous, yblock::Continuous)
-    outblock.n == yblock.n || error("Sizes of $outblock and $yblock differ!")
+    outblock.size == yblock.size || error("Sizes of $outblock and $yblock differ!")
     return Flux.Losses.mse
 end
