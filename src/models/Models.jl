@@ -18,7 +18,7 @@ include("tabularmodel.jl")
 
 
 export xresnet18, xresnet50, UNetDynamic, 
-TabularModel, get_emb_sz, embeddingbackbone, continuousbackbone, sigmoidrange
+TabularModel, get_emb_sz, embeddingbackbone, continuousbackbone, classifierbackbone, sigmoidrange
 
 
 end
