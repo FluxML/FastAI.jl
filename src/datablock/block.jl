@@ -166,6 +166,14 @@ mockblock(block::Keypoints{N}) where N = rand(SVector{N, Float32}, block.sz)
 
 # TableRow
 
+"""
+    TableRow{M, N}(catcols, contcols, categorydict) <: Block
+
+`Block` for table rows with M categorical and N continuous columns. `data`
+is valid if it satisfies the `AbstractRow` interface in Tables.jl, values 
+present in indices for categorical and continuous columns are consistent, 
+and `data` is indexable by the elements of `catcols` and `contcols`.
+"""
 struct TableRow{M, N} <: Block
     catcols
     contcols
@@ -182,10 +190,19 @@ function checkblock(block::TableRow, x)
     all(col -> haskey(block.categorydict, col), block.catcols))
 end
 
+# Continous
+
+"""
+    Continuous(n) <: Block
+
+`Block` for collections of numbers. `data` is valid if it's 
+length is `n` and contains `Number`s.
+"""
+
 struct Continuous <: Block
     n
 end
 
 function checkblock(block::Continuous, x)
-    block.n == length(x)
+    block.n == length(x) && eltype(x) <: Number
 end
