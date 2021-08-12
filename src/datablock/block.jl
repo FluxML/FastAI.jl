@@ -200,7 +200,7 @@ length is `n` and contains `Number`s.
 """
 
 struct Continuous <: Block
-    n
+    size::Int
 end
 
 function checkblock(block::Continuous, x)
