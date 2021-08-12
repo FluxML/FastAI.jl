@@ -1,77 +1,36 @@
-struct RawContinuousBlock{N, T, M} <: Block
-    columns
-    allcols
-end
-
-RawContinuousBlock(columns, allcols) = RawContinuousBlock{length(columns), eltype(columns), length(allcols)}(columns, allcols)
-
-struct RawCategoricalBlock{N, T, M} <: Block 
-    columns
-    allcols
+struct EncodedTableRow{M, N} <: Block
+    catcols
+    contcols
     categorydict
 end
 
-RawCategoricalBlock(columns, allcols, categorydict) = RawCategoricalBlock{length(columns), eltype(columns), length(allcols)}(columns, categorydict)
-
-function checkblock(::Union{RawContinuousBlock{N}, RawCategoricalBlock{N}}, x) where N
-    N == length(x)
+function EncodedTableRow(catcols, contcols, categorydict)
+    EncodedTableRow{length(catcols), length(contcols)}(catcols, contcols, categorydict)
 end
 
-# function checkblock(block::RawCategoricalBlock{1, T, M}, ::Flux.OneHotVector{S, O}) where {T, M, S, O}
-#     (length(block.categorydict[block.columns[1]]) == O)
-# end
+function checkblock(::EncodedTableRow{M, N}, x) where {M, N}
+    length(x[1]) == M && length(x[2]) == N
+end
 
 struct TabularTransform <: Encoding
 	tfms
 end
 
-# function encode(tt::TabularTransform, _, block::Tuple{TableRow, RegressionBlock}, row)
-#     tfmrow = DataAugmentation.apply(tt.tfms, DataAugmentation.TabularItem(row, block[1].columns)).data
-#     x = (
-#              [Int32(tfmrow[col]) for col in block[1].catcols], 
-#              [tfmrow[col] for col in block[1].contcols]
-#     )
-#     y = [tfmrow[col] for col in block[2].columns]
-#     (x, y)
-# end
+function encodedblock(::TabularTransform, block::TableRow)
+    EncodedTableRow(block.catcols, block.contcols, block.categorydict)
+end
 
-# function encode(tt::TabularTransform, _, block::Tuple{TableRow, ClassificationBlock}, row)
-#     tfmrow = DataAugmentation.apply(tt.tfms, DataAugmentation.TabularItem(row, block[1].columns)).data
-#     x = (
-#              [Int32(tfmrow[col]) for col in block[1].catcols], 
-#              [tfmrow[col] for col in block[1].contcols]
-#     )
-#     y = Flux.onehot(tfmrow[block[2].column], block[2].classes)
-#     (x, y)
-# end
-
-# function encodedblock(tt::TabularTransform, block)
-#     return block
-# end
-
-function encode(tt::TabularTransform, _, block::Union{ContinuousBlock, CategoricalBlock}, row)
+function encode(tt::TabularTransform, _, block::TableRow, row)
+    columns = Tables.columnnames(row)
+    usedrow = NamedTuple(filter(
+            x -> x[1] ∈ block.catcols || x[1] ∈ block.contcols, 
+            collect(zip(columns, row))
+        ))
     tfmrow = DataAugmentation.apply(
-            tt.tfms, 
-            DataAugmentation.TabularItem(row, block.allcols)
-        ).data
-    return map(col -> tfmrow[col], block.columns)
+        tt.tfms, 
+        DataAugmentation.TabularItem(usedrow, keys(usedrow))
+    ).data
+    catvals = map(col -> tfmrow[col], block.catcols)
+    contvals = map(col -> tfmrow[col], block.contcols)
+    (catvals, contvals)
 end
-
-function encode(tt::TabularTransform, context, blocks::Tuple, row)
-    return map(b -> encode(tt, context, b, row), blocks)
-end
-
-function encodedblock(::TabularTransform, block::ContinuousBlock{N, T, M}) where {N, T, M}
-    return RawContinuousBlock{N, T, M}(block.columns, block.allcols)
-end
-
-function encodedblock(::TabularTransform, block::CategoricalBlock{N, T, M}) where {N, T, M}
-    return RawCategoricalBlock{N, T, M}(block.columns, block.allcols, block.categorydict)
-end
-
-function encodedblock(tt::TabularTransform, blocks::Tuple)
-    return map(b -> encodedblock(tt, b), blocks)
-end
-
-
-# function encode()

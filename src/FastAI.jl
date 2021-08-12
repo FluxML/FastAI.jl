@@ -129,11 +129,8 @@ export
     LabelMulti,
     Keypoints,
     Many,
-    # TableRow,
-    # RegressionBlock,
-    # ClassificationBlock,
-    ContinuousBlock,
-    CategoricalBlock,
+    TableRow,
+    Continuous,
 
     # encodings
     encode,

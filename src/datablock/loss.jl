@@ -43,14 +43,7 @@ function blocklossfn(outblock::KeypointTensor{N}, yblock::KeypointTensor{N}) whe
     return Flux.Losses.mse
 end
 
-function blocklossfn(
-        ::Union{FastAI.RawContinuousBlock{N, T, M}, ContinuousBlock{N, T, M}}, 
-        ::Union{FastAI.RawContinuousBlock{N, T, M}, ContinuousBlock{N, T, M}}) where {N, T, M}
-    # length(outblock.columns) == length(yblock.columns) || error("Number of columns in $outblock and $yblock differ!")
+function blocklossfn(outblock::Continuous, yblock::Continuous)
+    outblock.n == yblock.n || error("Sizes of $outblock and $yblock differ!")
     return Flux.Losses.mse
-end
-
-function blocklossfn(::FastAI.OneHotCols{1, T, M}, ::FastAI.OneHotCols{1, T, M}) where {T, M}
-    # length(outblock.columns) == length(yblock.columns) || error("Number of columns in $outblock and $yblock differ!")
-    return Flux.Losses.logitcrossentropy
 end

@@ -29,19 +29,6 @@ function mockblock(block::OneHotTensorMulti{0}) where N
     return encode(OneHot(), Validation(), labelblock, mockblock(labelblock))
 end
 
-struct OneHotCols{N, T, M} <: Block
-    columns
-    allcols
-    categorydict
-end
-
-function checkblock(
-        block::OneHotCols{1, T, M}, 
-        ::Flux.OneHotVector{S, O}) where {M, O, S, T}
-    length(block.categorydict[block.columns[1]]) == O
-end
-
-
 """
     OneHot()
     OneHot(T, threshold)
@@ -107,23 +94,4 @@ function decode(enc::OneHot, context, block::OneHotTensor, data)
         map(I -> Tidx(I.I[end]), argmax(data; dims = ndims(data))),
         size(data)[1:end-1])
     return IndirectArray(classidxs, block.classes)
-end
-
-# ### `CategoricalBlock` implementation
-
-# encodedblock(::OneHot, block::RawCategoricalBlock{1, T, M}) where {T, M} = OneHotTensor{0, T}(block.categorydict[columns[first]])
-function encodedblock(::OneHot, block::Union{RawCategoricalBlock{1, T, M}, CategoricalBlock{1, T, M}}) where {T, M}
-    OneHotCols{1, T, M}(block.columns, block.allcols, block.categorydict)
-end
-
-function decodedblock(::OneHot, block::OneHotCols{1, T, M}) where {T, M}
-    RawCategoricalBlock{1, T, M}(block.columns, block.allcols, block.categorydict)
-end
-
-function encode(::OneHot, context, block::Union{FastAI.RawCategoricalBlock{1}, CategoricalBlock{1}}, data)
-    Flux.onehot(data..., block.categorydict[block.columns...])
-end
-
-function decode(::OneHot, context, block::OneHotCols{1}, data)
-    block.categorydict[block.columns...][Flux.onecold(data)]
 end
