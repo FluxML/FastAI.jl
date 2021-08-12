@@ -185,9 +185,11 @@ function TableRow(catcols, contcols, categorydict)
 end
 
 function checkblock(block::TableRow, x)
-    (all(col -> x[col] ∈ block.categorydict[col], block.catcols) &&
-    all(col -> x[col] isa Number, block.contcols) &&
-    all(col -> haskey(block.categorydict, col), block.catcols))
+    columns = Tables.columnnames(x)
+    (all(col -> col ∈ columns, [block.catcols..., block.contcols...]) &&
+    all(col -> haskey(block.categorydict, col) && 
+        (ismissing(x[col]) || x[col] ∈ block.categorydict[col]), block.catcols) &&
+    all(col -> ismissing(x[col]) || x[col] isa Number, block.contcols))
 end
 
 # Continous
