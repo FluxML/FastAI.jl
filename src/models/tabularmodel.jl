@@ -18,7 +18,7 @@ function sigmoidrange(x, low, high)
 end
 
 function embeddingbackbone(embedding_sizes, dropoutprob=0.)
-    embedslist = [Embedding(ni => nf) for (ni, nf) in embedding_sizes]
+    embedslist = [Flux.Embedding(ni, nf) for (ni, nf) in embedding_sizes]
     emb_drop = dropoutprob==0. ? identity : Dropout(dropoutprob)
     Chain(
         x -> tuple(eachrow(x)...), 
@@ -67,9 +67,9 @@ function TabularModel(
         out_sz::Number,
         layers=[200, 100];
         catdict,
-        embszs=nothing,
+        sz_dict=nothing,
         ps=0.)
-    embedszs = get_emb_sz(catdict, catcols, sz_dict=embszs)
+    embedszs = get_emb_sz(catdict, catcols, sz_dict=sz_dict)
     catback = embeddingbackbone(embedszs)
     contback = continuousbackbone(n_cont)
 
