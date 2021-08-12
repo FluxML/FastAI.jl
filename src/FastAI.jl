@@ -143,13 +143,6 @@ export
     describemethod,
     checkblock,
     
-    # pipeline steps
-    TabularTransforms, gettransformationdict,
-
-    # methods
-    TabularRegression,
-    TabularClassification,
-
     # learning methods
     findlearningmethods,
     ImageClassificationSingle,
