@@ -246,7 +246,7 @@ function testencoding(encoding, block, data = mockblock(block))
         @test checkblock(outblock, outdata)
 
         # Test decoding (if supported) works correctly
-        inblock = decodedblock(encoding, outblock, true)
+        inblock = decodedblock(encoding, outblock)
         if !isnothing(inblock)
             @test block == inblock
             indata = decode(encoding, Training(), outblock, outdata)
