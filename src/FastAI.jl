@@ -120,6 +120,7 @@ export
     Label,
     LabelMulti,
     Keypoints,
+    Many,
 
     # encodings
     encode,

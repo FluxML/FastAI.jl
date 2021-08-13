@@ -39,8 +39,8 @@ Replaces all `nothing`s in outblocks with the corresponding block in `inblocks`.
 `outblocks` may be obtained by
 """
 fillblock(inblocks::Tuple, outblocks::Tuple) = map(fillblock, inblocks, outblocks)
-fillblock(inblock::Block, ::Nothing) = inblock
-fillblock(::Block, outblock::Block) = outblock
+fillblock(inblock::AbstractBlock, ::Nothing) = inblock
+fillblock(::AbstractBlock, outblock::AbstractBlock) = outblock
 
 function encodedblock(enc, block, fill::Bool)
     outblock = encodedblock(enc, block)
