@@ -60,6 +60,13 @@ Randomly generate an instance of `block`.
 mockblock(blocks::Tuple) = map(mockblock, blocks)
 
 
+# ## Utilities
+
+typify(T::Type) = T
+typify(t::Tuple) = Tuple{map(typify, t)...}
+typify(block::FastAI.AbstractBlock) = typeof(block)
+
+
 # ## Block implementations
 
 abstract type AbstractLabel{T} <: Block end

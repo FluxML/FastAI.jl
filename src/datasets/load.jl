@@ -51,29 +51,6 @@ function getclassessegmentation(dir::AbstractPath)
 end
 getclassessegmentation(name::String) = getclassessegmentation(datasetpath(name))
 
-#=
-"""
-    loadtaskdata(dir, ImageSegmentation; [split = false])
-
-Load a data container for `ImageSegmentation` with observations
-`(input = image, target = mask)`.
-
-If `split` is `true`, returns a tuple of the data containers split by
-the name of the grandparent folder.
-
-"""
-function loadtaskdata(
-        dir,
-        ::Type{FastAI.ImageSegmentation};
-        split=false,
-        kwargs...)
-    imagedata = mapobs(loadfile, filterobs(isimagefile, FileDataset(joinpath(dir, "images"))))
-    maskdata = mapobs(maskfromimage ∘ loadfile, filterobs(isimagefile, FileDataset(joinpath(dir, "labels"))))
-    return mapobs((input = obs -> obs[1], target = obs -> obs[2]), (imagedata, maskdata))
-end
-=#
-
-
 
 
 maskfromimage(a::AbstractArray{<:Gray{T}}, classes) where T = maskfromimage(reinterpret(T, a), classes)

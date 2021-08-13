@@ -2,15 +2,7 @@ include("../imports.jl")
 
 
 @testset "ImageClassification" begin
-    method = BlockMethod(
-        (Image{2}(), Label(1:2)),
-        (
-            ProjectiveTransforms((16, 16), inferencefactor=8),
-            ImagePreprocessing(),
-            OneHot()
-        )
-    )
-
+    method = ImageClassificationMulti((16, 16), [1, 2])
     testencoding(method.encodings, method.blocks)
     DLPipelines.checkmethod_core(method)
     @test_nowarn methodlossfn(method)
@@ -35,5 +27,16 @@ include("../imports.jl")
         #encodetarget!(y, method, Training(), 2)
         #@test y ≈ [0, 1]
     end
+    FastAI.checkmethod_plot(method)
+end
+
+@testset ExtendedTestSet "ImageClassificationMulti" begin
+
+    method = ImageClassificationMulti((16, 16), [1, 2])
+
+    testencoding(method.encodings, method.blocks)
+    DLPipelines.checkmethod_core(method)
+    @test_nowarn methodlossfn(method)
+    @test_nowarn methodmodel(method, Models.xresnet18())
     FastAI.checkmethod_plot(method)
 end

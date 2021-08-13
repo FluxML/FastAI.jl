@@ -30,6 +30,7 @@ using MLDataPattern
 using Parameters
 using PrettyTables
 using StaticArrays
+using Setfield
 using ShowCases
 using Statistics: mean
 using Test: @testset, @test, @test_nowarn
@@ -57,7 +58,6 @@ include("datablock/loss.jl")
 include("datablock/plot.jl")
 
 
-
 # submodules
 include("datasets/Datasets.jl")
 @reexport using .Datasets
@@ -76,6 +76,11 @@ include("training/lrfind.jl")
 include("training/metrics.jl")
 
 include("serialization.jl")
+
+
+include("fasterai/methodregistry.jl")
+include("fasterai/learningmethods.jl")
+include("fasterai/defaults.jl")
 
 
 
@@ -115,6 +120,7 @@ export
     Label,
     LabelMulti,
     Keypoints,
+    Many,
 
     # encodings
     encode,
@@ -130,6 +136,14 @@ export
     BlockMethod,
     describemethod,
     checkblock,
+
+    # learning methods
+    findlearningmethods,
+    ImageClassificationSingle,
+    ImageClassificationMulti,
+    ImageSegmentation,
+    ImageKeypointRegression,
+
 
     # training
     methodlearner,

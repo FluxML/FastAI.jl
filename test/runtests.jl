@@ -14,6 +14,9 @@ include("imports.jl")
         @testset ExtendedTestSet "keypointpreprocessing.jl" begin
             include("encodings/keypointpreprocessing.jl")
         end
+        @testset ExtendedTestSet "many.jl" begin
+            include("encodings/many.jl")
+        end
     end
 
     @testset ExtendedTestSet "methods/" begin
@@ -23,8 +26,8 @@ include("imports.jl")
         @testset ExtendedTestSet "imagesegmentation.jl" begin
             include("methods/imagesegmentation.jl")
         end
-        @testset ExtendedTestSet "singlekeypointregression.jl" begin
-            include("methods/singlekeypointregression.jl")
+        @testset ExtendedTestSet "imagekeypointregression.jl" begin
+            include("methods/imagekeypointregression.jl")
         end
     end
 
@@ -34,6 +37,12 @@ include("imports.jl")
         end
         @testset ExtendedTestSet "containers.jl" begin
             include("datasets/containers.jl")
+        end
+        @testset ExtendedTestSet "recipes.jl" begin
+            include("datasets/recipes.jl")
+        end
+        @testset ExtendedTestSet "registry.jl" begin
+            include("datasets/registry.jl")
         end
     end
 
