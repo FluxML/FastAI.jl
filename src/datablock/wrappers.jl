@@ -1,15 +1,23 @@
-abstract type WrapperBlock <: Block end
+abstract type WrapperBlock <: AbstractBlock end
 
 wrapped(w::WrapperBlock) = w.block
+function setwrapped(w::WrapperBlock, b)
+    return Setfield.@set w.block = b
+end
 mockblock(w::WrapperBlock) = mockblock(wrapped(w))
 checkblock(w::WrapperBlock, data) = checkblock(wrapped(w), data)
 
 # If not overwritten, encodings are applied to the wrapped block
+
+function encodedblock(enc::Encoding, wrapper::W) where {W<:WrapperBlock}
+    W(encodedblock(enc, wrapped(many)))
+end
+decodedblock(enc::Encoding, wrapper::WrapperBlock) = Many(decodedblock(enc, wrapped(many)))
 function encode(enc::Encoding, ctx, wrapper::WrapperBlock, data; kwargs...)
-    return encode(enc, ctx, wrapper.block, data; kwargs...)
+    return encode(enc, ctx, wrapped(wrapper), data; kwargs...)
 end
 function decode(enc::Encoding, ctx, wrapper::WrapperBlock, data; kwargs...)
-    return decode(enc, ctx, wrapper.block, data; kwargs...)
+    return decode(enc, ctx, wrapped(wrapper), data; kwargs...)
 end
 
 
