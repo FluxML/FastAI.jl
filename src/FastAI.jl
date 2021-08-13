@@ -30,6 +30,7 @@ using MLDataPattern
 using Parameters
 using PrettyTables
 using StaticArrays
+using Setfield
 using ShowCases
 using Statistics: mean
 using Test: @testset, @test, @test_nowarn
@@ -119,6 +120,7 @@ export
     Label,
     LabelMulti,
     Keypoints,
+    Many,
 
     # encodings
     encode,

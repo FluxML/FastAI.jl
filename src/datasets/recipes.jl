@@ -47,7 +47,7 @@ recipeblocks(::R) where {R<:DatasetRecipe} = recipeblocks(R)
 # ImageClfFolders
 
 """
-    ImageClfFolders(; labelfn = parentname, split = false)
+    ImageFolders(; labelfn = parentname, split = false)
 
 Recipe for loading a single-label image classification dataset
 stored in a hierarchical folder format. If `split == true`, split

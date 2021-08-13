@@ -1,17 +1,32 @@
-abstract type WrapperBlock <: Block end
+# # Wrapper blocks
+
+abstract type WrapperBlock <: AbstractBlock end
 
 wrapped(w::WrapperBlock) = w.block
+function setwrapped(w::WrapperBlock, b)
+    return Setfield.@set w.block = b
+end
 mockblock(w::WrapperBlock) = mockblock(wrapped(w))
 checkblock(w::WrapperBlock, data) = checkblock(wrapped(w), data)
 
 # If not overwritten, encodings are applied to the wrapped block
+
+function encodedblock(enc::Encoding, wrapper::WrapperBlock)
+    inner = encodedblock(enc, wrapped(wrapper))
+    return isnothing(inner) ? nothing : setwrapped(wrapper, inner)
+end
+function decodedblock(enc::Encoding, wrapper::WrapperBlock)
+    inner = decodedblock(enc, wrapped(wrapper))
+    return isnothing(inner) ? nothing : setwrapped(wrapper, inner)
+end
 function encode(enc::Encoding, ctx, wrapper::WrapperBlock, data; kwargs...)
-    return encode(enc, ctx, wrapper.block, data; kwargs...)
+    return encode(enc, ctx, wrapped(wrapper), data; kwargs...)
 end
 function decode(enc::Encoding, ctx, wrapper::WrapperBlock, data; kwargs...)
-    return decode(enc, ctx, wrapper.block, data; kwargs...)
+    return decode(enc, ctx, wrapped(wrapper), data; kwargs...)
 end
 
+# ## Named
 
 """
     Named(name, block)
@@ -36,7 +51,39 @@ function decodedblock(enc::Encoding, named::Named{Name}) where Name
     return isnothing(outblock) ? nothing : Named(Name, outblock)
 end
 
-# Wrapper encodings
+# ## Many
+
+"""
+    Many(block) <: WrapperBlock
+
+`Many` indicates that you can variable number of data instances for
+`block`. Consider a bounding box detection task where there may be any
+number of targets in an image and this number varies for different
+samples. The blocks `(Image{2}(), BoundingBox{2}()` imply that there is exactly
+one bounding box for every image, which is not the case. Instead you
+would want to use `(Image{2}(), Many(BoundingBox{2}())`.
+"""
+struct Many{B<:AbstractBlock} <: WrapperBlock
+    block::B
+end
+
+FastAI.checkblock(many::Many, datas) = all(checkblock(wrapped(many), data) for data in datas)
+FastAI.mockblock(many::Many) = [mockblock(wrapped(many)), mockblock(wrapped(many))]
+
+function FastAI.encode(enc::Encoding, ctx, many::Many, datas)
+    return map(datas) do data
+        encode(enc, ctx, wrapped(many), data)
+    end
+end
+
+function FastAI.decode(enc::Encoding, ctx, many::Many, datas)
+    return map(datas) do data
+        decode(enc, ctx, wrapped(many), data)
+    end
+end
+
+
+# # Wrapper encodings
 
 """
     Only(name, encoding)

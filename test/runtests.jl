@@ -22,6 +22,9 @@ include("imports.jl")
         @testset ExtendedTestSet "keypointpreprocessing.jl" begin
             include("encodings/keypointpreprocessing.jl")
         end
+        @testset ExtendedTestSet "many.jl" begin
+            include("encodings/many.jl")
+        end
     end
 
     @testset ExtendedTestSet "methods/" begin
