@@ -1,7 +1,7 @@
 
 const FASTAI_DATA_RECIPES = Dict{String, Vector{DatasetRecipe}}(
     # Image classification datasets
-    [name => [ImageClassificationFolders()] for name in (
+    [name => [ImageFolders()] for name in (
         "imagenette", "imagenette-160", "imagenette-320",
         "imagenette2", "imagenette2-160", "imagenette2-320",
         "imagewoof", "imagewoof-160", "imagewoof-320",
@@ -9,6 +9,7 @@ const FASTAI_DATA_RECIPES = Dict{String, Vector{DatasetRecipe}}(
     )]...,
 
     "camvid_tiny" => [ImageSegmentationFolders()],
+    "pascal_2007" => [ImageTableMultiLabel()],
 )
 
 

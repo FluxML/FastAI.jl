@@ -23,7 +23,7 @@ include("../imports.jl")
 
     @testset ExtendedTestSet "registerrecipe!" begin
         @test_nowarn Datasets.registerrecipe!(
-            reg, "mnist_var_size_tiny", Datasets.ImageClassificationFolders())
+            reg, "mnist_var_size_tiny", Datasets.ImageFolders())
     end
 
     @testset ExtendedTestSet "finddatasets" begin

@@ -56,16 +56,16 @@ defaults to the name of the parent folder but a custom function can
 be passed as `labelfn`.
 
 ```julia
-julia> recipeblocks(ImageClassificationFolders)
+julia> recipeblocks(ImageFolders)
 Tuple{Image{2}, Label}
 ```
 """
-Base.@kwdef struct ImageClassificationFolders <: DatasetRecipe
+Base.@kwdef struct ImageFolders <: DatasetRecipe
     labelfn = parentname
     split::Bool = false
 end
 
-function loadrecipe(recipe::ImageClassificationFolders, path)
+function loadrecipe(recipe::ImageFolders, path)
     isdir(path) || error("$path is not a directory")
     data = loadfolderdata(
         path,
@@ -81,7 +81,7 @@ function loadrecipe(recipe::ImageClassificationFolders, path)
     return data, blocks
 end
 
-recipeblocks(::Type{ImageClassificationFolders}) = Tuple{Image{2}, Label}
+recipeblocks(::Type{ImageFolders}) = Tuple{Image{2}, Label}
 
 
 # ImageSegmentationFolders
@@ -124,3 +124,37 @@ function loadrecipe(recipe::ImageSegmentationFolders, path)
 end
 
 recipeblocks(::Type{ImageSegmentationFolders}) = Tuple{Image{2}, Mask{2}}
+
+# ImageTableMultiLabel
+
+Base.@kwdef struct ImageTableMultiLabel <: DatasetRecipe
+    csvfile::String = "train.csv"
+    imagefolder::String = "train"
+    filecol::Symbol = :fname
+    labelcol::Symbol = :labels
+    split::Bool = false
+    splitcol::Symbol = :is_valid
+    labelsep::String = " "
+end
+
+
+function loadrecipe(recipe::ImageTableMultiLabel, path)
+    csvpath = joinpath(path, recipe.csvfile)
+    isfile(csvpath) || error("File $csvpath does not exist")
+    df = loadfile(csvpath)
+    images = mapobs(f -> loadfile(joinpath(path, recipe.imagefolder, f)), df[:, recipe.filecol])
+    labels = map(str -> split(str, recipe.labelsep), df[:,recipe.labelcol])
+    data = (images, labels)
+    blocks = Image{2}(), LabelMulti(unique(Iterators.flatten(labels)))
+    if recipe.split
+        idxs = 1:nobs(data)
+        splits = df[:, recipe.splitcol]
+        data = Dict(
+            "train" => datasubset(data, idxs[splits]),
+            "valid" => datasubset(data, idxs[(!).(splits)])
+        )
+    end
+    return data, blocks
+end
+
+recipeblocks(::Type{ImageTableMultiLabel}) = Tuple{Image{2}, LabelMulti}
