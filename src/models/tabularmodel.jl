@@ -9,6 +9,20 @@ function _one_emb_sz(cardinalitydict, catcol, sz_dict=nothing)
     Int64(n_cat)+1, Int64(sz)
 end
 
+"""
+    get_emb_sz(cardinalitydict, cols; sz_dict=nothing)
+
+Returns a collection of tuples containing embedding dimensions for each column 
+in `cols`. `cardinalitydict` is an indexable collection which maps to the cardinality
+for each column present in `cols`. 
+
+## Keyword arguments
+
+- `sz_dict`: An indexable collection which may contain the required embedding 
+    size for a particular column present in `cols`. If not passed, then the size is
+    calculated using fastai's rule of thumb for embedding dimensions.
+"""
+
 function get_emb_sz(cardinalitydict, cols; sz_dict=nothing)
     map(catcol -> _one_emb_sz(cardinalitydict, catcol, sz_dict), cols)
 end
@@ -30,6 +44,35 @@ end
 function tabular_continuous_backbone(n_cont)
     BatchNorm(n_cont)
 end
+
+"""
+    TabularModel(catbackbone, contbackbone, [finalclassifier]; kwargs...)
+    TabularModel(catcols, `n_cont::Number, outsz::Number[; kwargs...)
+
+Create a tabular model which takes in a tuple of categorical values 
+(label or one-hot encoded) and continuous values. The default categorical backbone is
+a Parallel of Embedding layers corresponding to each categorical variable, and continuous
+variables are just BatchNormed. The output from these backbones is then passed through
+a final classifier block.
+
+## Keyword arguments
+
+- `outsz`: The output size of the final classifier block. For single classification tasks, 
+    this would just be the number of classes and for regression tasks, this could be the
+    number of target continuous variables.
+- `layers`: The sizes of the hidden layers in the classifier block.
+- `ps`: Dropout probability. This could either be a single number which would be used for
+        for all the classifier layers, or a collection of numbers which are cycled through
+        for each layer.
+- `use_bn`: Boolean variable which controls whether to use batch normalization in the classifier.
+- `act_cls`: The activation function to use in the classifier layers.
+- `lin_first`: Controls if the linear layer comes before or after BatchNorm and Dropout.
+- `cardinalitydict`: An indexable collection which maps to the cardinality for each column present
+        in `catcols`.
+- `sz_dict`: An indexable collection which may contain the required embedding 
+    size for a particular column present in `cols`. If not passed, then the size is
+    calculated using fastai's rule of thumb for embedding dimensions.
+"""
 
 function TabularModel(
         catbackbone, 
