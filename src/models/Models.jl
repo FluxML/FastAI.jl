@@ -17,8 +17,6 @@ include("unet.jl")
 include("tabularmodel.jl")
 
 
-export xresnet18, xresnet50, UNetDynamic, 
-TabularModel, get_emb_sz, embeddingbackbone, continuousbackbone, classifierbackbone, sigmoidrange
-
+export xresnet18, xresnet50, UNetDynamic, TabularModel
 
 end
