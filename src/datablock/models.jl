@@ -63,23 +63,34 @@ end
 """
     blockmodel(inblock::TableRow{M, N}, outblock::Union{Continuous, OneHotTensor{0}}, backbone=nothing) where {M, N}
 
-Contruct a model for tabular classification or regression. `backbone` should 
-either be `nothing` or a tuple of categoricalbackbone, continuousbackbone, 
-and a classifierbackbone, with the first two taking in batches of corresponding 
-row value matrices.
+Contruct a model for tabular classification or regression. `backbone` should be a 
+Dict of categoricalbackbone, continuousbackbone, and a finalclassifier layer, with 
+the first two taking in batches of corresponding row value matrices.
 """
 
-# function blockmodel(
-#         inblock::EncodedTableRow{M, N}, 
-#         outblock::Union{Continuous, OneHotTensor{0}}, 
-#         backbone=nothing;) where {M, N}
-#     outsz = outblock isa Continuous ? outblock.size : length(outblock.classes)
-#     if isnothing(backbone)
-#         TabularModel(inblock.catcols, N, outsz; catdict = inblock.categorydict)
-#     else
-#         TabularModel(backbone[1], backbone[2], backbone[3])
-#     end
-# end
+function blockmodel(
+        inblock::EncodedTableRow{M, N}, 
+        outblock::Union{Continuous, OneHotTensor{0}}, 
+        backbone=Dict()) where {M, N}
+    
+    backbone = Dict{Any, Any}((backbonetype => layer) for (backbonetype, layer) in collect(backbone))
+    backbonekeys = keys(backbone)
+    if !(:categoricalbackbone in backbonekeys)
+        embedszs = FastAI.Models.get_emb_sz(
+            Dict(col => length(classes) for (col, classes) in collect(inblock.categorydict)),
+            inblock.catcols)
+        backbone[:categoricalbackbone] = Models.tabular_embedding_backbone(embedszs)
+    end
+    if !(:continuousbackbone in backbonekeys)
+        backbone[:continuousbackbone] = Models.tabular_continuous_backbone(N)
+    end
+    if (:finalclassifier in backbonekeys)
+        TabularModel(backbone[:categoricalbackbone], backbone[:continuousbackbone], backbone[:finalclassifier])
+    else
+        outsz = outblock isa Continuous ? outblock.size : length(outblock.classes)
+        TabularModel(backbone[:categoricalbackbone], backbone[:continuousbackbone]; outsz=outsz)
+    end
+end
 
 
 
