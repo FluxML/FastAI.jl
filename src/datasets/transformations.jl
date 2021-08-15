@@ -6,7 +6,7 @@ struct MappedData{F, D}
     data::D
 end
 
-Base.show(io::IO, data::MappedData) = print(io, "mapobs($(data.f), $(data.data))")
+Base.show(io::IO, data::MappedData) = print(io, "mapobs($(data.f), $(summary(data.data)))")
 Base.show(io::IO, data::MappedData{F, <:AbstractArray}) where F = print(io, "mapobs($(data.f), $(ShowLimit(data.data, limit=80)))")
 LearnBase.nobs(data::MappedData) = nobs(data.data)
 LearnBase.getobs(data::MappedData, idx::Int) = data.f(getobs(data.data, idx))

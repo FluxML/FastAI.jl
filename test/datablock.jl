@@ -1,15 +1,6 @@
-#include("imports.jl")
-using FastAI
-import FastAI: Block, Encoding, encode, decode, checkblock, encodedblock, decodedblock
-using FastAI: Label, LabelMulti, Mask, Image, ImageTensor, testencoding
-using FastAI: OneHot
-using Test
-using StaticArrays
-using Images
-using FastAI: grabbounds
-using Images
+include("imports.jl")
 
-##
+
 struct ABlock <: Block
     end
 checkblock(::ABlock, ::Int) = true
@@ -69,9 +60,7 @@ end
     testencoding(enc, block, image)
     @testset "randstate is shared" begin
         im1, im2 = encode(enc, Training(), (block, block), (image, image))
-        im3 = encode(enc, Training(), block, image)
         @test im1 ≈ im2
-        @test !(im1 == im3)
     end
 
     @testset "don't transform data that doesn't need to be resized" begin

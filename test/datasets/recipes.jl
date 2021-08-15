@@ -15,11 +15,11 @@ function testrecipe(recipe::Datasets.DatasetRecipe, data, blocks)
 end
 
 
-@testset ExtendedTestSet "ImageClassificationFolders" begin
+@testset ExtendedTestSet "ImageFolders" begin
     path = joinpath(datasetpath("mnist_var_size_tiny"), "train")
 
     @testset ExtendedTestSet "Basic configuration" begin
-        recipe = Datasets.ImageClassificationFolders()
+        recipe = Datasets.ImageFolders()
         data, blocks = loadrecipe(recipe, path)
         testrecipe(recipe, data, blocks)
         @test blocks[1] isa Image
@@ -27,19 +27,19 @@ end
     end
 
     @testset ExtendedTestSet "Split configuration" begin
-        recipe = Datasets.ImageClassificationFolders(split=true)
+        recipe = Datasets.ImageFolders(split=true)
         data, blocks = loadrecipe(recipe, path)
         testrecipe(recipe, data["train"], blocks)
     end
 
     @testset ExtendedTestSet "Error cases" begin
         @testset ExtendedTestSet "Empty directory" begin
-            recipe = Datasets.ImageClassificationFolders(split=true)
+            recipe = Datasets.ImageFolders(split=true)
             @test_throws ErrorException loadrecipe(recipe, mktempdir())
         end
 
         @testset ExtendedTestSet "Only one label" begin
-            recipe = Datasets.ImageClassificationFolders(labelfn=x -> "1")
+            recipe = Datasets.ImageFolders(labelfn=x -> "1")
             @test_throws ErrorException loadrecipe(recipe, path)
         end
     end

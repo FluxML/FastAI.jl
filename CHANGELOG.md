@@ -4,10 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] - 2020-03-08 – now
+## [Unreleased] - 2020-07-32 – now
 
 ### Added
-- `plotlrfind` to visualize results of `LRFinderPhase`
+- High-level API "FasterAI"
+    - Find datasets and learning methods based on `Block`s: `finddataset`, `findlearningmethods`
+    - `loaddataset` for quickly loading data containers from configured recipes
+- Data container recipes (`DatasetRecipe`, `loadrecipe`)
 
 ### Changed
-- Documentation notebooks to reflect changes in API

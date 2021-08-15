@@ -34,10 +34,10 @@ end
 Wrapper `Block` to attach a name to a block. Can be used in conjunction
 with [`Only`](#) to apply encodings to specific blocks only.
 """
-struct Named{Name, B<:Block} <: WrapperBlock
+struct Named{Name, B<:AbstractBlock} <: WrapperBlock
     block::B
 end
-Named(name::Symbol, block::B) where {B<:Block} = Named{name, B}(block)
+Named(name::Symbol, block::B) where {B<:AbstractBlock} = Named{name, B}(block)
 
 
 # the name is preserved through encodings and decodings

@@ -2,8 +2,8 @@
 using Colors: RGB, N0f8, Gray
 using FastAI
 using FastAI: ParamGroups, IndexGrouper, getgroup, DiscriminativeLRs, decay_optim
-using FastAI: Image, Keypoints, Mask, testencoding, Label, OneHot, ProjectiveTransforms,
-    encodedblock, decodedblock, encode, decode, mockblock
+import FastAI: Image, Keypoints, Mask, testencoding, Label, OneHot, ProjectiveTransforms,
+    encodedblock, decodedblock, encode, decode, mockblock, checkblock, Block, Encoding
 using FilePathsBase
 using FastAI.Datasets
 using DLPipelines
