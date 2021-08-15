@@ -50,8 +50,8 @@ function encode(tt::TabularTransform, _, block::TableRow, row)
         tt.tfms, 
         DataAugmentation.TabularItem(usedrow, keys(usedrow))
     ).data
-    catvals = map(col -> tfmrow[col], block.catcols)
-    contvals = map(col -> tfmrow[col], block.contcols)
+    catvals = collect(map(col -> tfmrow[col], block.catcols))
+    contvals = collect(map(col -> tfmrow[col], block.contcols))
     (catvals, contvals)
 end
 
@@ -64,7 +64,7 @@ These functions assume that the table in the TableDataset object td has Tables.j
 
 function gettransformationdict(td, ::Type{DataAugmentation.NormalizeRow}, cols)
     dict = Dict()
-    for col in cols
+    map(cols) do col
         vals = skipmissing(Tables.getcolumn(td.table, col))
         dict[col] = (Statistics.mean(vals), Statistics.std(vals))
     end
@@ -73,7 +73,7 @@ end
 
 function gettransformationdict(td, ::Type{DataAugmentation.FillMissing}, cols)
     dict = Dict()
-    for col in cols
+    map(cols) do col
         vals = skipmissing(Tables.getcolumn(td.table, col))
         dict[col] = Statistics.median(vals)
     end
@@ -82,10 +82,36 @@ end
 
 function gettransformationdict(td, ::Type{DataAugmentation.Categorify}, cols)
     dict = Dict()
-    for col in cols
+    map(cols) do col
         vals = Tables.getcolumn(td.table, col)
         dict[col] = unique(vals)
     end
     dict
+end
+
+"""
+The convenience functions defined below can be used to get the categorical and continuous 
+columns present in a `TableDataset`, and quickly get transformations for it which can be 
+passed in `TableTransform`.
+"""
+
+function getcoltypes(td::Datasets.TableDataset)
+    schema = Tables.schema(td.table)
+    contcols = filter(col->schema.types[findfirst(isequal(col), schema.names)] <: Union{Number, Missing}, schema.names)
+    catcols = filter(col->!(col in contcols), schema.names)
+    catcols, contcols
+end
+
+function gettransforms(td::Datasets.TableDataset)
+    catcols, contcols = getcoltypes(td)
+    normstats = FastAI.gettransformationdict(td, DataAugmentation.NormalizeRow, contcols)
+    fmvals = FastAI.gettransformationdict(td, DataAugmentation.FillMissing, contcols)
+    catdict = FastAI.gettransformationdict(td, DataAugmentation.Categorify, catcols)
+    
+    normalize = DataAugmentation.NormalizeRow(normstats, contcols)
+    categorify = DataAugmentation.Categorify(catdict, catcols)
+    fm = DataAugmentation.FillMissing(fmvals, contcols)
+    
+    fm|>normalize|>categorify
 end
         

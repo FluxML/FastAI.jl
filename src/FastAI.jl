@@ -41,6 +41,13 @@ using Test: @testset, @test, @test_nowarn
 include("plotting.jl")
 include("learner.jl")
 
+# submodules
+include("datasets/Datasets.jl")
+@reexport using .Datasets
+
+include("models/Models.jl")
+using .Models
+
 # Data block API
 include("datablock/block.jl")
 include("datablock/encoding.jl")
@@ -60,14 +67,6 @@ include("encodings/keypointpreprocessing.jl")
 include("datablock/models.jl")
 include("datablock/loss.jl")
 include("datablock/plot.jl")
-
-# submodules
-include("datasets/Datasets.jl")
-@reexport using .Datasets
-
-
-include("models/Models.jl")
-using .Models
 
 # training
 include("training/paramgroups.jl")
