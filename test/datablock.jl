@@ -1,15 +1,6 @@
-#include("imports.jl")
-using FastAI
-import FastAI: Block, Encoding, encode, decode, checkblock, encodedblock, decodedblock
-using FastAI: Label, LabelMulti, Mask, Image, ImageTensor, testencoding
-using FastAI: OneHot
-using Test
-using StaticArrays
-using Images
-using FastAI: grabbounds
-using Images
+include("imports.jl")
 
-##
+
 struct ABlock <: Block
     end
 checkblock(::ABlock, ::Int) = true
