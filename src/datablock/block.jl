@@ -175,8 +175,8 @@ present in indices for categorical and continuous columns are consistent,
 and `data` is indexable by the elements of `catcols` and `contcols`.
 """
 struct TableRow{M, N} <: Block
-    catcols
-    contcols
+    catcols::NTuple{M}
+    contcols::NTuple{N}
     categorydict
 end
 
@@ -186,7 +186,7 @@ end
 
 function checkblock(block::TableRow, x)
     columns = Tables.columnnames(x)
-    (all(col -> col ∈ columns, [block.catcols..., block.contcols...]) &&
+    (all(col -> col ∈ columns, (block.catcols..., block.contcols...)) &&
     all(col -> haskey(block.categorydict, col) && 
         (ismissing(x[col]) || x[col] ∈ block.categorydict[col]), block.catcols) &&
     all(col -> ismissing(x[col]) || x[col] isa Number, block.contcols))

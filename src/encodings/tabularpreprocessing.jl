@@ -6,8 +6,8 @@ N continuous value collections.
 """
 
 struct EncodedTableRow{M, N} <: Block
-    catcols
-    contcols
+    catcols::NTuple{M}
+    contcols::NTuple{N}
     categorydict
 end
 
@@ -22,16 +22,13 @@ end
 """
     TabularTransform <: Encoding
 
-Encodes `TableRow`s by applying a composition of various preprocessing
-steps available in `DataAugmentation.jl`. Currently, preprocessing could 
-consist of
+Encodes a `TableRow` by applying the following preprocessing steps:
 - [`DataAugmentation.NormalizeRow`](#) (for normalizing a row of data for continuous columns)
 - [`DataAugmentation.FillMissing`](#) (for filling missing values)
 - [`DataAugmentation.Categorify`](#) (for label encoding categorical columns, which can be later used for indexing into embedding matrices)
 or a sequence of these transformations.
 
 """
-
 struct TabularTransform <: Encoding
 	tfms
 end
@@ -61,7 +58,6 @@ which will be required for creating various tabular transformations available in
 
 These functions assume that the table in the TableDataset object td has Tables.jl columnaccess interface defined.
 """
-
 function gettransformationdict(td, ::Type{DataAugmentation.NormalizeRow}, cols)
     dict = Dict()
     map(cols) do col
@@ -112,6 +108,6 @@ function gettransforms(td::Datasets.TableDataset)
     categorify = DataAugmentation.Categorify(catdict, catcols)
     fm = DataAugmentation.FillMissing(fmvals, contcols)
     
-    fm|>normalize|>categorify
+    return fm |> normalize |> categorify
 end
         
