@@ -1,30 +1,39 @@
+"""
+    emb_sz_rule(n_cat)
+
+Returns an embedding size corresponding to the number of classes for a 
+categorical variable using the rule of thumb present in python fastai.
+(see https://github.com/fastai/fastai/blob/2742fe844573d06e700f869839fb9ec5f3a9bca9/fastai/tabular/model.py#L12)
+"""
 function emb_sz_rule(n_cat)
     min(600, round(1.6 * n_cat^0.56))
 end
 
-function _one_emb_sz(cardinalitydict, catcol, sz_dict=nothing)
-    sz_dict = isnothing(sz_dict) ? Dict() : sz_dict
-    n_cat = cardinalitydict[catcol]
-    sz = catcol in keys(sz_dict) ? sz_dict[catcol] : emb_sz_rule(n_cat)
-    Int64(n_cat)+1, Int64(sz)
-end
-
 """
-    get_emb_sz(cardinalitydict, cols; sz_dict=nothing)
+    get_emb_sz(cardinalities, size_overrides=nothing)
 
-Returns a collection of tuples containing embedding dimensions for each column 
-in `cols`. `cardinalitydict` is an indexable collection which maps to the cardinality
-for each column present in `cols`. 
+Returns a collection of tuples containing embedding dimensions corresponding to 
+number of classes in categorical columns present in `cardinalities` and adjusting for nans. 
 
 ## Keyword arguments
 
-- `sz_dict`: An indexable collection which may contain the required embedding 
-    size for a particular column present in `cols`. If not passed, then the size is
-    calculated using fastai's rule of thumb for embedding dimensions.
+- `size_overrides`: A collection of Integers and `nothing`. The integer present at 
+    any index will be used to override the rule of thumb for getting embedding sizes.
 """
 
-function get_emb_sz(cardinalitydict, cols; sz_dict=nothing)
-    map(catcol -> _one_emb_sz(cardinalitydict, catcol, sz_dict), cols)
+function get_emb_sz(cardinalities, size_overrides = fill(nothing, length(cardinalities)))
+    map(Iterators.enumerate(cardinalities)) do (i, cardinality)
+        emb_dim = isnothing(size_overrides[i]) ? emb_sz_rule(cardinality+1) : size_overrides[i]
+        (Int64(cardinality)+1, Int64(emb_dim))
+    end
+end
+
+function get_emb_sz(cardinalities; catcols, size_overrides=Dict())
+    keylist = keys(size_overrides)
+    overrides = map(catcols) do col
+        col in keylist ? size_overrides[col] : nothing
+    end
+    get_emb_sz(cardinalities, overrides)
 end
 
 function sigmoidrange(x, low, high)
@@ -47,7 +56,7 @@ end
 
 """
     TabularModel(catbackbone, contbackbone, [finalclassifier]; kwargs...)
-    TabularModel(catcols, `n_cont::Number, outsz::Number[; kwargs...)
+    TabularModel(catcols, `n_cont::Number, outsize::Number[; kwargs...)
 
 Create a tabular model which takes in a tuple of categorical values 
 (label or one-hot encoded) and continuous values. The default categorical backbone is
@@ -57,30 +66,29 @@ a final classifier block.
 
 ## Keyword arguments
 
-- `outsz`: The output size of the final classifier block. For single classification tasks, 
+- `outsize`: The output size of the final classifier block. For single classification tasks, 
     this would just be the number of classes and for regression tasks, this could be the
     number of target continuous variables.
-- `layers`: The sizes of the hidden layers in the classifier block.
-- `ps`: Dropout probability. This could either be a single number which would be used for
-        for all the classifier layers, or a collection of numbers which are cycled through
-        for each layer.
-- `use_bn`: Boolean variable which controls whether to use batch normalization in the classifier.
-- `act_cls`: The activation function to use in the classifier layers.
-- `lin_first`: Controls if the linear layer comes before or after BatchNorm and Dropout.
-- `cardinalitydict`: An indexable collection which maps to the cardinality for each column present
-        in `catcols`.
-- `sz_dict`: An indexable collection which may contain the required embedding 
-    size for a particular column present in `cols`. If not passed, then the size is
-    calculated using fastai's rule of thumb for embedding dimensions.
+- `layersizes`: The sizes of the hidden layers in the classifier block.
+- `dropout_rates`: Dropout probability. This could either be a single number which would be 
+    used for for all the classifier layers, or a collection of numbers which are cycled through
+    for each layer.
+- `batchnorm`: Boolean variable which controls whether to use batch normalization in the classifier.
+- `activation`: The activation function to use in the classifier layers.
+- `linear_first`: Controls if the linear layer comes before or after BatchNorm and Dropout.
+- `cardinalities`: A collection of sizes (number of classes) for each categorical column.
+- `size_overrides`: An optional argument which corresponds to a collection containing 
+    embedding sizes to override the value returned by the "rule of thumb" for a particular index 
+    corresponding to `cardinalities`, or `nothing`.
 """
 
 function TabularModel(
         catbackbone, 
         contbackbone;
         outsize,
-        layers=[200, 100],
+        layersizes=[200, 100],
         kwargs...)
-    TabularModel(catbackbone, contbackbone, Dense(layers[end], outsz); layers=layers, kwargs...)
+    TabularModel(catbackbone, contbackbone, Dense(layersizes[end], outsize); layersizes=layersizes, kwargs...)
 end
 
 function TabularModel(
@@ -97,14 +105,14 @@ function TabularModel(
 
     classifierin = mapreduce(layer -> size(layer.weight)[1], +, catbackbone[2].layers;
                              init = contbackbone.chs)
-    ps = Iterators.cycle(ps)
+    dropout_rates = Iterators.cycle(dropout_rates)
     classifiers = []
 
-    first_ps, ps = Iterators.peel(ps)
-    push!(classifiers, linbndrop(classifierin, first(layers); use_bn=use_bn, p=first_ps, lin_first=lin_first, act=act_cls))
+    first_ps, dropout_rates = Iterators.peel(dropout_rates)
+    push!(classifiers, linbndrop(classifierin, first(layersizes); use_bn=batchnorm, p=first_ps, lin_first=linear_first, act=activation))
 
-    for (isize, osize, p) in zip(layers[1:(end-1)], layers[2:end], ps)
-        layer = linbndrop(isize, osize; use_bn=use_bn, p=p, act=act_cls, lin_first=lin_first)
+    for (isize, osize, p) in zip(layersizes[1:(end-1)], layersizes[2:end], dropout_rates)
+        layer = linbndrop(isize, osize; use_bn=batchnorm, p=p, act=activation, lin_first=linear_first)
         push!(classifiers, layer)
     end
     
@@ -116,15 +124,14 @@ function TabularModel(
 end
 
 function TabularModel(
-        catcols,
         n_cont::Number,
-        outsz::Number,
-        layers=[200, 100];
-        cardinalitydict,
-        sz_dict=nothing)
-    embedszs = get_emb_sz(cardinalitydict, catcols, sz_dict=sz_dict)
+        outsize::Number,
+        layersizes=[200, 100];
+        cardinalities,
+        size_overrides=fill(nothing, length(cardinalities)))
+    embedszs = get_emb_sz(cardinalities, size_overrides)
     catback = tabular_embedding_backbone(embedszs)
     contback = tabular_continuous_backbone(n_cont)
 
-    TabularModel(catback, contback; layers=layers, outsz=outsz)
+    TabularModel(catback, contback; layersizes=layersizes, outsize=outsize)
 end

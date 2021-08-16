@@ -25,16 +25,15 @@ include("../imports.jl")
 
         x = ([rand(1:n) for (n, _) in embed_szs], rand(5, 1))
 
-        tm = TabularModel(embeds, contback; outsz=4)
+        tm = TabularModel(embeds, contback; outsize=4)
         @test size(tm(x)) == (4, 1)
 
         tm2 = TabularModel(embeds, contback, Chain(Dense(100, 4), x->FastAI.Models.sigmoidrange(x, 2, 5)))
         y2 = tm2(x)
         @test all(y2.> 2) && all(y2.<5)
 
-        catcols = [:a, :b, :c]
-        cardict = Dict(:a => 4, :b => 99, :c => 1)
-        tm3 = TabularModel(catcols, n, 4, [200, 100], cardinalitydict = cardict, sz_dict = Dict(:a=>10, :b=>30, :c=>30))
+        cardinalities = (4, 99, 1)
+        tm3 = TabularModel(n, 4, [200, 100], cardinalities = cardinalities, size_overrides = (10, 30, 30))
         @test size(tm3(x)) == (4, 1)
     end
 end
