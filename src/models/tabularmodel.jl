@@ -10,18 +10,22 @@ function emb_sz_rule(n_cat)
 end
 
 """
-    get_emb_sz(cardinalities, size_overrides=nothing)
+    get_emb_sz(cardinalities, [size_overrides])
+    get_emb_sz(cardinalities; catcols, [size_overrides])
 
 Returns a collection of tuples containing embedding dimensions corresponding to 
 number of classes in categorical columns present in `cardinalities` and adjusting for nans. 
 
 ## Keyword arguments
 
-- `size_overrides`: A collection of Integers and `nothing`. The integer present at 
-    any index will be used to override the rule of thumb for getting embedding sizes.
+- `size_overrides`: Depending on the method used, this could either be a collection of 
+    Integers and `nothing` or an indexable collection with column name as key and size
+    to override it with as the value. In the first case, the integer present at any index 
+    will be used to override the rule of thumb for getting embedding sizes.
+- `categorical_cols`: A collection of categorical column names.
 """
 
-function get_emb_sz(cardinalities, size_overrides = fill(nothing, length(cardinalities)))
+function get_emb_sz(cardinalities, size_overrides=fill(nothing, length(cardinalities)))
     map(Iterators.enumerate(cardinalities)) do (i, cardinality)
         emb_dim = isnothing(size_overrides[i]) ? emb_sz_rule(cardinality+1) : size_overrides[i]
         (Int64(cardinality)+1, Int64(emb_dim))
@@ -56,7 +60,7 @@ end
 
 """
     TabularModel(catbackbone, contbackbone, [finalclassifier]; kwargs...)
-    TabularModel(catcols, `n_cont::Number, outsize::Number[; kwargs...)
+    TabularModel(`n_cont::Number, outsize::Number[; kwargs...])
 
 Create a tabular model which takes in a tuple of categorical values 
 (label or one-hot encoded) and continuous values. The default categorical backbone is
