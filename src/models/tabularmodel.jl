@@ -77,7 +77,7 @@ a final classifier block.
 function TabularModel(
         catbackbone, 
         contbackbone;
-        outsz,
+        outsize,
         layers=[200, 100],
         kwargs...)
     TabularModel(catbackbone, contbackbone, Dense(layers[end], outsz); layers=layers, kwargs...)
@@ -87,15 +87,16 @@ function TabularModel(
         catbackbone,
         contbackbone,
         finalclassifier;
-        layers=[200, 100],
-        ps=0.,
-        use_bn=true,
-        act_cls=Flux.relu,
-        lin_first=true)
+        layersizes=[200, 100],
+        dropout_rates=0.,
+        batchnorm=true,
+        activation=Flux.relu,
+        linear_first=true)
     
     tabularbackbone = Parallel(vcat, catbackbone, contbackbone)
 
-    classifierin = mapreduce(layer -> size(layer.weight)[1], +, catbackbone[2].layers, init = contbackbone.chs)
+    classifierin = mapreduce(layer -> size(layer.weight)[1], +, catbackbone[2].layers;
+                             init = contbackbone.chs)
     ps = Iterators.cycle(ps)
     classifiers = []
 
