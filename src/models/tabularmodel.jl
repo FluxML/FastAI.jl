@@ -9,18 +9,14 @@ emb_sz_rule(n_cat) = min(600, round(Int, 1.6 * n_cat^0.56))
 
 """
     get_emb_sz(cardinalities, [size_overrides])
-    get_emb_sz(cardinalities; catcols, [size_overrides])
 
 Returns a collection of tuples containing embedding dimensions corresponding to 
 number of classes in categorical columns present in `cardinalities` and adjusting for NaNs. 
 
 ## Keyword arguments
 
-- `size_overrides`: Depending on the method used, this could either be a collection of 
-    Integers and `nothing` or an indexable collection with column name as key and size
-    to override it with as the value. In the first case, the integer present at any index 
+- `size_overrides`: A collection of Integers and `nothing` where the integer present at any index 
     will be used to override the rule of thumb for getting embedding sizes.
-- `categorical_cols`: A collection of categorical column names.
 """
 
 get_emb_sz(cardinalities::AbstractVector{<:Integer}, size_overrides=fill(nothing, length(cardinalities))) =
@@ -29,19 +25,32 @@ get_emb_sz(cardinalities::AbstractVector{<:Integer}, size_overrides=fill(nothing
         return (cardinality + 1, emb_dim)
     end
 
-function get_emb_sz(cardinalities; catcols, size_overrides=Dict())
+"""
+    get_emb_sz(cardinalities, categorical_cols, [size_overrides])
+
+Returns a collection of tuples containing embedding dimensions corresponding to 
+number of classes in categorical columns present in `cardinalities` and adjusting for NaNs. 
+
+## Keyword arguments
+
+- `size_overrides`: An indexable collection with column name as key and size
+    to override it with as the value.
+- `categorical_cols`: A collection of categorical column names.
+"""
+
+function get_emb_sz(cardinalities::AbstractVector{<:Integer}, categorical_cols::Tuple, size_overrides=Dict())
     keylist = keys(size_overrides)
-    overrides = map(catcols) do col
+    overrides = collect(map(categorical_cols) do col
         col in keylist ? size_overrides[col] : nothing
-    end
+    end)
     get_emb_sz(cardinalities, overrides)
 end
 
 sigmoidrange(x, low, high) = @. Flux.sigmoid(x) * (high - low) + low
 
-function tabular_embedding_backbone(embedding_sizes, dropoutprob=0.)
+function tabular_embedding_backbone(embedding_sizes, dropout_rate=0.)
     embedslist = [Flux.Embedding(ni, nf) for (ni, nf) in embedding_sizes]
-    emb_drop = dropoutprob==0. ? identity : Dropout(dropoutprob)
+    emb_drop = iszero(dropout_rate) ? identity : Dropout(dropout_rate)
     Chain(
         x -> tuple(eachrow(x)...), 
         Parallel(vcat, embedslist), 
@@ -53,13 +62,12 @@ tabular_continuous_backbone(n_cont) = BatchNorm(n_cont)
 
 """
     TabularModel(catbackbone, contbackbone, [finalclassifier]; kwargs...)
-    TabularModel(n_cont, outsize [; kwargs...])
 
 Create a tabular model which takes in a tuple of categorical values 
-(label or one-hot encoded) and continuous values. The default categorical backbone is
+(label or one-hot encoded) and continuous values. The default categorical backbone or `catbackbone` is
 a Parallel of Embedding layers corresponding to each categorical variable, and continuous
-variables are just BatchNormed. The output from these backbones is then passed through
-a final classifier block.
+variables are just BatchNormed using `contbackbone`. The output from these backbones is then passed through
+a `finalclassifier` block.
 
 ## Keyword arguments
 
@@ -73,10 +81,6 @@ a final classifier block.
 - `batchnorm`: Boolean variable which controls whether to use batch normalization in the classifier.
 - `activation`: The activation function to use in the classifier layers.
 - `linear_first`: Controls if the linear layer comes before or after BatchNorm and Dropout.
-- `cardinalities`: A collection of sizes (number of classes) for each categorical column.
-- `size_overrides`: An optional argument which corresponds to a collection containing 
-    embedding sizes to override the value returned by the "rule of thumb" for a particular index 
-    corresponding to `cardinalities`, or `nothing`.
 """
 
 function TabularModel(
@@ -120,6 +124,25 @@ function TabularModel(
         finalclassifier
     )
 end
+
+"""
+    TabularModel(n_cont, outsize, [layersizes; kwargs...])
+
+Create a tabular model which takes in a tuple of categorical values 
+(label or one-hot encoded) and continuous values. The default categorical backbone is
+a Parallel of Embedding layers corresponding to each categorical variable, and continuous
+variables are just BatchNormed. The output from these backbones is then passed through
+a final classifier block. Uses `n_cont` the number of continuous columns, `outsize` which
+is the output size of the final classifier block, and `layersizes` which is a collection of
+classifier layer sizes, to create the model.
+
+## Keyword arguments
+
+- `cardinalities`: A collection of sizes (number of classes) for each categorical column.
+- `size_overrides`: An optional argument which corresponds to a collection containing 
+    embedding sizes to override the value returned by the "rule of thumb" for a particular index 
+    corresponding to `cardinalities`, or `nothing`.
+"""
 
 function TabularModel(
         n_cont::Number,
