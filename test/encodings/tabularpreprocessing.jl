@@ -4,8 +4,8 @@
     vals = [1, 2, 3, "a", "x"]
     row = NamedTuple(zip(cols, vals))
 
-    catcols = [:col4, :col5]
-    contcols = [:col1, :col2, :col3]
+    catcols = (:col4, :col5)
+    contcols = (:col1, :col2, :col3)
 
     col1_mean, col1_std = 10, 100
     col2_mean, col2_std = 100, 10
@@ -17,7 +17,7 @@
         :col3 => (col3_mean, col3_std)
     )
 
-    tfm = TabularTransform(
+    tfm = TabularPreprocessing(
         NormalizeRow(normdict, contcols)
     )
     

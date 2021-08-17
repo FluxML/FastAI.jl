@@ -136,7 +136,7 @@ export
     Only,
     Named,
     augs_projection, augs_lighting,
-    TabularTransform,
+    TabularPreprocessing,
 
     BlockMethod,
     describemethod,
