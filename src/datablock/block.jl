@@ -174,10 +174,10 @@ is valid if it satisfies the `AbstractRow` interface in Tables.jl, values
 present in indices for categorical and continuous columns are consistent, 
 and `data` is indexable by the elements of `catcols` and `contcols`.
 """
-struct TableRow{M, N} <: Block
+struct TableRow{M, N, T} <: Block
     catcols::NTuple{M}
     contcols::NTuple{N}
-    categorydict
+    categorydict::T
 end
 
 function TableRow(catcols, contcols, categorydict)

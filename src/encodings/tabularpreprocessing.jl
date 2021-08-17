@@ -29,8 +29,8 @@ Encodes a `TableRow` by applying the following preprocessing steps:
 or a sequence of these transformations.
 
 """
-struct TabularTransform <: Encoding
-	tfms
+struct TabularTransform{T} <: Encoding
+	tfms::T
 end
 
 function encodedblock(::TabularTransform, block::TableRow)
