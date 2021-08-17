@@ -32,7 +32,7 @@ include("../imports.jl")
         y2 = tm2(x)
         @test all(y2.> 2) && all(y2.<5)
 
-        cardinalities = (4, 99, 1)
+        cardinalities = [4, 99, 1]
         tm3 = TabularModel(n, 4, [200, 100], cardinalities = cardinalities, size_overrides = (10, 30, 30))
         @test size(tm3(x)) == (4, 1)
     end
