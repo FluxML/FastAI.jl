@@ -192,13 +192,22 @@ function checkblock(block::TableRow, x)
     all(col -> ismissing(x[col]) || x[col] isa Number, block.contcols))
 end
 
+function mockblock(block::TableRow)
+    cols = (block.catcols..., block.contcols...)
+    vals = map(cols) do col
+        col in block.catcols ? 
+            rand(block.categorydict[col]) : rand()
+    end
+    return NamedTuple(zip(cols, vals))
+end
+
 # Continous
 
 """
-    Continuous(n) <: Block
+    Continuous(size) <: Block
 
 `Block` for collections of numbers. `data` is valid if it's 
-length is `n` and contains `Number`s.
+length is `size` and contains `Number`s.
 """
 
 struct Continuous <: Block
@@ -208,3 +217,5 @@ end
 function checkblock(block::Continuous, x)
     block.size == length(x) && eltype(x) <: Number
 end
+
+mockblock(block::Continuous) = rand(block.size)

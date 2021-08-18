@@ -148,6 +148,8 @@ export
     ImageClassificationMulti,
     ImageSegmentation,
     ImageKeypointRegression,
+    TabularClassificationSingle,
+    TabularRegression,
 
 
     # training

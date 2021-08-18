@@ -40,6 +40,12 @@ include("imports.jl")
         @testset ExtendedTestSet "imagekeypointregression.jl" begin
             include("methods/imagekeypointregression.jl")
         end
+        @testset ExtendedTestSet "tabularclassification.jl" begin
+            include("methods/tabularclassification.jl")
+        end
+        @testset ExtendedTestSet "tabularregression.jl" begin
+            include("methods/tabularregression.jl")
+        end
     end
 
     @testset ExtendedTestSet "datasets/" begin
