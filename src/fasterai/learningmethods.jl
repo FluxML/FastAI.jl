@@ -53,7 +53,7 @@ end
 """
     ImageClassificationMulti(size, classes; kwargs...)
 
-Learning method for single-label image classification. Images are
+Learning method for multi-label image classification. Images are
 resized to `size` and classified into multiple of `classes`.
 
 Use [`ImageClassificationSingle`](#) for the single-class setting.
