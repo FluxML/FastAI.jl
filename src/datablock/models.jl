@@ -75,7 +75,7 @@ function blockmodel(
 
     default_backbones = default_tabular_backbone(inblock, outblock)
     backbones = [haskey(backbone, k) ? backbone[k] : default_backbones[k]
-        for k in (:categorical, :continuous, :classifier)]
+        for k in (:categorical, :continuous, :finalclassifier)]
     TabularModel(backbones...)
 end
 
@@ -83,7 +83,7 @@ function default_tabular_backbone(
         inblock::EncodedTableRow{M, N}, 
         outblock::Union{Continuous, OneHotTensor{0}}) where {M, N}
 
-    embedszs = FastAI.Models.get_emb_sz(map(col -> length(inblock.categorydict[col]), inblock.catcols))
+    embedszs = Models.get_emb_sz(collect(map(col -> length(inblock.categorydict[col]), inblock.catcols)), inblock.catcols)
     catback = Models.tabular_embedding_backbone(embedszs)
 
     contback = Models.tabular_continuous_backbone(N)

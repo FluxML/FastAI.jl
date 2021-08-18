@@ -24,6 +24,7 @@ include("imports.jl")
         end
         @testset ExtendedTestSet "many.jl" begin
             include("encodings/many.jl")
+        end
         @testset ExtendedTestSet "tabularpreprocessing.jl" begin
             include("encodings/tabularpreprocessing.jl")
         end

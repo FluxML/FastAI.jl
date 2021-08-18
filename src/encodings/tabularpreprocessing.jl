@@ -15,7 +15,7 @@ function EncodedTableRow(catcols, contcols, categorydict)
     EncodedTableRow{length(catcols), length(contcols)}(catcols, contcols, categorydict)
 end
 
-function checkblock(::EncodedTableRow{M, N}, x::Vector{Tuple, Tuple}) where {M, N}
+function checkblock(::EncodedTableRow{M, N}, x::Tuple{Vector, Vector}) where {M, N}
     length(x[1]) == M && length(x[2]) == N
 end
 
