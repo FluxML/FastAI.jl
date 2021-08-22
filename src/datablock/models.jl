@@ -83,7 +83,7 @@ function default_tabular_backbone(
         inblock::EncodedTableRow{M, N}, 
         outblock::Union{Continuous, OneHotTensor{0}}) where {M, N}
 
-    embedszs = Models.get_emb_sz(collect(map(col -> length(inblock.categorydict[col]), inblock.catcols)), inblock.catcols)
+    embedszs = Models.get_emb_sz(Dict((col => length(inblock.categorydict[col]) for col in inblock.catcols)))
     catback = Models.tabular_embedding_backbone(embedszs)
 
     contback = Models.tabular_continuous_backbone(N)
