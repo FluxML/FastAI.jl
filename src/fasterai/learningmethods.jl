@@ -53,10 +53,10 @@ end
 """
     ImageClassificationMulti(size, classes; kwargs...)
 
-Learning method for single-label image classification. Images are
+Learning method for multi-label image classification. Images are
 resized to `size` and classified into multiple of `classes`.
 
-Use [`ImageClassificationMulti`](#) for the single-class setting.
+Use [`ImageClassificationSingle`](#) for the single-class setting.
 """
 function ImageClassificationMulti(size::NTuple{N,Int}, classes::AbstractVector; kwargs...) where N
     blocks = (Image{N}(), LabelMulti(classes))
@@ -131,3 +131,69 @@ function ImageKeypointRegression(size::NTuple{N,Int}, nkeypoints::Int; kwargs...
 end
 
 registerlearningmethod!(FASTAI_METHOD_REGISTRY, ImageKeypointRegression, (Image, Keypoints))
+
+# ## Tabular
+
+function TabularClassificationSingle(
+        blocks::Tuple{<:TableRow, <:Label}; 
+        data::TableDataset)
+    return BlockMethod(
+        blocks,
+        (
+            TabularPreprocessing(data),
+            OneHot()
+        )
+    )
+end
+
+"""
+    TabularClassificationSingle(catcols, contcols, classes; data)
+
+Learning method for single-label tabular classification. Continuous columns are
+normalized and missing values are filled, categorical columns are label encoded 
+taking into account any missing values which might be present. The target value
+is predicted from `classes`.
+"""
+function TabularClassificationSingle(
+        catcols::NTuple, 
+        contcols::NTuple, 
+        classes::AbstractVector;
+        data::Datasets.TableDataset)
+    blocks = (
+        TableRow(catcols, contcols, gettransformdict(data, DataAugmentation.Categorify, catcols)), 
+        Label(classes)
+    )
+    return TabularClassificationSingle(blocks; data = data)
+end
+
+# ---
+
+function TabularRegression(
+        blocks::Tuple{<:TableRow, <:Continuous}; 
+        data::TableDataset)
+    return BlockMethod(
+        blocks,
+        (TabularPreprocessing(data),),
+        outputblock=blocks[2]
+    )
+end
+
+"""
+    TabularRegression(catcols, contcols; kwargs...)
+
+Learning method for single-label tabular classification. Continuous columns are
+normalized and missing values are filled, categorical columns are label encoded 
+taking into account any missing values which might be present. The target value
+is predicted from `classes`.
+"""
+
+function TabularRegression(
+        catcols::NTuple{M}, 
+        contcols::NTuple{N};
+        data::Datasets.TableDataset) where {M, N}
+    blocks = (
+        TableRow(catcols, contcols, gettransformdict(data, DataAugmentation.Categorify, catcols)), 
+        Continuous(N)
+    )
+    return TabularRegression(blocks; data = data)
+end

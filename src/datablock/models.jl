@@ -59,3 +59,40 @@ function blockmodel(inblock::ImageTensor{N}, outblock::KeypointTensor{N}, backbo
     head = Models.visionhead(outch, prod(outblock.sz)*N, p = 0.)
     return Chain(backbone, head)
 end
+
+"""
+    blockmodel(inblock::TableRow{M, N}, outblock::Union{Continuous, OneHotTensor{0}}, backbone=nothing) where {M, N}
+
+Contruct a model for tabular classification or regression. `backbone` should be a 
+NamedTuple of categorical, continuous, and a finalclassifier layer, with 
+the first two taking in batches of corresponding row value matrices.
+"""
+
+function blockmodel(
+        inblock::EncodedTableRow{M, N}, 
+        outblock::Union{Continuous, OneHotTensor{0}}, 
+        backbone=NamedTuple()) where {M, N}
+
+    default_backbones = default_tabular_backbone(inblock, outblock)
+    backbones = [haskey(backbone, k) ? backbone[k] : default_backbones[k]
+        for k in (:categorical, :continuous, :finalclassifier)]
+    TabularModel(backbones...)
+end
+
+function default_tabular_backbone(
+        inblock::EncodedTableRow{M, N}, 
+        outblock::Union{Continuous, OneHotTensor{0}}) where {M, N}
+
+    embedszs = Models.get_emb_sz(Dict((col => length(inblock.categorydict[col]) for col in inblock.catcols)))
+    catback = Models.tabular_embedding_backbone(embedszs)
+
+    contback = Models.tabular_continuous_backbone(N)
+
+    outsize = outblock isa Continuous ? outblock.size : length(outblock.classes)
+    finalclassifier = Dense(100, outsize)
+
+    return (categorical = catback, continuous = contback, finalclassifier = finalclassifier)
+end
+
+
+

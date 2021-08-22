@@ -38,7 +38,7 @@ Return a vector of tuples where each element is `(in_size, out_size)` for an emb
                     (i.e. `size_overrides[col]` is the output embedding size for `col`).
 """
 function get_emb_sz(cardinalities::Dict{<:Any, <:Integer}, size_overrides=Dict())
-    values_and_overrides = map(pairs(cardinalities)) do (col, cardinality)
+    values_and_overrides = map(collect(pairs(cardinalities))) do (col, cardinality)
         cardinality, get(size_overrides, col, nothing)
     end
     get_emb_sz(first.(values_and_overrides), last.(values_and_overrides))
