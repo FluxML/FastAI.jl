@@ -7,123 +7,111 @@
 using FastAI
 ```
 
-On the [quickstart page](../notebooks/quickstart.ipynb), we showed how to train models on common tasks in a few lines of code:
+On the [quickstart page](../notebooks/quickstart.ipynb), we showed how to train models on common tasks in a few lines of code like these:
 
 ```julia
 using FastAI
-path = datasetpath("imagenette2-160")
-data = Datasets.loadfolderdata(
-    path,
-    filterfn=isimagefile,
-    loadfn=(loadfile, parentname))
-classes = unique(eachobs(data[2]))
-method = BlockMethod(
-    (Image{2}(), Label(classes)),
-    (
-        ProjectiveTransforms((128, 128), augmentations=augs_projection()),
-        ImagePreprocessing(),
-        OneHot()
-    )
-)
-learner = methodlearner(method, data)
+data, blocks = loaddataset("imagenette2-160", (Image, Label))
+method = ImageClassificationSingle(blocks)
+learner = methodlearner(method, data, Models.xresnet18(), ToGPU())
 fitonecycle!(learner, 10)
+plotpredictions(method, learner)
 ```
 
-Let's unpack each line.
+Each of the five lines encapsulates one part of the deep learning pipeline to give a high-level API while still allowing customization. Let's have a closer look. 
 
-## Data containers
+## Dataset
 
 {cell=main}
 ```julia
-path = datasetpath("imagenette2-160")
-data = Datasets.loadfolderdata(
-    path,
-    filterfn=isimagefile,
-    loadfn=(loadfile, parentname))
+data, blocks = loaddataset("imagenette2-160", (Image, Label))
 ```
 
-These two lines download and load the [ImageNette](https://github.com/fastai/imagenette) image classification dataset, a small subset of ImageNet with 10 different classes. `data` is a [data container](data_containers.md) that can be used to load individual observations, here of images and the corresponding labels. We can use `getobs(data, i)` to load the `i`-th observation and `nobs` to find out how many observations there are.
+This line downloads and loads the [ImageNette](https://github.com/fastai/imagenette) image classification dataset, a small subset of ImageNet with 10 different classes. `data` is a [data container](data_containers.md) that can be used to load individual observations, here of images and the corresponding labels. We can use `getobs(data, i)` to load the `i`-th observation and `nobs` to find out how many observations there are.
 
 {cell=main }
 ```julia
-image, class = getobs(data, 1000)
+image, class = sample =  getobs(data, 1000)
 @show class
 image
 ```
 
+`blocks` describe the format of the data that you want to use for learning. For supervised training tasks, they are a tuple of `(inputblock, targetblock)`. Since we want to do image classification, the input block is `Image{2}()`, representing a 2-dimensional image and the target block is `Label(classes)`, representing the class the image belongs to.
+
 {cell=main}
 ```julia
-nobs(data)
+blocks
 ```
 
-To train on a different dataset, you could replace `dataset` with other data containers made up of pairs of images and classes.
-
-## Method
+## Learning method
 
 {cell=main}
 ```julia
-classes = unique(eachobs(data[2]))
+method = ImageClassificationSingle(blocks)
+```
+
+The next line defines a learning method which encapsulates the data preprocessing pipeline and other logic related to the task. `ImageClassificationSingle` is a simple wrapper around `BlockMethod` which takes in blocks and data processing steps, so-called _encodings_. Using it, we can replace the above line with
+
+
+```julia
 method = BlockMethod(
     (Image{2}(), Label(classes)),
     (
-        ProjectiveTransforms((128, 128), augmentations=augs_projection()),
+        ProjectiveTransforms((128, 128)),
         ImagePreprocessing(),
         OneHot()
     )
 )
 ```
 
-Here we define a learning method for image classification which defines how data is processed before being fed to the model and how model outputs are turned into predictions. `classes` is a vector of strings naming each class, and `(224, 224)` the size of the images that are input to the model.
+Based on the blocks and encodings, the learning method can derive lots of functionality:
 
-A `LearningMethod` is an abstraction that encapsulates the logic and configuration for training models on a specific learning task. See [learning methods](learning_methods.md) to find out more.
-
-## Data loaders
-
-{cell=main}
-```julia
-dls = methoddataloaders(data, method, 16)
-```
-
-Next we turn the data container into training and validation data loaders. These take care of efficiently loading batches of data (by default in parallel). The observations are already preprocessed using the information in `method` and then batched together. Let's look at a single batch:
-
-{cell=main}
-```julia
-traindl, valdl = dls
-(xs, ys), _ = iterate(traindl)
-summary.((xs, ys))
-```
-
-`xs` is a batch of cropped and normalized images with dimensions `(height, width, color channels, batch size)` and `ys` a batch of one-hot encoded classes with dimensions `(classes, batch size)`.
-We can visualize a batch of encoded data using [`plotbatch`](#):
-
-{cell=main}
-```julia
-plotbatch(method, xs, ys)
-```
-
-## Model
-
-{cell=main}
-```julia
-model = methodmodel(method, Models.xresnet18())
-```
-
-Now we create a Flux.jl model. [`methodmodel`](#) is a part of the learning method interface that knows how to smartly construct a model based on the input and output blocks passed to the learning method. It can adapt different backbone architectures to a task. Here a classificiation head with the appropriate number of classes is stacked on a slightly modified version of the ResNet architecture.
+- data processing
+- visualization
+- constructing task-specific models from a backbone
+- creating a loss function
 
 ## Learner
 
 {cell=main}
 ```julia
-learner = Learner(model, dls, ADAM(), methodlossfn(method), ToGPU(), Metrics(accuracy))
+learner = methodlearner(method, data, Models.xresnet18(), ToGPU(), Metrics(accuracy))
 ```
 
-Finally we bring the model and data loaders together with an optimizer and loss function in a `Learner`. The `Learner` stores all state for training the model. It also features a powerful, extensible [callback system](https://lorenzoh.github.io/FluxTraining.jl/dev/docs/callbacks/reference.html) enabling checkpointing, hyperparameter scheduling, TensorBoard logging, and many other features. Here we use the `ToGPU()` callback so that model and batch data will be transferred to an available GPU and `Metrics(accuracy)` to track the classification accuracy during training.
+Next we create a [`Learner`](#) that encapsulates everything needed for training, including:
+- parallelized training and validation data loaders using [`methoddataloaders`](#)
+- a loss function using [`methodlossfn`](#)
+- a task-specific model using [`methodmodel`](#)
 
-With that setup, training `learner` is dead simple:
+The customizable, expanded version of the code looks like this:
 
 ```julia
-fitonecycle!(learner, 5)
+dls = methoddataloaders(data, method)
+model = methodmodel(method, Models.xresnet18())
+lossfn = methodlossfn(method)
+learner = Learner(model, dls, ADAM(), lossfn, ToGPU(), Metrics(accuracy))
 ```
 
+At this step, we can also pass in any number of [callbacks](https://fluxml.ai/FluxTraining.jl/dev/docs/callbacks/reference.md.html) to customize the training. Here [`ToGPU`](#) ensures an available GPU is used, and [`Metrics`](#) adds additional metrics to track during training.
+
+## Training
+
+```julia
+fitonecycle!(learner, 10)
+```
+
+Training now is quite simple. You have several options for high-level training schedules:
+
+- [`lrfind`](#) to run a learning rate finder
+- [`finetune!`](#) for when you're using a pretrained backbone
+- [`fitonecycle!`](#) for when you're training a model from scratch
 
 
+
+## Visualization
+
+```julia
+plotpredictions(method, learner)
+```
+
+Finally, the last line visualizes the predictions of the trained model. It takes some samples from the training data loader, runs them through the model and decodes the outputs. How each piece of data is visualized is also inferred through the blocks in the learning method.
