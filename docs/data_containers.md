@@ -13,20 +13,16 @@ ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 {cell=main}
 ```julia
 using FastAI
-
-NAME = "imagenette2-160"
-dir = datasetpath(NAME)
-data = Datasets.loadfolderdata(
-    dir,
-    filterfn=isimagefile,
-    loadfn=(loadfile, parentname))
+data, _ = loaddataset("imagenette2-160", (Image, Label))
 ```
 
-A data container is any type that holds observations of data and allows us to load them with `getobs` and query the number of observations with `nobs`:
+A data container is any type that holds observations of data and allows us to load them with `getobs` and query the number of observations with `nobs`. In this case, each observation is a tuple of an image and the corresponding class; after all, we want to use it for image classification. 
 
 {cell=main}
 ```julia
-obs = getobs(data, 1)
+image, class = obs = getobs(data, 1)
+@show class
+image
 ```
 
 {cell=main}
@@ -34,26 +30,18 @@ obs = getobs(data, 1)
 nobs(data)
 ```
 
-In this case, each observation is a tuple of an image and the corresponding class; after all, we want to use it for image classification. 
-
-{cell=main}
-```julia
-image, class = obs
-@show class
-image
-```
-
-As you saw above, the `Datasets` submodule provides functions for loading and creating data containers. We used [`Datasets.datasetpath`](#) to download a dataset if it wasn't yet and get the folder it was downloaded to. Then, [`loadfolderdata`](#) took the folder and loaded a data container suitable for image classification. FastAI.jl makes it easy to download the datasets from fastai's collection on AWS Open Datasets. For the full list, see `Datasets.DATASETS`.
-
-
-### Exercises
-
-1. Have a look at the other image classification datasets in [`Datasets.DATASETS_IMAGECLASSIFICATION`](#) and change the above code to load a different dataset.
-
+[`loaddataset`](#) makes it easy to a load a data container that is compatible with some block types, but to get a better feel for what it does, let's look under the hood by creating the same data container using some mid-level APIs.
 
 ## Creating data containers from files
 
-Now let's create the same data container, but using more general functions FastAI.jl provides to get a look behind the scenes. We'll start with [`FileDataset`](#) which creates a data container (here a `Vector`) of files given a path. We'll use the path of the downloaded dataset:
+Before we recreate the data container, [`datasetpath`](#) downloads a dataset and returns the path to the extracted files.
+
+{cell=main}
+```julia
+dir = datasetpath("imagenette2-160")
+```
+
+Now we'll start with [`FileDataset`](#) which creates a data container (here a `Vector`) of files given a path. We'll use the path of the downloaded dataset:
 
 {cell=main}
 ```julia
@@ -93,7 +81,8 @@ data = mapobs(loadimageclass, files);
 
 ### Exercises
 
-1. Using `mapobs` and `loadfile`, create a data container where every observation is only an image.
+1. Using [`mapobs`](#) and [`loadfile`](#), create a data container where every observation is only an image.
+2. Change the above code to run on a different dataset from the list in `Datasets.DATASETS_IMAGECLASSIFICATION`.
 
 
 ## Splitting a data container into subsets
@@ -133,3 +122,16 @@ trainfiles, validfiles = datagroups["train"], datagroups["val"]
 ```
 
 Using this official split, it will be easier to compare the performance of your results with those of others'. 
+
+
+## Dataset recipes
+
+We saw above how different image classification datasets can be loaded with the same logic as long as they are in a common format. To encapsulate the logic for loading common dataset formats, FastAI.jl has `DatasetRecipe`s. When we used [`finddatasets`](#) in the [discovery tutorial](discovery.md), it returned pairs of a dataset name and a `DatasetRecipe`. For example, `"imagenette2-160"` has an associated [`ImageFolders`](#) recipe and we can load it using [`loadrecipe`] and the path to the downloaded dataset:
+
+{cell=main}
+```julia
+name, recipe = finddatasets(blocks=(Image, Label), name="imagenette2-160")[1]
+data, blocks = loadrecipe(recipe, datasetpath(name))
+```
+
+These recipes also take care of loading the data block information for the dataset. Read the [discovery tutorial](discovery.md) to find out more about that.
