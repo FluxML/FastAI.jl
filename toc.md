@@ -1,12 +1,13 @@
 - [README](README.md)
 - [Setup](docs/setup.md)
+- [Quickstart](notebooks/quickstart.ipynb)
 - Tutorials
-    - [Introduction](docs/introduction.md)
-    - [Quickstart](notebooks/quickstart.ipynb)
-    - Vision
+    - Beginner
+        - [Introduction](docs/introduction.md)
+        - [Discovery](docs/discovery.md)
+    - Intermediate
         - [Image segmentation](notebooks/imagesegmentation.ipynb)
         - [Keypoint regression](notebooks/keypointregression.ipynb)
-    - Intermediate
         - [Data containers](docs/data_containers.md)
         - [Saving and loading models](notebooks/serialization.ipynb)
     - Advanced
