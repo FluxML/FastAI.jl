@@ -6,6 +6,7 @@ const FASTAI_DATA_RECIPES = Dict{String, Vector{DatasetRecipe}}(
         "imagenette2", "imagenette2-160", "imagenette2-320",
         "imagewoof", "imagewoof-160", "imagewoof-320",
         "imagewoof2", "imagewoof2-160", "imagewoof2-320",
+        "cifar10", "cifar100"
     )]...,
 
     "camvid_tiny" => [ImageSegmentationFolders()],
