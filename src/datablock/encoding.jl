@@ -246,11 +246,22 @@ function testencoding(encoding, block, data = mockblock(block))
         @test checkblock(outblock, outdata)
 
         # Test decoding (if supported) works correctly
-        inblock = decodedblock(encoding, outblock, true)
-        if !isnothing(inblock)
-            @test block == inblock
-            indata = decode(encoding, Training(), outblock, outdata)
-            @test checkblock(inblock, indata)
+        if (outblock isa Tuple)
+            for idx in length(outblock)
+                inblock = decodedblock(encoding, outblock[idx])
+                if !isnothing(inblock)
+                    @test block[idx] == inblock
+                    indata = decode(encoding, Training(), outblock[idx], outdata[idx])
+                    @test checkblock(inblock, indata)
+                end
+            end
+        else
+            inblock = decodedblock(encoding, outblock)
+            if !isnothing(inblock)
+                @test block == inblock
+                indata = decode(encoding, Training(), outblock, outdata)
+                @test checkblock(inblock, indata)
+            end
         end
     end
 end

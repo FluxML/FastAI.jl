@@ -162,3 +162,60 @@ function checkblock(
 end
 
 mockblock(block::Keypoints{N}) where N = rand(SVector{N, Float32}, block.sz)
+
+
+# TableRow
+
+"""
+    TableRow{M, N}(catcols, contcols, categorydict) <: Block
+
+`Block` for table rows with M categorical and N continuous columns. `data`
+is valid if it satisfies the `AbstractRow` interface in Tables.jl, values 
+present in indices for categorical and continuous columns are consistent, 
+and `data` is indexable by the elements of `catcols` and `contcols`.
+"""
+struct TableRow{M, N, T} <: Block
+    catcols::NTuple{M}
+    contcols::NTuple{N}
+    categorydict::T
+end
+
+function TableRow(catcols, contcols, categorydict)
+    TableRow{length(catcols), length(contcols)}(catcols, contcols, categorydict)
+end
+
+function checkblock(block::TableRow, x)
+    columns = Tables.columnnames(x)
+    (all(col -> col ∈ columns, (block.catcols..., block.contcols...)) &&
+    all(col -> haskey(block.categorydict, col) && 
+        (ismissing(x[col]) || x[col] ∈ block.categorydict[col]), block.catcols) &&
+    all(col -> ismissing(x[col]) || x[col] isa Number, block.contcols))
+end
+
+function mockblock(block::TableRow)
+    cols = (block.catcols..., block.contcols...)
+    vals = map(cols) do col
+        col in block.catcols ? 
+            rand(block.categorydict[col]) : rand()
+    end
+    return NamedTuple(zip(cols, vals))
+end
+
+# Continous
+
+"""
+    Continuous(size) <: Block
+
+`Block` for collections of numbers. `data` is valid if it's 
+length is `size` and contains `Number`s.
+"""
+
+struct Continuous <: Block
+    size::Int
+end
+
+function checkblock(block::Continuous, x)
+    block.size == length(x) && eltype(x) <: Number
+end
+
+mockblock(block::Continuous) = rand(block.size)

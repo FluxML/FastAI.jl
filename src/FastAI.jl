@@ -1,6 +1,8 @@
 module FastAI
 
 
+using Base: NamedTuple
+using Colors: colormaps_sequential
 using Reexport
 @reexport using DLPipelines
 @reexport using FluxTraining
@@ -32,7 +34,8 @@ using PrettyTables
 using StaticArrays
 using Setfield
 using ShowCases
-using Statistics: mean
+using Tables
+using Statistics
 using Test: @testset, @test, @test_nowarn
 
 include("plotting.jl")
@@ -46,7 +49,15 @@ include("datablock/describe.jl")
 include("datablock/checks.jl")
 include("datablock/wrappers.jl")
 
+# submodules
+include("datasets/Datasets.jl")
+@reexport using .Datasets
+
+include("models/Models.jl")
+using .Models
+
 # Encodings
+include("encodings/tabularpreprocessing.jl")
 include("encodings/onehot.jl")
 include("encodings/imagepreprocessing.jl")
 include("encodings/projective.jl")
@@ -56,15 +67,6 @@ include("encodings/keypointpreprocessing.jl")
 include("datablock/models.jl")
 include("datablock/loss.jl")
 include("datablock/plot.jl")
-
-
-# submodules
-include("datasets/Datasets.jl")
-@reexport using .Datasets
-
-
-include("models/Models.jl")
-using .Models
 
 # training
 include("training/paramgroups.jl")
@@ -121,6 +123,8 @@ export
     LabelMulti,
     Keypoints,
     Many,
+    TableRow,
+    Continuous,
 
     # encodings
     encode,
@@ -132,17 +136,20 @@ export
     Only,
     Named,
     augs_projection, augs_lighting,
+    TabularPreprocessing,
 
     BlockMethod,
     describemethod,
     checkblock,
-
+    
     # learning methods
     findlearningmethods,
     ImageClassificationSingle,
     ImageClassificationMulti,
     ImageSegmentation,
     ImageKeypointRegression,
+    TabularClassificationSingle,
+    TabularRegression,
 
 
     # training

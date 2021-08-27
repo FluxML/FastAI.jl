@@ -60,9 +60,7 @@ end
     testencoding(enc, block, image)
     @testset "randstate is shared" begin
         im1, im2 = encode(enc, Training(), (block, block), (image, image))
-        im3 = encode(enc, Training(), block, image)
         @test im1 ≈ im2
-        @test !(im1 == im3)
     end
 
     @testset "don't transform data that doesn't need to be resized" begin

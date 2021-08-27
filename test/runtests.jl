@@ -25,6 +25,9 @@ include("imports.jl")
         @testset ExtendedTestSet "many.jl" begin
             include("encodings/many.jl")
         end
+        @testset ExtendedTestSet "tabularpreprocessing.jl" begin
+            include("encodings/tabularpreprocessing.jl")
+        end
     end
 
     @testset ExtendedTestSet "methods/" begin
@@ -36,6 +39,12 @@ include("imports.jl")
         end
         @testset ExtendedTestSet "imagekeypointregression.jl" begin
             include("methods/imagekeypointregression.jl")
+        end
+        @testset ExtendedTestSet "tabularclassification.jl" begin
+            include("methods/tabularclassification.jl")
+        end
+        @testset ExtendedTestSet "tabularregression.jl" begin
+            include("methods/tabularregression.jl")
         end
     end
 
@@ -71,5 +80,11 @@ include("imports.jl")
             include("training/lrfind.jl")
         end
         # TODO: test learning rate finder
+    end
+
+    @testset ExtendedTestSet "models/" begin
+        @testset ExtendedTestSet "tabularmodel.jl" begin
+            include("models/tabularmodel.jl")
+        end
     end
 end
