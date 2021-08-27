@@ -14,9 +14,7 @@
         - [Presizing vision datasets](notebooks/presizing.ipynb)
         - [Custom Learning methods](docs/learning_methods.md)
 - How To
-    - [Train a model from scratch](notebooks/fitonecycle.ipynb)
-    - [Finetune a pretrained model](notebooks/finetune.ipynb)
-    - [Find a good learning rate](notebooks/lrfind.ipynb)
+    - [Train your model](notebooks/training.ipynb)
     - [Augment vision data](docs/howto/augmentvision.md)
     - [Visualize data](notebooks/how_to_visualize.ipynb)
     - [Log to TensorBoard](docs/howto/logtensorboard.md)
