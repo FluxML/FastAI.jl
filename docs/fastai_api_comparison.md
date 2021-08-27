@@ -4,7 +4,9 @@ FastAI.jl is in many ways similar to the original Python [fastai](docs.fast.ai),
 
 ## Applications
 
-FastAI.jl's own data block API makes it possible to derive every part of a high-level interface and as such there is no need for application-specific functions like fastai's `ImageDataLoaders`, `SegmentationDataLoaders`, `cnn_learner` or `unet_learner`. Instead it suffices to create a learning method and based on the blocks and encodings specified, the proper model builder, loss function, and visualizations are implemented. For a high-level API, a complete `Learner` can be constructed using [`methodlearner`](#) without much boilerplate. The application-specific logic hence lies only in the application-specific data blocks and encodings.
+FastAI.jl's own data block API makes it possible to derive every part of a high-level interface with a unified API across tasks. Instead it suffices to create a learning method and based on the blocks and encodings specified the proper model builder, loss function, and visualizations are implemented (see below). For a high-level API, a complete `Learner` can be constructed using [`methodlearner`](#) without much boilerplate. There are some helper functions for  creating these learning methods, for example [`ImageClassificationSingle`](#) and [`ImageSegmentation`](#).
+
+FastAI.jl additionally has a unified API for registering and discovering functionality across applications also based on the data block abstraction.  `finddatasets` and `loaddataset` let you quickly load common datasets matching some data modality and `findlearningmethod` lets you find learning method helpers for common tasks. See [the discovery tutorial](discovery.md) for more info.
 
 ### Vision
 
@@ -12,7 +14,7 @@ Computer vision is the most developed part of FastAI.jl with good support for di
 
 ### Tabular
 
-Support for tabular data is currently in the works as part of an ongoing Google Summer of Code project. The progress is tracked in [this issue](https://github.com/FluxML/ML-Coordination-Tracker/issues/34).
+Support for tabular data is merged into master but is lacking documentation which will come with the next release (0.2.0).
 
 ### Deployment
 
@@ -28,7 +30,7 @@ There is no integration (yet!) for text and collaborative filtering applications
 
 FastAI.jl also has a data block API but it differs from fastai's in a number of ways. In the Julia package it only handles the data encoding and decoding part, and doesn't concern itself with creating datasets. For dataset loading, see the [data container API](data_containers.md). As mentioned above, the high-level application-specific logic is also derived from the data block API. To use it you need to specify a tuple of input and target blocks as well as a tuple of encodings that are applied to the data. The encodings  are invertible data-specific data processing steps which correspond to `fastai.Transform`s. As in fastai, dispatch is used to transform applicable data and pass other data through unchanged. Unlike in fastai, there are no default steps associated with a block, allowing greater flexibility.
 
-We can create a `BlockMethod` (corresponding to `fastai.DataBlock`) and get information about the representations the data goes through. 
+We can create a `BlockMethod` (similar to `fastai.DataBlock`) and get information about the representations the data goes through. 
 
 {cell=main}
 ```julia
