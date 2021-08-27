@@ -23,8 +23,8 @@
 - Reference
     - [Docstrings](REFERENCE)
     - [fastai API comparison](docs/fastai_api_comparison.md)
-    - [API](docs/api.md)
     - [Extension APIs](docs/interfaces.md)
     - [Glossary](docs/glossary.md)
 - Background
+    - [Blocks and encodings](docs/background/blocksencodings.md)
     - [Performant data pipelines](docs/background/datapipelines.md)
