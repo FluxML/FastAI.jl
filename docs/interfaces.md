@@ -37,7 +37,6 @@ For visualizing observations and predictions using [Makie.jl](https://github.com
 - Enables use of:
     - [`plotsamples`](#)
     - [`plotbatch`](#)
-    - `MethodVisualizationCallback`
 
 ### Training interface
 
