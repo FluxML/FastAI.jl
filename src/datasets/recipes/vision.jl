@@ -1,50 +1,4 @@
-"""
-abstract type DatasetRecipe
 
-A recipe that contains configuration for loading a data container. Calling it with a path returns a data container and the blocks that each sample is made of.
-
-#### Interface
-
-- `loadrecipe(::DatasetRecipe, args...) -> (data, blocks)`
-- `recipeblocks(::Type{DatasetRecipe}) -> TBlocks`
-
-#### Invariants
-
-- `data` must be a data container of samples that are valid `blocks`, i.e. `checkblock(blocks, getobs(data, 1)) == true`
-"""
-abstract type DatasetRecipe end
-
-
-"""
-    loadrecipe(recipe, path)
-
-Load a recipe from a path. Return a data container `data` and concrete
-`blocks`.
-"""
-function loadrecipe end
-
-
-"""
-    recipeblocks(TRecipe) -> TBlocks
-    recipeblocks(recipe) -> TBlocks
-
-Return the `Block` _types_ for the data container that recipe
-type `TRecipe` creates. Does not return `Block` instances as the exact
-configuration may not be known until the dataset is being
-loaded.
-
-#### Examples
-
-```julia
-recipeblocks(ImageLabelClf) == Tuple{Image{2}, Label}
-```
-"""
-recipeblocks(::R) where {R<:DatasetRecipe} = recipeblocks(R)
-
-
-# ## Implementations
-
-# ImageClfFolders
 
 """
     ImageFolders(; labelfn = parentname, split = false)
@@ -63,13 +17,14 @@ Tuple{Image{2}, Label}
 Base.@kwdef struct ImageFolders <: DatasetRecipe
     labelfn = parentname
     split::Bool = false
+    filefilterfn = _ -> true
 end
 
 function loadrecipe(recipe::ImageFolders, path)
     isdir(path) || error("$path is not a directory")
     data = loadfolderdata(
         path,
-        filterfn=isimagefile,
+        filterfn=f -> isimagefile(f) && recipe.filefilterfn(f),
         loadfn=(loadfile, recipe.labelfn),
         splitfn=recipe.split ? grandparentname : nothing)
 
@@ -81,10 +36,7 @@ function loadrecipe(recipe::ImageFolders, path)
     return data, blocks
 end
 
-recipeblocks(::Type{ImageFolders}) = Tuple{Image{2}, Label}
-
-
-# ImageSegmentationFolders
+recipeblocks(::Type{ImageFolders}) = Tuple{Image{2},Label}
 
 
 """
@@ -123,7 +75,7 @@ function loadrecipe(recipe::ImageSegmentationFolders, path)
     return (images, masks), blocks
 end
 
-recipeblocks(::Type{ImageSegmentationFolders}) = Tuple{Image{2}, Mask{2}}
+recipeblocks(::Type{ImageSegmentationFolders}) = Tuple{Image{2},Mask{2}}
 
 # ImageTableMultiLabel
 
@@ -157,4 +109,4 @@ function loadrecipe(recipe::ImageTableMultiLabel, path)
     return data, blocks
 end
 
-recipeblocks(::Type{ImageTableMultiLabel}) = Tuple{Image{2}, LabelMulti}
+recipeblocks(::Type{ImageTableMultiLabel}) = Tuple{Image{2},LabelMulti}
