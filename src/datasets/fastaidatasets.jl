@@ -5,14 +5,20 @@ struct FastAIDataset
     description
     checksum
     datadepname
+    subpath
     size
 end
 
 const ROOT_URL = "https://s3.amazonaws.com/fast-ai-"
 
 function FastAIDataset(
-        name, subfolder, checksum=""; extension="tgz", description="", datadepname=name, size="???")
-    return FastAIDataset(name, subfolder, extension, description, checksum, datadepname, size)
+        name, subfolder, checksum="";
+        extension="tgz",
+        description="",
+        datadepname=name,
+        subpath=name,
+        size="???")
+    return FastAIDataset(name, subfolder, extension, description, checksum, datadepname, subpath, size)
 end
 
 
@@ -20,7 +26,7 @@ const DATASETCONFIGS = [
     # imageclas
     FastAIDataset("CUB_200_2011", "imageclas", "0c685df5597a8b24909f6a7c9db6d11e008733779a671760afef78feb49bf081", size = "1GiB"),
     FastAIDataset("bedroom", "imageclas", size="4.25GiB"),
-    FastAIDataset("caltech_101", "imageclas"),
+    FastAIDataset("caltech_101", "imageclas", "af6ece2f339791ca20f855943d8b55dd60892c0a25105fcd631ee3d6430f9926", size="126MiB", subpath="101_ObjectCategories"),
     FastAIDataset("cifar10", "imageclas", "637c5814e11aefcb6ee76d5f59c67ddc8de7f5b5077502a195b0833d1e3e4441"),
     FastAIDataset("cifar100", "imageclas", "085ac613ceb0b3659c8072143ae553d5dd146b3c4206c3672a56ed02d0e77d28"),
     FastAIDataset("food-101", "imageclas"),

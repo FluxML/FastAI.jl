@@ -8,8 +8,11 @@ If it hasn't been downloaded yet, you will be asked if you want to
 download it. See [`Datasets.DATASETS`](#) for a list of available datasets.
 """
 function datasetpath(name)
+    i = findfirst(DATASETS .== name)
+    isnothing(i) && error("Dataset $name does not exist. Check `DATASETS` for available datasets.")
+    config = DATASETCONFIGS[i]
     datadeppath = @datadep_str "fastai-$name"
-    return Path(joinpath(datadeppath, name))
+    return Path(joinpath(datadeppath, config.subpath))
 end
 
 

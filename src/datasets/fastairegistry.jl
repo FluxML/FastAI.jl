@@ -1,14 +1,15 @@
 
-const FASTAI_DATA_RECIPES = Dict{String, Vector{DatasetRecipe}}(
+const FASTAI_DATA_RECIPES = Dict{String,Vector{DatasetRecipe}}(
     # Image classification datasets
     [name => [ImageFolders()] for name in (
         "imagenette", "imagenette-160", "imagenette-320",
         "imagenette2", "imagenette2-160", "imagenette2-320",
         "imagewoof", "imagewoof-160", "imagewoof-320",
         "imagewoof2", "imagewoof2-160", "imagewoof2-320",
-        "cifar10", "cifar100"
+        "cifar10", "cifar100", "caltech_101",
     )]...,
-
+    [name => [ImageFolders(filefilterfn=f -> !(occursin("unsup", f)))]
+        for name in ("imagewang-160", "imagewang-320", "imagewang")]...,
     "camvid_tiny" => [ImageSegmentationFolders()],
     "pascal_2007" => [ImageTableMultiLabel()],
 )
