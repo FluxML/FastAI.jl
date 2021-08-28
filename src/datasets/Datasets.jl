@@ -19,7 +19,7 @@ using ..FastAI: typify, TableRow
 using DataDeps
 using Glob
 using FilePathsBase
-using DataAugmentation
+import DataAugmentation
 using FilePathsBase: filename
 import FileIO
 using IndirectArrays: IndirectArray

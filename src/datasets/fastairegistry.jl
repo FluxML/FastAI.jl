@@ -12,6 +12,14 @@ const FASTAI_DATA_RECIPES = Dict{String,Vector{DatasetRecipe}}(
         for name in ("imagewang-160", "imagewang-320", "imagewang")]...,
     "camvid_tiny" => [ImageSegmentationFolders()],
     "pascal_2007" => [ImageTableMultiLabel()],
+
+
+    # Tabular datasets
+    "adult_sample" => [
+        TableDatasetRecipe(file="adult.csv"),
+        TableClassificationRecipe(TableDatasetRecipe(file="adult.csv"), :salary),
+        TableRegressionRecipe(TableDatasetRecipe(file="adult.csv"), :age),
+    ],
 )
 
 
