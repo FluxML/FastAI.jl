@@ -67,7 +67,7 @@ finddatasets(name="pascal2007")
 """
 function finddatasets(reg::DatasetRegistry; name=nothing, blocks=Any)::Vector{Pair{String,DatasetRecipe}}
     results = collect(Iterators.flatten(((k => v) for v in vs) for (k, vs) in reg.recipes))
-    results = filter(((d, recipe),) -> recipeblocks(recipe) <: typify(blocks), results)
+    results = filter(((d, recipe),) -> typify(recipeblocks(recipe)) <: typify(blocks), results)
     if !isnothing(name)
         results = filter(((d, r),) -> d == name, results)
     end

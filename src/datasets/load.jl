@@ -8,8 +8,11 @@ If it hasn't been downloaded yet, you will be asked if you want to
 download it. See [`Datasets.DATASETS`](#) for a list of available datasets.
 """
 function datasetpath(name)
+    i = findfirst(DATASETS .== name)
+    isnothing(i) && error("Dataset $name does not exist. Check `DATASETS` for available datasets.")
+    config = DATASETCONFIGS[i]
     datadeppath = @datadep_str "fastai-$name"
-    return Path(joinpath(datadeppath, name))
+    return Path(joinpath(datadeppath, config.subpath))
 end
 
 
@@ -42,15 +45,6 @@ matches(re::Regex) = f -> matches(re, f)
 matches(re::Regex, f) = !isnothing(match(re, f))
 const RE_IMAGEFILE = r".*\.(gif|jpe?g|tiff?|png|webp|bmp)$"i
 isimagefile(f) = matches(RE_IMAGEFILE, f)
-
-
-
-function getclassessegmentation(dir::AbstractPath)
-    classes = readlines(open(joinpath(dir, "codes.txt")))
-    return classes
-end
-getclassessegmentation(name::String) = getclassessegmentation(datasetpath(name))
-
 
 
 maskfromimage(a::AbstractArray{<:Gray{T}}, classes) where T = maskfromimage(reinterpret(T, a), classes)

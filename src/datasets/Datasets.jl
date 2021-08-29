@@ -14,11 +14,12 @@ module Datasets
 
 
 using ..FastAI
-using ..FastAI: typify
+using ..FastAI: typify, TableRow
 
 using DataDeps
 using Glob
 using FilePathsBase
+import DataAugmentation
 using FilePathsBase: filename
 import FileIO
 using IndirectArrays: IndirectArray
@@ -42,7 +43,9 @@ include("containers.jl")
 include("transformations.jl")
 
 include("load.jl")
-include("recipes.jl")
+include("recipes/recipe.jl")
+include("recipes/vision.jl")
+include("recipes/tabular.jl")
 include("registry.jl")
 include("fastairegistry.jl")
 

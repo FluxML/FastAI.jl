@@ -1,7 +1,7 @@
 """
     EncodedTableRow{M, N} <: Block
 
-Block for processed rows having a tuple of M categorical and 
+Block for processed rows having a tuple of M categorical and
 N continuous value collections.
 """
 
@@ -25,10 +25,9 @@ end
 Encodes a `TableRow` by applying the following preprocessing steps:
 - [`DataAugmentation.NormalizeRow`](#) (for normalizing a row of data for continuous columns)
 - [`DataAugmentation.FillMissing`](#) (for filling missing values)
-- [`DataAugmentation.Categorify`](#) (for label encoding categorical columns, 
+- [`DataAugmentation.Categorify`](#) (for label encoding categorical columns,
     which can be later used for indexing into embedding matrices)
 or a sequence of these transformations.
-
 """
 struct TabularPreprocessing{T} <: Encoding
 	tfms::T
@@ -43,11 +42,11 @@ end
 function encode(tt::TabularPreprocessing, _, block::TableRow, row)
     columns = Tables.columnnames(row)
     usedrow = NamedTuple(filter(
-            x -> x[1] ∈ block.catcols || x[1] ∈ block.contcols, 
+            x -> x[1] ∈ block.catcols || x[1] ∈ block.contcols,
             collect(zip(columns, row))
         ))
     tfmrow = DataAugmentation.apply(
-        tt.tfms, 
+        tt.tfms,
         DataAugmentation.TabularItem(usedrow, keys(usedrow))
     ).data
     catvals = collect(map(col -> tfmrow[col], block.catcols))
@@ -93,31 +92,30 @@ end
 
 Returns the categorical and continuous columns present in a `TableDataset`.
 """
-
 function getcoltypes(td::Datasets.TableDataset)
     schema = Tables.schema(td.table)
-    contcols = filter(col->schema.types[findfirst(isequal(col), schema.names)] <: Union{Number, Missing}, schema.names)
-    catcols = filter(col->!(col in contcols), schema.names)
+    catcols = Tuple(name for (name, T) in zip(schema.names, schema.types)
+        if T <: Union{Union{Missing, String}, Union{Missing, Symbol}, String, Symbol})
+    contcols = Tuple(name for (name, T) in zip(schema.names, schema.types)
+        if T <: Union{<:Number, <:Union{Missing, <:Number}})
     catcols, contcols
 end
 
 """
     gettransforms(td::Datasets.TableDataset)
 
-Returns a composition of basic tabular transformations constructed 
+Returns a composition of basic tabular transformations constructed
 for the given TableDataset.
 """
-
 function gettransforms(td::Datasets.TableDataset)
     catcols, contcols = getcoltypes(td)
     normstats = FastAI.gettransformdict(td, DataAugmentation.NormalizeRow, contcols)
     fmvals = FastAI.gettransformdict(td, DataAugmentation.FillMissing, contcols)
     catdict = FastAI.gettransformdict(td, DataAugmentation.Categorify, catcols)
-    
+
     normalize = DataAugmentation.NormalizeRow(normstats, contcols)
     categorify = DataAugmentation.Categorify(catdict, catcols)
     fm = DataAugmentation.FillMissing(fmvals, contcols)
-    
+
     return fm |> normalize |> categorify
 end
-        
