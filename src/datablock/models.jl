@@ -83,7 +83,11 @@ Create a model for tabular classification. `backbone` should be named tuple
 `(categorical = ..., continuous = ...)`. See [`TabularModel`](#) for more info.
 """
 function blockmodel(inblock::EncodedTableRow, outblock::OneHotTensor{0}, backbone)
-    TabularModel(backbone.categorical, backbone.continuous, length(outblock.classes))
+    TabularModel(
+        backbone.categorical,
+        backbone.continuous,
+        Dense(100, length(outblock.classes))
+    )
 end
 
 
@@ -94,7 +98,11 @@ Create a model for tabular regression. `backbone` should be named tuple
 `(categorical = ..., continuous = ...)`. See [`TabularModel`](#) for more info.
 """
 function blockmodel(inblock::EncodedTableRow, outblock::Continuous, backbone)
-    TabularModel(backbone.categorical, backbone.continuous, outblock.size)
+    TabularModel(
+        backbone.categorical,
+        backbone.continuous,
+        Dense(100, outblock.size)
+    )
 end
 
 """
