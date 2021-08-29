@@ -21,30 +21,36 @@ function FastAIDataset(
     return FastAIDataset(name, subfolder, extension, description, checksum, datadepname, subpath, size)
 end
 
+DESCRIPTIONS = Dict(
+    "imagenette" => "A subset of 10 easily classified classes from Imagenet: tench, English springer, cassette player, chain saw, church, French horn, garbage truck, gas pump, golf ball, parachute",
+    "imagewoof" => "A subset of 10 harder to classify classes from Imagenet (all dog breeds): Australian terrier, Border terrier, Samoyed, beagle, Shih-Tzu, English foxhound, Rhodesian ridgeback, dingo, golden retriever, Old English sheepdog",
+    "food-101" => "101 food categories, with 101,000 images; 250 test images and 750 training images per class. The training images were not cleaned. All images were rescaled to have a maximum side length of 512 pixels.",
+
+)
 
 const DATASETCONFIGS = [
     # imageclas
-    FastAIDataset("CUB_200_2011", "imageclas", "0c685df5597a8b24909f6a7c9db6d11e008733779a671760afef78feb49bf081", size = "1GiB"),
+    FastAIDataset("CUB_200_2011", "imageclas", "0c685df5597a8b24909f6a7c9db6d11e008733779a671760afef78feb49bf081", size="1GiB"),
     FastAIDataset("bedroom", "imageclas", "7c95250ccb177c582f602c08f239c71f7a70512729d2e078925261cf5e349f5d", size="4.25GiB"),
     FastAIDataset("caltech_101", "imageclas", "af6ece2f339791ca20f855943d8b55dd60892c0a25105fcd631ee3d6430f9926", size="126MiB", subpath="101_ObjectCategories"),
     FastAIDataset("cifar10", "imageclas", "637c5814e11aefcb6ee76d5f59c67ddc8de7f5b5077502a195b0833d1e3e4441"),
     FastAIDataset("cifar100", "imageclas", "085ac613ceb0b3659c8072143ae553d5dd146b3c4206c3672a56ed02d0e77d28"),
-    FastAIDataset("food-101", "imageclas"),
-    FastAIDataset("imagenette-160", "imageclas", "1bd650bc16884ca88e4f0f537ed8569b1f8d7ae865d37eba8ecdd87d9cd9dcfa", size="1.45GiB"),
-    FastAIDataset("imagenette-320", "imageclas"),
-    FastAIDataset("imagenette", "imageclas"),
-    FastAIDataset("imagenette2-160", "imageclas", "64d0c4859f35a461889e0147755a999a48b49bf38a7e0f9bd27003f10db02fe5"),
-    FastAIDataset("imagenette2-320", "imageclas", "569b4497c98db6dd29f335d1f109cf315fe127053cedf69010d047f0188e158c"),
-    FastAIDataset("imagenette2", "imageclas", "6cbfac238434d89fe99e651496f0812ebc7a10fa62bd42d6874042bf01de4efd"),
+    FastAIDataset("food-101", "imageclas", "abc3d6b03a9886fdea6d2a124cf88e22a99dfdb03085b2478be97de3f8e4679f", size="5.3GB", description=DESCRIPTIONS["food-101"]),
+    FastAIDataset("imagenette-160", "imageclas", "1bd650bc16884ca88e4f0f537ed8569b1f8d7ae865d37eba8ecdd87d9cd9dcfa", size="1.45GiB", description=DESCRIPTIONS["imagenette"]),
+    FastAIDataset("imagenette-320", "imageclas", description=DESCRIPTIONS["imagenette"]),
+    FastAIDataset("imagenette", "imageclas", description=DESCRIPTIONS["imagenette"]),
+    FastAIDataset("imagenette2-160", "imageclas", "64d0c4859f35a461889e0147755a999a48b49bf38a7e0f9bd27003f10db02fe5", description=DESCRIPTIONS["imagenette"]),
+    FastAIDataset("imagenette2-320", "imageclas", "569b4497c98db6dd29f335d1f109cf315fe127053cedf69010d047f0188e158c", description=DESCRIPTIONS["imagenette"]),
+    FastAIDataset("imagenette2", "imageclas", "6cbfac238434d89fe99e651496f0812ebc7a10fa62bd42d6874042bf01de4efd", description=DESCRIPTIONS["imagenette"]),
     FastAIDataset("imagewang-160", "imageclas", "a0d360f9d8159055b3bf2b8926a51d19b2f1ff98a1eef6034e4b891c59ca3f1a", size="182MiB"),
     FastAIDataset("imagewang-320", "imageclas", "fd53301c335aa46f0f4add68dd471cd0b8b66412382cc36f5f510d0a03fb4d9d", size="639MiB"),
     FastAIDataset("imagewang", "imageclas"),
-    FastAIDataset("imagewoof-160", "imageclas", "a0d360f9d8159055b3bf2b8926a51d19b2f1ff98a1eef6034e4b891c59ca3f1a"),
-    FastAIDataset("imagewoof-320", "imageclas"),
-    FastAIDataset("imagewoof", "imageclas"),
-    FastAIDataset("imagewoof2-160", "imageclas", "663c22f69c2802d85e2a67103c017e047096702ffddf9149a14011b7002539bf"),
-    FastAIDataset("imagewoof2-320", "imageclas"),
-    FastAIDataset("imagewoof2", "imageclas"),
+    FastAIDataset("imagewoof-160", "imageclas", "a0d360f9d8159055b3bf2b8926a51d19b2f1ff98a1eef6034e4b891c59ca3f1a", description=DESCRIPTIONS["imagewoof"]),
+    FastAIDataset("imagewoof-320", "imageclas", description=DESCRIPTIONS["imagewoof"]),
+    FastAIDataset("imagewoof", "imageclas", description=DESCRIPTIONS["imagewoof"]),
+    FastAIDataset("imagewoof2-160", "imageclas", "663c22f69c2802d85e2a67103c017e047096702ffddf9149a14011b7002539bf", description=DESCRIPTIONS["imagewoof"]),
+    FastAIDataset("imagewoof2-320", "imageclas", description=DESCRIPTIONS["imagewoof"]),
+    FastAIDataset("imagewoof2", "imageclas", description=DESCRIPTIONS["imagewoof"]),
     FastAIDataset("mnist_png", "imageclas", "9e18edaa3a08b065d8f80a019ca04329e6d9b3e391363414a9bd1ada30563672"),
     FastAIDataset("mnist_var_size_tiny", "imageclas", "8a0f6ca04c2d31810dc08e739c7fa9b612e236383f70dd9fc6e5a62e672e2283"),
     FastAIDataset("oxford-102-flowers", "imageclas"),
@@ -85,8 +91,8 @@ const DATASETCONFIGS = [
     FastAIDataset("mnist_sample", "sample", "b373a14f282298aeba0f7dd56b7cdb6c2401063d4f118c39c54982907760bd38", size="3MB"),
     FastAIDataset("mnist_tiny", "sample", "0d1fedf86243931aa3fc065d2cf4ffab339a972958d8594ae993ee32bd8e15b9", size="300KB"),
     FastAIDataset("movie_lens_sample", "sample"),
-    FastAIDataset("planet_sample", "sample"),
-    FastAIDataset("planet_tiny", "sample"),
+    FastAIDataset("planet_sample", "sample", "f2509212bb2dcdc147423b164564f2e63cae1d1db0b504166e5b92cfbcbb3b4c", size="14.8MB"),
+    FastAIDataset("planet_tiny", "sample", "41a5fdd82db1c9fb2cff17e1a1270102414a25a34b21b770f953d28483961edb", size="1MB"),
 
     # coco
     FastAIDataset("coco_sample", "coco", "56960c0ac09ff35cd8588823d37e1ed0954cb88b8bfbd214a7763e72f982911c", size="3GB"),

@@ -83,6 +83,7 @@ Base.@kwdef struct ImageTableMultiLabel <: DatasetRecipe
     csvfile::String = "train.csv"
     imagefolder::String = "train"
     filecol::Symbol = :fname
+    fileext::String = ""
     labelcol::Symbol = :labels
     split::Bool = false
     splitcol::Symbol = :is_valid
@@ -94,8 +95,12 @@ function loadrecipe(recipe::ImageTableMultiLabel, path)
     csvpath = joinpath(path, recipe.csvfile)
     isfile(csvpath) || error("File $csvpath does not exist")
     df = loadfile(csvpath)
-    images = mapobs(f -> loadfile(joinpath(path, recipe.imagefolder, f)), df[:, recipe.filecol])
-    labels = map(str -> split(str, recipe.labelsep), df[:,recipe.labelcol])
+    images = mapobs(
+        f -> loadfile(joinpath(path, recipe.imagefolder, f * recipe.fileext)),
+        df[:, recipe.filecol])
+    labels = map(
+        str -> split(str, recipe.labelsep),
+        df[:,recipe.labelcol])
     data = (images, labels)
     blocks = Image{2}(), LabelMulti(unique(Iterators.flatten(labels)))
     if recipe.split
