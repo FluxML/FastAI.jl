@@ -35,7 +35,7 @@ callbacks = [
 
 data = ...
 method = ...
-learner = methodlearner(method, data, Models.xresnet18(), callbacks...)
+learner = methodlearner(method, data; callbacks=callbacks)
 fitonecycle!(learner, 5)
 ```
 
