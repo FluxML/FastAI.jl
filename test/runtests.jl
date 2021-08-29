@@ -63,6 +63,10 @@ include("imports.jl")
         end
     end
 
+    @testset ExtendedTestSet "learner.jl" begin
+        include("learner.jl")
+    end
+
     @testset ExtendedTestSet "training/" begin
         @testset ExtendedTestSet "paramgroups.jl" begin
             include("training/paramgroups.jl")
