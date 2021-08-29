@@ -3,6 +3,23 @@ data = Datasets.loadfolderdata(
     datasetpath(&quot;imagenette2-160&quot;),
     filterfn=isimagefile,
     loadfn=(loadfile, parentname))
+</code></pre><pre class=codeoutput ><code>
+7-Zip (a) [64] 16.02 : Copyright (c) 1999-2016 Igor Pavlov : 2016-05-21
+p7zip Version 16.02 (locale=C.UTF-8,Utf16=on,HugeFiles=on,64 bits,2 CPUs Intel(R) Xeon(R) CPU E5-2673 v3 @ 2.40GHz (306F2),ASM,AES-NI)
+
+
+Extracting archive: 
+--
+Path = 
+Type = tar
+Code Page = UTF-8
+
+Everything is Ok
+
+Folders: 23
+Files: 13397
+Size:       107794109
+Compressed: 6872064
 </code></pre><pre class=coderesult ><code>(mapobs(loadfile, ["/home/runner/.julia/datadeps/fastai-imagenette2-160/imagenette2-160/train/n014…]), mapobs(parentname, ["/home/runner/.julia/datadeps/fastai-imagenette2-160/imagenette2-160/train/n014…]))</code></pre></div><p>We’ll also collect the unique class names:</p><div class=cellcontainer cell=main lang=julia ><pre class=codecell cell=main lang=julia ><code>images, targets = data
 classes = unique(eachobs(targets))
 </code></pre><pre class=coderesult ><code>10-element Vector{String}:
