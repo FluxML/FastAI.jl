@@ -12,7 +12,7 @@ method = BlockMethod(
 )
 
 backbone = Metalhead.ResNet50(pretrain=true).layers[1:end-3]
-learner = methodlearner(method, data, backbone, ToGPU(), Metrics(accuracy))
+learner = methodlearner(method, data; backbone=backbone, callbacks=[ToGPU(), Metrics(accuracy)])
 finetune!(learner, 3)</code></pre><pre class=codeoutput ><code><span class="sgr32">Epoch 1 TrainingPhase(): 100%|██████████████████████████| Time: 0:05:59</span>:41
 ┌───────────────┬───────┬─────────┬──────────┐
 │<span class="sgr1">         Phase </span>│<span class="sgr1"> Epoch </span>│<span class="sgr1">    Loss </span>│<span class="sgr1"> Accuracy </span>│

@@ -3,7 +3,7 @@ Pkg.add(&quot;FastAI&quot;)
 </code></pre><p>or try it out with this <a href=https://colab.research.google.com/gist/lorenzoh/2fdc91f9e42a15e633861c640c68e5e8 title= >Google Colab template</a>.</p><p>As an example, here is how to train an image classification model:</p><pre lang=julia ><code>using FastAI
 data, blocks = loaddataset(&quot;imagenette2-160&quot;, (Image, Label))
 method = ImageClassificationSingle(blocks)
-learner = methodlearner(method, data, Models.xresnet18(), ToGPU())
+learner = methodlearner(method, data, callbacks=[ToGPU()])
 fitonecycle!(learner, 10)
 plotpredictions(method, learner)
 </code></pre><p>Please read <a href=https://fluxml.github.io/FastAI.jl/dev title= >the documentation</a> for more information and see the <a href=docs/setup.md.html title= >setup instructions</a>.</p></article><footer class=book-footer ></footer></div><aside class=book-toc ><nav id=toc class=book-toc-content ><ul><li><a href=#fastai >FastAI</a><ul></ul></li></ul></nav></aside></main></body></HTML>

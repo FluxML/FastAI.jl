@@ -2,10 +2,27 @@
 </code></pre></div><p>On the <a href=../notebooks/quickstart.ipynb.html title= >quickstart page</a>, we showed how to train models on common tasks in a few lines of code like these:</p><pre lang=julia ><code>using FastAI
 data, blocks = loaddataset(&quot;imagenette2-160&quot;, (Image, Label))
 method = ImageClassificationSingle(blocks)
-learner = methodlearner(method, data, Models.xresnet18(), ToGPU())
+learner = methodlearner(method, data, callbacks=[ToGPU()])
 fitonecycle!(learner, 10)
 plotpredictions(method, learner)
 </code></pre><p>Each of the five lines encapsulates one part of the deep learning pipeline to give a high-level API while still allowing customization. Let’s have a closer look.</p><h2 id=dataset >Dataset</h2><div class=cellcontainer cell=main lang=julia ><pre class=codecell cell=main lang=julia ><code>data, blocks = loaddataset(&quot;imagenette2-160&quot;, (Image, Label))
+</code></pre><pre class=codeoutput ><code>
+7-Zip (a) [64] 16.02 : Copyright (c) 1999-2016 Igor Pavlov : 2016-05-21
+p7zip Version 16.02 (locale=C.UTF-8,Utf16=on,HugeFiles=on,64 bits,2 CPUs Intel(R) Xeon(R) Platinum 8272CL CPU @ 2.60GHz (50657),ASM,AES-NI)
+
+
+Extracting archive: 
+--
+Path = 
+Type = tar
+Code Page = UTF-8
+
+Everything is Ok
+
+Folders: 23
+Files: 13397
+Size:       107794109
+Compressed: 6872064
 </code></pre><pre class=coderesult ><code>((mapobs(loadfile, ["/home/runner/.julia/datadeps/fastai-imagenette2-160/imagenette2-160/train/n014…]), mapobs(parentname, ["/home/runner/.julia/datadeps/fastai-imagenette2-160/imagenette2-160/train/n014…])), (FastAI.Image{2}(), FastAI.Label{String}(["n01440764", "n02102040", "n02979186", "n03000684", "n03028079", "n03394916", "n03417042", "n03425413", "n03445777", "n03888257"])))</code></pre></div><p>This line downloads and loads the <a href=https://github.com/fastai/imagenette title= >ImageNette</a> image classification dataset, a small subset of ImageNet with 10 different classes. <code>data</code> is a <a href=./data_containers.md.html title= >data container</a> that can be used to load individual observations, here of images and the corresponding labels. We can use <code>getobs(data, i)</code> to load the <code>i</code>-th observation and <code>nobs</code> to find out how many observations there are.</p><div class=cellcontainer cell=main lang=julia ><pre class=codecell cell=main lang=julia ><code>image, class = sample =  getobs(data, 1000)
 @show class
 image
@@ -20,7 +37,7 @@ image
         OneHot()
     )
 )
-</code></pre><p>Based on the blocks and encodings, the learning method can derive lots of functionality:</p><ul><li><p>data processing</p></li><li><p>visualization</p></li><li><p>constructing task-specific models from a backbone</p></li><li><p>creating a loss function</p></li></ul><h2 id=learner >Learner</h2><div class=cellcontainer cell=main lang=julia ><pre class=codecell cell=main lang=julia ><code>learner = methodlearner(method, data, Models.xresnet18(), ToGPU(), Metrics(accuracy))
+</code></pre><p>Based on the blocks and encodings, the learning method can derive lots of functionality:</p><ul><li><p>data processing</p></li><li><p>visualization</p></li><li><p>constructing task-specific models from a backbone</p></li><li><p>creating a loss function</p></li></ul><h2 id=learner >Learner</h2><div class=cellcontainer cell=main lang=julia ><pre class=codecell cell=main lang=julia ><code>learner = methodlearner(method, data, callbacks=[ToGPU(), Metrics(accuracy)])
 </code></pre><pre class=coderesult ><code>Learner()</code></pre></div><p>Next we create a <a href=../REFERENCE/FluxTraining.Learner.html ><code>Learner</code></a> that encapsulates everything needed for training, including:</p><ul><li><p>parallelized training and validation data loaders using <a href=../REFERENCE/DLPipelines.methoddataloaders.html ><code>DLPipelines.methoddataloaders</code></a></p></li><li><p>a loss function using <a href=../REFERENCE/DLPipelines.methodlossfn.html ><code>DLPipelines.methodlossfn</code></a></p></li><li><p>a task-specific model using <a href=../REFERENCE/DLPipelines.methodmodel.html ><code>DLPipelines.methodmodel</code></a></p></li></ul><p>The customizable, expanded version of the code looks like this:</p><pre lang=julia ><code>dls = methoddataloaders(data, method)
 model = methodmodel(method, Models.xresnet18())
 lossfn = methodlossfn(method)

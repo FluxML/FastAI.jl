@@ -2,9 +2,9 @@
 
 dir = mktempdir()
 backend = TensorBoardBackend(dir)
-</code></pre><pre class=coderesult ><code>TensorBoardBackend(/tmp/jl_K7GofP)</code></pre></div><p>Then we create callbacks for logging metrics and hyperparameters to that backend:</p><div class=cellcontainer cell=main lang=julia ><pre class=codecell cell=main lang=julia ><code>metricscb = LogMetrics(backend)
+</code></pre><pre class=coderesult ><code>TensorBoardBackend(/tmp/jl_0VSovu)</code></pre></div><p>Then we create callbacks for logging metrics and hyperparameters to that backend:</p><div class=cellcontainer cell=main lang=julia ><pre class=codecell cell=main lang=julia ><code>metricscb = LogMetrics(backend)
 hparamscb = LogHyperParams(backend)
-</code></pre><pre class=coderesult ><code>LogHyperParams((TensorBoardBackend(/tmp/jl_K7GofP),))</code></pre></div><p>Like any other callbacks, these can then be passed to a <code>Learner</code> along with other callbacks and we can start training. By using the <a href=../../REFERENCE/FluxTraining.Metrics.html ><code>Metrics</code></a> callback we can log metrics other than the loss.</p><pre lang=julia ><code>
+</code></pre><pre class=coderesult ><code>LogHyperParams((TensorBoardBackend(/tmp/jl_0VSovu),))</code></pre></div><p>Like any other callbacks, these can then be passed to a <code>Learner</code> along with other callbacks and we can start training. By using the <a href=../../REFERENCE/FluxTraining.Metrics.html ><code>Metrics</code></a> callback we can log metrics other than the loss.</p><pre lang=julia ><code>
 callbacks = [
     metricscb,
     hparamscb,
@@ -14,7 +14,7 @@ callbacks = [
 
 data = ...
 method = ...
-learner = methodlearner(method, data, Models.xresnet18(), callbacks...)
+learner = methodlearner(method, data; callbacks=callbacks)
 fitonecycle!(learner, 5)
 </code></pre><h2 id=inspecting-logs >Inspecting logs</h2><p>To inspect the logs you will have to install the <code>tensorboard</code> command-line using <code>pip</code> (you can access the command-line in the Julia REPL by pressing <code>;</code>).</p><pre lang= ><code>shell&gt; pip install tensorboard
 </code></pre><p>After this one-time installation, you can run it by pointing it to the log directory created above:</p><pre lang= ><code>shell&gt; tensorboard --logdir $dir
