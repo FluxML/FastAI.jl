@@ -13,7 +13,7 @@ On the [quickstart page](../notebooks/quickstart.ipynb), we showed how to train 
 using FastAI
 data, blocks = loaddataset("imagenette2-160", (Image, Label))
 method = ImageClassificationSingle(blocks)
-learner = methodlearner(method, data, Models.xresnet18(), ToGPU())
+learner = methodlearner(method, data, callbacks=[ToGPU()])
 fitonecycle!(learner, 10)
 plotpredictions(method, learner)
 ```
@@ -75,7 +75,7 @@ Based on the blocks and encodings, the learning method can derive lots of functi
 
 {cell=main}
 ```julia
-learner = methodlearner(method, data, Models.xresnet18(), ToGPU(), Metrics(accuracy))
+learner = methodlearner(method, data, callbacks=[ToGPU(), Metrics(accuracy)])
 ```
 
 Next we create a [`Learner`](#) that encapsulates everything needed for training, including:

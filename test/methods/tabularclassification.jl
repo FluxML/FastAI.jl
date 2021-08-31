@@ -7,7 +7,7 @@ include("../imports.jl")
     testencoding(method.encodings, method.blocks)
     DLPipelines.checkmethod_core(method)
     @test_nowarn methodlossfn(method)
-    @test_nowarn methodmodel(method, NamedTuple())
+    @test_nowarn methodmodel(method)
 
     @testset "`encodeinput`" begin
         row = mockblock(method.blocks[1])
