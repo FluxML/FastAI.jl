@@ -115,7 +115,7 @@ blockbackbone(inblock::ImageTensor{2}) = Models.xresnet18(c_in = inblock.nchanne
 
 
 function blockbackbone(inblock::EncodedTableRow{M, N}) where {M, N}
-    embedszs = Models.get_emb_sz(Dict((col => length(inblock.categorydict[col]) for col in inblock.catcols)))
+    embedszs = Models.get_emb_sz(Dict((col => length(inblock.categorydict[col]) for col in inblock.catcols)), inblock.catcols)
     catback = Models.tabular_embedding_backbone(embedszs)
     contback = Models.tabular_continuous_backbone(N)
     return (categorical = catback, continuous = contback)
