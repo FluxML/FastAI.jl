@@ -44,7 +44,7 @@ catdict = FastAI.gettransformdict(data, DataAugmentation.Categorify, cat);</code
     ),
     ((FastAI.TabularPreprocessing(data)), FastAI.OneHot())
 )</code></pre><pre class=codeoutput ><code>┌ Warning: There is a missing value present for category &#39;occupation&#39; which will be removed from Categorify dict
-└ @ DataAugmentation /home/lorenz/.julia/dev/DataAugmentation/src/rowtransforms.jl:108
+└ @ DataAugmentation /Users/manikyabardhan/.julia/packages/DataAugmentation/IwnxZ/src/rowtransforms.jl:108
 </code></pre><pre class=coderesult ><code>BlockMethod(TableRow{8, 6, Dict{Any, Any}} -> Label{String})</code></pre><p>In case our initial problem wasn’t a classification task, and we had a continuous target column, we would need to perform tabular regression. To create a learning method suitable for regression, we use a <code>Continuous</code> block for representing our target column. This can be done even with multiple continuous target columns by just passing the number of columns in <code>Continuous</code>. For example, the method here could be used for 3 targets.</p><pre lang=julia ><code>
 method2 = BlockMethod(
 
@@ -78,11 +78,11 @@ method2 = BlockMethod(
   [36mTabularPreprocessing[39m                 [1m[36mFastAI.EncodedTableRow{8, 6, Dict{Any, Any}}[39m[22m                  [36mLabel{String}[39m
                 [36mOneHot[39m          [36m(x, y)[39m [36mFastAI.EncodedTableRow{8, 6, Dict{Any, Any}}[39m [1m[36mFastAI.OneHotTensor{0, String}[39m[22m
 
-  Decoding a model output ([36mdecode(method, context, ŷ)[39m)
+  Decoding a model output ([36mdecode(method, context, ŷ)[39m)
 
               Decoding        Name             [36mmethod.outputblock[39m
   –––––––––––––––––––– ––––––––––– ––––––––––––––––––––––––––––––
-                                [36mŷ[39m [36mFastAI.OneHotTensor{0, String}[39m
+                                [36mŷ[39m [36mFastAI.OneHotTensor{0, String}[39m
                 [36mOneHot[39m                              [1m[36mLabel{String}[39m[22m
   [36mTabularPreprocessing[39m [36mtarget_pred[39m                  [36mLabel{String}[39m</code></pre><p><code>getobs</code> gets us a row of data from the <code>TableContainer</code>, which we encode here. This gives us a tuple with the input and target. The input here is again a tuple, containing the categorical values (which have been label encoded or “categorified”) and the continuous values (which have been normalized and any missing values have been filled).</p><pre lang=julia ><code>getobs(splitdata, 1000)</code></pre><pre class=coderesult ><code>([1mDataFrameRow[0m
 [1m  Row [0m│[1m age   [0m[1m workclass  [0m[1m fnlwgt [0m[1m education [0m[1m education-num [0m[1m marital-status   [0m ⋯
@@ -93,17 +93,17 @@ method2 = BlockMethod(
   Parallel(
     vcat,
     Chain(
-      FastAI.Models.var"#43#45"(),
+      FastAI.Models.var"#41#43"(),
       Parallel(
         vcat,
-        Embedding(17, 8),               [90m# 136 parameters[39m
-        Embedding(6, 4),                [90m# 24 parameters[39m
-        Embedding(3, 3),                [90m# 9 parameters[39m
         Embedding(10, 6),               [90m# 60 parameters[39m
         Embedding(17, 8),               [90m# 136 parameters[39m
-        Embedding(7, 5),                [90m# 35 parameters[39m
-        Embedding(43, 13),              [90m# 559 parameters[39m
         Embedding(8, 5),                [90m# 40 parameters[39m
+        Embedding(17, 8),               [90m# 136 parameters[39m
+        Embedding(7, 5),                [90m# 35 parameters[39m
+        Embedding(6, 4),                [90m# 24 parameters[39m
+        Embedding(3, 3),                [90m# 9 parameters[39m
+        Embedding(43, 13),              [90m# 559 parameters[39m
       ),
       identity,
     ),
@@ -119,32 +119,36 @@ method2 = BlockMethod(
     BatchNorm(100),                     [90m# 200 parameters[39m[90m, plus 200[39m
     identity,
   ),
-  2,
-)[90m                   # Total: 16 arrays, [39m33_211 parameters, 129.273 KiB.</code></pre><p>It is really simple to create a custom backbone using the functions present in <code>FastAI.Models</code>.</p><pre lang=julia ><code>cardinalities = collect(map(col -&gt; length(catdict[col]), cat))
-embedszs = FastAI.Models.get_emb_sz(cardinalities)
+  Dense(100, 2),                        [90m# 202 parameters[39m
+)[90m                   # Total: 18 arrays, [39m33_413 parameters, 130.172 KiB.</code></pre><p>It is really simple to create a custom backbone using the functions present in <code>FastAI.Models</code>.</p><pre lang=julia ><code>cardinalities = collect(map(col -&gt; length(catdict[col]), cat))
+
+ovdict = Dict(:workclass =&gt; 10, :education =&gt; 12, Symbol(&quot;native-country&quot;) =&gt; 16)
+overrides = collect(map(col -&gt; col in keys(ovdict) ? ovdict[col] : nothing, cat))
+
+embedszs = FastAI.Models.get_emb_sz(cardinalities, overrides)
 catback = FastAI.Models.tabular_embedding_backbone(embedszs, 0.2);</code></pre><p>We can then pass a named tuple <code>(categorical = ..., continuous = ...)</code> to <code>methodmodel</code> to replace the default backbone.</p><pre lang=julia ><code>backbone = (categorical = catback, continuous =  BatchNorm(length(cont)))
 model = methodmodel(method, backbone)</code></pre><pre class=coderesult ><code>Chain(
   Parallel(
     vcat,
     Chain(
-      FastAI.Models.var"#43#45"(),
+      FastAI.Models.var"#41#43"(),
       Parallel(
         vcat,
-        Embedding(10, 6),               [90m# 60 parameters[39m
-        Embedding(17, 8),               [90m# 136 parameters[39m
+        Embedding(10, 10),              [90m# 100 parameters[39m
+        Embedding(17, 12),              [90m# 204 parameters[39m
         Embedding(8, 5),                [90m# 40 parameters[39m
         Embedding(17, 8),               [90m# 136 parameters[39m
         Embedding(7, 5),                [90m# 35 parameters[39m
         Embedding(6, 4),                [90m# 24 parameters[39m
         Embedding(3, 3),                [90m# 9 parameters[39m
-        Embedding(43, 13),              [90m# 559 parameters[39m
+        Embedding(43, 16),              [90m# 688 parameters[39m
       ),
       Dropout(0.2),
     ),
     BatchNorm(6),                       [90m# 12 parameters[39m[90m, plus 12[39m
   ),
   Chain(
-    Dense(58, 200, relu; bias=false),   [90m# 11_600 parameters[39m
+    Dense(69, 200, relu; bias=false),   [90m# 13_800 parameters[39m
     BatchNorm(200),                     [90m# 400 parameters[39m[90m, plus 400[39m
     identity,
   ),
@@ -154,42 +158,42 @@ model = methodmodel(method, backbone)</code></pre><pre class=coderesult ><code>C
     identity,
   ),
   Dense(100, 2),                        [90m# 202 parameters[39m
-)[90m                   # Total: 18 arrays, [39m33_413 parameters, 130.234 KiB.</code></pre><p>To directly get a <code>Learner</code> suitable for our method and data, we can use the <code>methodlearner</code> function.</p><pre lang=julia ><code>learner = methodlearner(method, splitdata;
+)[90m                   # Total: 18 arrays, [39m35_850 parameters, 138.828 KiB.</code></pre><p>To directly get a <code>Learner</code> suitable for our method and data, we can use the <code>methodlearner</code> function.</p><pre lang=julia ><code>learner = methodlearner(method, splitdata;
     backbone=backbone, callbacks=[Metrics(accuracy)],
-    batchsize=128, buffered=false)</code></pre><pre class=coderesult ><code>Learner()</code></pre><p>Once we have our learner, we can just call <a href=../REFERENCE/FastAI.fitonecycle!.html ><code>fitonecycle!</code></a> on it to train it for the desired number of epochs.</p><pre lang=julia ><code>fitonecycle!(learner, 3, 0.2)</code></pre><pre class=codeoutput ><code><span class="sgr32">Epoch 1 TrainingPhase(): 100%|██████████████████████████| Time: 0:00:02</span>
+    batchsize=128, buffered=false)</code></pre><pre class=coderesult ><code>Learner()</code></pre><p>Once we have our learner, we can just call <a href=../REFERENCE/FastAI.fitonecycle!.html ><code>fitonecycle!</code></a> on it to train it for the desired number of epochs.</p><pre lang=julia ><code>fitonecycle!(learner, 3, 0.2)</code></pre><pre class=codeoutput ><code><span class="sgr32">Epoch 1 TrainingPhase(): 100%|██████████████████████████| Time: 0:00:57</span>
 ┌───────────────┬───────┬─────────┬──────────┐
 │<span class="sgr1">         Phase </span>│<span class="sgr1"> Epoch </span>│<span class="sgr1">    Loss </span>│<span class="sgr1"> Accuracy </span>│
 ├───────────────┼───────┼─────────┼──────────┤
-│ TrainingPhase │   1.0 │ 0.44043 │  0.82431 │
+│ TrainingPhase │   1.0 │ 0.38906 │  0.81998 │
 └───────────────┴───────┴─────────┴──────────┘
-<span class="sgr32">Epoch 1 ValidationPhase(): 100%|████████████████████████| Time: 0:00:00</span>
+<span class="sgr32">Epoch 1 ValidationPhase(): 100%|████████████████████████| Time: 0:00:02</span>
 ┌─────────────────┬───────┬─────────┬──────────┐
 │<span class="sgr1">           Phase </span>│<span class="sgr1"> Epoch </span>│<span class="sgr1">    Loss </span>│<span class="sgr1"> Accuracy </span>│
 ├─────────────────┼───────┼─────────┼──────────┤
-│ ValidationPhase │   1.0 │ 0.39627 │  0.81209 │
+│ ValidationPhase │   1.0 │ 0.33287 │  0.84165 │
 └─────────────────┴───────┴─────────┴──────────┘
-<span class="sgr32">Epoch 2 TrainingPhase(): 100%|██████████████████████████| Time: 0:00:02</span>
+<span class="sgr32">Epoch 2 TrainingPhase(): 100%|██████████████████████████| Time: 0:00:03</span>
 ┌───────────────┬───────┬─────────┬──────────┐
 │<span class="sgr1">         Phase </span>│<span class="sgr1"> Epoch </span>│<span class="sgr1">    Loss </span>│<span class="sgr1"> Accuracy </span>│
 ├───────────────┼───────┼─────────┼──────────┤
-│ TrainingPhase │   2.0 │ 0.34174 │  0.84043 │
+│ TrainingPhase │   2.0 │ 0.35171 │  0.83392 │
 └───────────────┴───────┴─────────┴──────────┘
 <span class="sgr32">Epoch 2 ValidationPhase(): 100%|████████████████████████| Time: 0:00:00</span>
 ┌─────────────────┬───────┬─────────┬──────────┐
 │<span class="sgr1">           Phase </span>│<span class="sgr1"> Epoch </span>│<span class="sgr1">    Loss </span>│<span class="sgr1"> Accuracy </span>│
 ├─────────────────┼───────┼─────────┼──────────┤
-│ ValidationPhase │   2.0 │ 0.31593 │  0.85412 │
+│ ValidationPhase │   2.0 │ 0.31995 │   0.8554 │
 └─────────────────┴───────┴─────────┴──────────┘
-<span class="sgr32">Epoch 3 TrainingPhase(): 100%|██████████████████████████| Time: 0:00:02</span>
+<span class="sgr32">Epoch 3 TrainingPhase(): 100%|██████████████████████████| Time: 0:00:04</span>
 ┌───────────────┬───────┬─────────┬──────────┐
 │<span class="sgr1">         Phase </span>│<span class="sgr1"> Epoch </span>│<span class="sgr1">    Loss </span>│<span class="sgr1"> Accuracy </span>│
 ├───────────────┼───────┼─────────┼──────────┤
-│ TrainingPhase │   3.0 │ 0.31959 │  0.85215 │
+│ TrainingPhase │   3.0 │ 0.32234 │  0.84912 │
 └───────────────┴───────┴─────────┴──────────┘
 <span class="sgr32">Epoch 3 ValidationPhase(): 100%|████████████████████████| Time: 0:00:00</span>
 ┌─────────────────┬───────┬─────────┬──────────┐
 │<span class="sgr1">           Phase </span>│<span class="sgr1"> Epoch </span>│<span class="sgr1">    Loss </span>│<span class="sgr1"> Accuracy </span>│
 ├─────────────────┼───────┼─────────┼──────────┤
-│ ValidationPhase │   3.0 │ 0.31082 │  0.85588 │
+│ ValidationPhase │   3.0 │ 0.30943 │  0.85641 │
 └─────────────────┴───────┴─────────┴──────────┘
-</code></pre></article><footer class=book-footer ></footer></div><aside class=book-toc ><nav id=toc class=book-toc-content ><ul><li><a href=#tabular-classification >Tabular Classification</a><ul></ul></li></ul></nav></aside></main></body></HTML>
+</code></pre><pre lang=julia ><code></code></pre></article><footer class=book-footer ></footer></div><aside class=book-toc ><nav id=toc class=book-toc-content ><ul><li><a href=#tabular-classification >Tabular Classification</a><ul></ul></li></ul></nav></aside></main></body></HTML>
