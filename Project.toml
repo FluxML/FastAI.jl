@@ -40,7 +40,7 @@ Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 [compat]
 Animations = "0.4"
 BSON = "0.3"
-CSV = "0.8"
+CSV = "0.8, 0.9"
 Colors = "0.12"
 DLPipelines = "0.3"
 DataAugmentation = "0.2.4"
