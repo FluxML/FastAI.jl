@@ -50,6 +50,11 @@ function methodmodel(method::BlockMethod, backbone)
     return blockmodel(xblock, method.outputblock, backbone)
 end
 
+function methodmodel(method::BlockMethod)
+    xblock = encodedblock(method.encodings, method.blocks[1], true)
+    return blockmodel(xblock, method.outputblock, blockbackbone(xblock))
+end
+
 function methodlossfn(method::BlockMethod)
     yblock = encodedblock(method.encodings, method.blocks[2], true)
     return blocklossfn(method.outputblock, yblock)

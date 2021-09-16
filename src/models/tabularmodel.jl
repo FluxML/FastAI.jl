@@ -26,24 +26,6 @@ get_emb_sz(cardinalities::AbstractVector{<:Integer}, size_overrides=fill(nothing
         return (cardinality + 1, emb_dim)
     end
 
-"""
-    get_emb_sz(cardinalities::Dict, [size_overrides::Dict])
-
-Given a map from columns to `cardinalities`, compute the output embedding size according to [`emb_sz_rule`](#).
-Return a vector of tuples where each element is `(in_size, out_size)` for an embedding layer.
-
-## Keyword arguments
-
-- `size_overrides`: A map of output embedding size overrides
-                    (i.e. `size_overrides[col]` is the output embedding size for `col`).
-"""
-function get_emb_sz(cardinalities::Dict{<:Any, <:Integer}, size_overrides=Dict())
-    values_and_overrides = map(collect(pairs(cardinalities))) do (col, cardinality)
-        cardinality, get(size_overrides, col, nothing)
-    end
-    get_emb_sz(first.(values_and_overrides), last.(values_and_overrides))
-end
-
 sigmoidrange(x, low, high) = @. Flux.sigmoid(x) * (high - low) + low
 
 function tabular_embedding_backbone(embedding_sizes, dropout_rate=0.)
