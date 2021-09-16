@@ -129,6 +129,7 @@ export
     # encodings
     encode,
     decode,
+    setup,
     ProjectiveTransforms,
     ImagePreprocessing,
     OneHot,
@@ -141,7 +142,7 @@ export
     BlockMethod,
     describemethod,
     checkblock,
-    
+
     # learning methods
     findlearningmethods,
     ImageClassificationSingle,

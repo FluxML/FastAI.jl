@@ -103,7 +103,7 @@ end
 # Setup and image statistic calculation
 
 """
-    imagedatasetstats(image, C)
+    imagestats(image, C)
 
 Compute the color channel-wise means and standard deviations of all pixels.
 `image` is converted to color type `C` (e.g. `RGB{N0f8}`, `Gray{N0f8}`)
