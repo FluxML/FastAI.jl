@@ -8,6 +8,7 @@
     - Intermediate
         - [Image segmentation](notebooks/imagesegmentation.ipynb)
         - [Keypoint regression](notebooks/keypointregression.ipynb)
+        - [Tabular classification](notebooks/tabularclassification.ipynb)
         - [Data containers](docs/data_containers.md)
         - [Saving and loading models](notebooks/serialization.ipynb)
     - Advanced

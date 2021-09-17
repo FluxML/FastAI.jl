@@ -3,7 +3,8 @@ include("../imports.jl")
 @testset "TabularClassificationSingle" begin
     df = DataFrame(A = 1:4, B = ["M", "F", "F", "M"], C = ["P", "F", "P", "F"])
     td = TableDataset(df)
-    method = TabularClassificationSingle((:B,), (:A,), ["P", "F"]; data = td)
+
+    method = TabularClassificationSingle(["P", "F"], td; catcols=(:B,), contcols=(:A,), )
     testencoding(method.encodings, method.blocks)
     DLPipelines.checkmethod_core(method)
     @test_nowarn methodlossfn(method)
@@ -25,4 +26,7 @@ include("../imports.jl")
         @test y ≈ [1, 0]
     end
 
+
+    @test_nowarn TabularClassificationSingle(["P", "F"], td)
+    @test TabularClassificationSingle(["P", "F"], td).blocks[1].catcols == (:B, :C)
 end

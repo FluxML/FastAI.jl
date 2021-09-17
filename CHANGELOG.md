@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased] - 2020-07-32 – now
 
 ### Added
+
 - High-level API "FasterAI"
+    - dataset recipes
+    - learning method helpers
     - Find datasets and learning methods based on `Block`s: `finddataset`, `findlearningmethods`
     - `loaddataset` for quickly loading data containers from configured recipes
 - Data container recipes (`DatasetRecipe`, `loadrecipe`)
@@ -16,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - [Blocks and encodings](https://fluxml.ai/FastAI.jl/dev/docs/background/blocksencodings.md.html)
 - New interfaces
     - `blockbackbone` creates a default backbone for an input block
+- Support for tabular data along with recipes and learning methods:
+    - [`TabularPreprocessing`], [`TableRow`], [`TableDataset`], [`TabularClassificiationSingle`], [`TabularRegression`]
+    - [Tabular classification tutorial](https://fluxml.ai/FastAI.jl/dev/notebooks/tabularclassification.ipynb.html)
 
 
 ### Changed

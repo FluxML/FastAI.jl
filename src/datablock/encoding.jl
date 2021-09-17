@@ -216,13 +216,29 @@ function decode(
                     for (block, data) in zip(blocks, datas))
 end
 
-"""
-    checkencodings()
 
-Check that `encodings` can be sequenced, i.e. given input `blocks`, the
-`encodedblock`s of every encoding can be fed into the next.
 """
-function checkencodings end
+    setup(Encoding, block, data; kwargs...)
+
+Create an encoding using statistics derived from a data container `data`
+with observations of block `block`. Used when some arguments of the encoding
+are dependent on the dataset. `data` should be the training dataset. Additional
+`kwargs` are passed through to the regular constructor of `Encoding`.
+
+## Examples
+
+```julia
+(images, labels), blocks = loaddataset("imagenette2-160", (Image, Label))
+setup(ImagePreprocessing, Image{2}(), images; buffered = false)
+```
+
+```julia
+data, block = loaddataset("adult_sample", TableRow)
+setup(TabularPreprocessing, block, data)
+```
+"""
+function setup end
+
 
 """
     testencoding(encoding, block, data)

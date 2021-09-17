@@ -100,6 +100,57 @@ function decode(ip::ImagePreprocessing, context, block::ImageTensor, data)
     return copy(DataAugmentation.tensortoimage(DataAugmentation.denormalize(data, means, stds)))
 end
 
+# Setup and image statistic calculation
+
+"""
+    imagestats(image, C)
+
+Compute the color channel-wise means and standard deviations of all pixels.
+`image` is converted to color type `C` (e.g. `RGB{N0f8}`, `Gray{N0f8}`)
+before statistics are calculated.
+"""
+function imagestats(img::AbstractArray{T,N}, C) where {T,N}
+    imt = DataAugmentation.imagetotensor(map(x -> convert(C, x), img))
+    means = reshape(mean(imt; dims=1:N), :)
+    stds = reshape(std(imt; dims=1:N), :)
+    return means, stds
+end
+
+
+"""
+    imagedatasetstats(data, C[; parallel, progress])
+
+Given a data container of images `data`, compute the color channel-wise means
+and standard deviations across all observations. Images are converted to color type
+`C` (e.g. `RGB{N0f8}`, `Gray{N0f8}`) before statistics are calculated.
+
+If `progress = true`, show a progress bar.
+"""
+function imagedatasetstats(
+        data,
+        C;
+        progress=true,
+        progressfn=progress ? tqdm : identity)
+    means, stds = imagestats(getobs(data, 1), C)
+    loaderfn = d -> eachobsparallel(d, buffered=false, useprimary=true)
+
+    for (means_, stds_) in mapobs(img -> imagestats(img, C), data) |> loaderfn |> progressfn
+        means .+= means_
+        stds .+= stds_
+    end
+    return means ./ nobs(data), stds ./ nobs(data)
+end
+
+
+function setup(::Type{ImagePreprocessing}, ::Image, data; C = RGB{N0f8}, progress = false, kwargs...)
+    means, stds = imagedatasetstats(data, C; progress = progress)
+    return ImagePreprocessing(;
+        means=SVector{length(means)}(means),
+        stds=SVector{length(means)}(stds),
+        C=C,
+        kwargs...
+    )
+end
 
 # Augmentation helper
 

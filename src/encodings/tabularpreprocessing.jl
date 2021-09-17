@@ -54,6 +54,14 @@ function encode(tt::TabularPreprocessing, _, block::TableRow, row)
     (catvals, contvals)
 end
 
+
+function setup(::Type{TabularPreprocessing}, block::TableRow, data::TableDataset)
+    return TabularPreprocessing(gettransforms(data, block.catcols, block.contcols))
+end
+
+
+# Utils
+
 """
 The helper functions defined below can be used for quickly constructing a dictionary,
 which will be required for creating various tabular transformations available in DataAugmentation.jl.
@@ -107,15 +115,16 @@ end
 Returns a composition of basic tabular transformations constructed
 for the given TableDataset.
 """
-function gettransforms(td::Datasets.TableDataset)
-    catcols, contcols = getcoltypes(td)
+function gettransforms(td::TableDataset, catcols, contcols)
     normstats = FastAI.gettransformdict(td, DataAugmentation.NormalizeRow, contcols)
     fmvals = FastAI.gettransformdict(td, DataAugmentation.FillMissing, contcols)
     catdict = FastAI.gettransformdict(td, DataAugmentation.Categorify, catcols)
-
     normalize = DataAugmentation.NormalizeRow(normstats, contcols)
     categorify = DataAugmentation.Categorify(catdict, catcols)
     fm = DataAugmentation.FillMissing(fmvals, contcols)
 
     return fm |> normalize |> categorify
 end
+
+
+gettransforms(td::TableDataset) = gettransforms(td, getcoltypes(td)...)
