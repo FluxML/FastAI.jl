@@ -60,6 +60,20 @@ Randomly generate an instance of `block`.
 mockblock(blocks::Tuple) = map(mockblock, blocks)
 
 
+"""
+    setup(Block, data)
+
+Create an instance of block type `Block` from data container `data`.
+
+## Examples
+
+```julia
+setup(Label, ["cat", "dog", "cat"]) == Label(["cat", "dog"])
+```
+"""
+function setup end
+
+
 # ## Utilities
 
 typify(T::Type) = T
@@ -86,6 +100,7 @@ end
 checkblock(label::Label{T}, data::T) where T = data ∈ label.classes
 mockblock(label::Label) = rand(label.classes)
 
+setup(::Type{Label}, data) = Label(unqiue(eachobs(data)))
 
 # LabelMulti
 
@@ -109,6 +124,8 @@ mockblock(label::LabelMulti) =
     unique([rand(label.classes) for _ in 1:rand(1:length(label.classes))])
 
 
+setup(::Type{LabelMulti}, data) = Label(unqiue(eachobs(data)))
+
 # Image
 
 """
@@ -121,6 +138,8 @@ struct Image{N} <: Block end
 
 checkblock(::Image{N}, ::AbstractArray{T,N}) where {T <: Union{Colorant,Number},N} = true
 mockblock(::Image{N}) where N = rand(RGB{N0f8}, ntuple(_ -> 16, N))
+
+setup(::Type{Image}, data) = Image{ndims(getobs(data, 1))}()
 
 """
     Mask{N, T}(classes) <: Block
@@ -199,6 +218,24 @@ function mockblock(block::TableRow)
             rand(block.categorydict[col]) : rand()
     end
     return NamedTuple(zip(cols, vals))
+end
+
+"""
+    setup(TableRow, data[; catcols, contcols])
+
+Create a `TableRow` block from data container `data::TableDataset`. If the
+categorical and continuous columns are not specified manually, try to
+guess them from the dataset's column types.
+"""
+function setup(::Type{TableRow}, data; catcols=nothing, contcols=nothing)
+    catcols_, contcols_ = getcoltypes(data)
+    catcols = isnothing(catcols) ? catcols_ : catcols
+    contcols = isnothing(contcols) ? contcols_ : contcols
+
+    return TableRow(
+        catcols,
+        contcols,
+        gettransformdict(data, DataAugmentation.Categorify, catcols))
 end
 
 function Base.show(io::IO, block::TableRow)
