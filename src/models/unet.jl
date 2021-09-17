@@ -25,7 +25,7 @@ the same spatial output dimensions as its input.
 ```julia
 using FastAI, Metalhead
 
-backbone = Metalhead.ResNet50(pretrain=true).layers[1:end-3]
+backbone = Metalhead.ResNet50(pretrain=true).layers[1][1:end-1]
 unet = UNetDynamic(backbone, (256, 256, 3, 1); k_out = 10)
 Flux.outputsize(unet, (256, 256, 3, 1)) == (256, 256, 10, 1)
 
