@@ -3,7 +3,8 @@ include("../imports.jl")
 @testset "TabularRegression" begin
     df = DataFrame(A = 1:4, B = ["M", "F", "F", "M"], C = 10:13)
     td = TableDataset(df)
-    method = TabularRegression((:B,), (:A,); data = td)
+    targets = [rand(2) for _ in 1:4]
+    method = TabularRegression(2, td; catcols=(:B,), contcols=(:A,))
     testencoding(method.encodings, method.blocks)
     DLPipelines.checkmethod_core(method)
     @test_nowarn methodlossfn(method)
@@ -25,4 +26,5 @@ include("../imports.jl")
         @test target == y
     end
 
+    @test_nowarn method = TabularRegression(2, td)
 end
