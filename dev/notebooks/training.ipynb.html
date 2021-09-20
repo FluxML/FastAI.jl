@@ -131,6 +131,6 @@ fitonecycle!(learner, 10, 0.0005)</code></pre><pre class=codeoutput ><code><span
 </code></pre><h2 id=finetuning-a-pretrained-model >Finetuning a pretrained model</h2><p>When finetuning a pretrained model, it is recommended to use <a href=../REFERENCE/FastAI.finetune!.html ><code>finetune!</code></a> which uses a warmup schedule to train the newly initiliazed head more quickly than the pretrained backbone.</p><pre lang=julia ><code>data, blocks = loaddataset(&quot;imagenette2-160&quot;, (Image, Label))
 method = ImageClassificationSingle(blocks)
 learner = methodlearner(method, data;
-    backbone=Metalhead.ResNet50(pretrain=true).layers[1:end-3],
+    backbone=Metalhead.ResNet50(pretrain=true).layers[1][1:end-1],
     callbacks=[ToGPU(), Metrics(accuracy)])
 finetune!(learner, 5, 0.0005)</code></pre></article><footer class=book-footer ></footer></div><aside class=book-toc ><nav id=toc class=book-toc-content ><ul><li><a href=#how-to-train-a-model >How to train a model</a><ul><li><a href=#finding-a-learning-rate >Finding a learning rate</a><ul></ul></li><li><a href=#training-a-model-from-scratch >Training a model from scratch</a><ul></ul></li><li><a href=#finetuning-a-pretrained-model >Finetuning a pretrained model</a><ul></ul></li></ul></li></ul></nav></aside></main></body></HTML>

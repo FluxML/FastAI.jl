@@ -86,7 +86,7 @@ end
 
 </code></pre><pre lang=julia ><code>using Metalhead
 
-backbone = Metalhead.ResNet50(pretrain=true).layers[1:end-3]
+backbone = Metalhead.ResNet50(pretrain=true).layers[1][1:end-1]
 model = methodmodel(method, backbone);</code></pre><p>Next we create a pair of training and validation data loaders. They take care of batching and loading the data in parallel in the background.</p><pre lang=julia ><code>traindl, validdl = FastAI.methoddataloaders(traindata, validdata, method, 16)</code></pre><pre class=coderesult ><code>(eachobsparallel(batchviewcollated() with 950 batches of size 16), eachobsparallel(batchviewcollated() with 16 batches of size 32))</code></pre><p>With the addition of an optimizer and a loss function, we can now create a <a href=../REFERENCE/FluxTraining.Learner.html ><code>Learner</code></a> and start training. Just like <a href=# title= ><code>methomodel</code></a>, <a href=../REFERENCE/DLPipelines.methodlossfn.html ><code>DLPipelines.methodlossfn</code></a> selects the appropriate loss function for a <code>BlockMethod</code>s blocks. Here both the encoded target block and model output block are <code>block = KeypointTensor{2, Float32}((1,))</code>, so <code>blocklossfn(block, block)</code> is called which returns Mean Squared Error as a suitable loss function.</p><pre lang=julia ><code>learner = Learner(
     model,
     (traindl, validdl),
