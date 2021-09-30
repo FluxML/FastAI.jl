@@ -36,7 +36,7 @@ using Setfield
 using ShowCases
 using Tables
 using Statistics
-using Test: @testset, @test, @test_nowarn
+using InlineTest: @testset, @test, @test_nowarn
 
 include("plotting.jl")
 include("learner.jl")

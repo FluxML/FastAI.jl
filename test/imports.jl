@@ -19,6 +19,7 @@ using TestSetExtensions
 using DataFrames
 using Tables
 using CSV
+using ReTest
 
 ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 include("testdata.jl")
