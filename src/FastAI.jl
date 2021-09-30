@@ -68,6 +68,9 @@ include("datablock/models.jl")
 include("datablock/loss.jl")
 include("datablock/plot.jl")
 
+# Interpretation
+include("interpretation/backend.jl")
+
 # training
 include("training/paramgroups.jl")
 include("training/discriminativelrs.jl")
