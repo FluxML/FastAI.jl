@@ -38,7 +38,7 @@ using ShowCases
 using Tables
 import UnicodePlots
 using Statistics
-using InlineTest: @testset, @test, @test_nowarn
+import InlineTest
 
 include("plotting.jl")
 include("learner.jl")
@@ -73,6 +73,7 @@ include("datablock/plot.jl")
 # Interpretation
 include("interpretation/backend.jl")
 include("interpretation/text.jl")
+include("interpretation/makie.jl")
 
 # training
 include("training/paramgroups.jl")

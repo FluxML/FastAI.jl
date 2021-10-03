@@ -217,7 +217,7 @@ function decode(
 end
 
 
-"""
+@doc """
     setup(Encoding, block, data; kwargs...)
 
 Create an encoding using statistics derived from a data container `data`
@@ -236,8 +236,7 @@ setup(ImagePreprocessing, Image{2}(), images; buffered = false)
 data, block = loaddataset("adult_sample", TableRow)
 setup(TabularPreprocessing, block, data)
 ```
-"""
-function setup end
+""" setup
 
 
 """
@@ -252,7 +251,7 @@ Performs some tests that the encoding interface is set up properly for
     and that the block is identical to `block`
 """
 function testencoding(encoding, block, data = mockblock(block))
-    @testset "Encoding `$(typeof(encoding))` for block `$block`" begin
+    Test.@testset "Encoding `$(typeof(encoding))` for block `$block`" begin
         # Test that `data` is a valid instance of `block`
         @test checkblock(block, data)
         @test !isnothing(encodedblock(encoding, block))
