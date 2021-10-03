@@ -28,6 +28,7 @@ using FluxTraining: Learner, handle
 using FluxTraining.Events
 using JLD2: jldsave, jldopen
 using Markdown
+import ImageInTerminal
 using MLDataPattern
 using Parameters
 using PrettyTables
@@ -35,6 +36,7 @@ using StaticArrays
 using Setfield
 using ShowCases
 using Tables
+import UnicodePlots
 using Statistics
 using InlineTest: @testset, @test, @test_nowarn
 
@@ -70,6 +72,7 @@ include("datablock/plot.jl")
 
 # Interpretation
 include("interpretation/backend.jl")
+include("interpretation/text.jl")
 
 # training
 include("training/paramgroups.jl")
@@ -145,6 +148,11 @@ export
     BlockMethod,
     describemethod,
     checkblock,
+
+    # interpretation
+    ShowText,
+    showblock,
+    showblocks,
 
     # learning methods
     findlearningmethods,

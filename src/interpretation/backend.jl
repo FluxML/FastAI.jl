@@ -68,6 +68,19 @@ showblock!(handle, backend, (title, block)::Pair, data) =
 
 
 """
+    showblock(backend, block, data)
+    showblock(backend, blocks, datas)
+    showblock(backend, title => block, data)
+
+Show a block or blocks of data to `backend <: ShowBackend`.
+
+`block` can be a `Block`, a tuple of `block`s, or a `Pair` of `title => block`.
+"""
+showblock(backend::ShowBackend, block, data) =
+    showblock!(createhandle(backend), backend, block, data)
+
+
+"""
     showblocks!(handle, backend, block, datas)
 
 Show a vector of observations `datas` of the same `block` type.
@@ -84,14 +97,6 @@ and `showblocks!` will show multiple rows.
 """
 function showblocks! end
 
-"""
-    showblock(backend, block, data)
-    showblock(backend, blocks, datas)
-    showblock(backend, title => block, data)
 
-Show a block or blocks of data to `backend <: ShowBackend`.
-
-`block` can be a `Block`, a tuple of `block`s, or a `Pair` of `title => block`.
-"""
-showblock(backend::ShowBackend, block, data) =
-    showblock!(createhandle(backend), backend, block, data)
+showblocks(backend::ShowBackend, block, datas) =
+    showblocks!(createhandle(backend), backend, block, datas)
