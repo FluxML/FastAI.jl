@@ -36,6 +36,7 @@ using StaticArrays
 using Setfield
 using ShowCases
 using Tables
+using Test
 import UnicodePlots
 using Statistics
 import InlineTest
@@ -74,6 +75,7 @@ include("datablock/plot.jl")
 include("interpretation/backend.jl")
 include("interpretation/text.jl")
 include("interpretation/makie.jl")
+include("interpretation/showinterpretable.jl")
 
 # training
 include("training/paramgroups.jl")
