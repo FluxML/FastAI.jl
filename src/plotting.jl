@@ -141,7 +141,6 @@ function imageaxis(f; kwargs...)
     ax.leftspinevisible = false
     ax.rightspinevisible = false
     ax.topspinevisible = false
-    MakieLayout.tightlimits!(ax)
     hidedecorations!(ax)
 
     return ax
@@ -155,7 +154,8 @@ end
 
 @recipe(PlotImage, image) do scene
     Attributes(
-        alpha = 1
+        alpha = 1,
+        interpolate = false,
     )
 end
 
