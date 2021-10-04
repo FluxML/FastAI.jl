@@ -28,8 +28,7 @@ function showblockinterpretable(backend::ShowBackend, encodings, block, data)
         Validation(),
         block,
         data)
-    @show block_
-    return showblock(backend, block_, data_)
+    showblock(backend, block_, data_)
 end
 
 
@@ -38,8 +37,8 @@ end
 
 Multi-sample version [`showblockinterpretable`](#).
 """
-function showblocksinterpretable(backend::ShowBackend, encodings, block, data::AbstractVector)
-    blockdatas_ = [decodewhile(
+function showblocksinterpretable(backend::ShowBackend, encodings, block, datas::AbstractVector)
+    blockdatas = [decodewhile(
         block -> !_isshowable(backend, block),
         encodings,
         Validation(),
@@ -47,7 +46,7 @@ function showblocksinterpretable(backend::ShowBackend, encodings, block, data::A
         data) for data in datas]
     block_ = first(first(blockdatas))
     datas_ = last.(blockdatas)
-    return showblock(backend, block_, data_)
+    showblocks(backend, block_, datas_)
 end
 
 
@@ -63,7 +62,6 @@ end
 
 Decode `block` by successively applying `encodings` to decode in
 reverse order until `f(block') == false`.
-
 """
 function decodewhile(f, encodings, ctx, block::FastAI.AbstractBlock, data)
     if f(block)
@@ -85,4 +83,10 @@ function decodewhile(f, encodings, ctx, blocks::Tuple, datas::Tuple)
     blocks = first.(results)
     datas = last.(results)
     return blocks, datas
+end
+
+
+function decodewhile(f, encodings, ctx, (title, block)::Pair, data)
+    block_, data_ = decodewhile(f, encodings, ctx, block, data)
+    (title => block_, data_)
 end
