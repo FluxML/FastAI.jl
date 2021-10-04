@@ -49,6 +49,9 @@ function showblocks!(io, backend::ShowText, blocks::Tuple, datass::AbstractVecto
     pretty_table(io, tabledata; header=header, noheader=all(isempty, header), backend.kwargs...)
 end
 
+showblocks!(io, backend::ShowText, block, data::AbstractVector) =
+    showblocks!(io, backend, (block,), data)
+
 
 
 # Block implementations
@@ -71,7 +74,7 @@ function showblock!(io, ::ShowText, block::LabelMulti, data)
 end
 
 function showblock!(io, ::ShowText, block::OneHotTensor{0}, data)
-    plot = UnicodePlots.barplot(block.classes, data)
+    plot = UnicodePlots.barplot(block.classes, data, width=20)
     print(IOContext(io, :color => true), plot)
 end
 
