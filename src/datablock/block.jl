@@ -99,6 +99,25 @@ Create an instance of block type `Block` from data container `data`.
 ```julia
 setup(Label, ["cat", "dog", "cat"]) == Label(["cat", "dog"])
 ```
+
+    setup(Encoding, block, data; kwargs...)
+
+Create an encoding using statistics derived from a data container `data`
+with observations of block `block`. Used when some arguments of the encoding
+are dependent on the dataset. `data` should be the training dataset. Additional
+`kwargs` are passed through to the regular constructor of `Encoding`.
+
+## Examples
+
+```julia
+(images, labels), blocks = loaddataset("imagenette2-160", (Image, Label))
+setup(ImagePreprocessing, Image{2}(), images; buffered = false)
+```
+
+```julia
+data, block = loaddataset("adult_sample", TableRow)
+setup(TabularPreprocessing, block, data)
+```
 """
 function setup end
 
