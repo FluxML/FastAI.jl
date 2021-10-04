@@ -68,24 +68,33 @@ showblock!(handle, backend, (title, block)::Pair, data) =
 
 
 """
-    showblock(backend, block, data)
-    showblock(backend, blocks, datas)
-    showblock(backend, title => block, data)
+    showblock([backend], block, data)
+    showblock([backend], blocks, datas)
+    showblock([backend], title => block, data)
 
 Show a block or blocks of data to `backend <: ShowBackend`.
 
 `block` can be a `Block`, a tuple of `block`s, or a `Pair` of `title => block`.
 """
-showblock(backend::ShowBackend, block, data) =
-    showblock!(createhandle(backend), backend, block, data)
+function showblock(backend::ShowBackend, block, data)
+    handle = createhandle(backend)
+    showblock!(handle, backend, block, data)
+end
 
 
 """
+    showblocks([backend], block, datas)
     showblocks!(handle, backend, block, datas)
 
 Show a vector of observations `datas` of the same `block` type.
 
-See [`showblocks`](#) for examples.
+## Examples
+
+```julia
+data, blocks = loaddataset("imagenette2-160")
+samples = [getobs(data, i) for i in range(1:4)]
+showblocks(blocks, samples)
+```
 
 ## Extending
 
@@ -98,5 +107,6 @@ and `showblocks!` will show multiple rows.
 function showblocks! end
 
 
+Base.@doc (Base.@doc showblocks!)
 showblocks(backend::ShowBackend, block, datas) =
     showblocks!(createhandle(backend), backend, block, datas)
