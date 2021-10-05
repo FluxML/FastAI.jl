@@ -131,48 +131,6 @@ typify(block::FastAI.AbstractBlock) = typeof(block)
 
 # ## Block implementations
 
-abstract type AbstractLabel{T} <: Block end
-
-# Label
-
-"""
-    Label(classes)
-
-`Block` for a categorical label in a single-class context.
-`data` is valid for `Label(classes)` if `data ∈ classes`.
-"""
-struct Label{T} <: AbstractLabel{T}
-    classes::AbstractVector{T}
-end
-
-checkblock(label::Label{T}, data::T) where T = data ∈ label.classes
-mockblock(label::Label) = rand(label.classes)
-
-setup(::Type{Label}, data) = Label(unqiue(eachobs(data)))
-
-# LabelMulti
-
-"""
-    LabelMulti(classes[; thresh = 0.5])
-
-`Block` for a categorical label in a multi-class context.
-`data` is valid for `Label(classes)` if `data ∈ classes`.
-"""
-struct LabelMulti{T} <: AbstractLabel{T}
-    classes::AbstractVector{T}
-    thresh::Float32
-end
-LabelMulti(classes; thresh=0.5f0) = LabelMulti(classes, thresh)
-
-function checkblock(label::LabelMulti{T}, v::AbstractVector{T}) where T
-    return all(map(x -> x ∈ label.classes, v))
-end
-
-mockblock(label::LabelMulti) =
-    unique([rand(label.classes) for _ in 1:rand(1:length(label.classes))])
-
-
-setup(::Type{LabelMulti}, data) = Label(unqiue(eachobs(data)))
 
 # Image
 

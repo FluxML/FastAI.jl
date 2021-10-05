@@ -234,29 +234,29 @@ Performs some tests that the encoding interface is set up properly for
 function testencoding(encoding, block, data = mockblock(block))
     Test.@testset "Encoding `$(typeof(encoding))` for block `$block`" begin
         # Test that `data` is a valid instance of `block`
-        @test checkblock(block, data)
-        @test !isnothing(encodedblock(encoding, block))
+        Test.@test checkblock(block, data)
+        Test.@test !isnothing(encodedblock(encoding, block))
         outblock = encodedblock(encoding, block, true)
         outdata = encode(encoding, Training(), block, data)
         # The encoded data should be a valid instance for the `encodedblock`
-        @test checkblock(outblock, outdata)
+        Test.@test checkblock(outblock, outdata)
 
         # Test decoding (if supported) works correctly
         if (outblock isa Tuple)
             for idx in length(outblock)
                 inblock = decodedblock(encoding, outblock[idx])
                 if !isnothing(inblock)
-                    @test block[idx] == inblock
+                    Test.@test block[idx] == inblock
                     indata = decode(encoding, Training(), outblock[idx], outdata[idx])
-                    @test checkblock(inblock, indata)
+                    Test.@test checkblock(inblock, indata)
                 end
             end
         else
             inblock = decodedblock(encoding, outblock)
             if !isnothing(inblock)
-                @test block == inblock
+                Test.@test block == inblock
                 indata = decode(encoding, Training(), outblock, outdata)
-                @test checkblock(inblock, indata)
+                Test.@test checkblock(inblock, indata)
             end
         end
     end

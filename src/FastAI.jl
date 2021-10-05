@@ -36,10 +36,10 @@ using StaticArrays
 using Setfield
 using ShowCases
 using Tables
-using Test
+import Test
 import UnicodePlots
 using Statistics
-import InlineTest
+using InlineTest
 
 include("plotting.jl")
 include("learner.jl")
@@ -59,6 +59,9 @@ include("datasets/Datasets.jl")
 include("models/Models.jl")
 using .Models
 
+# Blocks
+include("blocks/label.jl")
+
 # Encodings
 include("encodings/tabularpreprocessing.jl")
 include("encodings/onehot.jl")
@@ -69,12 +72,13 @@ include("encodings/keypointpreprocessing.jl")
 # Training interface
 include("datablock/models.jl")
 include("datablock/loss.jl")
-include("datablock/plot.jl")
 
 # Interpretation
 include("interpretation/backend.jl")
 include("interpretation/text.jl")
 include("interpretation/makie.jl")
+include("interpretation/detect.jl")
+include("interpretation/method.jl")
 include("interpretation/showinterpretable.jl")
 
 # training
@@ -154,8 +158,19 @@ export
 
     # interpretation
     ShowText,
+    ShowMakie,
     showblock,
     showblocks,
+    showsample,
+    showsamples,
+    showoutput,
+    showoutputs,
+    showoutputbatch,
+    showencodedsample,
+    showencodedsamples,
+    showbatch,
+    showprediction,
+    showpredictions,
 
     # learning methods
     findlearningmethods,
