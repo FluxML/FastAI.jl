@@ -30,7 +30,7 @@ end
 function showblock!(io, backend::ShowText, blocks::Tuple, datas::Tuple)
     header = [block isa Pair ? first(block) : "" for block in blocks]
     blocks = [block isa Pair ? last(block) : block for block in blocks]
-    data = reshape([AnsiTextCell(io -> showblock!(IOContext(io, :color => true), backend, block, data))
+    data = reshape([PrettyTables.AnsiTextCell(io -> showblock!(IOContext(io, :color => true), backend, block, data))
                 for (block, data) in zip(blocks, datas)], 1, :)
     pretty_table(io, data; header=header, noheader=all(isempty, header), backend.kwargs...)
 end
@@ -41,7 +41,8 @@ function showblocks!(io, backend::ShowText, blocks::Tuple, datass::AbstractVecto
     blocks = [block isa Pair ? last(block) : block for block in blocks]
     rows = []
     for datas in datass
-        row = reshape([AnsiTextCell(io -> showblock!(io, backend, block, data))
+        row = reshape([AnsiTextCell(
+                    io -> showblock!(IOContext(io, :color => true), backend, block, data))
                 for (block, data) in zip(blocks, datas)], 1, :)
         push!(rows, row)
     end
@@ -59,6 +60,11 @@ showblocks!(io, backend::ShowText, block, datas::AbstractVector) =
 
 function showblock!(io, ::ShowText, block::Image{2}, data)
     ImageInTerminal.imshow(io, data)
+end
+
+function showblock!(io, ::ShowText, block::Mask{2}, data)
+    img = maskimage(data, block.classes)
+    ImageInTerminal.imshow(io, img)
 end
 
 function showblock!(io, ::ShowText, block::Label, data)
@@ -94,4 +100,23 @@ function showblock!(io, ::ShowText, block::TableRow, data)
         alignment=[:r, :l],
         highlighters=Highlighter((data, i, j) -> (j == 2), bold=true),
         noheader=true, tf=PrettyTables.tf_borderless,)
+end
+
+
+function showblock!(io, ::ShowText, block::EncodedTableRow, data)
+    print(io, data)
+end
+
+
+function showblock!(io, ::ShowText, block::Keypoints{2}, data)
+    print(io, UnicodePlots.scatterplot(first.(data), last.(data)), marker=:cross)
+end
+
+
+function showblock!(io, ::ShowText, block::Bounded{2, <:Keypoints{2}}, data)
+    h, w = block.size
+    plot = UnicodePlots.scatterplot(
+        first.(data), last.(data),
+        xlim=(0, w), ylim=(0, h), marker=:cross)
+    print(io, plot)
 end

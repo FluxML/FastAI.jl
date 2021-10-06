@@ -62,6 +62,8 @@ using .Models
 # Blocks
 include("blocks/label.jl")
 
+include("blocks/bounded.jl")
+
 # Encodings
 include("encodings/tabularpreprocessing.jl")
 include("encodings/onehot.jl")
