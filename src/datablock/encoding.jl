@@ -246,7 +246,7 @@ function testencoding(encoding, block, data = mockblock(block))
             for idx in length(outblock)
                 inblock = decodedblock(encoding, outblock[idx])
                 if !isnothing(inblock)
-                    Test.@test block[idx] == inblock
+                    Test.@test wrapped(block[idx]) == wrapped(inblock)
                     indata = decode(encoding, Training(), outblock[idx], outdata[idx])
                     Test.@test checkblock(inblock, indata)
                 end
@@ -254,7 +254,7 @@ function testencoding(encoding, block, data = mockblock(block))
         else
             inblock = decodedblock(encoding, outblock)
             if !isnothing(inblock)
-                Test.@test block == inblock
+                Test.@test wrapped(block) == wrapped(inblock)
                 indata = decode(encoding, Training(), outblock, outdata)
                 Test.@test checkblock(inblock, indata)
             end

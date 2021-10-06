@@ -3,6 +3,7 @@
 abstract type WrapperBlock <: AbstractBlock end
 
 wrapped(w::WrapperBlock) = w.block
+wrapped(b::Block) = b
 function setwrapped(w::WrapperBlock, b)
     return Setfield.@set w.block = b
 end
@@ -99,6 +100,18 @@ end
 showblock!(handle, backend::ShowBackend, block::WrapperBlock, data) =
     showblock!(handle, backend, wrapped(block), data)
 
+isshowable(backend::ShowBackend, wrapper::WrapperBlock) =
+    isshowable(backend, wrapped(wrapper))
+
+# Training interface
+
+blockbackbone(wrapper::WrapperBlock) = blockbackbone(wrapped(wrapper))
+blockmodel(wrapper::WrapperBlock, out, args...) = blockmodel(wrapped(wrapper), out, args...)
+blockmodel(in::Block, out::WrapperBlock, args...) = blockmodel(in, wrapped(out), args...)
+
+blocklossfn(wrapper::WrapperBlock, out) = blocklossfn(wrapped(wrapper), out)
+blocklossfn(in::Block, out::WrapperBlock) = blocklossfn(in, wrapped(out))
+
 # ## Named
 
 """
@@ -107,10 +120,10 @@ showblock!(handle, backend::ShowBackend, block::WrapperBlock, data) =
 Wrapper `Block` to attach a name to a block. Can be used in conjunction
 with [`Only`](#) to apply encodings to specific blocks only.
 """
-struct Named{Name, B<:AbstractBlock} <: WrapperBlock
+struct Named{Name,B <: AbstractBlock} <: WrapperBlock
     block::B
 end
-Named(name::Symbol, block::B) where {B<:AbstractBlock} = Named{name, B}(block)
+Named(name::Symbol, block::B) where {B <: AbstractBlock} = Named{name,B}(block)
 
 
 # the name is preserved through encodings and decodings
@@ -136,7 +149,7 @@ samples. The blocks `(Image{2}(), BoundingBox{2}()` imply that there is exactly
 one bounding box for every image, which is not the case. Instead you
 would want to use `(Image{2}(), Many(BoundingBox{2}())`.
 """
-struct Many{B<:AbstractBlock} <: WrapperBlock
+struct Many{B <: AbstractBlock} <: WrapperBlock
     block::B
 end
 
@@ -152,7 +165,7 @@ end
 function FastAI.decode(enc::Encoding, ctx, many::Many, datas)
     return map(datas) do data
         decode(enc, ctx, wrapped(many), data)
-    end
+end
 end
 
 
@@ -164,12 +177,12 @@ end
 Wrapper that conditionally applies `encoding` only if the block
 is a `Named{name}`.
 """
-struct Only{Name, E<:Encoding} <: StatefulEncoding
+struct Only{Name,E <: Encoding} <: StatefulEncoding
     encoding::E
 end
 
 function Only(name::Symbol, encoding::E) where E
-    return Only{name, E}(encoding)
+    return Only{name,E}(encoding)
 end
 
 
@@ -186,7 +199,7 @@ function encode(
         block::Named{Name},
         data;
         state=encodestate(only, context, block, data)) where Name
-    return encode(only.encoding, context, block, data; state = state)
+    return encode(only.encoding, context, block, data; state=state)
 end
 
 
@@ -196,5 +209,5 @@ function decode(
         block::Named{Name},
         data;
         state=decodestate(only, context, block, data)) where Name
-    return decode(only.encoding, context, block, data; state = state)
+    return decode(only.encoding, context, block, data; state=state)
 end

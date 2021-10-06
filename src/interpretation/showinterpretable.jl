@@ -23,7 +23,7 @@ showblockinterpretable(ShowText(), encodings, block, x)  # will decode to an `Im
 """
 function showblockinterpretable(backend::ShowBackend, encodings, block, data)
     res = decodewhile(
-        block -> !_isshowable(backend, block),
+        block -> !isshowable(backend, block),
         encodings,
         Validation(),
         block,
@@ -41,7 +41,7 @@ Multi-sample version [`showblockinterpretable`](#).
 """
 function showblocksinterpretable(backend::ShowBackend, encodings, block, datas::AbstractVector)
     blockdatas = [decodewhile(
-        block -> !_isshowable(backend, block),
+        block -> !isshowable(backend, block),
         encodings,
         Validation(),
         block,
@@ -56,7 +56,7 @@ end
 # Helpers
 
 
-function _isshowable(backend::S, block::B) where {S<:ShowBackend, B<:AbstractBlock}
+function isshowable(backend::S, block::B) where {S<:ShowBackend, B<:AbstractBlock}
     hasmethod(FastAI.showblock!, (Any, S, B, Any))
 end
 
