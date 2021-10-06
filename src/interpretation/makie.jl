@@ -132,7 +132,7 @@ end
 
 
 function showblock!(grid, ::ShowMakie, block::Union{<:OneHotTensor{0},<:OneHotTensorMulti{0}}, data)
-    ax = Axis(grid[1, 1], yticks=(1:length(block.classes), block.classes,))
+    ax = Axis(grid[1, 1], yticks=(1:length(block.classes), string.(block.classes),))
     barplot!(
 		ax,
 		data,
