@@ -181,7 +181,7 @@ showoutputs(method::BlockMethod, args...) = showoutputs(default_showbackend(), m
 
 """
     showoutputbatch([backend], method, outputbatch)
-    showoutputbatch([backend], method, batch, batch, outputbatch)
+    showoutputbatch([backend], method, batch, outputbatch)
 
 Show collated batch of outputs to `backend`. If a collated batch of encoded samples
 `batch` is also given, show them next to the outputs. See [`showoutputs`](#) if you
