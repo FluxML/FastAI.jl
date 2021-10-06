@@ -63,6 +63,9 @@ function encodedblock(enc::Encoding, wrapper::WrapperBlock, ::PropagateSameBlock
     return inner
 end
 
+decodedblock(enc::Encoding, wrapper::WrapperBlock) =
+    decodedblock(enc, wrapper, propagatewrapper(wrapper))
+
 function decodedblock(enc::Encoding, wrapper::WrapperBlock, ::PropagateAlways)
     inner = decodedblock(enc, wrapped(wrapper))
     return isnothing(inner) ? nothing : setwrapped(wrapper, inner)

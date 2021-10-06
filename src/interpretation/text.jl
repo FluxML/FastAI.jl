@@ -109,7 +109,7 @@ end
 
 
 function showblock!(io, ::ShowText, block::Keypoints{2}, data)
-    print(io, UnicodePlots.scatterplot(first.(data), last.(data)), marker=:cross)
+    print(io, UnicodePlots.scatterplot(first.(data), last.(data), marker=:cross))
 end
 
 
