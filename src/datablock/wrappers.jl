@@ -10,21 +10,91 @@ mockblock(w::WrapperBlock) = mockblock(wrapped(w))
 checkblock(w::WrapperBlock, data) = checkblock(wrapped(w), data)
 
 # If not overwritten, encodings are applied to the wrapped block
+"""
+    abstract type PropagateWrapper
 
-function encodedblock(enc::Encoding, wrapper::WrapperBlock)
+Defines the default propagation behavior of a `WrapperBlock` when
+an encoding is applied to it.
+
+Propagation refers to what happens when an encoding is applied to
+a `WrapperBlock`. If no `encode` method is defined for a wrapper block
+`wrapper`, `encode` is instead called on the wrapped block.
+Propagating the wrapper block means that the block resulting from
+encoding the wrapped block is rewrapped in `wrapper.`.
+
+```
+wrapper = Wrapper(block)
+# propagate
+encodedblock(enc, wrapper) = Wrapper(encodedblock(enc, wrapped(wrapper)))
+
+# don't propagate
+encodedblock(enc, wrapper) = encodedblock(enc, wrapped(wrapper))
+```
+
+The following wrapping behaviors exist:
+
+- `PropagateAlways`: Always propagate. This is the default behavior.
+- `PropagateNever`: Never propagate
+- `PropagateSameBlock`: Only propagate if the wrapped block is unchanged
+"""
+abstract type PropagateWrapper end
+
+struct PropagateAlways <: PropagateWrapper end
+struct PropagateSameBlock <: PropagateWrapper end
+struct PropagateNever <: PropagateWrapper end
+
+propagatewrapper(::WrapperBlock) = PropagateAlways()
+
+encodedblock(enc::Encoding, wrapper::WrapperBlock) =
+    encodedblock(enc, wrapper, propagatewrapper(wrapper))
+
+function encodedblock(enc::Encoding, wrapper::WrapperBlock, ::PropagateAlways)
     inner = encodedblock(enc, wrapped(wrapper))
     return isnothing(inner) ? nothing : setwrapped(wrapper, inner)
 end
-function decodedblock(enc::Encoding, wrapper::WrapperBlock)
+
+function encodedblock(enc::Encoding, wrapper::WrapperBlock, ::PropagateNever)
+    return encodedblock(enc, wrapped(wrapper))
+end
+
+function encodedblock(enc::Encoding, wrapper::WrapperBlock, ::PropagateSameBlock)
+    inner = encodedblock(enc, wrapped(wrapper))
+    inner == wrapped(block) && return setwrapped(wrapper, inner)
+    return inner
+end
+
+function decodedblock(enc::Encoding, wrapper::WrapperBlock, ::PropagateAlways)
     inner = decodedblock(enc, wrapped(wrapper))
     return isnothing(inner) ? nothing : setwrapped(wrapper, inner)
 end
+
+function decodedblock(enc::Encoding, wrapper::WrapperBlock, ::PropagateNever)
+    return decodedblock(enc, wrapped(wrapper))
+end
+
+function decodedblock(enc::Encoding, wrapper::WrapperBlock, ::PropagateSameBlock)
+    inner = decodedblock(enc, wrapped(wrapper))
+    inner == wrapped(block) && return setwrapped(wrapper, inner)
+    return inner
+end
+
+
+# Encoding and decoding, if not overwritten for specific wrapper, are fowarded
+# to wrapped block.
+
 function encode(enc::Encoding, ctx, wrapper::WrapperBlock, data; kwargs...)
     return encode(enc, ctx, wrapped(wrapper), data; kwargs...)
 end
+
 function decode(enc::Encoding, ctx, wrapper::WrapperBlock, data; kwargs...)
     return decode(enc, ctx, wrapped(wrapper), data; kwargs...)
 end
+
+
+# Visualization
+
+showblock!(handle, backend::ShowBackend, block::WrapperBlock, data) =
+    showblock!(handle, backend, wrapped(block), data)
 
 # ## Named
 
@@ -87,10 +157,9 @@ end
 
 """
     Only(name, encoding)
-    Only(block, encoding)
 
 Wrapper that conditionally applies `encoding` only if the block
-equals `block` or is a `Named{name}`.
+is a `Named{name}`.
 """
 struct Only{Name, E<:Encoding} <: StatefulEncoding
     encoding::E
