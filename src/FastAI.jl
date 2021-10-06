@@ -41,7 +41,6 @@ import UnicodePlots
 using Statistics
 using InlineTest
 
-include("plotting.jl")
 include("learner.jl")
 
 # Data block API
@@ -78,10 +77,11 @@ include("datablock/loss.jl")
 # Interpretation
 include("interpretation/backend.jl")
 include("interpretation/text.jl")
-include("interpretation/makie.jl")
 include("interpretation/detect.jl")
 include("interpretation/method.jl")
 include("interpretation/showinterpretable.jl")
+include("interpretation/learner.jl")
+include("interpretation/makie/makie.jl")
 
 # training
 include("training/paramgroups.jl")
@@ -123,13 +123,6 @@ export
     nobs,
     predict,
     predictbatch,
-
-    # plotting API
-    plotbatch,
-    plotsample,
-    plotsamples,
-    plotpredictions,
-    makebatch,
 
     # blocks
     Image,
