@@ -22,12 +22,14 @@ showblockinterpretable(ShowText(), encodings, block, x)  # will decode to an `Im
 
 """
 function showblockinterpretable(backend::ShowBackend, encodings, block, data)
-    block_, data_ = decodewhile(
+    res = decodewhile(
         block -> !_isshowable(backend, block),
         encodings,
         Validation(),
         block,
         data)
+    isnothing(res) && error("Could not decode to an interpretable block representation!")
+    block_, data_ = res
     showblock(backend, block_, data_)
 end
 
@@ -44,6 +46,7 @@ function showblocksinterpretable(backend::ShowBackend, encodings, block, datas::
         Validation(),
         block,
         data) for data in datas]
+    isnothing(res) && error("Could not decode to an interpretable block representation!")
     block_ = first(first(blockdatas))
     datas_ = last.(blockdatas)
     showblocks(backend, block_, datas_)
@@ -63,7 +66,8 @@ end
 Decode `block` by successively applying `encodings` to decode in
 reverse order until `f(block') == false`.
 """
-function decodewhile(f, encodings, ctx, block::FastAI.AbstractBlock, data)
+function decodewhile(f, encodings, ctx, block::AbstractBlock, data)
+    encodings === () && return nothing
     if f(block)
         return decodewhile(
             f,
@@ -77,9 +81,12 @@ function decodewhile(f, encodings, ctx, block::FastAI.AbstractBlock, data)
     end
 end
 
+
 function decodewhile(f, encodings, ctx, blocks::Tuple, datas::Tuple)
+    encodings === () && return nothing
     results = Tuple(decodewhile(f, encodings, ctx, block, data)
                 for (block, data) in zip(blocks, datas))
+    any(isnothing, results) && return nothing
     blocks = first.(results)
     datas = last.(results)
     return blocks, datas
@@ -87,6 +94,9 @@ end
 
 
 function decodewhile(f, encodings, ctx, (title, block)::Pair, data)
-    block_, data_ = decodewhile(f, encodings, ctx, block, data)
+    encodings === () && return nothing
+    res = decodewhile(f, encodings, ctx, block, data)
+    isnothing(res) && return nothing
+    block_, data_ = res
     (title => block_, data_)
 end
