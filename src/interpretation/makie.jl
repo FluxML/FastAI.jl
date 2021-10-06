@@ -55,10 +55,15 @@ function showblock!(grid, backend::ShowMakie, blocks::Tuple, datas::Tuple)
 
 
     # Show blocks in a row
+    col = 1
     for (i, (block, data)) in enumerate(zip(blocks, datas))
-        subgrid = grid[1, i] = GridLayout(tellheight=false)
+        w = _nblocks(block)
+        subgrid = grid[1, col:col+w-1] = GridLayout(tellheight=false)
         showblock!(subgrid, backend, block, data)
-        colsize!(grid, 1, Makie.Fixed(backend.size[1]))
+        for j in col:col+w-1
+            colsize!(grid, j, Makie.Fixed(backend.size[1]))
+        end
+        col += w
     end
 
     # Add titles to named blocks
@@ -102,12 +107,15 @@ function showblocks!(grid, backend::ShowMakie, blocks::Tuple, datas::AbstractVec
 
     # Add titles to named blocks
     Makie.Label(grid[0, 1], "", textsize=25)
-    for (i, title) in enumerate(header)
-        Makie.Label(grid[1, i], title, tellwidth=false, textsize=25)
+    col = 1
+    for (i, (title, block)) in enumerate(zip(header, blocks))
+        w = _nblocks(block)
+        Makie.Label(grid[1, col:col+w-1], title, tellwidth=false, textsize=25)
+        col += w
     end
 end
 showblocks!(grid, backend::ShowMakie, block, datas::AbstractVector) =
-    showblocks!(grid, backend, (block,), datas)
+    showblocks!(grid, backend, (block,), map(data -> (data,), datas))
 
 ## Block definitions
 
@@ -146,5 +154,16 @@ end
 
 function showblock!(grid, ::ShowMakie, block::Keypoints{2}, data)
     ax = imageaxis(grid[1, 1])
-    scatter!(ax, data)
+    h = maximum(first.(data))
+    ks = [SVector(x, h-y) for (y, x) in data]
+    scatter!(ax, ks)
+end
+
+function showblock!(grid, ::ShowMakie, block::Bounded{2, <:Keypoints{2}}, data)
+    ax = imageaxis(grid[1, 1])
+    h, w = block.size
+    ks = [SVector(x, h-y) for (y, x) in data]
+    xlims!(ax, 0, w)
+    ylims!(ax, 0, h)
+    scatter!(ax, ks)
 end
