@@ -27,4 +27,6 @@ include("../imports.jl")
     end
 
     @test_nowarn method = TabularRegression(2, td)
+
+    FastAI.test_method_show(method, ShowText(Base.DevNull()))
 end

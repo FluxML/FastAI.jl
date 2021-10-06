@@ -8,7 +8,7 @@ include("../imports.jl")
         DLPipelines.checkmethod_core(method)
         @test_nowarn methodlossfn(method)
         @test_nowarn methodmodel(method, Models.xresnet18())
-        FastAI.checkmethod_plot(method)
+        FastAI.test_method_show(method, ShowText(Base.DevNull()))
     end
     @testset ExtendedTestSet "3D" begin
         method = BlockMethod(
