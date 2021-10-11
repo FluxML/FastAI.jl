@@ -110,3 +110,12 @@ function showblocks! end
 Base.@doc (Base.@doc showblocks!)
 showblocks(backend::ShowBackend, block, datas) =
     showblocks!(createhandle(backend), backend, block, datas)
+
+
+# WrapperBlock handling
+
+showblock!(handle, backend::ShowBackend, block::WrapperBlock, data) =
+    showblock!(handle, backend, wrapped(block), data)
+
+isshowable(backend::ShowBackend, wrapper::WrapperBlock) =
+    isshowable(backend, wrapped(wrapper))

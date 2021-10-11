@@ -95,14 +95,6 @@ function decode(enc::Encoding, ctx, wrapper::WrapperBlock, data; kwargs...)
 end
 
 
-# Visualization
-
-showblock!(handle, backend::ShowBackend, block::WrapperBlock, data) =
-    showblock!(handle, backend, wrapped(block), data)
-
-isshowable(backend::ShowBackend, wrapper::WrapperBlock) =
-    isshowable(backend, wrapped(wrapper))
-
 # Training interface
 
 blockbackbone(wrapper::WrapperBlock) = blockbackbone(wrapped(wrapper))
