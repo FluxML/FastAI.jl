@@ -10,7 +10,6 @@ using Reexport
 @reexport using Flux
 
 using Animations
-using Makie
 using Colors
 using DataAugmentation
 using DataAugmentation: getbounds, Bounds
@@ -32,6 +31,7 @@ import ImageInTerminal
 using MLDataPattern
 using Parameters
 using PrettyTables
+using Requires
 using StaticArrays
 using Setfield
 using ShowCases
@@ -81,7 +81,6 @@ include("interpretation/detect.jl")
 include("interpretation/method.jl")
 include("interpretation/showinterpretable.jl")
 include("interpretation/learner.jl")
-include("interpretation/makie/makie.jl")
 
 # training
 include("training/paramgroups.jl")
@@ -99,6 +98,14 @@ include("fasterai/methodregistry.jl")
 include("fasterai/learningmethods.jl")
 include("fasterai/defaults.jl")
 
+
+function __init__()
+    @require Makie="ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a" begin
+        using .Makie
+        include("interpretation/makie/recipes.jl")
+        include("interpretation/makie/showmakie.jl")
+    end
+end
 
 
 

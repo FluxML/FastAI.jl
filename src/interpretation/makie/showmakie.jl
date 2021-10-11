@@ -1,4 +1,6 @@
 
+using FastAI
+import FastAI: createhandle, showblock!
 
 """
     ShowMakie([; kwargs...]) <: ShowBackend
@@ -166,4 +168,13 @@ function showblock!(grid, ::ShowMakie, block::Bounded{2, <:Keypoints{2}}, data)
     xlims!(ax, 0, w)
     ylims!(ax, 0, h)
     scatter!(ax, ks)
+end
+
+
+function default_showbackend()
+    if ismissing(Makie.current_backend[])
+        return ShowText()
+    else
+        return ShowMakie()
+    end
 end
