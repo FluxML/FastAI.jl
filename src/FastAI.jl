@@ -104,6 +104,7 @@ function __init__()
         using .Makie
         include("interpretation/makie/recipes.jl")
         include("interpretation/makie/showmakie.jl")
+        include("interpretation/makie/lrfind.jl")
     end
 end
 
