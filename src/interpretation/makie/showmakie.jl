@@ -29,7 +29,7 @@ function showblock(backend::ShowMakie, block, data)
     # A margin of 10% is added for titles
     width = _nblocks(block) * backend.size[2]
     height = round(Int, 1.1 * backend.size[1])
-    res = (width, height)
+
 
     grid = createhandle(backend, resolution=res)
     fig = grid.parent.parent
@@ -79,8 +79,8 @@ end
 
 function showblocks(backend::ShowMakie, block, datas)
     width = _nblocks(block) * backend.size[2]
-    height = round(Int, length(datas) * backend.size[1] + 0.2 * backend.size[1])
-    res = (width, height)
+    height = round(Int, length(datas) * 1.1 * backend.size[1])
+    res = (width*1.2, height*1.1)
 
     grid = createhandle(backend, resolution=res)
     fig = grid.parent.parent
@@ -134,6 +134,9 @@ end
 
 
 function showblock!(grid, ::ShowMakie, block::Union{<:OneHotTensor{0},<:OneHotTensorMulti{0}}, data)
+    if !(sum(data) ≈ 1)
+        data = softmax(data)
+    end
     ax = Axis(grid[1, 1], yticks=(1:length(block.classes), string.(block.classes),))
     barplot!(
 		ax,

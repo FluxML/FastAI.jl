@@ -104,7 +104,7 @@ end
 
 
 function showblock!(io, ::ShowText, block::EncodedTableRow, data)
-    print(io, data)
+    print(io, "EncodedTableRow(...)")
 end
 
 

@@ -78,9 +78,18 @@ or validation data if `validation = true`. If `n` take only the first
 
 """
 function getbatch(learner; context = Training(), n = nothing)
-    dl = validation ? learner.data.validation : learner.data.training
+    dl = context==Validation() ? learner.data.validation : learner.data.training
     batch = first(learner.data.validation)
     bs = DataLoaders._batchsize(batch, DataLoaders.BatchDimLast())
-    batch = DataLoaders.collate([s for (s, _) in zip(DataLoaders.obsslices(batch), 1:min(n, bs))])
+    b = isnothing(n) ? bs : min(n, bs)
+    batch = DataLoaders.collate([s for (s, _) in zip(DataLoaders.obsslices(batch), 1:b)])
     return batch
+end
+
+
+InlineTest.@testset "getbatch" begin
+    batch = rand(1, 10), rand(1, 10)
+    learner = Learner(identity, ([batch], [batch]), nothing, nothing)
+    @test size.(getbatch(learner)) == ((1,10), (1, 10))
+    @test size.(getbatch(learner, n=4)) == ((1,4), (1,4))
 end

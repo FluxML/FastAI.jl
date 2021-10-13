@@ -173,7 +173,7 @@ function showoutputs(backend::ShowBackend, method::BlockMethod, encsamples, outp
         backend,
         method.encodings,
         ("Encoded sample" => encsampleblock, "Output" => outblock),
-        (encsamples, outputs))
+        collect(zip(encsamples, outputs)))
 end
 
 showoutputs(method::BlockMethod, args...) = showoutputs(default_showbackend(), method, args...)

@@ -46,7 +46,7 @@ function showblocksinterpretable(backend::ShowBackend, encodings, block, datas::
         Validation(),
         block,
         data) for data in datas]
-    isnothing(res) && error("Could not decode to an interpretable block representation!")
+    any(isnothing, blockdatas) && error("Could not decode to an interpretable block representation!")
     block_ = first(first(blockdatas))
     datas_ = last.(blockdatas)
     showblocks(backend, block_, datas_)

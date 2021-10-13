@@ -158,6 +158,8 @@ export
     BlockMethod,
     describemethod,
     checkblock,
+    makebatch,
+    getbatch,
 
     # interpretation
     ShowText,
