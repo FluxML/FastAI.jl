@@ -15,7 +15,7 @@ data, blocks = loaddataset("imagenette2-160", (Image, Label))
 method = ImageClassificationSingle(blocks)
 learner = methodlearner(method, data, callbacks=[ToGPU()])
 fitonecycle!(learner, 10)
-plotpredictions(method, learner)
+showoutputs(method, learner)
 ```
 
 Each of the five lines encapsulates one part of the deep learning pipeline to give a high-level API while still allowing customization. Let's have a closer look. 
@@ -111,7 +111,7 @@ Training now is quite simple. You have several options for high-level training s
 ## Visualization
 
 ```julia
-plotpredictions(method, learner)
+showoutputs(method, learner)
 ```
 
 Finally, the last line visualizes the predictions of the trained model. It takes some samples from the training data loader, runs them through the model and decodes the outputs. How each piece of data is visualized is also inferred through the blocks in the learning method.

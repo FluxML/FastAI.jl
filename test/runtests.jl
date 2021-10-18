@@ -4,6 +4,9 @@ include("imports.jl")
 ##
 
 @testset ExtendedTestSet "FastAI.jl" begin
+    @testset ExtendedTestSet "Inline tests" begin
+        ReTest.retest(FastAI)
+    end
     @testset ExtendedTestSet "datablock.jl" begin
         include("datablock.jl")
     end

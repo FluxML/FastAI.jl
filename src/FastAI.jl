@@ -10,7 +10,6 @@ using Reexport
 @reexport using Flux
 
 using Animations
-using Makie
 using Colors
 using DataAugmentation
 using DataAugmentation: getbounds, Bounds
@@ -28,17 +27,20 @@ using FluxTraining: Learner, handle
 using FluxTraining.Events
 using JLD2: jldsave, jldopen
 using Markdown
+import ImageInTerminal
 using MLDataPattern
 using Parameters
 using PrettyTables
+using Requires
 using StaticArrays
 using Setfield
 using ShowCases
 using Tables
+import Test
+import UnicodePlots
 using Statistics
-using Test: @testset, @test, @test_nowarn
+using InlineTest
 
-include("plotting.jl")
 include("learner.jl")
 
 # Data block API
@@ -56,6 +58,11 @@ include("datasets/Datasets.jl")
 include("models/Models.jl")
 using .Models
 
+# Blocks
+include("blocks/label.jl")
+
+include("blocks/bounded.jl")
+
 # Encodings
 include("encodings/tabularpreprocessing.jl")
 include("encodings/onehot.jl")
@@ -66,7 +73,14 @@ include("encodings/keypointpreprocessing.jl")
 # Training interface
 include("datablock/models.jl")
 include("datablock/loss.jl")
-include("datablock/plot.jl")
+
+# Interpretation
+include("interpretation/backend.jl")
+include("interpretation/text.jl")
+include("interpretation/detect.jl")
+include("interpretation/method.jl")
+include("interpretation/showinterpretable.jl")
+include("interpretation/learner.jl")
 
 # training
 include("training/paramgroups.jl")
@@ -84,6 +98,15 @@ include("fasterai/methodregistry.jl")
 include("fasterai/learningmethods.jl")
 include("fasterai/defaults.jl")
 
+
+function __init__()
+    @require Makie="ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a" begin
+        using .Makie
+        include("interpretation/makie/recipes.jl")
+        include("interpretation/makie/showmakie.jl")
+        include("interpretation/makie/lrfind.jl")
+    end
+end
 
 
 
@@ -108,13 +131,6 @@ export
     nobs,
     predict,
     predictbatch,
-
-    # plotting API
-    plotbatch,
-    plotsample,
-    plotsamples,
-    plotpredictions,
-    makebatch,
 
     # blocks
     Image,
@@ -142,6 +158,24 @@ export
     BlockMethod,
     describemethod,
     checkblock,
+    makebatch,
+    getbatch,
+
+    # interpretation
+    ShowText,
+    ShowMakie,
+    showblock,
+    showblocks,
+    showsample,
+    showsamples,
+    showoutput,
+    showoutputs,
+    showoutputbatch,
+    showencodedsample,
+    showencodedsamples,
+    showbatch,
+    showprediction,
+    showpredictions,
 
     # learning methods
     findlearningmethods,

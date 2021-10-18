@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+- A new API for visualizing data. See [this issue](https://github.com/FluxML/FastAI.jl/issues/154) for motivation. This includes:
+
+    - High-level functions for visualizing data related to a learning method: `showsample`,  `showsamples`, `showencodedsample`, `showencodedsamples`, `showbatch`, `showprediction`, `showpredictions`, `showoutput`, `showoutputs`, `showoutputbatch`
+    - Support for multiple backends, including a new text-based show backend that you can use to visualize data in a non-graphical environment. This is also the default unless `Makie` is imported.
+    - Functions for showing blocks directly: `showblock`, `showblocks`
+    - Interfaces for extension: `ShowBackend`, `showblock!`, `showblocks!`
+
+### Removed
+
+- The old visualization API incl. all its `plot*` methods: `plotbatch`, `plotsample`, `plotsamples`, `plotpredictions`
+
+
 ## 0.2.0
 
 ### Added

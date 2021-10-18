@@ -83,7 +83,7 @@ end
 
 
 function encodedblock(enc::ProjectiveTransforms{N}, block::Block) where N
-    return isnothing(blockitemtype(block, N)) ? nothing : block
+    return isnothing(blockitemtype(block, N)) ? nothing : Bounded(block, enc.sz)
 end
 
 

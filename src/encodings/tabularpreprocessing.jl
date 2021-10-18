@@ -102,10 +102,11 @@ Returns the categorical and continuous columns present in a `TableDataset`.
 """
 function getcoltypes(td::Datasets.TableDataset)
     schema = Tables.schema(td.table)
-    catcols = Tuple(name for (name, T) in zip(schema.names, schema.types)
-        if T <: Union{Union{Missing, String}, Union{Missing, Symbol}, String, Symbol})
+
     contcols = Tuple(name for (name, T) in zip(schema.names, schema.types)
         if T <: Union{<:Number, <:Union{Missing, <:Number}})
+
+    catcols = Tuple(name for name in schema.names if !(name in contcols))
     catcols, contcols
 end
 

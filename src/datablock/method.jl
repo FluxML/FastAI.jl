@@ -69,7 +69,7 @@ mockmodel(method::BlockMethod) = mockmodel(
     method.outputblock
 )
 
-function mockmodel(inblock::Block, outblock::Block)
+function mockmodel(inblock::AbstractBlock, outblock::AbstractBlock)
     return function mockmodel_block(xs)
         out = mockblock(outblock)
         DataLoaders.collate([out])

@@ -36,7 +36,34 @@ julia> findlearningmethods((Image, Any))
 ```
 """
 function findlearningmethods(reg::LearningMethodRegistry, blocktypes=Any)
-	return [methodfn for (methodfn, methodblocks) in reg.methods if methodblocks <: typify(blocktypes)]
+	return [methodfn for (methodfn, methodblocks) in reg.methods if blocktypesmatch(methodblocks, blocktypes)]
+end
+
+
+function blocktypesmatch(
+        BSupported::Type{<:AbstractBlock},
+        BWanted::Type{<:AbstractBlock})
+    BWanted <: BSupported
+end
+function blocktypesmatch(B1::Type{<:Tuple}, B2::Type{<:Tuple})
+    all(blocktypesmatch(b1, b2) for (b1, b2) in zip(B1.types, B2.types))
+end
+
+blocktypesmatch(BSupported::Type, _::Type{Any}) = true
+blocktypesmatch(bsupported, bwanted) = blocktypesmatch(typify(bsupported), bwanted)
+blocktypesmatch(BSupported::Type, bwanted) = blocktypesmatch(BSupported, typify(bwanted))
+
+@testset "`blocktypesmatch`" begin
+    @test blocktypesmatch(FastAI.Image, FastAI.Image{2})
+    @test blocktypesmatch(FastAI.Image, FastAI.Image)
+    @test !blocktypesmatch(FastAI.Image{2}, FastAI.Image)
+    @test blocktypesmatch(Tuple{FastAI.Image}, Tuple{FastAI.Image})
+    @test !blocktypesmatch(Tuple{FastAI.Image{2}}, Tuple{FastAI.Image})
+    @test blocktypesmatch(Tuple{FastAI.Image{2}}, Any)
+    @test blocktypesmatch(FastAI.Image{2}(), FastAI.Image{2})
+    @test blocktypesmatch(FastAI.Image, FastAI.Image{2}())
+    @test blocktypesmatch((FastAI.Image, FastAI.Label), (FastAI.Image{2}(), FastAI.Label(1:10)))
+    @test blocktypesmatch((FastAI.Image, FastAI.Label), (FastAI.Image{2}(), Any))
 end
 
 

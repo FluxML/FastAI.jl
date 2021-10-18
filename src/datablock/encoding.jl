@@ -217,27 +217,7 @@ function decode(
 end
 
 
-"""
-    setup(Encoding, block, data; kwargs...)
 
-Create an encoding using statistics derived from a data container `data`
-with observations of block `block`. Used when some arguments of the encoding
-are dependent on the dataset. `data` should be the training dataset. Additional
-`kwargs` are passed through to the regular constructor of `Encoding`.
-
-## Examples
-
-```julia
-(images, labels), blocks = loaddataset("imagenette2-160", (Image, Label))
-setup(ImagePreprocessing, Image{2}(), images; buffered = false)
-```
-
-```julia
-data, block = loaddataset("adult_sample", TableRow)
-setup(TabularPreprocessing, block, data)
-```
-"""
-function setup end
 
 
 """
@@ -252,31 +232,31 @@ Performs some tests that the encoding interface is set up properly for
     and that the block is identical to `block`
 """
 function testencoding(encoding, block, data = mockblock(block))
-    @testset "Encoding `$(typeof(encoding))` for block `$block`" begin
+    Test.@testset "Encoding `$(typeof(encoding))` for block `$block`" begin
         # Test that `data` is a valid instance of `block`
-        @test checkblock(block, data)
-        @test !isnothing(encodedblock(encoding, block))
+        Test.@test checkblock(block, data)
+        Test.@test !isnothing(encodedblock(encoding, block))
         outblock = encodedblock(encoding, block, true)
         outdata = encode(encoding, Training(), block, data)
         # The encoded data should be a valid instance for the `encodedblock`
-        @test checkblock(outblock, outdata)
+        Test.@test checkblock(outblock, outdata)
 
         # Test decoding (if supported) works correctly
         if (outblock isa Tuple)
             for idx in length(outblock)
                 inblock = decodedblock(encoding, outblock[idx])
                 if !isnothing(inblock)
-                    @test block[idx] == inblock
+                    Test.@test wrapped(block[idx]) == wrapped(inblock)
                     indata = decode(encoding, Training(), outblock[idx], outdata[idx])
-                    @test checkblock(inblock, indata)
+                    Test.@test checkblock(inblock, indata)
                 end
             end
         else
             inblock = decodedblock(encoding, outblock)
             if !isnothing(inblock)
-                @test block == inblock
+                Test.@test wrapped(block) == wrapped(inblock)
                 indata = decode(encoding, Training(), outblock, outdata)
-                @test checkblock(inblock, indata)
+                Test.@test checkblock(inblock, indata)
             end
         end
     end

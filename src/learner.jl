@@ -69,13 +69,27 @@ function methodlearner(method, data; pctgval=0.2, kwargs...)
 end
 
 
-function plotpredictions(method::LearningMethod, learner::Learner; n=4)
-    cb = FluxTraining.getcallback(learner, ToDevice)
-    devicefn = isnothing(cb) ? identity : cb.movedatafn
-    backfn = isnothing(cb) ? identity : cpu
-    xs, ys = first(learner.data.validation)
-    b = last(size(xs))
-    xs, ys = DataLoaders.collate([s for (s, _) in zip(DataLoaders.obsslices((xs, ys)), 1:min(n, b))])
-    ŷs = learner.model(devicefn(xs)) |> backfn
-    return plotpredictions(method, xs, ŷs, ys)
+"""
+    getbatch(learner[; validation = false, n = nothing])
+
+Get a batch of data from `learner`. Take a batch of training data by default
+or validation data if `validation = true`. If `n` take only the first
+`n` samples from the batch.
+
+"""
+function getbatch(learner; context = Training(), n = nothing)
+    dl = context==Validation() ? learner.data.validation : learner.data.training
+    batch = first(learner.data.validation)
+    bs = DataLoaders._batchsize(batch, DataLoaders.BatchDimLast())
+    b = isnothing(n) ? bs : min(n, bs)
+    batch = DataLoaders.collate([s for (s, _) in zip(DataLoaders.obsslices(batch), 1:b)])
+    return batch
+end
+
+
+InlineTest.@testset "getbatch" begin
+    batch = rand(1, 10), rand(1, 10)
+    learner = Learner(identity, ([batch], [batch]), nothing, nothing)
+    @test size.(getbatch(learner)) == ((1,10), (1, 10))
+    @test size.(getbatch(learner, n=4)) == ((1,4), (1,4))
 end

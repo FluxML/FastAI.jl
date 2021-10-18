@@ -29,4 +29,6 @@ include("../imports.jl")
 
     @test_nowarn TabularClassificationSingle(["P", "F"], td)
     @test TabularClassificationSingle(["P", "F"], td).blocks[1].catcols == (:B, :C)
+
+    FastAI.test_method_show(method, ShowText(Base.DevNull()))
 end

@@ -1,8 +1,8 @@
 include("../imports.jl")
 
 
-@testset "ImageClassification" begin
-    method = ImageClassificationMulti((16, 16), [1, 2])
+@testset ExtendedTestSet "ImageClassificationSingle" begin
+    method = ImageClassificationSingle((16, 16), [1, 2])
     testencoding(method.encodings, method.blocks)
     DLPipelines.checkmethod_core(method)
     @test_nowarn methodlossfn(method)
@@ -27,7 +27,14 @@ include("../imports.jl")
         #encodetarget!(y, method, Training(), 2)
         #@test y ≈ [0, 1]
     end
-    FastAI.checkmethod_plot(method)
+    @testset "Show backends" begin
+        @testset "ShowText" begin
+            #@test_broken FastAI.test_method_show(method, ShowText(Base.DevNull()))
+        end
+        @testset "ShowMakie" begin
+            #@test_broken FastAI.test_method_show(method, ShowMakie())
+        end
+    end
 end
 
 @testset ExtendedTestSet "ImageClassificationMulti" begin
@@ -38,5 +45,12 @@ end
     DLPipelines.checkmethod_core(method)
     @test_nowarn methodlossfn(method)
     @test_nowarn methodmodel(method, Models.xresnet18())
-    FastAI.checkmethod_plot(method)
+    @testset "Show backends" begin
+        @testset "ShowText" begin
+            FastAI.test_method_show(method, ShowText(Base.DevNull()))
+        end
+        @testset "ShowMakie" begin
+            FastAI.test_method_show(method, ShowMakie())
+        end
+    end
 end

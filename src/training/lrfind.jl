@@ -137,71 +137,47 @@ LRFinderResult(losses, lrs, estimators) = LRFinderResult(
 
 # Printing and plotting
 
-function Base.show(io::IO, lrfindresult::LRFinderResult)
-    println(io, "LRFindResult(")
-    for (est, v) in zip(lrfindresult.estimators, lrfindresult.estimates)
-        println(io, "    ", est, " => ", v)
+function Base.show(io::IO, result::LRFinderResult)
+    lrfindtextplot!(io, result)
+
+    names = [typeof(est).name.name for est in result.estimators]
+    println(io)
+    println(io)
+    pretty_table(
+        io,
+        hcat(names, result.estimates),
+        header=["Estimator", "Suggestion"], tf=tf_borderless,
+        alignment=[:r, :l])
+end
+
+lrfindtextplot(result::LRFinderResult) = lrfindtextplot!(stdout, result)
+function lrfindtextplot!(io, result::LRFinderResult)
+    p = UnicodePlots.lineplot(
+        result.lrs, result.losses,
+        height=10, xscale=:log10, width=displaysize(io)[2]-15)
+    UnicodePlots.title!(p, "Learning rate finder result")
+
+    for (i, estimate) in enumerate(result.estimates)
+        UnicodePlots.lines!(p, estimate, maximum(result.losses), estimate, minimum(result.losses), :red)
+        UnicodePlots.annotate!(p, estimate, maximum(result.losses), string(round(estimate; sigdigits=4)))
     end
-    print(io, ")")
+    show(io, p)
+    return p
+end
+
+InlineTest.@testset "LRFinderResult" begin
+    res = LRFinderResult(100.:-1:1, 1:100.)
+    InlineTest.@test_nowarn show(Base.DevNull(), res)
 end
 
 
-function Makie.plot(result::LRFinderResult)
-    ticks = [round((10.)^i, digits=abs(i)) for i in -10:2]
-    fig = Figure()
-    ax = Axis(
-        title = "Learning rate finder",
-        titlesize = 20,
-        fig[1, 1],
-        xscale = log,
-        xticks = (ticks, string.(ticks)),
-        xminorticks = IntervalsBetween(5),
-        xminorgridvisible=true,
-        ygridcolor = :white,
-        xlabelsize = 14,
-        ylabelsize = 14,
-        ylabelcolor = :gray,
-        xtickcolor= :gray,
-        xticklabelcolor= :black,
-        xticklabelsize= 12,
-        ytickcolor= :gray,
-        yticklabelcolor= :gray,
-        yticklabelsize= 12,
-        ylabel = "Loss",
-        xlabel = "Learning rate (log)")
-
-    lines!(
-        result.lrs,
-        smoothvalues(result.losses, 0.98),
-        color = :black,
-    )
-
-    hidespines!(ax)
-
-    # plot suggestions
-    ls = []
-    for (estim, val) in zip(result.estimators, result.estimates)
-        push!(ls, vlines!(ax, [val]))
-
-    end
-
-    leg = Legend(
-        fig[2, 1], ls,
-        ["$(estim): $(round(val, sigdigits=3))" for (estim, val) in zip(result.estimators, result.estimates)],
-        framevisible=false,
-        labelsize=14,
-        orientation = :horizontal,)
-    leg.tellheight[] = true
-    leg.tellwidth[] = false
-    fig
-end
 
 # Utilities
 
 """
     smoothvalues(xs, β)
 
-Apply exponential smoothing with parameter `b` to vector `xs`.
+Apply exponential smoothing with parameter `β` to vector `xs`.
 """
 function smoothvalues(xs, β)
     res = similar(xs)

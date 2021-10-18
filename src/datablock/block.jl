@@ -99,6 +99,25 @@ Create an instance of block type `Block` from data container `data`.
 ```julia
 setup(Label, ["cat", "dog", "cat"]) == Label(["cat", "dog"])
 ```
+
+    setup(Encoding, block, data; kwargs...)
+
+Create an encoding using statistics derived from a data container `data`
+with observations of block `block`. Used when some arguments of the encoding
+are dependent on the dataset. `data` should be the training dataset. Additional
+`kwargs` are passed through to the regular constructor of `Encoding`.
+
+## Examples
+
+```julia
+(images, labels), blocks = loaddataset("imagenette2-160", (Image, Label))
+setup(ImagePreprocessing, Image{2}(), images; buffered = false)
+```
+
+```julia
+data, block = loaddataset("adult_sample", TableRow)
+setup(TabularPreprocessing, block, data)
+```
 """
 function setup end
 
@@ -112,48 +131,6 @@ typify(block::FastAI.AbstractBlock) = typeof(block)
 
 # ## Block implementations
 
-abstract type AbstractLabel{T} <: Block end
-
-# Label
-
-"""
-    Label(classes)
-
-`Block` for a categorical label in a single-class context.
-`data` is valid for `Label(classes)` if `data ∈ classes`.
-"""
-struct Label{T} <: AbstractLabel{T}
-    classes::AbstractVector{T}
-end
-
-checkblock(label::Label{T}, data::T) where T = data ∈ label.classes
-mockblock(label::Label) = rand(label.classes)
-
-setup(::Type{Label}, data) = Label(unqiue(eachobs(data)))
-
-# LabelMulti
-
-"""
-    LabelMulti(classes[; thresh = 0.5])
-
-`Block` for a categorical label in a multi-class context.
-`data` is valid for `Label(classes)` if `data ∈ classes`.
-"""
-struct LabelMulti{T} <: AbstractLabel{T}
-    classes::AbstractVector{T}
-    thresh::Float32
-end
-LabelMulti(classes; thresh=0.5f0) = LabelMulti(classes, thresh)
-
-function checkblock(label::LabelMulti{T}, v::AbstractVector{T}) where T
-    return all(map(x -> x ∈ label.classes, v))
-end
-
-mockblock(label::LabelMulti) =
-    unique([rand(label.classes) for _ in 1:rand(1:length(label.classes))])
-
-
-setup(::Type{LabelMulti}, data) = Label(unqiue(eachobs(data)))
 
 # Image
 

@@ -22,7 +22,7 @@ data, blocks = loaddataset("imagenette2-160", (Image, Label))
 method = ImageClassificationSingle(blocks)
 learner = methodlearner(method, data, callbacks=[ToGPU()])
 fitonecycle!(learner, 10)
-plotpredictions(method, learner)
+showoutputs(method, learner)
 ```
 
 Please read [the documentation](https://fluxml.github.io/FastAI.jl/dev) for more information and see the [setup instructions](docs/setup.md).

@@ -5,6 +5,7 @@ using FastAI: ParamGroups, IndexGrouper, getgroup, DiscriminativeLRs, decay_opti
 import FastAI: Image, Keypoints, Mask, testencoding, Label, OneHot, ProjectiveTransforms,
     encodedblock, decodedblock, encode, decode, mockblock, checkblock, Block, Encoding,
     imagedatasetstats
+import Makie
 using FilePathsBase
 using FastAI.Datasets
 using FastAI.Models
@@ -19,6 +20,7 @@ using TestSetExtensions
 using DataFrames
 using Tables
 using CSV
+import ReTest
 
 ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 include("testdata.jl")
