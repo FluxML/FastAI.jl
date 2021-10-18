@@ -222,12 +222,12 @@ function test_method_show(
     pred = decodeŷ(method, context, output)
 
     Test.@testset "`show*` test suite for learning method $method and backend $(typeof(backend))" begin
-        Test.@test_nowarn showsample(backend, method, sample)
-        Test.@test_nowarn showencodedsample(backend, method, encsample)
-        Test.@test_nowarn showoutput(backend, method, output)
-        Test.@test_nowarn showoutput(backend, method, encsample, output)
-        Test.@test_nowarn showprediction(backend, method, pred)
-        Test.@test_nowarn showprediction(backend, method, sample, pred)
+        @test (showsample(backend, method, sample); true)
+        @test (showencodedsample(backend, method, encsample); true)
+        @test (showoutput(backend, method, output); true)
+        @test (showoutput(backend, method, encsample, output); true)
+        @test (showprediction(backend, method, pred); true)
+        @test (showprediction(backend, method, sample, pred); true)
     end
 end
 
