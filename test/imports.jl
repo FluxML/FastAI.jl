@@ -5,7 +5,7 @@ using FastAI: ParamGroups, IndexGrouper, getgroup, DiscriminativeLRs, decay_opti
 import FastAI: Image, Keypoints, Mask, testencoding, Label, OneHot, ProjectiveTransforms,
     encodedblock, decodedblock, encode, decode, mockblock, checkblock, Block, Encoding,
     imagedatasetstats
-using Makie
+import Makie
 using FilePathsBase
 using FastAI.Datasets
 using FastAI.Models
