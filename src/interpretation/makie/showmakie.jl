@@ -31,7 +31,7 @@ function showblock(backend::ShowMakie, block, data)
     height = round(Int, 1.1 * backend.size[1])
 
 
-    grid = createhandle(backend, resolution=res)
+    grid = createhandle(backend, resolution=(width, height))
     fig = grid.parent.parent
     showblock!(grid, backend, block, data)
     return fig
@@ -44,8 +44,6 @@ _nblocks((_, block)::Pair) = _nblocks(block)
 
 function showblock!(grid, backend::ShowMakie, (title, block)::Pair, data)
     showblock!(grid[1, 1], backend, block, data)
-    # title = Makie.Label(grid[0, 1], title, tellwidth=false, textsize=25)
-
 end
 
 
