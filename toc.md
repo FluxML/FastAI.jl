@@ -17,7 +17,6 @@
 - How To
     - [Train your model](notebooks/training.ipynb)
     - [Augment vision data](docs/howto/augmentvision.md)
-    - [Visualize data](notebooks/how_to_visualize.ipynb)
     - [Log to TensorBoard](docs/howto/logtensorboard.md)
 - Reference
     - [Docstrings](REFERENCE)
