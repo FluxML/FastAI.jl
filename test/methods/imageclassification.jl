@@ -32,7 +32,7 @@ include("../imports.jl")
             #@test_broken FastAI.test_method_show(method, ShowText(Base.DevNull()))
         end
         @testset "ShowMakie" begin
-            FastAI.test_method_show(method, ShowMakie())
+            #@test_broken FastAI.test_method_show(method, ShowMakie())
         end
     end
 end
