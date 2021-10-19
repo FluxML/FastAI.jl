@@ -112,19 +112,19 @@ blocklossfn(in::Block, out::WrapperBlock) = blocklossfn(in, wrapped(out))
 Wrapper `Block` to attach a name to a block. Can be used in conjunction
 with [`Only`](#) to apply encodings to specific blocks only.
 """
-struct Named{Name,B <: AbstractBlock} <: WrapperBlock
+struct Named{Name,B<:AbstractBlock} <: WrapperBlock
     block::B
 end
-Named(name::Symbol, block::B) where {B <: AbstractBlock} = Named{name,B}(block)
+Named(name::Symbol, block::B) where {B<:AbstractBlock} = Named{name,B}(block)
 
 
 # the name is preserved through encodings and decodings
-function encodedblock(enc::Encoding, named::Named{Name}) where Name
+function encodedblock(enc::Encoding, named::Named{Name}) where {Name}
     outblock = encodedblock(enc, wrapped(named))
     return isnothing(outblock) ? nothing : Named(Name, outblock)
 end
 
-function decodedblock(enc::Encoding, named::Named{Name}) where Name
+function decodedblock(enc::Encoding, named::Named{Name}) where {Name}
     outblock = decodedblock(enc, wrapped(named))
     return isnothing(outblock) ? nothing : Named(Name, outblock)
 end
@@ -141,11 +141,12 @@ samples. The blocks `(Image{2}(), BoundingBox{2}()` imply that there is exactly
 one bounding box for every image, which is not the case. Instead you
 would want to use `(Image{2}(), Many(BoundingBox{2}())`.
 """
-struct Many{B <: AbstractBlock} <: WrapperBlock
+struct Many{B<:AbstractBlock} <: WrapperBlock
     block::B
 end
 
-FastAI.checkblock(many::Many, datas) = all(checkblock(wrapped(many), data) for data in datas)
+FastAI.checkblock(many::Many, datas) =
+    all(checkblock(wrapped(many), data) for data in datas)
 FastAI.mockblock(many::Many) = [mockblock(wrapped(many)), mockblock(wrapped(many))]
 
 function FastAI.encode(enc::Encoding, ctx, many::Many, datas)
@@ -157,49 +158,106 @@ end
 function FastAI.decode(enc::Encoding, ctx, many::Many, datas)
     return map(datas) do data
         decode(enc, ctx, wrapped(many), data)
-end
+    end
 end
 
 
 # # Wrapper encodings
 
 """
+    Only(fn, encoding)
+    Only(BlockType, encoding)
     Only(name, encoding)
 
-Wrapper that conditionally applies `encoding` only if the block
-is a `Named{name}`.
+Wrapper that applies the wrapped `encoding` to a `block` if
+`fn(block) === true`. Instead of a function you can also pass in
+a type of block `BlockType` or the `name` of a `Named` block.
 """
-struct Only{Name,E <: Encoding} <: StatefulEncoding
+struct Only{E<:Encoding} <: StatefulEncoding
+    fn::Any
     encoding::E
 end
 
-function Only(name::Symbol, encoding::E) where E
-    return Only{name,E}(encoding)
+function Only(name::Symbol, encoding::Encoding) where {E}
+    return Only(Named{name}, encoding)
+end
+
+function Only(B::Type{<:AbstractBlock}, encoding::Encoding) where {E}
+    return Only(block -> block isa B, encoding)
 end
 
 
-encodedblock(only::Only{Name}, block::Named{Name}) where Name = encodedblock(only.encoding, block)
-decodedblock(only::Only{Name}, block::Named{Name}) where Name = decodedblock(only.encoding, block)
+encodedblock(only::Only, block::Block) =
+    only.fn(block) ? encodedblock(only.encoding, block) : nothing
+encodedblock(only::Only, block::WrapperBlock) =
+    only.fn(block) ? encodedblock(only.encoding, block) : nothing
+encodedblock(only::Only, block::Named) =
+    only.fn(block) ? encodedblock(only.encoding, block) : nothing
+
+function decodedblock(only::Only, block::Block)
+    inblock = decodedblock(only.encoding, block)
+    only.fn(inblock) || return nothing
+    return inblock
+end
+function decodedblock(only::Only, block::WrapperBlock)
+    inblock = decodedblock(only.encoding, block)
+    only.fn(inblock) || return nothing
+    return inblock
+end
+function decodedblock(only::Only, block::Named)
+    inblock = decodedblock(only.encoding, block)
+    only.fn(inblock) || return nothing
+    return inblock
+end
 
 encodestate(only::Only, args...) = encodestate(only.encoding, args...)
 decodestate(only::Only, args...) = decodestate(only.encoding, args...)
 
 
-function encode(
-        only::Only{Name},
-        context,
-        block::Named{Name},
-        data;
-        state=encodestate(only, context, block, data)) where Name
-    return encode(only.encoding, context, block, data; state=state)
+function encode(only::Only, ctx, block::Block, data; kwargs...)
+    _encode(only, ctx, block, data; kwargs...)
+end
+function encode(only::Only, ctx, block::WrapperBlock, data; kwargs...)
+    _encode(only, ctx, block, data; kwargs...)
+end
+function _encode(only, ctx, block, data; kwargs...)
+    return only.fn(block) ? encode(only.encoding, ctx, block, data; kwargs...) : data
+end
+
+function decode(only::Only, ctx, block::Block, data; kwargs...)
+    _decode(only, ctx, block, data; kwargs...)
+end
+function decode(only::Only, ctx, block::WrapperBlock, data; kwargs...)
+    _decode(only, ctx, block, data; kwargs...)
+end
+function _decode(only, ctx, block, data; kwargs...)
+    return only.fn(decodedblock(only.encoding, block)) ?
+           decode(only.encoding, ctx, block, data; kwargs...) : data
 end
 
 
-function decode(
-        only::Only{Name},
-        context,
-        block::Named{Name},
-        data;
-        state=decodestate(only, context, block, data)) where Name
-    return decode(only.encoding, context, block, data; state=state)
+InlineTest.@testset "Only" begin
+    encx = Only(:x, OneHot())
+    inblock = Label(1:100)
+    inblocknamed = Named(:x, inblock)
+    data = mockblock(inblock)
+    encdata = encode(OneHot(), Training(), inblock, data)
+
+    @test encodedblock(encx, inblock) === nothing
+    @test encodedblock(encx, inblocknamed) isa Named{:x}
+    @test encodedblock(Only(Named, OneHot()), inblock) === nothing
+    @test encodedblock(Only(Named, OneHot()), inblocknamed) isa Named{:x}
+
+    outblock = encodedblock(OneHot(), inblock)
+    outblocknamed = encodedblock(OneHot(), inblocknamed)
+    @test decodedblock(encx, outblock) === nothing
+    @test decodedblock(encx, outblocknamed) isa Named{:x}
+    @test decodedblock(Only(Named, OneHot()), outblock) === nothing
+    @test decodedblock(Only(Named, OneHot()), outblocknamed) isa Named{:x}
+
+    @test encode(encx, Training(), inblock, data) == data
+    @test encode(encx, Training(), inblocknamed, data) != data
+
+    @test decode(encx, Training(), outblock, encdata) == encdata
+    @test decode(encx, Training(), outblocknamed, encdata) != encdata
 end
