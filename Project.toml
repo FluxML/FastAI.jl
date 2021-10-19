@@ -68,6 +68,7 @@ Setfield = "0.7, 0.8"
 ShowCases = "0.1"
 StaticArrays = "1.1"
 Tables = "1.4"
+UnicodePlots = "2"
 Zygote = "0.6"
 julia = "1"
 
