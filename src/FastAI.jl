@@ -2,7 +2,6 @@ module FastAI
 
 
 using Base: NamedTuple
-using Colors: colormaps_sequential
 using Reexport
 @reexport using DLPipelines
 @reexport using FluxTraining
@@ -10,9 +9,9 @@ using Reexport
 @reexport using Flux
 
 using Animations
-using Colors
-using DataAugmentation
-using DataAugmentation: getbounds, Bounds
+import DataAugmentation
+import DataAugmentation: getbounds, Bounds
+
 import DLPipelines: methoddataset, methodmodel, methodlossfn, methoddataloaders,
     mockmodel, mocksample, predict, predictbatch, mockmodel, encode, encodeinput,
     encodetarget, decodeŷ, decodey
@@ -27,9 +26,7 @@ using FluxTraining: Learner, handle
 using FluxTraining.Events
 using JLD2: jldsave, jldopen
 using Markdown
-import ImageInTerminal
 using MLDataPattern
-using Parameters
 using PrettyTables
 using Requires
 using StaticArrays
@@ -48,8 +45,8 @@ include("datablock/block.jl")
 include("datablock/encoding.jl")
 include("datablock/method.jl")
 include("datablock/describe.jl")
-include("datablock/checks.jl")
 include("datablock/wrappers.jl")
+
 
 # submodules
 include("datasets/Datasets.jl")
@@ -61,14 +58,10 @@ using .Models
 # Blocks
 include("blocks/label.jl")
 
-include("blocks/bounded.jl")
-
 # Encodings
 include("encodings/tabularpreprocessing.jl")
 include("encodings/onehot.jl")
-include("encodings/imagepreprocessing.jl")
-include("encodings/projective.jl")
-include("encodings/keypointpreprocessing.jl")
+
 
 # Training interface
 include("datablock/models.jl")
@@ -81,6 +74,15 @@ include("interpretation/detect.jl")
 include("interpretation/method.jl")
 include("interpretation/showinterpretable.jl")
 include("interpretation/learner.jl")
+
+
+# Domain-specific
+include("Vision/Vision.jl")
+using .Vision
+
+include("Tabular/Tabular.jl")
+using .Tabular
+
 
 # training
 include("training/paramgroups.jl")

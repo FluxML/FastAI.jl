@@ -217,9 +217,6 @@ function decode(
 end
 
 
-
-
-
 """
     testencoding(encoding, block, data)
 
@@ -243,7 +240,7 @@ function testencoding(encoding, block, data = mockblock(block))
 
         # Test decoding (if supported) works correctly
         if (outblock isa Tuple)
-            for idx in length(outblock)
+            for idx in 1:length(outblock)
                 inblock = decodedblock(encoding, outblock[idx])
                 if !isnothing(inblock)
                     Test.@test wrapped(block[idx]) == wrapped(inblock)

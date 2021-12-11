@@ -55,15 +55,3 @@ function Makie.plot!(plot::PlotMask; kwargs...)
     plotimage!(plot, im; alpha = 1, plot.attributes...)
     return plot
 end
-
-
-function maskimage(mask, classes)
-    classtoidx = Dict(class => i for (i, class) in enumerate(classes))
-    colors = distinguishable_colors(length(classes), transform=deuteranopic)
-    return map(x -> colors[classtoidx[x]], mask)
-end
-
-maskimage(mask::AbstractArray{<:Gray{T}}, args...) where T =
-    maskimage(reinterpret(T, mask), args...)
-maskimage(mask::AbstractArray{<:Normed{T}}, args...) where T =
-    maskimage(reinterpret(T, mask), args...)

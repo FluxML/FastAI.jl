@@ -31,3 +31,11 @@ end
 
 encodedblock(::KeypointPreprocessing{N, T}, block::Keypoints{N, M}) where {N, T, M} = KeypointTensor{N, T, M}(block.sz)
 decodedblock(::KeypointPreprocessing{N}, block::KeypointTensor{N}) where N = Keypoints{N}(block.sz)
+
+
+# The default loss function to compare encoded keypoints is Mean Squared Error:
+
+function blocklossfn(outblock::KeypointTensor{N}, yblock::KeypointTensor{N}) where {N}
+    outblock.sz == yblock.sz || error("Sizes of $outblock and $yblock differ!")
+    return Flux.Losses.mse
+end

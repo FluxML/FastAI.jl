@@ -43,7 +43,7 @@ are 2D only so `augs_projection` cannot be used for 3D data.
     in a sample
 
 """
-@with_kw_noshow struct ProjectiveTransforms{N} <: StatefulEncoding
+struct ProjectiveTransforms{N} <: StatefulEncoding
     sz::NTuple{N, Int}
     buffered::Bool
     augmentations

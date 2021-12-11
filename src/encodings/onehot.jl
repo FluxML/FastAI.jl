@@ -1,8 +1,20 @@
 
 
+"""
+    OneHotTensor{N, T}(classes) <: Block
+
+A block representing a one-hot encoded, N-dimensional array
+categorical variable. For example, a single categorical label
+is a `OneHotTensor{0, T}` (aliased to `OneHotTensor{T}`).
+
+Use the [`OneHot`](#) encoding to one-hot encode [`Label`](#)s
+or [`LabelMulti`](#)s.
+"""
 struct OneHotTensor{N, T} <: Block
     classes::AbstractVector{T}
 end
+
+const OneHotLabel{T} = OneHotTensor{0, T}
 
 function checkblock(block::OneHotTensor{N}, a::AbstractArray{T, M}) where {M, N, T}
     return N + 1 == M && last(size(a)) == length(block.classes)
@@ -52,7 +64,7 @@ OneHot() = OneHot(Float32, 0.5f0)
 
 # ### `Label` implementation
 encodedblock(::OneHot, block::Label{T}) where T = OneHotTensor{0, T}(block.classes)
-decodedblock(::OneHot, block::OneHotTensor{0}) = Label(block.classes)
+decodedblock(::OneHot, block::OneHotLabel) = Label(block.classes)
 
 function encode(enc::OneHot, context, block::Label, data)
     idx = findfirst(isequal(data), block.classes)
@@ -61,7 +73,7 @@ function encode(enc::OneHot, context, block::Label, data)
 end
 
 
-function decode(::OneHot, context, block::OneHotTensor{0}, data)
+function decode(::OneHot, context, block::OneHotLabel, data)
     return block.classes[argmax(data)]
 end
 
@@ -70,28 +82,10 @@ end
 encodedblock(::OneHot, block::LabelMulti{T}) where T = OneHotTensorMulti{0, T}(block.classes)
 decodedblock(::OneHot, block::OneHotTensorMulti{0}) = LabelMulti(block.classes)
 
-function encode(enc::OneHot, context, block::LabelMulti, data)
+function encode(enc::OneHot, _, block::LabelMulti, data)
     return collect(enc.T, (c in data for c in block.classes))
 end
 
-function decode(enc::OneHot, context, block::OneHotTensorMulti{0}, data)
+function decode(enc::OneHot, _, block::OneHotTensorMulti{0}, data)
     return block.classes[softmax(data) .> enc.threshold]
-end
-
-# ### `Mask` implementation
-
-encodedblock(::OneHot, block::Mask{N, T}) where {N, T} = OneHotTensor{N, T}(block.classes)
-decodedblock(::OneHot, block::OneHotTensor{N, T}) where {N, T} = Mask{N, T}(block.classes)
-
-function encode(enc::OneHot, context, block::Mask, data)
-    tfm = DataAugmentation.OneHot{enc.T}()
-    return apply(tfm, DataAugmentation.MaskMulti(data, block.classes)) |> DataAugmentation.itemdata
-end
-
-function decode(enc::OneHot, context, block::OneHotTensor, data)
-    Tidx = length(block.classes) >= 255 ? UInt16 : UInt8
-    classidxs = reshape(
-        map(I -> Tidx(I.I[end]), argmax(data; dims = ndims(data))),
-        size(data)[1:end-1])
-    return IndirectArray(classidxs, block.classes)
 end

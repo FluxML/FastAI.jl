@@ -7,7 +7,6 @@ but instead from [`Block`](#) or [`WrapperBlock`](#).
 abstract type AbstractBlock end
 
 
-
 """
     abstract type Block
 
@@ -132,61 +131,7 @@ typify(block::FastAI.AbstractBlock) = typeof(block)
 # ## Block implementations
 
 
-# Image
-
-"""
-    Image{N}() <: Block
-
-`Block` for an N-dimensional mask. `data` is valid for `Image{N}()`
-if it is an N-dimensional array with color or number element type.
-"""
-struct Image{N} <: Block end
-
-checkblock(::Image{N}, ::AbstractArray{T,N}) where {T <: Union{Colorant,Number},N} = true
-mockblock(::Image{N}) where N = rand(RGB{N0f8}, ntuple(_ -> 16, N))
-
-setup(::Type{Image}, data) = Image{ndims(getobs(data, 1))}()
-
-"""
-    Mask{N, T}(classes) <: Block
-
-Block for an N-dimensional categorical mask. `data` is valid for
-`Mask{N, T}(classes)`
-if it is an N-dimensional array with every element in `classes`.
-"""
-struct Mask{N,T} <: Block
-    classes::AbstractVector{T}
-end
-Mask{N}(classes::AbstractVector{T}) where {N,T} = Mask{N,T}(classes)
-
-function checkblock(block::Mask{N,T}, a::AbstractArray{T,N}) where {N,T}
-    return all(map(x -> x ∈ block.classes, a))
-end
-
-mockblock(mask::Mask{N}) where N = rand(mask.classes, ntuple(_ -> 16, N))
-
 # Keypoints
-
-"""
-
-    Keypoints{N}(sz) <: Block
-
-A block representing an array of size `sz` filled with keypoints of type
-`SVector{N}`.
-"""
-struct Keypoints{N, M} <: Block
-    sz::NTuple{M, Int}
-end
-Keypoints{N}(n::Int) where N = Keypoints{N, 1}((n,))
-Keypoints{N}(t::NTuple{M, Int}) where {N, M} = Keypoints{N, M}(t)
-
-function checkblock(
-        block::Keypoints{N,M},
-        a::AbstractArray{<:Union{SVector{N,T},Nothing},M}) where {M,N,T}
-    return true
-end
-
-mockblock(block::Keypoints{N}) where N = rand(SVector{N, Float32}, block.sz)
 
 
 # TableRow
@@ -199,29 +144,34 @@ is valid if it satisfies the `AbstractRow` interface in Tables.jl, values
 present in indices for categorical and continuous columns are consistent,
 and `data` is indexable by the elements of `catcols` and `contcols`.
 """
-struct TableRow{M, N, T} <: Block
+struct TableRow{M,N,T} <: Block
     catcols::NTuple{M}
     contcols::NTuple{N}
     categorydict::T
 end
 
 function TableRow(catcols, contcols, categorydict)
-    TableRow{length(catcols), length(contcols)}(catcols, contcols, categorydict)
+    TableRow{length(catcols),length(contcols)}(catcols, contcols, categorydict)
 end
 
 function checkblock(block::TableRow, x)
     columns = Tables.columnnames(x)
-    (all(col -> col ∈ columns, (block.catcols..., block.contcols...)) &&
-    all(col -> haskey(block.categorydict, col) &&
-        (ismissing(x[col]) || x[col] ∈ block.categorydict[col]), block.catcols) &&
-    all(col -> ismissing(x[col]) || x[col] isa Number, block.contcols))
+    (
+        all(col -> col ∈ columns, (block.catcols..., block.contcols...)) &&
+        all(
+            col ->
+                haskey(block.categorydict, col) &&
+                    (ismissing(x[col]) || x[col] ∈ block.categorydict[col]),
+            block.catcols,
+        ) &&
+        all(col -> ismissing(x[col]) || x[col] isa Number, block.contcols)
+    )
 end
 
 function mockblock(block::TableRow)
     cols = (block.catcols..., block.contcols...)
     vals = map(cols) do col
-        col in block.catcols ?
-            rand(block.categorydict[col]) : rand()
+        col in block.catcols ? rand(block.categorydict[col]) : rand()
     end
     return NamedTuple(zip(cols, vals))
 end
@@ -233,7 +183,7 @@ Create a `TableRow` block from data container `data::TableDataset`. If the
 categorical and continuous columns are not specified manually, try to
 guess them from the dataset's column types.
 """
-function setup(::Type{TableRow}, data; catcols=nothing, contcols=nothing)
+function setup(::Type{TableRow}, data; catcols = nothing, contcols = nothing)
     catcols_, contcols_ = getcoltypes(data)
     catcols = isnothing(catcols) ? catcols_ : catcols
     contcols = isnothing(contcols) ? contcols_ : contcols
@@ -241,11 +191,12 @@ function setup(::Type{TableRow}, data; catcols=nothing, contcols=nothing)
     return TableRow(
         catcols,
         contcols,
-        gettransformdict(data, DataAugmentation.Categorify, catcols))
+        gettransformdict(data, DataAugmentation.Categorify, catcols),
+    )
 end
 
 function Base.show(io::IO, block::TableRow)
-    print(io, ShowCase(block, (:catcols, :contcols), show_params=false, new_lines=true))
+    print(io, ShowCase(block, (:catcols, :contcols), show_params = false, new_lines = true))
 end
 
 # Continous

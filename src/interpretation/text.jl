@@ -58,14 +58,6 @@ showblocks!(io, backend::ShowText, block, datas::AbstractVector) =
 # Block implementations
 
 
-function showblock!(io, ::ShowText, block::Image{2}, data)
-    ImageInTerminal.imshow(io, data)
-end
-
-function showblock!(io, ::ShowText, block::Mask{2}, data)
-    img = maskimage(data, block.classes)
-    ImageInTerminal.imshow(io, img)
-end
 
 function showblock!(io, ::ShowText, block::Label, data)
     print(io, data)
@@ -79,7 +71,7 @@ function showblock!(io, ::ShowText, block::LabelMulti, data)
     print(io, data)
 end
 
-function showblock!(io, ::ShowText, block::OneHotTensor{0}, data)
+function showblock!(io, ::ShowText, block::OneHotLabel, data)
     if !(sum(data) ≈ 1)
         data = softmax(data)
     end
@@ -105,18 +97,4 @@ end
 
 function showblock!(io, ::ShowText, block::EncodedTableRow, data)
     print(io, "EncodedTableRow(...)")
-end
-
-
-function showblock!(io, ::ShowText, block::Keypoints{2}, data)
-    print(io, UnicodePlots.scatterplot(first.(data), last.(data), marker=:cross))
-end
-
-
-function showblock!(io, ::ShowText, block::Bounded{2, <:Keypoints{2}}, data)
-    h, w = block.size
-    plot = UnicodePlots.scatterplot(
-        first.(data), last.(data),
-        xlim=(0, w), ylim=(0, h), marker=:cross)
-    print(io, plot)
 end
