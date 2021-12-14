@@ -1,5 +1,6 @@
 module Models
 
+
 using Base: Bool, Symbol
 using ..FastAI
 
@@ -11,10 +12,8 @@ using DataDeps
 
 include("layers.jl")
 include("blocks.jl")
-
 include("xresnet.jl")
 include("unet.jl")
-include("tabularmodel.jl")
 
 
 export xresnet18, xresnet50, UNetDynamic, TabularModel

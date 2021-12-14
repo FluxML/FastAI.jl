@@ -19,7 +19,7 @@ end
     path = joinpath(datasetpath("mnist_var_size_tiny"), "train")
 
     @testset ExtendedTestSet "Basic configuration" begin
-        recipe = Datasets.ImageFolders()
+        recipe = Vision.ImageFolders()
         data, blocks = loadrecipe(recipe, path)
         testrecipe(recipe, data, blocks)
         @test blocks[1] isa Image
@@ -27,19 +27,19 @@ end
     end
 
     @testset ExtendedTestSet "Split configuration" begin
-        recipe = Datasets.ImageFolders(split=true)
+        recipe = Vision.ImageFolders(split=true)
         data, blocks = loadrecipe(recipe, path)
         testrecipe(recipe, data["train"], blocks)
     end
 
     @testset ExtendedTestSet "Error cases" begin
         @testset ExtendedTestSet "Empty directory" begin
-            recipe = Datasets.ImageFolders(split=true)
+            recipe = Vision.ImageFolders(split=true)
             @test_throws ErrorException loadrecipe(recipe, mktempdir())
         end
 
         @testset ExtendedTestSet "Only one label" begin
-            recipe = Datasets.ImageFolders(labelfn=x -> "1")
+            recipe = Vision.ImageFolders(labelfn=x -> "1")
             @test_throws ErrorException loadrecipe(recipe, path)
         end
     end
@@ -51,7 +51,7 @@ end
     path = datasetpath("camvid_tiny")
 
     @testset ExtendedTestSet "Basic configuration" begin
-        recipe = Datasets.ImageSegmentationFolders()
+        recipe = Vision.ImageSegmentationFolders()
         data, blocks = loadrecipe(recipe, path)
         testrecipe(recipe, data, blocks)
         @test blocks[1] isa Image
@@ -60,18 +60,18 @@ end
 
     @testset ExtendedTestSet "Error cases" begin
         @testset ExtendedTestSet "Empty directory" begin
-            recipe = Datasets.ImageSegmentationFolders()
+            recipe = Vision.ImageSegmentationFolders()
             @test_throws ErrorException loadrecipe(recipe, mktempdir())
         end
 
         @testset ExtendedTestSet "Only one label" begin
-            recipe = Datasets.ImageSegmentationFolders(labelfile="idontexist")
+            recipe = Vision.ImageSegmentationFolders(labelfile="idontexist")
             @test_throws ErrorException loadrecipe(recipe, path)
         end
     end
 end
 
-using FastAI.Datasets: TableDatasetRecipe, TableClassificationRecipe, TableRegressionRecipe
+using FastAI.Tabular: TableDatasetRecipe, TableClassificationRecipe, TableRegressionRecipe
 
 @testset ExtendedTestSet "TableDatasetRecipe" begin
     path = datasetpath("adult_sample")

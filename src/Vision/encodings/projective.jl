@@ -44,24 +44,25 @@ are 2D only so `augs_projection` cannot be used for 3D data.
 
 """
 struct ProjectiveTransforms{N} <: StatefulEncoding
-    sz::NTuple{N, Int}
+    sz::NTuple{N,Int}
     buffered::Bool
-    augmentations
-    tfms::Dict{Context, DataAugmentation.Transform}
+    augmentations::Any
+    tfms::Dict{Context,DataAugmentation.Transform}
     sharestate::Bool
 end
 
 
 
 function ProjectiveTransforms(
-        sz;
-        augmentations = Identity(),
-        inferencefactor = 8,
-        buffered = true,
-        sharestate = true)
-
-    tfms = Dict{Context, DataAugmentation.Transform}(
-        Training() => ScaleKeepAspect(sz) |> augmentations |> RandomCrop(sz) |> PinOrigin(),
+    sz;
+    augmentations = Identity(),
+    inferencefactor = 8,
+    buffered = true,
+    sharestate = true,
+)
+    tfms = Dict{Context,DataAugmentation.Transform}(
+        Training() =>
+            ScaleKeepAspect(sz) |> augmentations |> RandomCrop(sz) |> PinOrigin(),
         Validation() => CenterResizeCrop(sz),
         Inference() => ResizePadDivisible(sz, inferencefactor),
     )
@@ -74,7 +75,7 @@ function ProjectiveTransforms(
 end
 
 
-function encodestate(enc::ProjectiveTransforms{N}, context, blocks, datas) where N
+function encodestate(enc::ProjectiveTransforms{N}, context, blocks, datas) where {N}
     bounds = getsamplebounds(blocks, datas, N)
     tfm = enc.tfms[context]
     randstate = DataAugmentation.getrandstate(tfm)
@@ -82,21 +83,24 @@ function encodestate(enc::ProjectiveTransforms{N}, context, blocks, datas) where
 end
 
 
-function encodedblock(enc::ProjectiveTransforms{N}, block::Block) where N
+function encodedblock(enc::ProjectiveTransforms{N}, block::Block) where {N}
     return isnothing(blockitemtype(block, N)) ? nothing : Bounded(block, enc.sz)
 end
 
 
 function encode(
-        enc::ProjectiveTransforms{N},
-        context,
-        block::Block,
-        data;
-        state=nothing) where N
+    enc::ProjectiveTransforms{N},
+    context,
+    block::Block,
+    data;
+    state = nothing,
+) where {N}
     ItemType = blockitemtype(block, N)
     isnothing(ItemType) && return data
     # only init state if block is encoded
-    bounds, randstate = (isnothing(state) || !enc.sharestate) ? encodestate(enc, context, block, data) : state
+    bounds, randstate =
+        (isnothing(state) || !enc.sharestate) ? encodestate(enc, context, block, data) :
+        state
     # don't encode if bounds have wrong dimensionality
     bounds isa DataAugmentation.Bounds{N} || return data
 
@@ -126,15 +130,16 @@ but
     blockitemtype(Image{3}(), 2) -> nothing
 """
 blockitemtype(block::Block, n) = nothing
-blockitemtype(block::Image{N}, n::Int) where N = N == n ? DataAugmentation.Image : nothing
-function blockitemtype(block::Mask{N}, n::Int) where N
+blockitemtype(block::Image{N}, n::Int) where {N} = N == n ? DataAugmentation.Image : nothing
+function blockitemtype(block::Mask{N}, n::Int) where {N}
     return if N == n
         (data, bounds) -> DataAugmentation.MaskMulti(data, block.classes, bounds)
     else
         nothing
     end
 end
-blockitemtype(block::Keypoints{N}, n::Int) where N = N == n ? DataAugmentation.Keypoints : nothing
+blockitemtype(block::Keypoints{N}, n::Int) where {N} =
+    N == n ? DataAugmentation.Keypoints : nothing
 blockitemtype(block::WrapperBlock, n::Int) = blockitemtype(wrapped(block), n)
 
 
@@ -151,8 +156,10 @@ function grabbounds(blocks::Tuple, datas::Tuple, N::Int)
     end
 end
 
-grabbounds(block::Image{N}, a, n) where N = N == n ? DataAugmentation.Bounds(size(a)) : nothing
-grabbounds(block::Mask{N}, a, n) where N = N == n ? DataAugmentation.Bounds(size(a)) : nothing
+grabbounds(block::Image{N}, a, n) where {N} =
+    N == n ? DataAugmentation.Bounds(size(a)) : nothing
+grabbounds(block::Mask{N}, a, n) where {N} =
+    N == n ? DataAugmentation.Bounds(size(a)) : nothing
 grabbounds(block::WrapperBlock, a, n) = grabbounds(wrapped(block), a, n)
 
 
@@ -182,19 +189,19 @@ and keypoint data. Similar to fastai's
 - `max_warp = 0.05`: Intensity of corner warp. Set to `0.` to disable. See [`WarpAffine`](#).
 """
 function augs_projection(;
-        flipx=true,
-        flipy=false,
-        max_zoom=1.5,
-        max_rotate=10.,
-        max_warp=0.05,
-        )
+    flipx = true,
+    flipy = false,
+    max_zoom = 1.5,
+    max_rotate = 10.0,
+    max_warp = 0.05,
+)
     tfms = []
 
     flipx && push!(tfms, Maybe(FlipX()))
     flipy && push!(tfms, Maybe(FlipY()))
     max_warp > 0 && push!(tfms, WarpAffine(max_warp))
     max_rotate > 0 && push!(tfms, Rotate(max_rotate))
-    push!(tfms, Zoom((1., max_zoom)))
+    push!(tfms, Zoom((1.0, max_zoom)))
     return DataAugmentation.compose(tfms...)
 end
 
@@ -205,9 +212,73 @@ end
 function Base.show(io::IO, p::ProjectiveTransforms)
     show(io, ShowTypeOf(p))
     fields = (
-        sz = ShowLimit(p.sz, limit=80),
-        buffered = ShowLimit(p.buffered, limit=80),
-        augmentations = ShowLimit(p.augmentations, limit=80)
+        sz = ShowLimit(p.sz, limit = 80),
+        buffered = ShowLimit(p.buffered, limit = 80),
+        augmentations = ShowLimit(p.augmentations, limit = 80),
     )
-    show(io, ShowProps(fields, new_lines=true))
+    show(io, ShowProps(fields, new_lines = true))
+end
+
+
+# ## Tests
+
+@testset "ProjectiveTransforms" begin
+    @testset "image" begin
+        encoding = ProjectiveTransforms((32, 32))
+        image = rand(RGB, 64, 96)
+        block = FastAI.Image{2}()
+
+        ## We run `ProjectiveTransforms` in the different [`Context`]s:
+        imagetrain = encode(encoding, Training(), block, image)
+        @test size(imagetrain) == (32, 32)
+
+        imagevalid = encode(encoding, Validation(), block, image)
+        @test size(imagevalid) == (32, 32)
+
+        imageinference = encode(encoding, Inference(), block, image)
+        @test size(imageinference) == (32, 48)
+
+        ## During inference, the aspect ratio should stay the same
+        @test size(image, 1) / size(image, 2) == size(imageinference, 1) / size(imageinference, 2)
+    end
+
+    @testset "keypoints" begin
+        encoding = ProjectiveTransforms((32, 48))
+        ks = [SVector(0., 0), SVector(64, 96)]
+        block = FastAI.Keypoints{2}(10)
+        bounds = DataAugmentation.Bounds((1:32, 1:48))
+        r = DataAugmentation.getrandstate(encoding.tfms[Training()])
+        kstrain = encode(encoding, Training(), block, ks; state = (bounds, r))
+        ksvalid = encode(encoding, Validation(), block, ks; state = (bounds, r))
+        ksinference = encode(encoding, Inference(), block, ks; state = (bounds, r))
+
+        @test kstrain == ksvalid == ksinference
+    end
+
+    @testset "image and keypoints" begin
+        encoding = ProjectiveTransforms((32, 32))
+        image = rand(RGB, 64, 96)
+        ks = [SVector(0., 0), SVector(64, 96)]
+        blocks = (FastAI.Image{2}(), FastAI.Keypoints{2}(10))
+
+        @test_nowarn encode(encoding, Training(), blocks, (image, ks))
+        @test_nowarn encode(encoding, Validation(), blocks, (image, ks))
+        @test_nowarn encode(encoding, Inference(), blocks, (image, ks))
+    end
+
+    #= depends on buffered interface
+    @testset ExtendedTestSet "`run!`" begin
+        encoding = ProjectiveTransforms((32, 32))
+        image1 = rand(RGB, 64, 96)
+        image2 = rand(RGB, 64, 96)
+        buf = encode(encoding, Validation(), image1)
+        cbuf = copy(buf)
+        encode!(buf, encoding, Validation(), image1)
+        @test buf ≈ cbuf
+
+        encode!(buf, encoding, Validation(), image2)
+        # buf should be modified on different input
+        @test !(buf ≈ cbuf)
+    end
+    =#
 end

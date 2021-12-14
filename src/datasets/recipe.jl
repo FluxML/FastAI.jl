@@ -1,12 +1,13 @@
 """
     abstract type DatasetRecipe
 
-A recipe that contains configuration for loading a data container. Calling it with a path returns a data container and the blocks that each sample is made of.
-
+A recipe that contains configuration for loading a data container.
+Calling it with a path returns a data container and the blocks
+that each sample is made of.
 
 ## Examples
 
-For example implementations, see [`ImageFolders`](#).
+For example implementations, see [`Vision.ImageFolders`](#).
 
 ## Extending
 

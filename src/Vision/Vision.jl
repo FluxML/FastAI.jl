@@ -28,23 +28,42 @@ module Vision
 using ..FastAI
 using ..FastAI:
     # blocks
-    Block, WrapperBlock, AbstractBlock, OneHotTensor, OneHotTensorMulti,
+    Block, WrapperBlock, AbstractBlock, OneHotTensor, OneHotTensorMulti, Label,
+    LabelMulti, wrapped,
     # encodings
     Encoding, StatefulEncoding, OneHot,
     # visualization
-    ShowText
+    ShowText,
+    # other
+    FASTAI_METHOD_REGISTRY, registerlearningmethod!, Datasets
+import FastAI.Datasets
+
+# for tests
+using ..FastAI: testencoding
 
 # extending
 import ..FastAI:
-    blockmodel, blockbackbone, encode, decode,
-    encodedblock, decodedblock, showblock!
+    blockmodel, blockbackbone, blocklossfn, encode, decode, checkblock,
+    encodedblock, decodedblock, showblock!, mockblock, setup, encodestate,
+    decodestate
 
 
-import Colors: colormaps_sequential, Colorant, Color, Gray, Normed
+import Colors: colormaps_sequential, Colorant, Color, Gray, Normed, RGB,
+    alphacolor, deuteranopic, distinguishable_colors
+import FixedPointNumbers: N0f8
 import DataAugmentation
+import DataAugmentation: apply, Identity, ToEltype, ImageToTensor, Normalize,
+    BufferedThreadsafe, ScaleKeepAspect, PinOrigin, RandomCrop, CenterResizeCrop,
+    AdjustBrightness, AdjustContrast, Maybe,
+    ResizePadDivisible, itemdata
 import ImageInTerminal
-import InlineTest
+import IndirectArrays: IndirectArray
+import Requires: @require
 import StaticArrays: SVector
+import Statistics: mean, std
+import UnicodePlots
+
+using InlineTest
 
 
 # Blocks
@@ -58,14 +77,28 @@ include("encodings/imagepreprocessing.jl")
 include("encodings/keypointpreprocessing.jl")
 include("encodings/projective.jl")
 
+include("models/Models.jl")
 include("models.jl")
+include("learningmethods.jl")
+include("recipes.jl")
 
 
-export
-    # blocks
-    Image, Mask, Keypoints, Bounded,
 
+function __init__()
+    _registerrecipes()
+    @require Makie="ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a" begin
+        import .Makie
+        import .Makie: @recipe, @lift
+        import .FastAI: ShowMakie
+        include("makie.jl")
+    end
+end
+
+export Image, Mask, Keypoints, Bounded,
     # encodings
-    ImagePreprocessing, KeypointPreprocessing, ProjectiveTransforms
+    ImagePreprocessing, KeypointPreprocessing, ProjectiveTransforms,
+    # learning methods
+    ImageClassificationSingle, ImageClassificationMulti,
+    ImageKeypointRegression, ImageSegmentation
 
 end

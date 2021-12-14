@@ -14,7 +14,7 @@ module Datasets
 
 
 using ..FastAI
-using ..FastAI: typify, TableRow
+using ..FastAI: typify
 
 using DataDeps
 using Glob
@@ -43,9 +43,7 @@ include("containers.jl")
 include("transformations.jl")
 
 include("load.jl")
-include("recipes/recipe.jl")
-include("recipes/vision.jl")
-include("recipes/tabular.jl")
+include("recipe.jl")
 include("registry.jl")
 include("fastairegistry.jl")
 

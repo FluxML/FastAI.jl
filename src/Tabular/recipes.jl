@@ -1,3 +1,4 @@
+
 """
     TableDatasetRecipe(tablefile; catcols, contcols, kwargs...])
 
@@ -6,23 +7,23 @@ be read as a table. `catcols` and `contcols` indicate the categorical and
 continuous columns of the table. If they are not given, they are detected
 automatically.
 """
-Base.@kwdef struct TableDatasetRecipe <: DatasetRecipe
+Base.@kwdef struct TableDatasetRecipe <: Datasets.DatasetRecipe
     file = ""
     catcols = nothing
     contcols = nothing
     loadfn = loadfile
 end
 
-recipeblocks(::Type{TableDatasetRecipe}) = TableRow
+Datasets.recipeblocks(::Type{TableDatasetRecipe}) = TableRow
 
-function loadrecipe(recipe::TableDatasetRecipe, path)
+function Datasets.loadrecipe(recipe::TableDatasetRecipe, path)
     tablepath = joinpath(path, recipe.file)
     table = recipe.loadfn(tablepath)
     Tables.istable(table) || error("Expected `recipe.loadfn($(tablepath))` to return a table, instead got type $(typeof(table))")
     data = TableDataset(table)
 
     catcols, contcols = if isnothing(recipe.catcols) || isnothing(recipe.contcols)
-        cat, cont = FastAI.getcoltypes(data)
+        cat, cont = getcoltypes(data)
         cat = isnothing(recipe.catcols) ? cat : recipe.catcols
         cont = isnothing(recipe.contcols) ? cont : recipe.contcols
         cat, cont
@@ -33,22 +34,22 @@ function loadrecipe(recipe::TableDatasetRecipe, path)
     block = TableRow(
         catcols,
         contcols,
-        FastAI.gettransformdict(data, DataAugmentation.Categorify, catcols),
+        gettransformdict(data, DataAugmentation.Categorify, catcols),
     )
     return data, block
 end
 
 
 
-struct TableClassificationRecipe <: DatasetRecipe
+struct TableClassificationRecipe <: Datasets.DatasetRecipe
     recipe::TableDatasetRecipe
     targetcol
 end
 
-recipeblocks(::Type{TableClassificationRecipe}) = (TableRow, Label)
+Datasets.recipeblocks(::Type{TableClassificationRecipe}) = (TableRow, Label)
 
 
-function loadrecipe(recipe::TableClassificationRecipe, args...; kwargs...)
+function Datasets.loadrecipe(recipe::TableClassificationRecipe, args...; kwargs...)
     data, block::TableRow = loadrecipe(recipe.recipe, args...; kwargs...)
     recipe.targetcol in block.catcols || error("Expected categorical column $(recipe.targetcol) to exist.")
 
@@ -62,15 +63,15 @@ function loadrecipe(recipe::TableClassificationRecipe, args...; kwargs...)
 end
 
 
-struct TableRegressionRecipe <: DatasetRecipe
+struct TableRegressionRecipe <: Datasets.DatasetRecipe
     recipe::TableDatasetRecipe
     targetcol
 end
 
-recipeblocks(::Type{TableRegressionRecipe}) = (TableRow, Continuous)
+Datasets.recipeblocks(::Type{TableRegressionRecipe}) = (TableRow, Continuous)
 
 
-function loadrecipe(recipe::TableRegressionRecipe, args...; kwargs...)
+function Datasets.loadrecipe(recipe::TableRegressionRecipe, args...; kwargs...)
     data, block::TableRow = loadrecipe(recipe.recipe, args...; kwargs...)
     recipe.targetcol in block.contcols || error("Expected continuous column $(recipe.targetcol) to exist.")
 
@@ -86,7 +87,7 @@ end
 
 
 
-## Utils
+# Utils
 
 
 removecol(block::TableRow, col) = TableRow(
@@ -94,3 +95,22 @@ removecol(block::TableRow, col) = TableRow(
         Tuple(cont for cont in block.contcols if cat != col),
         Dict(catcol => cats for (catcol, cats) in block.categorydict if catcol != col)
     )
+
+
+# Registering recipes
+
+const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
+    "adult_sample" => [
+        TableDatasetRecipe(file="adult.csv"),
+        TableClassificationRecipe(TableDatasetRecipe(file="adult.csv"), :salary),
+        TableRegressionRecipe(TableDatasetRecipe(file="adult.csv"), :age),
+    ],
+)
+
+
+
+function _registerrecipes()
+    for (name, recipes) in RECIPES, recipe in recipes
+        Datasets.registerrecipe!(Datasets.FASTAI_DATA_REGISTRY, name, recipe)
+    end
+end

@@ -89,3 +89,14 @@ end
 function decode(enc::OneHot, _, block::OneHotTensorMulti{0}, data)
     return block.classes[softmax(data) .> enc.threshold]
 end
+
+
+function blocklossfn(outblock::OneHotTensor{0}, yblock::OneHotTensor{0})
+    outblock.classes == yblock.classes || error("Classes of $outblock and $yblock differ!")
+    return Flux.Losses.logitcrossentropy
+end
+
+function blocklossfn(outblock::OneHotTensorMulti{0}, yblock::OneHotTensorMulti{0})
+    outblock.classes == yblock.classes || error("Classes of $outblock and $yblock differ!")
+    return Flux.Losses.logitbinarycrossentropy
+end

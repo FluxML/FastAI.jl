@@ -79,22 +79,3 @@ function showblock!(io, ::ShowText, block::OneHotLabel, data)
     plot = UnicodePlots.barplot(block.classes, data, width=20, compact=true)
     print(IOContext(io, :color => true), plot)
 end
-
-function showblock!(io, ::ShowText, block::TableRow, data)
-    rowdata = vcat(
-        [data[col] for col in block.catcols],
-        [data[col] for col in block.contcols],
-    )
-    rownames = [block.catcols..., block.contcols...]
-    tabledata = hcat(rownames, rowdata)
-    pretty_table(
-        io, tabledata;
-        alignment=[:r, :l],
-        highlighters=Highlighter((data, i, j) -> (j == 2), bold=true),
-        noheader=true, tf=PrettyTables.tf_borderless,)
-end
-
-
-function showblock!(io, ::ShowText, block::EncodedTableRow, data)
-    print(io, "EncodedTableRow(...)")
-end

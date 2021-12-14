@@ -1,4 +1,4 @@
-
+# ## [`DatasetRecipe`] implementations
 
 """
     ImageFolders(; labelfn = parentname, split = false)
@@ -14,13 +14,13 @@ julia> recipeblocks(ImageFolders)
 Tuple{Image{2}, Label}
 ```
 """
-Base.@kwdef struct ImageFolders <: DatasetRecipe
+Base.@kwdef struct ImageFolders <: Datasets.DatasetRecipe
     labelfn = parentname
     split::Bool = false
     filefilterfn = _ -> true
 end
 
-function loadrecipe(recipe::ImageFolders, path)
+function Datasets.loadrecipe(recipe::ImageFolders, path)
     isdir(path) || error("$path is not a directory")
     data = loadfolderdata(
         path,
@@ -36,7 +36,7 @@ function loadrecipe(recipe::ImageFolders, path)
     return data, blocks
 end
 
-recipeblocks(::Type{ImageFolders}) = Tuple{Image{2},Label}
+Datasets.recipeblocks(::Type{ImageFolders}) = Tuple{Image{2},Label}
 
 
 """
@@ -47,13 +47,13 @@ where images and masks are stored as images in two different subfolders
 "<root>/<imagefolder>" and "<root>/<maskfolder>"
 The class labels should be in a newline-delimited file "<root>/<labelfile>".
 """
-Base.@kwdef struct ImageSegmentationFolders <: DatasetRecipe
+Base.@kwdef struct ImageSegmentationFolders <: Datasets.DatasetRecipe
     imagefolder::String = "images"
     maskfolder::String = "labels"
     labelfile::String = "codes.txt"
 end
 
-function loadrecipe(recipe::ImageSegmentationFolders, path)
+function Datasets.loadrecipe(recipe::ImageSegmentationFolders, path)
     isdir(path) || error("$path is not a directory")
     imagepath = joinpath(path, recipe.imagefolder)
     maskpath = joinpath(path, recipe.maskfolder)
@@ -75,11 +75,11 @@ function loadrecipe(recipe::ImageSegmentationFolders, path)
     return (images, masks), blocks
 end
 
-recipeblocks(::Type{ImageSegmentationFolders}) = Tuple{Image{2},Mask{2}}
+Datasets.recipeblocks(::Type{ImageSegmentationFolders}) = Tuple{Image{2},Mask{2}}
 
 # ImageTableMultiLabel
 
-Base.@kwdef struct ImageTableMultiLabel <: DatasetRecipe
+Base.@kwdef struct ImageTableMultiLabel <: Datasets.DatasetRecipe
     csvfile::String = "train.csv"
     imagefolder::String = "train"
     filecol::Symbol = :fname
@@ -91,7 +91,7 @@ Base.@kwdef struct ImageTableMultiLabel <: DatasetRecipe
 end
 
 
-function loadrecipe(recipe::ImageTableMultiLabel, path)
+function Datasets.loadrecipe(recipe::ImageTableMultiLabel, path)
     csvpath = joinpath(path, recipe.csvfile)
     isfile(csvpath) || error("File $csvpath does not exist")
     df = loadfile(csvpath)
@@ -114,4 +114,31 @@ function loadrecipe(recipe::ImageTableMultiLabel, path)
     return data, blocks
 end
 
-recipeblocks(::Type{ImageTableMultiLabel}) = Tuple{Image{2},LabelMulti}
+Datasets.recipeblocks(::Type{ImageTableMultiLabel}) = Tuple{Image{2},LabelMulti}
+
+
+# ## Registering recipes for fastai datasets
+
+const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
+    [name => [ImageFolders()] for name in (
+        "imagenette", "imagenette-160", "imagenette-320",
+        "imagenette2", "imagenette2-160", "imagenette2-320",
+        "imagewoof", "imagewoof-160", "imagewoof-320",
+        "imagewoof2", "imagewoof2-160", "imagewoof2-320",
+        "cifar10", "cifar100", "caltech_101", "mnist_png",
+        "mnist_sample", "CUB_200_2011"
+    )]...,
+    [name => [ImageFolders(filefilterfn=f -> !(occursin("unsup", f)))]
+        for name in ("imagewang-160", "imagewang-320", "imagewang")]...,
+    "camvid" => [ImageSegmentationFolders()],
+    "camvid_tiny" => [ImageSegmentationFolders()],
+    "pascal_2007" => [ImageTableMultiLabel()],
+    "mnist_tiny" => [ImageFolders(filefilterfn=f -> !occursin("test", f))],
+    "mnist_var_size_tiny" => [ImageFolders(filefilterfn=f -> !occursin("test", f))],
+)
+
+function _registerrecipes()
+    for (name, recipes) in RECIPES, recipe in recipes
+        Datasets.registerrecipe!(Datasets.FASTAI_DATA_REGISTRY, name, recipe)
+    end
+end

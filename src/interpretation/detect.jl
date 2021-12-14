@@ -14,3 +14,7 @@ default_showbackend() = ShowText()
 
 showblock(block, data) = showblock(default_showbackend(), block, data)
 showblocks(block, datas) = showblocks(default_showbackend(), block, datas)
+showblockinterpretable(encodings, block, data) =
+    showblockinterpretable(default_showbackend(), encodings, block, data)
+showblocksinterpretable(encodings, block, data) =
+    showblocksinterpretable(default_showbackend(), encodings, block, data)

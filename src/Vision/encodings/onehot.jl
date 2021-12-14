@@ -6,7 +6,7 @@ decodedblock(::OneHot, block::OneHotTensor{N, T}) where {N, T} = Mask{N, T}(bloc
 
 function encode(enc::OneHot, context, block::Mask, data)
     tfm = DataAugmentation.OneHot{enc.T}()
-    return apply(tfm, DataAugmentation.MaskMulti(data, block.classes)) |> DataAugmentation.itemdata
+    return DataAugmentation.apply(tfm, DataAugmentation.MaskMulti(data, block.classes)) |> DataAugmentation.itemdata
 end
 
 function decode(::OneHot, context, block::OneHotTensor, data)

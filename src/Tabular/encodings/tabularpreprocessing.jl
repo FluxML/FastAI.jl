@@ -1,3 +1,4 @@
+# ## Encoded tabular row block
 """
     EncodedTableRow{M, N} <: Block
 
@@ -18,6 +19,14 @@ end
 function checkblock(::EncodedTableRow{M, N}, x::Tuple{Vector, Vector}) where {M, N}
     length(x[1]) == M && length(x[2]) == N
 end
+
+
+function showblock!(io, ::ShowText, block::EncodedTableRow, data)
+    print(io, "EncodedTableRow(...)")
+end
+
+
+# ## Encoding
 
 """
     TabularPreprocessing <: Encoding
@@ -117,9 +126,9 @@ Returns a composition of basic tabular transformations constructed
 for the given TableDataset.
 """
 function gettransforms(td::TableDataset, catcols, contcols)
-    normstats = FastAI.gettransformdict(td, DataAugmentation.NormalizeRow, contcols)
-    fmvals = FastAI.gettransformdict(td, DataAugmentation.FillMissing, contcols)
-    catdict = FastAI.gettransformdict(td, DataAugmentation.Categorify, catcols)
+    normstats = gettransformdict(td, DataAugmentation.NormalizeRow, contcols)
+    fmvals = gettransformdict(td, DataAugmentation.FillMissing, contcols)
+    catdict = gettransformdict(td, DataAugmentation.Categorify, catcols)
     normalize = DataAugmentation.NormalizeRow(normstats, contcols)
     categorify = DataAugmentation.Categorify(catdict, catcols)
     fm = DataAugmentation.FillMissing(fmvals, contcols)

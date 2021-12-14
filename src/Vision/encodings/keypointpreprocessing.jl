@@ -1,3 +1,9 @@
+"""
+    KeypointTensor{N, T, M} <: Block
+
+Block for encoded [`Keypoints`](#)`{N, T, M}` returned by
+[`KeypointPreprocessing`](#).
+"""
 struct KeypointTensor{N, T, M} <: Block
     sz::NTuple{M, Int}
 end
@@ -7,6 +13,7 @@ mockblock(block::KeypointTensor{N}) where N = rand(SVector{N, Float32}, block.sz
 function checkblock(block::KeypointTensor{N, T}, data::AbstractArray{T}) where {N, T}
     return length(data) == (prod(block.sz) * N)
 end
+
 
 """
     KeypointPreprocessing(bounds) <: Encoding
@@ -33,9 +40,33 @@ encodedblock(::KeypointPreprocessing{N, T}, block::Keypoints{N, M}) where {N, T,
 decodedblock(::KeypointPreprocessing{N}, block::KeypointTensor{N}) where N = Keypoints{N}(block.sz)
 
 
+# ## Optional interfaces
+
 # The default loss function to compare encoded keypoints is Mean Squared Error:
 
 function blocklossfn(outblock::KeypointTensor{N}, yblock::KeypointTensor{N}) where {N}
     outblock.sz == yblock.sz || error("Sizes of $outblock and $yblock differ!")
     return Flux.Losses.mse
+end
+
+
+# ## Tests
+
+@testset "KeypointPreprocessing" begin
+
+    ks = [
+        SVector{2, Float32}(10, 10),
+        SVector{2, Float32}(50, 80),
+    ]
+    sz = (100, 100)
+
+    block = Keypoints{2}(2)
+    enc = KeypointPreprocessing(sz)
+    ctx = Training()
+
+    testencoding(enc, block, ks)
+    y = encode(enc, ctx, block, ks)
+    ks_ = decode(enc, ctx, encodedblock(enc, block), y)
+    @test ks ≈ ks_
+
 end

@@ -30,9 +30,8 @@ end
 
 
 @testset ExtendedTestSet "`blockbackbone`" begin
-    @test_nowarn FastAI.blockbackbone(FastAI.ImageTensor{2}(3))
-
-    @test_nowarn FastAI.blockbackbone(FastAI.EncodedTableRow((:x,), (:y,), Dict(:x => [1, 2])))
+    @test_nowarn FastAI.blockbackbone(Vision.ImageTensor{2}(3))
+    @test_nowarn FastAI.blockbackbone(EncodedTableRow((:x,), (:y,), Dict(:x => [1, 2])))
 end
 
 

@@ -1,4 +1,6 @@
 
+# Image statistics computed on ImageNet. These are used as a default
+# for normalizing RGB images during `ImagePreprocessing`.
 
 const IMAGENET_MEANS = SVector{3,Float32}(.485, 0.456, 0.406)
 const IMAGENET_STDS = SVector{3,Float32}(0.229, 0.224, 0.225)
@@ -29,11 +31,8 @@ expanding the color channels and normalizing the channel values.
 Additionally, apply pixel-level augmentations passed in as `augmentations`
 during `Training`.
 
-Currently works with 2D images only, but this constraint will be
-removed in the future.
-
 Encodes
-- `Image{2}` -> `ImageTensor{3}`
+- `Image{N}` -> `ImageTensor{N}`
 
 ## Keyword arguments
 
@@ -44,7 +43,6 @@ Encodes
 - `stds::SVector = IMAGENET_STDS`: standard deviation of each color channel.
 - `C::Type{<:Colorant} = RGB{N0f8}`: color type to convert images to.
 - `T::Type{<:Real} = Float32`: element type of output
-
 """
 struct ImagePreprocessing{P,N,C <: Color{P,N},T <: Number} <: Encoding
     buffered::Bool
@@ -175,4 +173,72 @@ function Base.show(io::IO, ip::ImagePreprocessing{P,N,C,T}) where {P,N,C,T}
         augmentations = ShowLimit(ip.augmentations, limit=80),
     )
     show(io, ShowProps(fields, new_lines=true))
+end
+
+
+# ## Tests
+
+
+@testset "ImagePreprocessing [encoding]" begin
+    encfns = [
+        () -> ImagePreprocessing(),
+        () -> ImagePreprocessing(buffered=false),
+        () -> ImagePreprocessing(T=Float64),
+        () -> ImagePreprocessing(augmentations=augs_lighting()),
+        () -> ImagePreprocessing(C=Gray{N0f8}, means=SVector(0.), stds=SVector(1.)),
+    ]
+    for encfn in encfns
+        enc = encfn()
+        block = Image{2}()
+        img = rand(RGB{N0f8}, 10, 10)
+        testencoding(enc, block, img)
+
+        ctx = Validation()
+        outblock = encodedblock(enc, block)
+        a = encode(enc, ctx, block, img)
+        rimg = decode(enc, ctx, outblock, a)
+        if eltype(rimg) <: RGB
+            @test img ≈ rimg
+        end
+    end
+
+    @testset "3D" begin
+        enc = ImagePreprocessing()
+        block = Image{3}()
+        img = rand(RGB{N0f8}, 10, 10, 10)
+        FastAI.testencoding(enc, block, img)
+
+        enc = ImagePreprocessing(buffered=false)
+        block = Image{3}()
+        img = rand(RGB{N0f8}, 10, 10, 10)
+        FastAI.testencoding(enc, block, img)
+    end
+
+    @testset "imagedatasetstats" begin
+
+        @testset "RGB" begin
+            data = [zeros(RGB{Float32}, 10, 10), ones(RGB{Float32}, 10, 10)]
+            means, stds = imagedatasetstats(data, RGB{N0f8}; progress=false)
+            @test means ≈ [0.5, 0.5, 0.5]
+            @test stds ≈ [0., 0., 0.]
+        end
+
+        @testset "Gray" begin
+            data = [zeros(Gray{Float32}, 10, 10), ones(Gray{Float32}, 10, 10)]
+            means, stds = imagedatasetstats(data, Gray{N0f8}; progress=false)
+            @test means ≈ [0.5]
+            @test stds ≈ [0.]
+        end
+
+    end
+
+    @testset "setup" begin
+        data = [
+            zeros(10, 10),
+            ones(10, 10),
+        ]
+        enc = setup(ImagePreprocessing, Image{2}(), data, C = Gray{N0f8})
+        @test enc.stats[1] ≈ [0.5]
+        @test enc.stats[2] ≈ [0.]
+    end
 end

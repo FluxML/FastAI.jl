@@ -14,7 +14,7 @@ function blockmodel(
     outsz = Flux.outputsize(backbone, (ntuple(_ -> 256, N)..., inblock.nchannels, 1))
     outch = outsz[end-1]
     head = Models.visionhead(outch, length(outblock.classes), p = 0.)
-    return Chain(backbone, head)
+    return Flux.Chain(backbone, head)
 end
 
 
@@ -26,7 +26,7 @@ be a convolutional feature extractor taking in batches of image tensors with
 `inblock.nch` color channels. Keyword arguments are passed to [`UNetDynamic`](#).
 """
 function blockmodel(inblock::ImageTensor{N}, outblock::OneHotTensor{N}, backbone; kwargs...) where N
-    return UNetDynamic(
+    return Models.UNetDynamic(
         backbone,
         (ntuple(_ -> 256, N)..., inblock.nchannels, 1),
         length(outblock.classes);
@@ -45,7 +45,7 @@ function blockmodel(inblock::ImageTensor{N}, outblock::KeypointTensor{N}, backbo
     outsz = Flux.outputsize(backbone, (ntuple(_ -> 256, N)..., inblock.nchannels, 1))
     outch = outsz[end-1]
     head = Models.visionhead(outch, prod(outblock.sz)*N, p = 0.)
-    return Chain(backbone, head)
+    return Flux.Chain(backbone, head)
 end
 
 
