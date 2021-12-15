@@ -221,3 +221,8 @@ gettransforms(td::TableDataset) = gettransforms(td, getcoltypes(td)...)
     testencoding(tfm, block, row)
     testencoding(setup(TabularPreprocessing, block, TableDataset(DataFrame([row, row]))), block, row)
 end
+
+
+@testset "blockbackbone" begin
+    @test_nowarn FastAI.blockbackbone(EncodedTableRow((:x,), (:y,), Dict(:x => [1, 2])))
+end

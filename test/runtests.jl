@@ -24,12 +24,7 @@ include("testdata.jl")
 
 include("encodingapi.jl")
 include("fasterai.jl")
-include("learner.jl")
-include("training/paramgroups.jl")
-include("training/discriminativelrs.jl")
-include("training/fitonecycle.jl")
-include("training/finetune.jl")
-include("training/lrfind.jl")
+include("training.jl")
 
 include("makie.jl")
 

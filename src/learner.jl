@@ -86,10 +86,40 @@ function getbatch(learner; context = Training(), n = nothing)
     return batch
 end
 
+# ## Tests
 
-InlineTest.@testset "getbatch" begin
+@testset "getbatch" begin
     batch = rand(1, 10), rand(1, 10)
     learner = Learner(identity, ([batch], [batch]), nothing, nothing)
     @test size.(getbatch(learner)) == ((1,10), (1, 10))
     @test size.(getbatch(learner, n=4)) == ((1,4), (1,4))
+end
+
+
+@testset "methodlearner" begin
+    method = BlockMethod((Label(1:2), Label(1:2)), (OneHot(),))
+    data = (rand(1:2, 1000), rand(1:2, 1000))
+    @test_nowarn learner = methodlearner(method, data, model=identity)
+
+    @testset "batch sizes" begin
+        learner = methodlearner(method, data, model=identity, batchsize=100)
+        @test length(learner.data.training) == 8
+        @test length(learner.data.validation) == 1
+
+        learner = methodlearner(method, data, model=identity, pctgval=0.4, batchsize=100)
+        @test length(learner.data.training) == 6
+        @test length(learner.data.validation) == 2
+
+        learner = methodlearner(method, data, model=identity, batchsize=100, validbsfactor=1)
+        @test length(learner.data.training) == 8
+        @test length(learner.data.validation) == 2
+    end
+
+    @testset "callbacks" begin
+        learner = methodlearner(
+            method, data, model=identity,
+            callbacks=[ToGPU(), Checkpointer(mktempdir())])
+        @test !isnothing(FluxTraining.getcallback(learner, Checkpointer))
+
+    end
 end

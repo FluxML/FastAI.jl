@@ -98,7 +98,7 @@ function decode(ip::ImagePreprocessing, context, block::ImageTensor, data)
     return copy(DataAugmentation.tensortoimage(DataAugmentation.denormalize(data, means, stds)))
 end
 
-# Setup and image statistic calculation
+# ## Setup and image statistic calculation
 
 """
     imagestats(image, C)

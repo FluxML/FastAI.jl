@@ -56,3 +56,12 @@ Construct a XResNet18 model that takes in an encoded image with `ch`
 color channels.
 """
 blockbackbone(inblock::ImageTensor{2}) = Models.xresnet18(c_in = inblock.nchannels)
+
+
+# ## Tests
+
+
+
+@testset "blockbackbone" begin
+    @test_nowarn FastAI.blockbackbone(Vision.ImageTensor{2}(3))
+end

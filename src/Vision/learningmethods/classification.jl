@@ -129,6 +129,11 @@ registerlearningmethod!(FASTAI_METHOD_REGISTRY, ImageClassificationMulti, (Image
             #@test_broken FastAI.test_method_show(method, ShowText(Base.DevNull()))
         end
     end
+
+    @testset "blockmodel" begin
+        method = ImageClassificationSingle((Image{2}(), Label(1:2)))
+        @test_nowarn methodmodel(method)
+    end
 end
 
 @testset "ImageClassificationMulti [method]" begin
