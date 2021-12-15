@@ -31,27 +31,19 @@ abstract type Encoding end
 
 
 """
-
     fillblock(inblocks, outblocks)
-
 
 Replaces all `nothing`s in outblocks with the corresponding block in `inblocks`.
 `outblocks` may be obtained by
 """
-fillblock(inblocks::Tuple, outblocks::Tuple) = map(fillblock, inblocks, outblocks)
+fillblock(inblocks::Tuple, outblocks::Tuple) =
+    map(fillblock, inblocks, outblocks)
 fillblock(inblock::AbstractBlock, ::Nothing) = inblock
+fillblock(inblocks::Tuple, ::Nothing) = inblocks
 fillblock(::AbstractBlock, outblock::AbstractBlock) = outblock
 
-function encodedblock(enc, block, fill::Bool)
-    outblock = encodedblock(enc, block)
-    return fill ? fillblock(block, outblock) : outblock
-end
-
-function decodedblock(enc, block, fill::Bool)
-    outblock = decodedblock(enc, block)
-    return fill ? fillblock(block, outblock) : outblock
-end
-
+encodedblockfilled(enc, block) = fillblock(block, encodedblock(enc, block))
+decodedblockfilled(enc, block) = fillblock(block, decodedblock(enc, block))
 # ## `encode` methods
 
 # By default an encoding doesn't change the data
@@ -68,7 +60,7 @@ encode(encoding::Encoding, ctx, block::Block, data; kwargs...) =
 function encode(encodings::NTuple{N, Encoding}, context, blocks, data) where N
     for encoding in encodings
         data = encode(encoding, context, blocks, data)
-        blocks = encodedblock(encoding, blocks, true)
+        blocks = encodedblockfilled(encoding, blocks)
     end
     return data
 end
@@ -76,31 +68,32 @@ end
 # By default, an encoding encodes every element in a tuple separately
 function encode(encoding::Encoding, context, blocks::Tuple, datas::Tuple)
     @assert length(blocks) == length(datas)
-    return Tuple(encode(encoding, context, block, data)
-                    for (block, data) in zip(blocks, datas))
+   return map(
+        (block, data) -> encode(encoding, context, block, data),
+        blocks, datas
+    )
 end
 
 # Named tuples of data are handled like tuples, but the keys are preserved
 function encode(encoding::Encoding, context, blocks::NamedTuple, datas::NamedTuple)
     @assert length(blocks) == length(datas)
-    return NamedTuple(zip(
-        keys(datas),
-        encode(encoding, context, values(blocks), values(datas))
-    ))
+    return NamedTuple(
+        zip(keys(datas), encode(encoding, context, values(blocks), values(datas))),
+    )
 end
 
 # ## `decode` methods
 
-# By default an encoding doesn't change the data
+# By default an encoding doesn't change the data when decoding
 decode(encoding::Encoding, ctx, block::Block, data; kwargs...) =
     isempty(kwargs) ? data : decode(encoding, ctx, block, data)
 
 # By default, a tuple of encodings decodes by decoding the data one encoding
 # after the other, with encodings iterated in reverse order
-function decode(encodings::NTuple{N, Encoding}, context, blocks, data) where N
+function decode(encodings::NTuple{N,Encoding}, context, blocks, data) where {N}
     for encoding in Iterators.reverse(encodings)
         data = decode(encoding, context, blocks, data)
-        blocks = decodedblock(encoding, blocks, true)
+        blocks = decodedblockfilled(encoding, blocks)
     end
     return data
 end
@@ -109,17 +102,18 @@ end
 # By default, an encoding decodes every element in a tuple separately
 function decode(encoding::Encoding, context, blocks::Tuple, datas::Tuple)
     @assert length(blocks) == length(datas)
-    return Tuple(decode(encoding, context, block, data)
-                    for (block, data) in zip(blocks, datas))
+    return map(
+        (block, data) -> decode(encoding, context, block, data),
+        blocks, datas
+    )
 end
 
-# Named tuples of data are handled like tuples, but the keys are preserved
+# Named tuples of data are handled like tuples, and the keys are preserved
 function decode(encoding::Encoding, context, blocks::NamedTuple, datas::NamedTuple)
     @assert length(blocks) == length(datas)
-    return NamedTuple(zip(
-        keys(datas),
-        decode(encoding, context, values(blocks), values(datas))
-    ))
+    return NamedTuple(
+        zip(keys(datas), decode(encoding, context, values(blocks), values(datas))),
+    )
 end
 
 
@@ -134,15 +128,16 @@ sample or on randomness. The default is to return `nothing`,
 meaning the same block is returned and not changed. Encodings that return the same
 block but change the data (e.g. `ProjectiveTransforms`) should return `block`.
 """
-encodedblock(enc, block) = nothing
+encodedblock(::Encoding, ::Block) = nothing
+
 function encodedblock(encoding::Encoding, blocks::Tuple)
-    Tuple(encodedblock(encoding, block) for block in blocks)
+    map(block -> encodedblock(encoding, block), blocks)
 end
-function encodedblock(encodings::NTuple{N, Encoding}, blocks) where N
+function encodedblock(encodings::Tuple, blocks)
     encoded = false
     for encoding in encodings
         encoded = encoded || !isnothing(encodedblock(encoding, blocks))
-        blocks = encodedblock(encoding, blocks, true)
+        blocks = encodedblockfilled(encoding, blocks)
     end
     return encoded ? blocks : nothing
 end
@@ -150,6 +145,7 @@ end
 """
     decodedblock(encoding, block)
     decodedblock(encoding, blocks)
+    decodedblock(encodings, blocks)
 
 Return the block that is obtained by decoding `block` with encoding `E`.
 This needs to be constant for an instance of `E`, so it cannot depend on the
@@ -158,14 +154,15 @@ meaning the same block is returned and not changed. Encodings that return the sa
 block but change the data when decoding should return `block`.
 """
 decodedblock(::Encoding, ::Block) = nothing
+
 function decodedblock(encoding::Encoding, blocks::Tuple)
-    Tuple(decodedblock(encoding, block) for block in blocks)
+    map(block -> decodedblock(encoding, block), blocks)
 end
-function decodedblock(encodings::NTuple{N, Encoding}, blocks) where N
+function decodedblock(encodings, blocks)
     decoded = false
     for encoding in Iterators.reverse(encodings)
         decoded = decoded || !isnothing(decodedblock(encoding, blocks))
-        blocks = decodedblock(encoding, blocks, true)
+        blocks = decodedblockfilled(encoding, blocks)
     end
     return decoded ? blocks : nothing
 end
@@ -193,27 +190,30 @@ encodestate(encoding, context, blocks, data) = nothing
 decodestate(encoding, context, blocks, data) = nothing
 
 function encode(
-        encoding::StatefulEncoding,
-        context,
-        blocks::Tuple,
-        datas::Tuple;
-        state = encodestate(encoding, context, blocks, datas))
-
-    @assert length(blocks) == length(datas)
-    return Tuple(encode(encoding, context, block, data; state = state)
-                    for (block, data) in zip(blocks, datas))
+    encoding::StatefulEncoding,
+    context,
+    blocks::Tuple,
+    datas::Tuple;
+    state = encodestate(encoding, context, blocks, datas),
+)
+    return map(
+        (block, data) -> encode(encoding, context, block, data; state = state),
+        blocks, datas)
 end
 
 function decode(
-        encoding::StatefulEncoding,
-        context,
-        blocks::Tuple,
-        datas::Tuple;
-        state = decodestate(encoding, context, blocks, datas))
+    encoding::StatefulEncoding,
+    context,
+    blocks::Tuple,
+    datas::Tuple;
+    state = decodestate(encoding, context, blocks, datas),
+)
 
     @assert length(blocks) == length(datas)
-    return Tuple(decode(encoding, context, block, data; state = state)
-                    for (block, data) in zip(blocks, datas))
+    return Tuple(
+        decode(encoding, context, block, data; state = state) for
+        (block, data) in zip(blocks, datas)
+    )
 end
 
 
@@ -233,7 +233,7 @@ function testencoding(encoding, block, data = mockblock(block))
         # Test that `data` is a valid instance of `block`
         Test.@test checkblock(block, data)
         Test.@test !isnothing(encodedblock(encoding, block))
-        outblock = encodedblock(encoding, block, true)
+        outblock = encodedblockfilled(encoding, block)
         outdata = encode(encoding, Training(), block, data)
         # The encoded data should be a valid instance for the `encodedblock`
         Test.@test checkblock(outblock, outdata)

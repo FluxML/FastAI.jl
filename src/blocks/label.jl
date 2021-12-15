@@ -32,7 +32,7 @@ struct Label{T} <: Block
 end
 
 checkblock(label::Label{T}, data::T) where T = data ∈ label.classes
-mockblock(label::Label) = rand(label.classes)
+mockblock(label::Label{T}) where T = rand(label.classes)::T
 
 setup(::Type{Label}, data) = Label(unique(eachobs(data)))
 

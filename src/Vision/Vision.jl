@@ -64,6 +64,7 @@ import Statistics: mean, std
 import UnicodePlots
 
 using InlineTest
+using ShowCases
 
 
 # Blocks

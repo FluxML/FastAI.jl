@@ -15,7 +15,7 @@ function checkblock(block::Mask{N,T}, a::AbstractArray{T,N}) where {N,T}
     return all(map(x -> x ∈ block.classes, a))
 end
 
-mockblock(mask::Mask{N}) where {N} = rand(mask.classes, ntuple(_ -> 16, N))
+mockblock(mask::Mask{N, T}) where {N, T} = rand(mask.classes, ntuple(_ -> 16, N))::AbstractArray{T, N}
 
 
 # Visualization

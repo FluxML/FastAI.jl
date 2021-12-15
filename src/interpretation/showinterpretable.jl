@@ -73,7 +73,7 @@ function decodewhile(f, encodings, ctx, block::AbstractBlock, data)
             f,
             encodings[1:end-1],
             ctx,
-            decodedblock(encodings[end], block, true),
+            decodedblockfilled(encodings[end], block),
             decode(encodings[end], ctx, block, data),
         )
     else

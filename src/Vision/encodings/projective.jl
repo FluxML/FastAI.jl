@@ -43,11 +43,11 @@ are 2D only so `augs_projection` cannot be used for 3D data.
     in a sample
 
 """
-struct ProjectiveTransforms{N} <: StatefulEncoding
+struct ProjectiveTransforms{N,T} <: StatefulEncoding
     sz::NTuple{N,Int}
     buffered::Bool
     augmentations::Any
-    tfms::Dict{Context,DataAugmentation.Transform}
+    tfms::T
     sharestate::Bool
 end
 
@@ -60,16 +60,13 @@ function ProjectiveTransforms(
     buffered = true,
     sharestate = true,
 )
-    tfms = Dict{Context,DataAugmentation.Transform}(
-        Training() =>
-            ScaleKeepAspect(sz) |> augmentations |> RandomCrop(sz) |> PinOrigin(),
-        Validation() => CenterResizeCrop(sz),
-        Inference() => ResizePadDivisible(sz, inferencefactor),
+    traintfm = ScaleKeepAspect(sz) |> augmentations |> RandomCrop(sz) |> PinOrigin()
+    validtfm = CenterResizeCrop(sz)
+    tfms = (;
+        training = buffered ? BufferedThreadsafe(traintfm) : traintfm,
+        validation = buffered ? BufferedThreadsafe(validtfm) : validtfm,
+        inference = ResizePadDivisible(sz, inferencefactor),
     )
-    if buffered
-        tfms[Training()] = BufferedThreadsafe(tfms[Training()])
-        tfms[Validation()] = BufferedThreadsafe(tfms[Validation()])
-    end
 
     return ProjectiveTransforms(sz, buffered, augmentations, tfms, sharestate)
 end
@@ -77,11 +74,14 @@ end
 
 function encodestate(enc::ProjectiveTransforms{N}, context, blocks, datas) where {N}
     bounds = getsamplebounds(blocks, datas, N)
-    tfm = enc.tfms[context]
+    tfm = _gettfm(enc.tfms, context)
     randstate = DataAugmentation.getrandstate(tfm)
     return bounds, randstate
 end
 
+_gettfm(tfms, ::Training) = tfms.training
+_gettfm(tfms, ::Validation) = tfms.validation
+_gettfm(tfms, ::Inference) = tfms.inference
 
 function encodedblock(enc::ProjectiveTransforms{N}, block::Block) where {N}
     return isnothing(blockitemtype(block, N)) ? nothing : Bounded(block, enc.sz)
@@ -104,7 +104,7 @@ function encode(
     # don't encode if bounds have wrong dimensionality
     bounds isa DataAugmentation.Bounds{N} || return data
 
-    tfm = enc.tfms[context]
+    tfm = _gettfm(enc.tfms, context)
     item = ItemType(data, bounds)
     tdata = apply(tfm, item; randstate = randstate) |> itemdata
     return copy(tdata)
@@ -163,7 +163,7 @@ grabbounds(block::Mask{N}, a, n) where {N} =
 grabbounds(block::WrapperBlock, a, n) = grabbounds(wrapped(block), a, n)
 
 
-function getsamplebounds(blocks, datas, N)
+function getsamplebounds(blocks, datas, N::Int)
     bounds = grabbounds(blocks, datas, N)
     isnothing(bounds) && error("Could not detect $N-dimensional bounds needed for projective
 transformations from blocks $(blocks)! Bounds can be grabbed from arrays
@@ -239,15 +239,16 @@ end
         @test size(imageinference) == (32, 48)
 
         ## During inference, the aspect ratio should stay the same
-        @test size(image, 1) / size(image, 2) == size(imageinference, 1) / size(imageinference, 2)
+        @test size(image, 1) / size(image, 2) ==
+              size(imageinference, 1) / size(imageinference, 2)
     end
 
     @testset "keypoints" begin
         encoding = ProjectiveTransforms((32, 48))
-        ks = [SVector(0., 0), SVector(64, 96)]
+        ks = [SVector(0.0, 0), SVector(64, 96)]
         block = FastAI.Keypoints{2}(10)
         bounds = DataAugmentation.Bounds((1:32, 1:48))
-        r = DataAugmentation.getrandstate(encoding.tfms[Training()])
+        r = DataAugmentation.getrandstate(encoding.tfms.training)
         kstrain = encode(encoding, Training(), block, ks; state = (bounds, r))
         ksvalid = encode(encoding, Validation(), block, ks; state = (bounds, r))
         ksinference = encode(encoding, Inference(), block, ks; state = (bounds, r))
@@ -258,7 +259,7 @@ end
     @testset "image and keypoints" begin
         encoding = ProjectiveTransforms((32, 32))
         image = rand(RGB, 64, 96)
-        ks = [SVector(0., 0), SVector(64, 96)]
+        ks = [SVector(0.0, 0), SVector(64, 96)]
         blocks = (FastAI.Image{2}(), FastAI.Keypoints{2}(10))
 
         @test_nowarn encode(encoding, Training(), blocks, (image, ks))
@@ -285,7 +286,11 @@ end
 
         @testset "3D" begin
 
-            testencoding(ProjectiveTransforms((16, 16, 16)), Image{3}(), rand(RGB{N0f8}, 32, 24, 24))
+            testencoding(
+                ProjectiveTransforms((16, 16, 16)),
+                Image{3}(),
+                rand(RGB{N0f8}, 32, 24, 24),
+            )
         end
     end
 

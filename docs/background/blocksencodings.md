@@ -63,14 +63,14 @@ Where do we draw the line between model and data processing? In general, the enc
     ```julia
     FastAI.testencoding(enc, Image{2}())
     ```
-- The default implementations of `encodedblock` and `decodedblock` is to return `nothing` indicating that it doesn't transform the data. This is overwritten for blocks for which `encode` and `decode` are implemented to indicate that the data is transformed. Using `encodedblock(block, data, true)` will replace returned `nothing`s with the unchanged block.
+- The default implementations of `encodedblock` and `decodedblock` is to return `nothing` indicating that it doesn't transform the data. This is overwritten for blocks for which `encode` and `decode` are implemented to indicate that the data is transformed. Using `encodedblockfilled(block, data)` will replace returned `nothing`s with the unchanged block.
     {cell=main}
     ```julia
     encodedblock(enc, Label(1:10)) === nothing
     ```
     {cell=main}
     ```julia
-    encodedblock(enc, Label(1:10), true) == Label(1:10)
+    encodedblockfilled(enc, Label(1:10)) == Label(1:10)
     ```
 - Encodings can be applied to tuples of blocks. The default behavior is to apply the encoding to each block separately.
     {cell=main}
