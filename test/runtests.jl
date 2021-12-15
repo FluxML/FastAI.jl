@@ -4,6 +4,7 @@
 
 
 ##
+using FastAI
 using ReTest
 FastAI.runtests([ReTest.fail, ReTest.not(ReTest.pass)])
 
