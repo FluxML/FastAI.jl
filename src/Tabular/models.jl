@@ -1,51 +1,6 @@
 
 # ## Model interfaces
 
-"""
-    blockmodel(inblock::TableRow{M, N}, outblock::Union{Continuous, OneHotTensor{0}}, backbone=nothing) where {M, N}
-
-Contruct a model for tabular classification or regression. `backbone` should be a
-NamedTuple of categorical, continuous, and a finalclassifier layer, with
-the first two taking in batches of corresponding row value matrices.
-"""
-
-"""
-    blockmodel(::EncodedTableRow, ::OneHotTensor[, backbone])
-
-Create a model for tabular classification. `backbone` should be named tuple
-`(categorical = ..., continuous = ...)`. See [`TabularModel`](#) for more info.
-"""
-function blockmodel(inblock::EncodedTableRow, outblock::OneHotTensor{0}, backbone)
-    TabularModel(
-        backbone.categorical,
-        backbone.continuous,
-        Dense(100, length(outblock.classes))
-    )
-end
-
-
-"""
-    blockmodel(::EncodedTableRow, ::Continuous[, backbone])
-
-Create a model for tabular regression. `backbone` should be named tuple
-`(categorical = ..., continuous = ...)`. See [`TabularModel`](#) for more info.
-"""
-function blockmodel(inblock::EncodedTableRow, outblock::Continuous, backbone)
-    TabularModel(
-        backbone.categorical,
-        backbone.continuous,
-        Dense(100, outblock.size)
-    )
-end
-
-
-function blockbackbone(inblock::EncodedTableRow{M, N}) where {M, N}
-    embedszs = _get_emb_sz(collect(map(col->length(inblock.categorydict[col]), inblock.catcols)))
-    catback = tabular_embedding_backbone(embedszs)
-    contback = tabular_continuous_backbone(N)
-    return (categorical = catback, continuous = contback)
-end
-
 
 # ## Model
 
@@ -200,5 +155,47 @@ function linbndrop(h_in, h_out; use_bn=true, p=0., act=identity, lin_first=false
         return Chain(dense, bn, dropout)
     else
         return Chain(bn, dropout, dense)
+    end
+end
+
+
+# ## Tests
+
+
+@testset "TabularModel Components" begin
+    @testset "embeddingbackbone" begin
+        embed_szs = [(5, 10), (100, 30), (2, 30)]
+        embeds = tabular_embedding_backbone(embed_szs, 0.)
+        x = [rand(1:n) for (n, _) in embed_szs]
+
+        @test size(embeds(x)) == (70, 1)
+    end
+
+    @testset "continuousbackbone" begin
+        n = 5
+        contback = tabular_continuous_backbone(n)
+        x = rand(5, 1)
+        @test size(contback(x)) == (5, 1)
+    end
+
+    @testset "TabularModel" begin
+        n = 5
+        embed_szs = [(5, 10), (100, 30), (2, 30)]
+
+        embeds = tabular_embedding_backbone(embed_szs, 0.)
+        contback = tabular_continuous_backbone(n)
+
+        x = ([rand(1:n) for (n, _) in embed_szs], rand(5, 1))
+
+        tm = TabularModel(embeds, contback; outsize=4)
+        @test size(tm(x)) == (4, 1)
+
+        tm2 = TabularModel(embeds, contback, Chain(Dense(100, 4), x->Tabular.sigmoidrange(x, 2, 5)))
+        y2 = tm2(x)
+        @test all(y2.> 2) && all(y2.<5)
+
+        cardinalities = [4, 99, 1]
+        tm3 = TabularModel(n, 4, [200, 100], cardinalities = cardinalities, size_overrides = (10, 30, 30))
+        @test size(tm3(x)) == (4, 1)
     end
 end

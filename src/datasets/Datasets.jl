@@ -32,6 +32,7 @@ using DataFrames
 using Tables
 using CSV
 using ShowCases
+using InlineTest
 
 include("fastaidatasets.jl")
 

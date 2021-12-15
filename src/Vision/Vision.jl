@@ -79,9 +79,13 @@ include("encodings/projective.jl")
 
 include("models/Models.jl")
 include("models.jl")
-include("learningmethods.jl")
+include("learningmethods/utils.jl")
+include("learningmethods/classification.jl")
+include("learningmethods/segmentation.jl")
+include("learningmethods/keypointregression.jl")
 include("recipes.jl")
 
+include("tests.jl")
 
 
 function __init__()

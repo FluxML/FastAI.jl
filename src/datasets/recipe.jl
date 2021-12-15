@@ -63,3 +63,17 @@ recipeblocks(ImageFolders) == Tuple{Image{2}, Label}
 ```
 """
 recipeblocks(::R) where {R <: DatasetRecipe} = recipeblocks(R)
+
+
+function testrecipe(recipe::Datasets.DatasetRecipe, path::AbstractPath)
+    data, blocks = loadrecipe(recipe, path)
+    return testrecipe(recipe, data, blocks)
+end
+
+function testrecipe(recipe::Datasets.DatasetRecipe, data, blocks)
+    # `blocks` must be an instance of `recipeblocks(recipe)`
+    @test blocks isa Datasets.recipeblocks(recipe)
+
+    # Observations must be compatible with `blocks`
+    @test checkblock(blocks, getobs(data, 1))
+end

@@ -23,12 +23,15 @@ import ..FastAI:
 
 
 import DataAugmentation
+import DataFrames: DataFrame
 import Flux: Embedding, Chain, Dropout, Dense, Parallel
 import PrettyTables
 import Requires: @require
 import ShowCases: ShowCase
 import Tables
 import Statistics
+
+using InlineTest
 
 
 # Blocks
@@ -39,7 +42,8 @@ include("encodings/tabularpreprocessing.jl")
 
 
 include("models.jl")
-include("learningmethods.jl")
+include("learningmethods/classification.jl")
+include("learningmethods/regression.jl")
 include("recipes.jl")
 
 

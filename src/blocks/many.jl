@@ -34,7 +34,7 @@ end
 
 # ## Tests
 
-@testset "`Many`" begin
+@testset "Many [block]" begin
     enc = ImagePreprocessing()
     block = Many(Image{2}())
     FastAI.testencoding(enc, block)

@@ -1,11 +1,11 @@
 include("imports.jl")
 
-@testset ExtendedTestSet "`methodlearner`" begin
+@testset "methodlearner" begin
     method = BlockMethod((Label(1:2), Label(1:2)), (OneHot(),))
     data = (rand(1:2, 1000), rand(1:2, 1000))
     @test_nowarn learner = methodlearner(method, data, model=identity)
 
-    @testset ExtendedTestSet "batch sizes" begin
+    @testset "batch sizes" begin
         learner = methodlearner(method, data, model=identity, batchsize=100)
         @test length(learner.data.training) == 8
         @test length(learner.data.validation) == 1
@@ -19,7 +19,7 @@ include("imports.jl")
         @test length(learner.data.validation) == 2
     end
 
-    @testset ExtendedTestSet "callbacks" begin
+    @testset "callbacks" begin
         learner = methodlearner(
             method, data, model=identity,
             callbacks=[ToGPU(), Checkpointer(mktempdir())])
@@ -29,13 +29,13 @@ include("imports.jl")
 end
 
 
-@testset ExtendedTestSet "`blockbackbone`" begin
+@testset "blockbackbone" begin
     @test_nowarn FastAI.blockbackbone(Vision.ImageTensor{2}(3))
     @test_nowarn FastAI.blockbackbone(EncodedTableRow((:x,), (:y,), Dict(:x => [1, 2])))
 end
 
 
-@testset ExtendedTestSet "`blockmodel`" begin
+@testset "blockmodel" begin
     method = ImageClassificationSingle((Image{2}(), Label(1:2)))
     @test_nowarn methodmodel(method)
 end

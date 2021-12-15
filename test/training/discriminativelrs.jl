@@ -1,10 +1,9 @@
-include("../imports.jl")
 
-@testset ExtendedTestSet "`DiscriminativeLRs`" begin
+@testset "DiscriminativeLRs" begin
     model = Chain(Dense(3, 5), Dense(5, 3))
-    pg = ParamGroups(IndexGrouper([1, 2]), model)
+    pg = FastAI.ParamGroups(FastAI.IndexGrouper([1, 2]), model)
     o = Optimiser(
-        DiscriminativeLRs(pg, Dict(1 => 0., 2 => 1.)),
+        FastAI.DiscriminativeLRs(pg, Dict(1 => 0., 2 => 1.)),
         Descent(0.1)
     )
     x1 = model[1].weight

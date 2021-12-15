@@ -95,97 +95,53 @@ end
 
 registerlearningmethod!(FASTAI_METHOD_REGISTRY, ImageClassificationMulti, (Image, LabelMulti))
 
-# ---
 
-function ImageSegmentation(
-		blocks::Tuple{<:Image{N},<:Mask{N}},
-        data=nothing;
-		size=ntuple(i -> 128, N),
-		aug_projections=DataAugmentation.Identity(),
-		aug_image=DataAugmentation.Identity(),
-        C=RGB{N0f8},
-        computestats=false,
-	) where N
-	return BlockMethod(
-		blocks,
-		(
-			ProjectiveTransforms(size; augmentations=aug_projections),
-			getimagepreprocessing(data, computestats; C=C, augmentations=aug_image),
-        	OneHot()
-		)
-	)
-end
+# ## Tests
 
+@testset "ImageClassificationSingle [method]" begin
+    method = ImageClassificationSingle((16, 16), [1, 2])
+    testencoding(method.encodings, method.blocks)
+    DLPipelines.checkmethod_core(method)
+    @test_nowarn methodlossfn(method)
+    @test_nowarn methodmodel(method, Models.xresnet18())
 
-"""
-    ImageSegmentation(size, classes; kwargs...)
+    @testset "`encodeinput`" begin
+        image = rand(RGB, 32, 48)
 
-Learning method for image segmentation. Images are
-resized to `size` and a class is predicted for every pixel.
+        xtrain = encodeinput(method, Training(), image)
+        @test size(xtrain) == (16, 16, 3)
+        @test eltype(xtrain) == Float32
 
-## Keyword arguments
-
-- `computestats = false`: Whether to compute image statistics on dataset `data` or use
-    default ImageNet stats.
-- `aug_projections = `[`DataAugmentation.Identity`](#): augmentation to apply during
-  [`ProjectiveTransforms`](#) (resizing and cropping)
-- `aug_image = `[`DataAugmentation.Identity`](#): pixel-level augmentation to apply during
-  [`ImagePreprocessing`](#)
-- `C = RGB{N0f8}`: Color type images are converted to before further processing. Use `Gray{N0f8}`
-    for grayscale images.
-"""
-function ImageSegmentation(size::NTuple{N,Int}, classes::AbstractVector; kwargs...) where N
-    blocks = (Image{N}(), Mask{N}(classes))
-    return ImageSegmentation(blocks; size=size, kwargs...)
-end
-
-registerlearningmethod!(FASTAI_METHOD_REGISTRY, ImageSegmentation, (Image, Mask))
-
-
-# ---
-
-
-function ImageKeypointRegression(
-        blocks::Tuple{<:Image{N},<:Keypoints{N}},
-        data=nothing;
-        size=ntuple(i -> 128, N),
-		aug_projections=DataAugmentation.Identity(),
-		aug_image=DataAugmentation.Identity(),
-        C=RGB{N0f8},
-        computestats=false,
-    ) where N
-    return BlockMethod(
-        blocks,
-        (
-			ProjectiveTransforms(size; augmentations=aug_projections),
-			getimagepreprocessing(data, computestats; C=C, augmentations=aug_image),
-            KeypointPreprocessing(size),
-        )
-    )
-end
-
-
-"""
-    ImageKeypointRegression(size, nkeypoints; kwargs...)
-
-Learning method for regressing a set of `nkeypoints` keypoints from
-images. Images are resized to `size` and a class is predicted for every pixel.
-"""
-function ImageKeypointRegression(size::NTuple{N,Int}, nkeypoints::Int; kwargs...) where N
-    blocks = (Image{N}(), Keypoints{N}((nkeypoints,)))
-    return ImageKeypointRegression(blocks; size = size, kwargs...)
-end
-
-registerlearningmethod!(FASTAI_METHOD_REGISTRY, ImageKeypointRegression, (Image, Keypoints))
-
-
-function getimagepreprocessing(data, computestats::Bool; kwargs...)
-    if isnothing(data) && computestats
-        error("If `computestats` is `true`, you have to pass in a data container `data`.")
+        xinference = encodeinput(method, Inference(), image)
+        @test size(xinference) == (16, 24, 3)
+        @test eltype(xinference) == Float32
     end
-    return if computestats
-        setup(ImagePreprocessing, Image{2}(), data; kwargs...)
-    else
-        ImagePreprocessing(; kwargs...)
+    @testset "`encodetarget`" begin
+        category = 1
+        y = encodetarget(method, Training(), category)
+        @test y ≈ [1, 0]
+        # depends on buffered interface for `BlockMethod`s and `Encoding`s
+        #encodetarget!(y, method, Training(), 2)
+        #@test y ≈ [0, 1]
+    end
+    @testset "Show backends" begin
+        @testset "ShowText" begin
+            #@test_broken FastAI.test_method_show(method, ShowText(Base.DevNull()))
+        end
+    end
+end
+
+@testset "ImageClassificationMulti [method]" begin
+
+    method = ImageClassificationMulti((16, 16), [1, 2])
+
+    testencoding(method.encodings, method.blocks)
+    DLPipelines.checkmethod_core(method)
+    @test_nowarn methodlossfn(method)
+    @test_nowarn methodmodel(method, Models.xresnet18())
+    @testset "Show backends" begin
+        @testset "ShowText" begin
+            FastAI.test_method_show(method, ShowText(Base.DevNull()))
+        end
     end
 end

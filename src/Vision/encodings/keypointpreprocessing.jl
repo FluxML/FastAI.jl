@@ -52,7 +52,7 @@ end
 
 # ## Tests
 
-@testset "KeypointPreprocessing" begin
+@testset "KeypointPreprocessing [encoding]" begin
 
     ks = [
         SVector{2, Float32}(10, 10),

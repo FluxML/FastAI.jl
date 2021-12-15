@@ -114,3 +114,32 @@ function _registerrecipes()
         Datasets.registerrecipe!(Datasets.FASTAI_DATA_REGISTRY, name, recipe)
     end
 end
+
+
+# ## Tests
+
+@testset "TableDatasetRecipe [recipe]" begin
+    path = datasetpath("adult_sample")
+    recipe = TableDatasetRecipe(file="adult.csv")
+    data, block = loadrecipe(recipe, path)
+    sample = getobs(data, 1)
+    @test checkblock(block, sample)
+end
+
+
+@testset "TableClassificationRecipe [recipe]" begin
+    path = datasetpath("adult_sample")
+    recipe = TableClassificationRecipe(TableDatasetRecipe(file="adult.csv"), :salary)
+    data, block = loadrecipe(recipe, path)
+    sample = getobs(data, 1)
+    @test checkblock(block, sample)
+end
+
+
+@testset "TableRegressionRecipe [recipe]" begin
+    path = datasetpath("adult_sample")
+    recipe = TableRegressionRecipe(TableDatasetRecipe(file="adult.csv"), :age)
+    data, block = loadrecipe(recipe, path)
+    sample = getobs(data, 1)
+    @test checkblock(block, sample)
+end

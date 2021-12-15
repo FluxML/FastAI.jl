@@ -100,3 +100,13 @@ function blocklossfn(outblock::OneHotTensorMulti{0}, yblock::OneHotTensorMulti{0
     outblock.classes == yblock.classes || error("Classes of $outblock and $yblock differ!")
     return Flux.Losses.logitbinarycrossentropy
 end
+
+
+# ## Tests
+
+@testset "OneHot [encoding]" begin
+    enc = OneHot()
+    testencoding(enc, Label(1:10), 1)
+    testencoding(enc, LabelMulti(1:10), [1])
+    testencoding(enc, Mask{2}(1:10), rand(1:10, 50, 50))
+end

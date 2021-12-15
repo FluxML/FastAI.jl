@@ -1,11 +1,9 @@
-# ## Encoded tabular row block
 """
     EncodedTableRow{M, N} <: Block
 
 Block for processed rows having a tuple of M categorical and
 N continuous value collections.
 """
-
 struct EncodedTableRow{M, N, T} <: Block
     catcols::NTuple{M}
     contcols::NTuple{N}
@@ -69,7 +67,57 @@ function setup(::Type{TabularPreprocessing}, block::TableRow, data::TableDataset
 end
 
 
-# Utils
+
+# ## `blockmodel`
+
+
+"""
+    blockmodel(inblock::TableRow{M, N}, outblock::Union{Continuous, OneHotTensor{0}}, backbone=nothing) where {M, N}
+
+Contruct a model for tabular classification or regression. `backbone` should be a
+NamedTuple of categorical, continuous, and a finalclassifier layer, with
+the first two taking in batches of corresponding row value matrices.
+"""
+
+"""
+    blockmodel(::EncodedTableRow, ::OneHotTensor[, backbone])
+
+Create a model for tabular classification. `backbone` should be named tuple
+`(categorical = ..., continuous = ...)`. See [`TabularModel`](#) for more info.
+"""
+function blockmodel(inblock::EncodedTableRow, outblock::OneHotTensor{0}, backbone)
+    TabularModel(
+        backbone.categorical,
+        backbone.continuous,
+        Dense(100, length(outblock.classes))
+    )
+end
+
+
+"""
+    blockmodel(::EncodedTableRow, ::Continuous[, backbone])
+
+Create a model for tabular regression. `backbone` should be named tuple
+`(categorical = ..., continuous = ...)`. See [`TabularModel`](#) for more info.
+"""
+function blockmodel(inblock::EncodedTableRow, outblock::Continuous, backbone)
+    TabularModel(
+        backbone.categorical,
+        backbone.continuous,
+        Dense(100, outblock.size)
+    )
+end
+
+
+function blockbackbone(inblock::EncodedTableRow{M, N}) where {M, N}
+    embedszs = _get_emb_sz(collect(map(col->length(inblock.categorydict[col]), inblock.catcols)))
+    catback = tabular_embedding_backbone(embedszs)
+    contback = tabular_continuous_backbone(N)
+    return (categorical = catback, continuous = contback)
+end
+
+
+# ## Utilities
 
 """
 The helper functions defined below can be used for quickly constructing a dictionary,
@@ -138,3 +186,38 @@ end
 
 
 gettransforms(td::TableDataset) = gettransforms(td, getcoltypes(td)...)
+
+
+# ## Tests
+
+@testset "TabularPreprocessing [encoding]" begin
+    cols = [:col1, :col2, :col3, :col4, :col5]
+    vals = [1, 2, 3, "a", "x"]
+    row = NamedTuple(zip(cols, vals))
+
+    catcols = (:col4, :col5)
+    contcols = (:col1, :col2, :col3)
+
+    col1_mean, col1_std = 10, 100
+    col2_mean, col2_std = 100, 10
+    col3_mean, col3_std = 15, 1
+
+    normdict = Dict(
+        :col1 => (col1_mean, col1_std),
+        :col2 => (col2_mean, col2_std),
+        :col3 => (col3_mean, col3_std)
+    )
+
+    tfm = TabularPreprocessing(
+        DataAugmentation.NormalizeRow(normdict, contcols)
+    )
+
+    block = TableRow(
+        catcols,
+        contcols,
+        Dict(:col4=>["a", "b"], :col5=>["x", "y", "z"])
+    )
+
+    testencoding(tfm, block, row)
+    testencoding(setup(TabularPreprocessing, block, TableDataset(DataFrame([row, row]))), block, row)
+end

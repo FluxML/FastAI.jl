@@ -222,7 +222,7 @@ end
 
 # ## Tests
 
-@testset "ProjectiveTransforms" begin
+@testset "ProjectiveTransforms [encoding]" begin
     @testset "image" begin
         encoding = ProjectiveTransforms((32, 32))
         image = rand(RGB, 64, 96)
@@ -264,6 +264,29 @@ end
         @test_nowarn encode(encoding, Training(), blocks, (image, ks))
         @test_nowarn encode(encoding, Validation(), blocks, (image, ks))
         @test_nowarn encode(encoding, Inference(), blocks, (image, ks))
+    end
+
+
+    @testset "custom tests" begin
+        enc = ProjectiveTransforms((32, 32), buffered = false)
+        block = Image{2}()
+        image = rand(RGB, 100, 50)
+
+        testencoding(enc, block, image)
+        @testset "randstate is shared" begin
+            im1, im2 = encode(enc, Training(), (block, block), (image, image))
+            @test im1 ≈ im2
+        end
+
+        @testset "don't transform data that doesn't need to be resized" begin
+            imagesmall = rand(RGB, 32, 32)
+            @test imagesmall ≈ encode(enc, Validation(), block, imagesmall)
+        end
+
+        @testset "3D" begin
+
+            testencoding(ProjectiveTransforms((16, 16, 16)), Image{3}(), rand(RGB{N0f8}, 32, 24, 24))
+        end
     end
 
     #= depends on buffered interface

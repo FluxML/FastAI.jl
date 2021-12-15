@@ -1,13 +1,11 @@
-include("../imports.jl")
-
-
-@testset ExtendedTestSet "fitonecycle!" begin
+@testset "fitonecycle!" begin
     learner = testlearner(Recorder())
     @test_nowarn fitonecycle!(learner, 5)
 end
 
 
-@testset ExtendedTestSet "decay_optim" begin
+import FastAI: decay_optim
+@testset "decay_optim" begin
     optim = ADAM()
     @test decay_optim(optim, 0.1) isa Optimiser
     @test decay_optim(Optimiser(ADAM(), ADAM()), 0.1) isa Optimiser

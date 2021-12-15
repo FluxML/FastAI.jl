@@ -1,85 +1,30 @@
 
-include("imports.jl")
+
+
+
 
 ##
+using ReTest
+FastAI.runtests([ReTest.fail, ReTest.not(ReTest.pass)])
 
-@testset ExtendedTestSet "FastAI.jl" begin
-    @testset ExtendedTestSet "Inline tests" begin
-        ReTest.retest(FastAI)
-    end
-    @testset ExtendedTestSet "datablock.jl" begin
-        include("datablock.jl")
-    end
+module FastAITests
 
-    @testset ExtendedTestSet "fasterai.jl" begin
-        include("fasterai.jl")
-    end
+using InlineTest
 
-    @testset ExtendedTestSet "encodings/" begin
-        @testset ExtendedTestSet "tabularpreprocessing.jl" begin
-            include("encodings/tabularpreprocessing.jl")
-        end
-    end
+include("imports.jl")
 
-    @testset ExtendedTestSet "methods/" begin
-        @testset ExtendedTestSet "imageclassification.jl" begin
-            include("methods/imageclassification.jl")
-        end
-        @testset ExtendedTestSet "imagesegmentation.jl" begin
-            include("methods/imagesegmentation.jl")
-        end
-        @testset ExtendedTestSet "imagekeypointregression.jl" begin
-            include("methods/imagekeypointregression.jl")
-        end
-        @testset ExtendedTestSet "tabularclassification.jl" begin
-            include("methods/tabularclassification.jl")
-        end
-        @testset ExtendedTestSet "tabularregression.jl" begin
-            include("methods/tabularregression.jl")
-        end
-    end
 
-    @testset ExtendedTestSet "datasets/" begin
-        @testset ExtendedTestSet "transformations.jl" begin
-            include("datasets/transformations.jl")
-        end
-        @testset ExtendedTestSet "containers.jl" begin
-            include("datasets/containers.jl")
-        end
-        @testset ExtendedTestSet "recipes.jl" begin
-            include("datasets/recipes.jl")
-        end
-        @testset ExtendedTestSet "registry.jl" begin
-            include("datasets/registry.jl")
-        end
-    end
+include("encodingapi.jl")
+include("fasterai.jl")
+include("learner.jl")
+include("training/paramgroups.jl")
+include("training/discriminativelrs.jl")
+include("training/fitonecycle.jl")
+include("training/finetune.jl")
+include("training/lrfind.jl")
 
-    @testset ExtendedTestSet "learner.jl" begin
-        include("learner.jl")
-    end
+include("makie.jl")
 
-    @testset ExtendedTestSet "training/" begin
-        @testset ExtendedTestSet "paramgroups.jl" begin
-            include("training/paramgroups.jl")
-        end
-        @testset ExtendedTestSet "discriminativelrs.jl" begin
-            include("training/discriminativelrs.jl")
-        end
-        @testset ExtendedTestSet "fitonecycle.jl" begin
-            include("training/fitonecycle.jl")
-        end
-        @testset ExtendedTestSet "finetune.jl" begin
-            include("training/finetune.jl")
-        end
-        @testset ExtendedTestSet "lrfind.jl" begin
-            include("training/lrfind.jl")
-        end
-        # TODO: test learning rate finder
-    end
-
-    @testset ExtendedTestSet "models/" begin
-        @testset ExtendedTestSet "tabularmodel.jl" begin
-            include("models/tabularmodel.jl")
-        end
-    end
 end
+
+FastAITests.runtests([ReTest.fail, ReTest.not(ReTest.pass)])

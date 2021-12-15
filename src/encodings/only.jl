@@ -91,7 +91,7 @@ end
 
 # ## Test
 
-InlineTest.@testset "Only" begin
+InlineTest.@testset "Only [block]" begin
     encx = Only(:x, OneHot())
     inblock = Label(1:100)
     inblocknamed = Named(:x, inblock)
