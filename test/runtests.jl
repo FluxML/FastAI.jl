@@ -1,9 +1,7 @@
 
 
+ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 
-
-
-##
 using FastAI
 using ReTest
 FastAI.runtests([ReTest.fail, ReTest.not(ReTest.pass)])
