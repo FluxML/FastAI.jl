@@ -66,15 +66,15 @@ OneHot() = OneHot(Float32, 0.5f0)
 encodedblock(::OneHot, block::Label{T}) where T = OneHotTensor{0, T}(block.classes)
 decodedblock(::OneHot, block::OneHotLabel) = Label(block.classes)
 
-function encode(enc::OneHot, context, block::Label, data)
-    idx = findfirst(isequal(data), block.classes)
-    isnothing(idx) && error("$data could not be found in `block.classes`: $(block.classes).")
+function encode(enc::OneHot, context, block::Label, obs)
+    idx = findfirst(isequal(obs), block.classes)
+    isnothing(idx) && error("$obs could not be found in `block.classes`: $(block.classes).")
     return DataAugmentation.onehot(enc.T, idx, length(block.classes))
 end
 
 
-function decode(::OneHot, context, block::OneHotLabel, data)
-    return block.classes[argmax(data)]
+function decode(::OneHot, context, block::OneHotLabel, obs)
+    return block.classes[argmax(obs)]
 end
 
 # ### `LabelMulti` implementation
@@ -82,12 +82,12 @@ end
 encodedblock(::OneHot, block::LabelMulti{T}) where T = OneHotTensorMulti{0, T}(block.classes)
 decodedblock(::OneHot, block::OneHotTensorMulti{0}) = LabelMulti(block.classes)
 
-function encode(enc::OneHot, _, block::LabelMulti, data)
-    return collect(enc.T, (c in data for c in block.classes))
+function encode(enc::OneHot, _, block::LabelMulti, obs)
+    return collect(enc.T, (c in obs for c in block.classes))
 end
 
-function decode(enc::OneHot, _, block::OneHotTensorMulti{0}, data)
-    return block.classes[softmax(data) .> enc.threshold]
+function decode(enc::OneHot, _, block::OneHotTensorMulti{0}, obs)
+    return block.classes[softmax(obs) .> enc.threshold]
 end
 
 

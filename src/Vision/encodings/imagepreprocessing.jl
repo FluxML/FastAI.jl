@@ -87,15 +87,15 @@ function encodedblock(ip::ImagePreprocessing{P,M,C}, ::Image{N}) where {P,M,C,N}
     return ImageTensor{N}(colorchannels(C))
 end
 
-function encode(ip::ImagePreprocessing, context, block::Image, data)
-    return copy(apply(ip.tfms[context], DataAugmentation.Image(data)) |> itemdata)
+function encode(ip::ImagePreprocessing, context, block::Image, obs)
+    return copy(apply(ip.tfms[context], DataAugmentation.Image(obs)) |> itemdata)
 end
 
 decodedblock(::ImagePreprocessing, ::ImageTensor{N}) where N = Image{N}()
 
-function decode(ip::ImagePreprocessing, context, block::ImageTensor, data)
+function decode(ip::ImagePreprocessing, context, block::ImageTensor, obs)
     means, stds = ip.stats
-    return copy(DataAugmentation.tensortoimage(DataAugmentation.denormalize(data, means, stds)))
+    return copy(DataAugmentation.tensortoimage(DataAugmentation.denormalize(obs, means, stds)))
 end
 
 # ## Setup and image statistic calculation

@@ -47,15 +47,17 @@ decodedblockfilled(enc, block) = fillblock(block, decodedblock(enc, block))
 # ## `encode` methods
 
 # By default an encoding doesn't change the data
-encode(encoding::Encoding, ctx, block::Block, data; kwargs...) =
-    isempty(kwargs) ? data : encode(encoding, ctx, block, data)
+encode(encoding::Encoding, ctx, block::Block, obs; kwargs...) =
+    isempty(kwargs) ? obs : encode(encoding, ctx, block, obs)
 
 # By default, a tuple of encodings encodes by encoding the data one encoding
 # after the other
 """
-    encode(encoding, context, block, data)
-    encode(encoding, context, blocks, data)
-    encode(encodings, context, blocks, data)
+    encode(encoding, context, block, obs)
+    encode(encoding, context, blocks, obss)
+    encode(encodings, context, blocks, obss)
+
+Apply one or more [`Encoding`](#)s to observation(s) `obs`.
 """
 function encode(encodings::NTuple{N, Encoding}, context, blocks, data) where N
     for encoding in encodings
@@ -66,53 +68,54 @@ function encode(encodings::NTuple{N, Encoding}, context, blocks, data) where N
 end
 
 # By default, an encoding encodes every element in a tuple separately
-function encode(encoding::Encoding, context, blocks::Tuple, datas::Tuple)
-    @assert length(blocks) == length(datas)
+
+function encode(encoding::Encoding, context, blocks::Tuple, obss::Tuple)
+    @assert length(blocks) == length(obss)
    return map(
-        (block, data) -> encode(encoding, context, block, data),
-        blocks, datas
+        (block, obs) -> encode(encoding, context, block, obs),
+        blocks, obss
     )
 end
 
 # Named tuples of data are handled like tuples, but the keys are preserved
-function encode(encoding::Encoding, context, blocks::NamedTuple, datas::NamedTuple)
-    @assert length(blocks) == length(datas)
+function encode(encoding::Encoding, context, blocks::NamedTuple, obss::NamedTuple)
+    @assert length(blocks) == length(obss)
     return NamedTuple(
-        zip(keys(datas), encode(encoding, context, values(blocks), values(datas))),
+        zip(keys(obss), encode(encoding, context, values(blocks), values(obss))),
     )
 end
 
 # ## `decode` methods
 
 # By default an encoding doesn't change the data when decoding
-decode(encoding::Encoding, ctx, block::Block, data; kwargs...) =
-    isempty(kwargs) ? data : decode(encoding, ctx, block, data)
+decode(encoding::Encoding, ctx, block::Block, obs; kwargs...) =
+    isempty(kwargs) ? obs : decode(encoding, ctx, block, obs)
 
 # By default, a tuple of encodings decodes by decoding the data one encoding
 # after the other, with encodings iterated in reverse order
-function decode(encodings::NTuple{N,Encoding}, context, blocks, data) where {N}
+function decode(encodings::NTuple{N,Encoding}, context, blocks, obs) where {N}
     for encoding in Iterators.reverse(encodings)
-        data = decode(encoding, context, blocks, data)
+        obs = decode(encoding, context, blocks, obs)
         blocks = decodedblockfilled(encoding, blocks)
     end
-    return data
+    return obs
 end
 
 
 # By default, an encoding decodes every element in a tuple separately
-function decode(encoding::Encoding, context, blocks::Tuple, datas::Tuple)
-    @assert length(blocks) == length(datas)
+function decode(encoding::Encoding, context, blocks::Tuple, obss::Tuple)
+    @assert length(blocks) == length(obss)
     return map(
-        (block, data) -> decode(encoding, context, block, data),
-        blocks, datas
+        (block, obs) -> decode(encoding, context, block, obs),
+        blocks, obss
     )
 end
 
 # Named tuples of data are handled like tuples, and the keys are preserved
-function decode(encoding::Encoding, context, blocks::NamedTuple, datas::NamedTuple)
-    @assert length(blocks) == length(datas)
+function decode(encoding::Encoding, context, blocks::NamedTuple, obss::NamedTuple)
+    @assert length(blocks) == length(obss)
     return NamedTuple(
-        zip(keys(datas), decode(encoding, context, values(blocks), values(datas))),
+        zip(keys(obss), decode(encoding, context, values(blocks), values(obss))),
     )
 end
 
@@ -186,57 +189,57 @@ to `decodestate(encoding, context, blocks, sample)`
 """
 abstract type StatefulEncoding <: Encoding end
 
-encodestate(encoding, context, blocks, data) = nothing
-decodestate(encoding, context, blocks, data) = nothing
+encodestate(encoding, context, blocks, obs) = nothing
+decodestate(encoding, context, blocks, obs) = nothing
 
 function encode(
     encoding::StatefulEncoding,
     context,
     blocks::Tuple,
-    datas::Tuple;
-    state = encodestate(encoding, context, blocks, datas),
+    obss::Tuple;
+    state = encodestate(encoding, context, blocks, obss),
 )
     return map(
-        (block, data) -> encode(encoding, context, block, data; state = state),
-        blocks, datas)
+        (block, obs) -> encode(encoding, context, block, obs; state = state),
+        blocks, obss)
 end
 
 function decode(
     encoding::StatefulEncoding,
     context,
     blocks::Tuple,
-    datas::Tuple;
-    state = decodestate(encoding, context, blocks, datas),
+    obss::Tuple;
+    state = decodestate(encoding, context, blocks, obss),
 )
 
-    @assert length(blocks) == length(datas)
+    @assert length(blocks) == length(obss)
     return Tuple(
-        decode(encoding, context, block, data; state = state) for
-        (block, data) in zip(blocks, datas)
+        decode(encoding, context, block, obs; state = state) for
+        (block, obs) in zip(blocks, obss)
     )
 end
 
 
 """
-    testencoding(encoding, block, data)
+    testencoding(encoding, block[, obs])
 
 Performs some tests that the encoding interface is set up properly for
 `encoding` and `block`. Tests that
 
-- `data` is a valid `block`
+- `obs` is a valid instance `block`
 - `encode` returns a valid `encodedblock(encoding, block)`
 - `decode` returns a valid `decodedblock(encoding, encodedblock(encoding, block))`
     and that the block is identical to `block`
 """
-function testencoding(encoding, block, data = mockblock(block))
+function testencoding(encoding, block, obs = mockblock(block))
     Test.@testset "Encoding `$(typeof(encoding))` for block `$block`" begin
-        # Test that `data` is a valid instance of `block`
-        Test.@test checkblock(block, data)
+        # Test that `obs` is a valid instance of `block`
+        Test.@test checkblock(block, obs)
         Test.@test !isnothing(encodedblock(encoding, block))
         outblock = encodedblockfilled(encoding, block)
-        outdata = encode(encoding, Training(), block, data)
+        outobs = encode(encoding, Training(), block, obs)
         # The encoded data should be a valid instance for the `encodedblock`
-        Test.@test checkblock(outblock, outdata)
+        Test.@test checkblock(outblock, outobs)
 
         # Test decoding (if supported) works correctly
         if (outblock isa Tuple)
@@ -244,16 +247,16 @@ function testencoding(encoding, block, data = mockblock(block))
                 inblock = decodedblock(encoding, outblock[idx])
                 if !isnothing(inblock)
                     Test.@test wrapped(block[idx]) == wrapped(inblock)
-                    indata = decode(encoding, Training(), outblock[idx], outdata[idx])
-                    Test.@test checkblock(inblock, indata)
+                    inobs = decode(encoding, Training(), outblock[idx], outobs[idx])
+                    Test.@test checkblock(inblock, inobs)
                 end
             end
         else
             inblock = decodedblock(encoding, outblock)
             if !isnothing(inblock)
                 Test.@test wrapped(block) == wrapped(inblock)
-                indata = decode(encoding, Training(), outblock, outdata)
-                Test.@test checkblock(inblock, indata)
+                inobs = decode(encoding, Training(), outblock, outobs)
+                Test.@test checkblock(inblock, inobs)
             end
         end
     end

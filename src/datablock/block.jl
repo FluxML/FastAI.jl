@@ -35,22 +35,22 @@ Consider the following when subtyping `Block`. A block
 There are many interfaces that can be implemented for a `Block`. See the docstrings
 of each function for more info about how to implement it.
 
-- [`checkblock`](#)`(block, data)`: check whether a piece of data is a valid block
-- [`mockblock`](#)`(block)`: randomly generate a piece of data
+- [`checkblock`](#)`(block, obs)`: check whether an observation is a valid block
+- [`mockblock`](#)`(block)`: randomly generate an observation
 - [`blocklossfn`](#)`(predblock, yblock)`: loss function for comparing two blocks
 - [`blockmodel`](#)`(inblock, outblock[, backbone])`: construct a task-specific model
 - [`blockbackbone`](#)`(inblock)`: construct a backbone model that takes in specific data
-- [`plotblock!`](#)`(block, data)`: visualize block data
+- [`showblock!`](#)`(block, obs)`: visualize an observation
 
 """
 abstract type Block <: AbstractBlock end
 
 
 """
-    checkblock(block, data)
-    checkblock(blocks, datas)
+    checkblock(block, obs)
+    checkblock(blocks, obss)
 
-Check whether `data` is compatible with `block`, returning a `Bool`.
+Check whether `obs` is compatible with `block`, returning a `Bool`.
 
 ## Examples
 
@@ -71,11 +71,11 @@ An implementation of `checkblock` should be as specific as possible. The
 default method returns `false`, so you only need to implement methods for valid types
 and return `true`.
 """
-checkblock(::Block, data) = false
+checkblock(::Block, obs) = false
 
-function checkblock(blocks::Tuple, datas::Tuple)
-    @assert length(blocks) == length(datas)
-    return all(checkblock(block, data) for (block, data) in zip(blocks, datas))
+function checkblock(blocks::Tuple, obss::Tuple)
+    @assert length(blocks) == length(obss)
+    return all(checkblock(block, obs) for (block, obs) in zip(blocks, obss))
 end
 
 
@@ -83,7 +83,8 @@ end
     mockblock(block)
     mockblock(blocks)
 
-Randomly generate an instance of `block`.
+Randomly generate an instance of `block`. It always holds that
+`checkblock(block, mockblock(block)) === true`.
 """
 mockblock(blocks::Tuple) = map(mockblock, blocks)
 

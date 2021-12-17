@@ -11,9 +11,9 @@ interpretable way.
 For a `ShowBackend` `Backend`, you should implement the following methods:
 
 - [`createhandle`](#)`(::Backend)` creates a context that blocks of data can be shown to
-- [`showblock!`](#)`(handle, ::Backend, block::B, data)` shows a block of type `B`. This
+- [`showblock!`](#)`(handle, ::Backend, block::B, obs)` shows a block of type `B`. This
     needs to be implemented for every block type you want to be able to show
-- [`showblocks!`](#)`(handle, ::Backend, blocks, datas)` shows a collection of blocks
+- [`showblocks!`](#)`(handle, ::Backend, blocks, obss)` shows a collection of blocks
 """
 abstract type ShowBackend end
 
@@ -27,10 +27,10 @@ when using `showblock` or `showblocks`.
 
 ```julia
 handle = createhandle(backend)
-showblock!(handle, backend, block, data)
+showblock!(handle, backend, block, obs)
 
 # Above is equivalent to
-showblock(backend, block, data)
+showblock(backend, block, obs)
 ```
 """
 function createhandle end
@@ -38,9 +38,9 @@ function createhandle end
 
 
 """
-    showblock!(handle, backend, block, data)
-    showblock!(handle, backend, blocks, datas)
-    showblock!(handle, backend, title => block, data)
+    showblock!(handle, backend, block, obs)
+    showblock!(handle, backend, blocks, obss)
+    showblock!(handle, backend, title => block, obs)
 
 Show block of data to an existing context `handle` using `backend`.
 
@@ -50,43 +50,43 @@ See [`showblock`](#) for examples.
 
 Every `ShowBackend` should implement the following versions of this method:
 
-- `showblock!(handle, backend, block::Block, data)` to show a single block of data;
+- `showblock!(handle, backend, block::Block, obs)` to show a single block of obs;
     should be implemented for every block type you want to show
-- `showblock!(handle, backend, blocks::Tuple, datas::Tuple)` to show several blocks that
+- `showblock!(handle, backend, blocks::Tuple, obss::Tuple)` to show several blocks that
     belong to the same observation.
 
 Optionally, you can also implement
 
-- `showblock!(handle, backend, pair::Pair, data)` where `(title, block) = pair` gives
+- `showblock!(handle, backend, pair::Pair, obs)` where `(title, block) = pair` gives
     the name for a block. If this is not implemented for a backend, then calling it
     will default to the untitled method.
 """
 function showblock! end
 
-showblock!(handle, backend, (title, block)::Pair, data) =
-    showblock!(handle, backend, block, data)
+showblock!(handle, backend, (title, block)::Pair, obs) =
+    showblock!(handle, backend, block, obs)
 
 
 """
-    showblock([backend], block, data)
-    showblock([backend], blocks, datas)
-    showblock([backend], title => block, data)
+    showblock([backend], block, obs)
+    showblock([backend], blocks, obss)
+    showblock([backend], title => block, obs)
 
-Show a block or blocks of data to `backend <: ShowBackend`.
+Show a block or blocks of obs to `backend <: ShowBackend`.
 
 `block` can be a `Block`, a tuple of `block`s, or a `Pair` of `title => block`.
 """
-function showblock(backend::ShowBackend, block, data)
+function showblock(backend::ShowBackend, block, obs)
     handle = createhandle(backend)
-    showblock!(handle, backend, block, data)
+    showblock!(handle, backend, block, obs)
 end
 
 
 """
-    showblocks([backend], block, datas)
-    showblocks!(handle, backend, block, datas)
+    showblocks([backend], block, obss)
+    showblocks!(handle, backend, block, obss)
 
-Show a vector of observations `datas` of the same `block` type.
+Show a vector of observations `obss` of the same `block` type.
 
 ## Examples
 
@@ -108,14 +108,14 @@ function showblocks! end
 
 
 Base.@doc (Base.@doc showblocks!)
-showblocks(backend::ShowBackend, block, datas) =
-    showblocks!(createhandle(backend), backend, block, datas)
+showblocks(backend::ShowBackend, block, obss) =
+    showblocks!(createhandle(backend), backend, block, obss)
 
 
 # WrapperBlock handling
 
-showblock!(handle, backend::ShowBackend, block::WrapperBlock, data) =
-    showblock!(handle, backend, wrapped(block), data)
+showblock!(handle, backend::ShowBackend, block::WrapperBlock, obs) =
+    showblock!(handle, backend, wrapped(block), obs)
 
 isshowable(backend::ShowBackend, wrapper::WrapperBlock) =
     isshowable(backend, wrapped(wrapper))

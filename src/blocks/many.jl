@@ -4,7 +4,7 @@
 """
     Many(block) <: WrapperBlock
 
-`Many` indicates that you can variable number of data instances for
+`Many` indicates that you can variable number of instances for
 `block`. Consider a bounding box detection task where there may be any
 number of targets in an image and this number varies for different
 samples. The blocks `(Image{2}(), BoundingBox{2}()` imply that there is exactly
@@ -15,19 +15,19 @@ struct Many{B<:AbstractBlock} <: WrapperBlock
     block::B
 end
 
-FastAI.checkblock(many::Many, datas) =
-    all(checkblock(wrapped(many), data) for data in datas)
+FastAI.checkblock(many::Many, obss) =
+    all(checkblock(wrapped(many), obs) for obs in obss)
 FastAI.mockblock(many::Many) = [mockblock(wrapped(many)), mockblock(wrapped(many))]
 
-function FastAI.encode(enc::Encoding, ctx, many::Many, datas)
-    return map(datas) do data
-        encode(enc, ctx, wrapped(many), data)
+function FastAI.encode(enc::Encoding, ctx, many::Many, obss)
+    return map(obss) do obs
+        encode(enc, ctx, wrapped(many), obs)
     end
 end
 
-function FastAI.decode(enc::Encoding, ctx, many::Many, datas)
-    return map(datas) do data
-        decode(enc, ctx, wrapped(many), data)
+function FastAI.decode(enc::Encoding, ctx, many::Many, obss)
+    return map(obss) do obs
+        decode(enc, ctx, wrapped(many), obs)
     end
 end
 

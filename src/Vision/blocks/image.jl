@@ -1,7 +1,7 @@
 """
     Image{N}() <: Block
 
-[`Block`](#) for an N-dimensional image. `data` is valid for `Image{N}()`
+[`Block`](#) for an N-dimensional image. `obs` is valid for `Image{N}()`
 if it is an N-dimensional array with color or number element type.
 
 ## Examples
@@ -54,6 +54,6 @@ setup(::Type{Image}, data) = Image{ndims(getobs(data, 1))}()
 
 # Visualization
 
-function showblock!(io, ::ShowText, block::Image{2}, data)
-    ImageInTerminal.imshow(io, data)
+function showblock!(io, ::ShowText, block::Image{2}, obs)
+    ImageInTerminal.imshow(io, obs)
 end

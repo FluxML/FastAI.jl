@@ -2,7 +2,7 @@
 """
     Mask{N, T}(classes) <: Block
 
-Block for an N-dimensional categorical mask. `data` is valid for
+Block for an N-dimensional categorical mask. `obs` is valid for
 `Mask{N, T}(classes)`
 if it is an N-dimensional array with every element in `classes`.
 """
@@ -20,8 +20,8 @@ mockblock(mask::Mask{N, T}) where {N, T} = rand(mask.classes, ntuple(_ -> 16, N)
 
 # Visualization
 
-function showblock!(io, ::ShowText, block::Mask{2}, data)
-    img = _maskimage(data, block.classes)
+function showblock!(io, ::ShowText, block::Mask{2}, obs)
+    img = _maskimage(obs, block.classes)
     ImageInTerminal.imshow(io, img)
 end
 

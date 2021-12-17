@@ -4,16 +4,16 @@
 encodedblock(::OneHot, block::Mask{N, T}) where {N, T} = OneHotTensor{N, T}(block.classes)
 decodedblock(::OneHot, block::OneHotTensor{N, T}) where {N, T} = Mask{N, T}(block.classes)
 
-function encode(enc::OneHot, context, block::Mask, data)
+function encode(enc::OneHot, context, block::Mask, obs)
     tfm = DataAugmentation.OneHot{enc.T}()
-    return DataAugmentation.apply(tfm, DataAugmentation.MaskMulti(data, block.classes)) |> DataAugmentation.itemdata
+    return DataAugmentation.apply(tfm, DataAugmentation.MaskMulti(obs, block.classes)) |> DataAugmentation.itemdata
 end
 
-function decode(::OneHot, context, block::OneHotTensor, data)
+function decode(::OneHot, context, block::OneHotTensor, obs)
     Tidx = length(block.classes) >= 255 ? UInt16 : UInt8
     classidxs = reshape(
-        map(I -> Tidx(I.I[end]), argmax(data; dims = ndims(data))),
-        size(data)[1:end-1])
+        map(I -> Tidx(I.I[end]), argmax(obs; dims = ndims(obs))),
+        size(obs)[1:end-1])
     return IndirectArray(classidxs, block.classes)
 end
 

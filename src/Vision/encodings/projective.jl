@@ -72,8 +72,8 @@ function ProjectiveTransforms(
 end
 
 
-function encodestate(enc::ProjectiveTransforms{N}, context, blocks, datas) where {N}
-    bounds = getsamplebounds(blocks, datas, N)
+function encodestate(enc::ProjectiveTransforms{N}, context, blocks, obss) where {N}
+    bounds = getsamplebounds(blocks, obss, N)
     tfm = _gettfm(enc.tfms, context)
     randstate = DataAugmentation.getrandstate(tfm)
     return bounds, randstate
@@ -92,22 +92,22 @@ function encode(
     enc::ProjectiveTransforms{N},
     context,
     block::Block,
-    data;
+    obs;
     state = nothing,
 ) where {N}
     ItemType = blockitemtype(block, N)
-    isnothing(ItemType) && return data
+    isnothing(ItemType) && return obs
     # only init state if block is encoded
     bounds, randstate =
-        (isnothing(state) || !enc.sharestate) ? encodestate(enc, context, block, data) :
+        (isnothing(state) || !enc.sharestate) ? encodestate(enc, context, block, obs) :
         state
     # don't encode if bounds have wrong dimensionality
-    bounds isa DataAugmentation.Bounds{N} || return data
+    bounds isa DataAugmentation.Bounds{N} || return obs
 
     tfm = _gettfm(enc.tfms, context)
-    item = ItemType(data, bounds)
-    tdata = apply(tfm, item; randstate = randstate) |> itemdata
-    return copy(tdata)
+    item = ItemType(obs, bounds)
+    tobs = apply(tfm, item; randstate = randstate) |> itemdata
+    return copy(tobs)
 end
 
 # ProjectiveTransforms is not invertible, hence no `decode` method!
@@ -133,7 +133,7 @@ blockitemtype(block::Block, n) = nothing
 blockitemtype(block::Image{N}, n::Int) where {N} = N == n ? DataAugmentation.Image : nothing
 function blockitemtype(block::Mask{N}, n::Int) where {N}
     return if N == n
-        (data, bounds) -> DataAugmentation.MaskMulti(data, block.classes, bounds)
+        (obs, bounds) -> DataAugmentation.MaskMulti(obs, block.classes, bounds)
     else
         nothing
     end
@@ -144,14 +144,14 @@ blockitemtype(block::WrapperBlock, n::Int) = blockitemtype(wrapped(block), n)
 
 
 """
-    grabbounds(blocks, datas, N)
+    grabbounds(blocks, obss, N)
 
 Looks through `blocks` for block data that carries `N`-dimensional
 bounds information needed for projective transformations.
 """
-function grabbounds(blocks::Tuple, datas::Tuple, N::Int)
-    for (block, data) in zip(blocks, datas)
-        bounds = grabbounds(block, data, N)
+function grabbounds(blocks::Tuple, obss::Tuple, N::Int)
+    for (block, obs) in zip(blocks, obss)
+        bounds = grabbounds(block, obs, N)
         !isnothing(bounds) && return bounds
     end
 end
@@ -163,8 +163,8 @@ grabbounds(block::Mask{N}, a, n) where {N} =
 grabbounds(block::WrapperBlock, a, n) = grabbounds(wrapped(block), a, n)
 
 
-function getsamplebounds(blocks, datas, N::Int)
-    bounds = grabbounds(blocks, datas, N)
+function getsamplebounds(blocks, obss, N::Int)
+    bounds = grabbounds(blocks, obss, N)
     isnothing(bounds) && error("Could not detect $N-dimensional bounds needed for projective
 transformations from blocks $(blocks)! Bounds can be grabbed from arrays
 like `Image{$N}` block data.")

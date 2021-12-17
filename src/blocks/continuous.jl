@@ -2,8 +2,8 @@
 """
     Continuous(size) <: Block
 
-`Block` for collections of numbers. `data` is valid if it's
-length is `size` and contains `Number`s.
+`Block` for collections of numbers. `obs` is a valid observation
+if it's length is `size` and contains `Number`s.
 """
 struct Continuous <: Block
     size::Int

@@ -19,7 +19,7 @@ function checkblock(::EncodedTableRow{M, N}, x::Tuple{Vector, Vector}) where {M,
 end
 
 
-function showblock!(io, ::ShowText, block::EncodedTableRow, data)
+function showblock!(io, ::ShowText, block::EncodedTableRow, obs)
     print(io, "EncodedTableRow(...)")
 end
 

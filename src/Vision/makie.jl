@@ -2,27 +2,27 @@
 
 
 
-function showblock!(grid, ::ShowMakie, block::Image{2}, data)
+function showblock!(grid, ::ShowMakie, block::Image{2}, obs)
     ax = cleanaxis(grid[1, 1])
-    plotimage!(ax, data)
+    plotimage!(ax, obs)
 end
-function showblock!(grid, ::ShowMakie, block::Mask{2}, data)
+function showblock!(grid, ::ShowMakie, block::Mask{2}, obs)
     ax = cleanaxis(grid[1, 1])
-    plotmask!(ax, data, block.classes)
+    plotmask!(ax, obs, block.classes)
 end
 
 
-function showblock!(grid, ::ShowMakie, block::Keypoints{2}, data)
+function showblock!(grid, ::ShowMakie, block::Keypoints{2}, obs)
     ax = cleanaxis(grid[1, 1])
-    h = maximum(first.(data))
-    ks = [SVector(x, h-y) for (y, x) in data]
+    h = maximum(first.(obs))
+    ks = [SVector(x, h-y) for (y, x) in obs]
     Makie.scatter!(ax, ks)
 end
 
-function showblock!(grid, ::ShowMakie, block::Bounded{2, <:Keypoints{2}}, data)
+function showblock!(grid, ::ShowMakie, block::Bounded{2, <:Keypoints{2}}, obs)
     ax = cleanaxis(grid[1, 1])
     h, w = block.size
-    ks = [SVector(x, h-y) for (y, x) in data]
+    ks = [SVector(x, h-y) for (y, x) in obs]
     Makie.xlims!(ax, 0, w)
     Makie.ylims!(ax, 0, h)
     Makie.scatter!(ax, ks)

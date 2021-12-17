@@ -68,25 +68,25 @@ encodestate(only::Only, args...) = encodestate(only.encoding, args...)
 decodestate(only::Only, args...) = decodestate(only.encoding, args...)
 
 
-function encode(only::Only, ctx, block::Block, data; kwargs...)
-    _encode(only, ctx, block, data; kwargs...)
+function encode(only::Only, ctx, block::Block, obs; kwargs...)
+    _encode(only, ctx, block, obs; kwargs...)
 end
-function encode(only::Only, ctx, block::WrapperBlock, data; kwargs...)
-    _encode(only, ctx, block, data; kwargs...)
+function encode(only::Only, ctx, block::WrapperBlock, obs; kwargs...)
+    _encode(only, ctx, block, obs; kwargs...)
 end
-function _encode(only, ctx, block, data; kwargs...)
-    return only.fn(block) ? encode(only.encoding, ctx, block, data; kwargs...) : data
+function _encode(only, ctx, block, obs; kwargs...)
+    return only.fn(block) ? encode(only.encoding, ctx, block, obs; kwargs...) : obs
 end
 
-function decode(only::Only, ctx, block::Block, data; kwargs...)
-    _decode(only, ctx, block, data; kwargs...)
+function decode(only::Only, ctx, block::Block, obs; kwargs...)
+    _decode(only, ctx, block, obs; kwargs...)
 end
-function decode(only::Only, ctx, block::WrapperBlock, data; kwargs...)
-    _decode(only, ctx, block, data; kwargs...)
+function decode(only::Only, ctx, block::WrapperBlock, obs; kwargs...)
+    _decode(only, ctx, block, obs; kwargs...)
 end
-function _decode(only, ctx, block, data; kwargs...)
+function _decode(only, ctx, block, obs; kwargs...)
     return only.fn(decodedblock(only.encoding, block)) ?
-           decode(only.encoding, ctx, block, data; kwargs...) : data
+           decode(only.encoding, ctx, block, obs; kwargs...) : obs
 end
 
 # ## Test
@@ -95,8 +95,8 @@ InlineTest.@testset "Only [block]" begin
     encx = Only(:x, OneHot())
     inblock = Label(1:100)
     inblocknamed = Named(:x, inblock)
-    data = mockblock(inblock)
-    encdata = encode(OneHot(), Training(), inblock, data)
+    obs = mockblock(inblock)
+    encobs = encode(OneHot(), Training(), inblock, obs)
 
     @test encodedblock(encx, inblock) === nothing
     @test encodedblock(encx, inblocknamed) isa Named{:x}
@@ -110,17 +110,17 @@ InlineTest.@testset "Only [block]" begin
     @test decodedblock(Only(Named, OneHot()), outblock) === nothing
     @test decodedblock(Only(Named, OneHot()), outblocknamed) isa Named{:x}
 
-    @test encode(encx, Training(), inblock, data) == data
-    @test encode(encx, Training(), inblocknamed, data) != data
+    @test encode(encx, Training(), inblock, obs) == obs
+    @test encode(encx, Training(), inblocknamed, obs) != obs
 
-    @test decode(encx, Training(), outblock, encdata) == encdata
-    @test decode(encx, Training(), outblocknamed, encdata) != encdata
+    @test decode(encx, Training(), outblock, encobs) == encobs
+    @test decode(encx, Training(), outblocknamed, encobs) != encobs
 
     tfm = OneHot()
     only = Only(:name, tfm)
     block = Named(:name, Label(["cat", "dog"]))
-    data = mockblock(block)
-    testencoding(only, block, data)
-    testencoding(only, (block, wrapped(block)), (data, data))
+    obs = mockblock(block)
+    testencoding(only, block, obs)
+    testencoding(only, (block, wrapped(block)), (obs, obs))
     @test encodedblock(only, wrapped(block)) isa Nothing
 end

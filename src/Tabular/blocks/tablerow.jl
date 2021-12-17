@@ -68,16 +68,16 @@ end
 
 # ## Interpretation
 
-function showblock!(io, ::ShowText, block::TableRow, data)
+function showblock!(io, ::ShowText, block::TableRow, obs)
     rowdata = vcat(
-        [data[col] for col in block.catcols],
-        [data[col] for col in block.contcols],
+        [obs[col] for col in block.catcols],
+        [obs[col] for col in block.contcols],
     )
     rownames = [block.catcols..., block.contcols...]
     tabledata = hcat(rownames, rowdata)
     PrettyTables.pretty_table(
         io, tabledata;
         alignment=[:r, :l],
-        highlighters=PrettyTables.Highlighter((data, i, j) -> (j == 2), bold=true),
+        highlighters=PrettyTables.Highlighter((obs, i, j) -> (j == 2), bold=true),
         noheader=true, tf=PrettyTables.tf_borderless,)
 end

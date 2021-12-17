@@ -9,7 +9,7 @@ function createhandle(backend::ShowMakie; kwargs...)
     return grid
 end
 
-function showblock(backend::ShowMakie, block, data)
+function showblock(backend::ShowMakie, block, obs)
     # Calculate resolution based on number of blocks and size for one block
     # A margin of 10% is added for titles
     width = _nblocks(block) * backend.size[2]
@@ -18,7 +18,7 @@ function showblock(backend::ShowMakie, block, data)
 
     grid = createhandle(backend, resolution = (width, height))
     fig = grid.parent.parent
-    showblock!(grid, backend, block, data)
+    showblock!(grid, backend, block, obs)
     return fig
 end
 
@@ -27,12 +27,12 @@ _nblocks(b::AbstractBlock) = 1
 _nblocks((_, block)::Pair) = _nblocks(block)
 
 
-function showblock!(grid, backend::ShowMakie, (title, block)::Pair, data)
-    showblock!(grid[1, 1], backend, block, data)
+function showblock!(grid, backend::ShowMakie, (title, block)::Pair, obs)
+    showblock!(grid[1, 1], backend, block, obs)
 end
 
 
-function showblock!(grid, backend::ShowMakie, blocks::Tuple, datas::Tuple)
+function showblock!(grid, backend::ShowMakie, blocks::Tuple, obss::Tuple)
     header = [block isa Pair ? first(block) : "" for block in blocks]
     blocks = Tuple(block isa Pair ? last(block) : block for block in blocks)
 
@@ -41,10 +41,10 @@ function showblock!(grid, backend::ShowMakie, blocks::Tuple, datas::Tuple)
 
     # Show blocks in a row
     col = 1
-    for (i, (block, data)) in enumerate(zip(blocks, datas))
+    for (i, (block, obs)) in enumerate(zip(blocks, obss))
         w = _nblocks(block)
         subgrid = grid[1, col:col+w-1] = GridLayout(tellheight = false)
-        showblock!(subgrid, backend, block, data)
+        showblock!(subgrid, backend, block, obs)
         for j = col:col+w-1
             colsize!(grid, j, Makie.Fixed(backend.size[1]))
         end
@@ -60,30 +60,30 @@ function showblock!(grid, backend::ShowMakie, blocks::Tuple, datas::Tuple)
 end
 
 
-function showblocks(backend::ShowMakie, block, datas)
+function showblocks(backend::ShowMakie, block, obss)
     width = _nblocks(block) * backend.size[2]
-    height = round(Int, length(datas) * 1.1 * backend.size[1])
+    height = round(Int, length(obss) * 1.1 * backend.size[1])
     res = (width * 1.2, height * 1.1)
 
     grid = createhandle(backend, resolution = res)
     fig = grid.parent.parent
 
-    showblocks!(grid, backend, block, datas)
+    showblocks!(grid, backend, block, obss)
     return fig
 end
 
 
-function showblocks!(grid, backend::ShowMakie, blocks::Tuple, datas::AbstractVector)
+function showblocks!(grid, backend::ShowMakie, blocks::Tuple, obss::AbstractVector)
     header = [block isa Pair ? first(block) : "" for block in blocks]
     blocks = Tuple(block isa Pair ? last(block) : block for block in blocks)
     n = _nblocks(blocks)
 
 
     # Show each sample in one row
-    for (i, data) in enumerate(datas)
+    for (i, obs) in enumerate(obss)
         subgrid = grid[i, 1:n] = GridLayout(tellheight = false)
         rowsize!(grid, i, Makie.Fixed(backend.size[2]))
-        showblock!(subgrid, backend, blocks, data)
+        showblock!(subgrid, backend, blocks, obs)
     end
 
     for i = 1:n
@@ -99,20 +99,20 @@ function showblocks!(grid, backend::ShowMakie, blocks::Tuple, datas::AbstractVec
         col += w
     end
 end
-showblocks!(grid, backend::ShowMakie, block, datas::AbstractVector) =
-    showblocks!(grid, backend, (block,), map(data -> (data,), datas))
+showblocks!(grid, backend::ShowMakie, block, obss::AbstractVector) =
+    showblocks!(grid, backend, (block,), map(obs -> (obs,), obss))
 
 ## Block definitions
 
 
-function showblock!(grid, ::ShowMakie, block::Label, data)
+function showblock!(grid, ::ShowMakie, block::Label, obs)
     ax = cleanaxis(grid[1, 1])
-    text!(ax, string(data), space = :data)
+    text!(ax, string(obs), space = :data)
 end
 
-function showblock!(grid, ::ShowMakie, block::LabelMulti, data)
+function showblock!(grid, ::ShowMakie, block::LabelMulti, obs)
     ax = cleanaxis(grid[1, 1])
-    text!(ax, join(string.(data), "\n"), space = :data)
+    text!(ax, join(string.(obs), "\n"), space = :data)
 end
 
 
@@ -120,13 +120,13 @@ function showblock!(
     grid,
     ::ShowMakie,
     block::Union{<:OneHotTensor{0},<:OneHotTensorMulti{0}},
-    data,
+    obs,
 )
-    if !(sum(data) ≈ 1)
-        data = softmax(data)
+    if !(sum(obs) ≈ 1)
+        obs = softmax(obs)
     end
     ax = Axis(grid[1, 1], yticks = (1:length(block.classes), string.(block.classes)))
-    barplot!(ax, data, direction = :x)
+    barplot!(ax, obs, direction = :x)
     hidespines!(ax)
 end
 

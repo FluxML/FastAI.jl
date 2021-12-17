@@ -23,15 +23,15 @@ mockblock(block::Keypoints{N}) where {N} = rand(SVector{N,Float32}, block.sz)
 
 # ## Visualization
 
-function showblock!(io, ::ShowText, block::Keypoints{2}, data)
-    print(io, UnicodePlots.scatterplot(first.(data), last.(data), marker=:cross))
+function showblock!(io, ::ShowText, block::Keypoints{2}, obs)
+    print(io, UnicodePlots.scatterplot(first.(obs), last.(obs), marker=:cross))
 end
 
 
-function showblock!(io, ::ShowText, block::Bounded{2, <:Keypoints{2}}, data)
+function showblock!(io, ::ShowText, block::Bounded{2, <:Keypoints{2}}, obs)
     h, w = block.size
     plot = UnicodePlots.scatterplot(
-        first.(data), last.(data),
+        first.(obs), last.(obs),
         xlim=(0, w), ylim=(0, h), marker=:cross)
     print(io, plot)
 end

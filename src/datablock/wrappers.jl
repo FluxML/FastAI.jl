@@ -8,7 +8,7 @@ function setwrapped(w::WrapperBlock, b)
     return Setfield.@set w.block = b
 end
 mockblock(w::WrapperBlock) = mockblock(wrapped(w))
-checkblock(w::WrapperBlock, data) = checkblock(wrapped(w), data)
+checkblock(w::WrapperBlock, obs) = checkblock(wrapped(w), obs)
 
 # If not overwritten, encodings are applied to the wrapped block
 """
@@ -87,12 +87,12 @@ end
 # Encoding and decoding, if not overwritten for specific wrapper, are fowarded
 # to wrapped block.
 
-function encode(enc::Encoding, ctx, wrapper::WrapperBlock, data; kwargs...)
-    return encode(enc, ctx, wrapped(wrapper), data; kwargs...)
+function encode(enc::Encoding, ctx, wrapper::WrapperBlock, obs; kwargs...)
+    return encode(enc, ctx, wrapped(wrapper), obs; kwargs...)
 end
 
-function decode(enc::Encoding, ctx, wrapper::WrapperBlock, data; kwargs...)
-    return decode(enc, ctx, wrapped(wrapper), data; kwargs...)
+function decode(enc::Encoding, ctx, wrapper::WrapperBlock, obs; kwargs...)
+    return decode(enc, ctx, wrapped(wrapper), obs; kwargs...)
 end
 
 
