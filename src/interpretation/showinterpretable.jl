@@ -67,8 +67,8 @@ Decode `block` by successively applying `encodings` to decode in
 reverse order until `f(block') == false`.
 """
 function decodewhile(f, encodings, ctx, block::AbstractBlock, obs)
-    encodings === () && return nothing
     if f(block)
+        encodings === () && return nothing
         return decodewhile(
             f,
             encodings[1:end-1],
