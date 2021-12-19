@@ -1,7 +1,7 @@
 
 
 """
-    showblockinterpretable(backend, encodings, block, data)
+    showblockinterpretable(backend, encodings, block, obs)
 
 Decode `block` successively by applying `encodings` until a block is gotten
 that can be shown by `backend`. Useful to visualize encoded data that
@@ -21,35 +21,35 @@ showblockinterpretable(ShowText(), encodings, block, x)  # will decode to an `Im
 ```
 
 """
-function showblockinterpretable(backend::ShowBackend, encodings, block, data)
+function showblockinterpretable(backend::ShowBackend, encodings, block, obs)
     res = decodewhile(
         block -> !isshowable(backend, block),
         encodings,
         Validation(),
         block,
-        data)
+        obs)
     isnothing(res) && error("Could not decode to an interpretable block representation!")
-    block_, data_ = res
-    showblock(backend, block_, data_)
+    block_, obs_ = res
+    showblock(backend, block_, obs_)
 end
 
 
 """
-    showblocksinterpretable(backend, encodings, block, datas)
+    showblocksinterpretable(backend, encodings, block, obss)
 
 Multi-sample version [`showblockinterpretable`](#).
 """
-function showblocksinterpretable(backend::ShowBackend, encodings, block, datas::AbstractVector)
-    blockdatas = [decodewhile(
+function showblocksinterpretable(backend::ShowBackend, encodings, block, obss::AbstractVector)
+    blockobss = [decodewhile(
         block -> !isshowable(backend, block),
         encodings,
         Validation(),
         block,
-        data) for data in datas]
-    any(isnothing, blockdatas) && error("Could not decode to an interpretable block representation!")
-    block_ = first(first(blockdatas))
-    datas_ = last.(blockdatas)
-    showblocks(backend, block_, datas_)
+        obs) for obs in obss]
+    any(isnothing, blockobss) && error("Could not decode to an interpretable block representation!")
+    block_ = first(first(blockobss))
+    obss_ = last.(blockobss)
+    showblocks(backend, block_, obss_)
 end
 
 
@@ -61,42 +61,42 @@ function isshowable(backend::S, block::B) where {S<:ShowBackend, B<:AbstractBloc
 end
 
 """
-    decodewhile(f, encodings, ctx, block, data) -> (block', data')
+    decodewhile(f, encodings, ctx, block, obs) -> (block', obs')
 
 Decode `block` by successively applying `encodings` to decode in
 reverse order until `f(block') == false`.
 """
-function decodewhile(f, encodings, ctx, block::AbstractBlock, data)
-    encodings === () && return nothing
+function decodewhile(f, encodings, ctx, block::AbstractBlock, obs)
     if f(block)
+        encodings === () && return nothing
         return decodewhile(
             f,
             encodings[1:end-1],
             ctx,
-            decodedblock(encodings[end], block, true),
-            decode(encodings[end], ctx, block, data),
+            decodedblockfilled(encodings[end], block),
+            decode(encodings[end], ctx, block, obs),
         )
     else
-        return (block, data)
+        return (block, obs)
     end
 end
 
 
-function decodewhile(f, encodings, ctx, blocks::Tuple, datas::Tuple)
+function decodewhile(f, encodings, ctx, blocks::Tuple, obss::Tuple)
     encodings === () && return nothing
-    results = Tuple(decodewhile(f, encodings, ctx, block, data)
-                for (block, data) in zip(blocks, datas))
+    results = Tuple(decodewhile(f, encodings, ctx, block, obs)
+                for (block, obs) in zip(blocks, obss))
     any(isnothing, results) && return nothing
     blocks = first.(results)
-    datas = last.(results)
-    return blocks, datas
+    obss_ = last.(results)
+    return blocks, obss_
 end
 
 
-function decodewhile(f, encodings, ctx, (title, block)::Pair, data)
+function decodewhile(f, encodings, ctx, (title, block)::Pair, obs)
     encodings === () && return nothing
-    res = decodewhile(f, encodings, ctx, block, data)
+    res = decodewhile(f, encodings, ctx, block, obs)
     isnothing(res) && return nothing
-    block_, data_ = res
-    (title => block_, data_)
+    block_, obs_ = res
+    (title => block_, obs_)
 end

@@ -1,97 +1,32 @@
 
-include("imports.jl")
 
-##
+ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 
-@testset ExtendedTestSet "FastAI.jl" begin
-    @testset ExtendedTestSet "Inline tests" begin
-        ReTest.retest(FastAI)
-    end
-    @testset ExtendedTestSet "datablock.jl" begin
-        include("datablock.jl")
-    end
+using FastAI
+using ReTest
+FastAI.runtests([ReTest.fail, ReTest.not(ReTest.pass)])
 
-    @testset ExtendedTestSet "fasterai.jl" begin
-        include("fasterai.jl")
-    end
+module FastAITests
 
-    @testset ExtendedTestSet "encodings/" begin
-        @testset ExtendedTestSet "projective.jl" begin
-            include("encodings/projective.jl")
-        end
-        @testset ExtendedTestSet "imagepreprocessing.jl" begin
-            include("encodings/imagepreprocessing.jl")
-        end
-        @testset ExtendedTestSet "keypointpreprocessing.jl" begin
-            include("encodings/keypointpreprocessing.jl")
-        end
-        @testset ExtendedTestSet "many.jl" begin
-            include("encodings/many.jl")
-        end
-        @testset ExtendedTestSet "tabularpreprocessing.jl" begin
-            include("encodings/tabularpreprocessing.jl")
-        end
-    end
+using InlineTest
 
-    @testset ExtendedTestSet "methods/" begin
-        @testset ExtendedTestSet "imageclassification.jl" begin
-            include("methods/imageclassification.jl")
-        end
-        @testset ExtendedTestSet "imagesegmentation.jl" begin
-            include("methods/imagesegmentation.jl")
-        end
-        @testset ExtendedTestSet "imagekeypointregression.jl" begin
-            include("methods/imagekeypointregression.jl")
-        end
-        @testset ExtendedTestSet "tabularclassification.jl" begin
-            include("methods/tabularclassification.jl")
-        end
-        @testset ExtendedTestSet "tabularregression.jl" begin
-            include("methods/tabularregression.jl")
-        end
-    end
+using ..FastAI
+import ..FastAI: Block, Encoding, encodedblock, decodedblock, encode, decode,
+    testencoding, test_method_show, checkblock
+using ..FastAI.Tabular: EncodedTableRow
+using Flux.Optimise: Optimiser, ADAM, apply!
+import Makie
 
-    @testset ExtendedTestSet "datasets/" begin
-        @testset ExtendedTestSet "transformations.jl" begin
-            include("datasets/transformations.jl")
-        end
-        @testset ExtendedTestSet "containers.jl" begin
-            include("datasets/containers.jl")
-        end
-        @testset ExtendedTestSet "recipes.jl" begin
-            include("datasets/recipes.jl")
-        end
-        @testset ExtendedTestSet "registry.jl" begin
-            include("datasets/registry.jl")
-        end
-    end
+ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
+include("testdata.jl")
 
-    @testset ExtendedTestSet "learner.jl" begin
-        include("learner.jl")
-    end
 
-    @testset ExtendedTestSet "training/" begin
-        @testset ExtendedTestSet "paramgroups.jl" begin
-            include("training/paramgroups.jl")
-        end
-        @testset ExtendedTestSet "discriminativelrs.jl" begin
-            include("training/discriminativelrs.jl")
-        end
-        @testset ExtendedTestSet "fitonecycle.jl" begin
-            include("training/fitonecycle.jl")
-        end
-        @testset ExtendedTestSet "finetune.jl" begin
-            include("training/finetune.jl")
-        end
-        @testset ExtendedTestSet "lrfind.jl" begin
-            include("training/lrfind.jl")
-        end
-        # TODO: test learning rate finder
-    end
+include("encodingapi.jl")
+include("fasterai.jl")
+include("training.jl")
 
-    @testset ExtendedTestSet "models/" begin
-        @testset ExtendedTestSet "tabularmodel.jl" begin
-            include("models/tabularmodel.jl")
-        end
-    end
+include("makie.jl")
+
 end
+
+FastAITests.runtests([ReTest.fail, ReTest.not(ReTest.pass)])

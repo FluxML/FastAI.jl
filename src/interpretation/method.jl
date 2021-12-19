@@ -51,7 +51,7 @@ showsamples(method::BlockMethod, samples) = showsamples(default_showbackend(), m
 Show an encoded sample `encsample` to `backend`.
 """
 function showencodedsample(backend::ShowBackend, method::BlockMethod, encsample)
-    xblock, yblock = encodedblock(method.encodings, method.blocks, true)
+    xblock, yblock = encodedblockfilled(method.encodings, method.blocks)
     showblockinterpretable(
         backend,
         method.encodings,
@@ -66,7 +66,7 @@ showencodedsample(method, encsample) = showencodedsample(default_showbackend(), 
 Show a vector of encoded samples `encsamples` to `backend`.
 """
 function showencodedsamples(backend::ShowBackend, method::BlockMethod, encsamples::AbstractVector)
-    xblock, yblock = encodedblock(method.encodings, method.blocks, true)
+    xblock, yblock = encodedblockfilled(method.encodings, method.blocks)
     showblocksinterpretable(
         backend,
         method.encodings,
@@ -93,12 +93,12 @@ Show a prediction `pred`. If a `sample` is also given, show it next to
 the prediction.
 """
 function showprediction(backend::ShowBackend, method::BlockMethod, pred)
-    predblock = decodedblock(method.encodings, method.outputblock, true)
+    predblock = decodedblockfilled(method.encodings, method.outputblock)
     showblock(backend, "Prediction" => predblock, pred)
 end
 
 function showprediction(backend::ShowBackend, method::BlockMethod, sample, pred)
-    predblock = decodedblock(method.encodings, method.outputblock, true)
+    predblock = decodedblockfilled(method.encodings, method.outputblock)
     showblock(
         backend,
         ("Sample" => method.blocks, "Prediction" => predblock),
@@ -118,12 +118,12 @@ Show predictions `pred`. If `samples` are also given, show them next to
 the prediction.
 """
 function showpredictions(backend::ShowBackend, method::BlockMethod, preds)
-    predblock = decodedblock(method.encodings, method.outputblock, true)
+    predblock = decodedblockfilled(method.encodings, method.outputblock)
     showblocks(backend, "Prediction" => predblock, preds)
 end
 
 function showpredictions(backend::ShowBackend, method::BlockMethod, samples, preds)
-    predblock = decodedblock(method.encodings, method.outputblock, true)
+    predblock = decodedblockfilled(method.encodings, method.outputblock)
     showblocks(
         backend,
         ("Sample" => method.blocks, "Prediction" => predblock),
@@ -145,7 +145,7 @@ function showoutput(backend::ShowBackend, method::BlockMethod, output)
     showblockinterpretable(backend, method.encodings, "Output" => method.outputblock, output)
 end
 function showoutput(backend::ShowBackend, method::BlockMethod, encsample, output)
-    encsampleblock = encodedblock(method.encodings, method.blocks, true)
+    encsampleblock = encodedblockfilled(method.encodings, method.blocks)
     outblock = method.outputblock
     showblockinterpretable(
         backend,
@@ -167,7 +167,7 @@ function showoutputs(backend::ShowBackend, method::BlockMethod, outputs)
     showblocks(backend, "Output" => method.outputblock, outputs)
 end
 function showoutputs(backend::ShowBackend, method::BlockMethod, encsamples, outputs)
-    encsampleblock = encodedblock(method.encodings, method.blocks, true)
+    encsampleblock = encodedblockfilled(method.encodings, method.blocks)
     outblock = method.outputblock
     showblocksinterpretable(
         backend,

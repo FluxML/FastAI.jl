@@ -10,7 +10,7 @@ struct BlockMethod{B, E, O} <: LearningMethod
     outputblock::O
 end
 
-function BlockMethod(blocks, encodings; outputblock = encodedblock(encodings, blocks[2], true))
+function BlockMethod(blocks, encodings; outputblock = encodedblockfilled(encodings, blocks[2]))
     return BlockMethod(blocks, encodings, outputblock)
 end
 
@@ -46,17 +46,17 @@ end
 # Training interface
 
 function methodmodel(method::BlockMethod, backbone)
-    xblock = encodedblock(method.encodings, method.blocks[1], true)
+    xblock = encodedblockfilled(method.encodings, method.blocks[1])
     return blockmodel(xblock, method.outputblock, backbone)
 end
 
 function methodmodel(method::BlockMethod)
-    xblock = encodedblock(method.encodings, method.blocks[1], true)
+    xblock = encodedblockfilled(method.encodings, method.blocks[1])
     return blockmodel(xblock, method.outputblock, blockbackbone(xblock))
 end
 
 function methodlossfn(method::BlockMethod)
-    yblock = encodedblock(method.encodings, method.blocks[2], true)
+    yblock = encodedblockfilled(method.encodings, method.blocks[2])
     return blocklossfn(method.outputblock, yblock)
 end
 

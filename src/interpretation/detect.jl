@@ -12,5 +12,9 @@ Else, return [`ShowText`](#).
 default_showbackend() = ShowText()
 
 
-showblock(block, data) = showblock(default_showbackend(), block, data)
-showblocks(block, datas) = showblocks(default_showbackend(), block, datas)
+showblock(block, obs) = showblock(default_showbackend(), block, obs)
+showblocks(block, obss) = showblocks(default_showbackend(), block, obss)
+showblockinterpretable(encodings, block, obs) =
+    showblockinterpretable(default_showbackend(), encodings, block, obs)
+showblocksinterpretable(encodings, block, obs) =
+    showblocksinterpretable(default_showbackend(), encodings, block, obs)

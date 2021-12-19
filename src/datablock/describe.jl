@@ -5,7 +5,7 @@ function listencodeblocks(encodings, blocks)
     changedblocks = Any[tuplemap(_ -> false, blocks)]
     for encoding in encodings
         push!(changedblocks, tuplemap(x -> !isnothing(x), encodedblock(encoding, blocks)))
-        blocks = encodedblock(encoding, blocks, true)
+        blocks = encodedblockfilled(encoding, blocks)
         push!(filledblocks, blocks)
     end
     return filledblocks, changedblocks
@@ -16,7 +16,7 @@ function listdecodeblocks(encodings, blocks)
     changedblocks = Any[tuplemap(_ -> false, blocks)]
     for encoding in Iterators.reverse(encodings)
         push!(changedblocks, tuplemap(x -> !isnothing(x), decodedblock(encoding, blocks)))
-        blocks = decodedblock(encoding, blocks, true)
+        blocks = decodedblockfilled(encoding, blocks)
         push!(filledblocks, blocks)
     end
     return filledblocks, changedblocks
