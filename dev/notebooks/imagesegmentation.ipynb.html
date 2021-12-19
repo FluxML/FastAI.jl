@@ -45,7 +45,7 @@ data = (images, masks)</code></pre><pre class=coderesult ><code>(mapobs(loadfile
  "TrafficLight"  "TrafficLight"     "TrafficLight"  "Column_Pole"
  "OtherMoving"   "TrafficLight"     "TrafficLight"  "TrafficLight"
  "OtherMoving"   "TrafficLight"     "TrafficLight"  "Column_Pole"
- "OtherMoving"   "OtherMoving"   …  "TrafficLight"  "TrafficLight"</code></pre><p>Next we need to create a learning method for image segmentation. This means using images to predict masks, so we’ll use the <a href=../REFERENCE/FastAI.Image.html ><code>Image</code></a> and <a href=../REFERENCE/FastAI.Mask.html ><code>Mask</code></a> blocks as input and target. Since the dataset is 2D, we’ll use 2-dimensional blocks.</p><pre lang=julia ><code>method = BlockMethod(
+ "OtherMoving"   "OtherMoving"   …  "TrafficLight"  "TrafficLight"</code></pre><p>Next we need to create a learning method for image segmentation. This means using images to predict masks, so we’ll use the <a href=../REFERENCE/DataAugmentation.Image.html ><code>Image</code></a> and <a href=../REFERENCE/FastAI.Mask.html ><code>Mask</code></a> blocks as input and target. Since the dataset is 2D, we’ll use 2-dimensional blocks.</p><pre lang=julia ><code>method = BlockMethod(
     (Image{2}(), Mask{2}(classes)),
     (
         ProjectiveTransforms((128, 128)),
