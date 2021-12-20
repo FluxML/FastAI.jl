@@ -100,7 +100,7 @@ registerlearningmethod!(FASTAI_METHOD_REGISTRY, ImageClassificationMulti, (Image
 
 @testset "ImageClassificationSingle [method]" begin
     method = ImageClassificationSingle((16, 16), [1, 2])
-    testencoding(method.encodings, method.blocks)
+    testencoding(getencodings(method), getblocks(method).sample)
     DLPipelines.checkmethod_core(method)
     @test_nowarn methodlossfn(method)
     @test_nowarn methodmodel(method, Models.xresnet18())
@@ -140,7 +140,7 @@ end
 
     method = ImageClassificationMulti((16, 16), [1, 2])
 
-    testencoding(method.encodings, method.blocks)
+    testencoding(getencodings(method), getblocks(method).sample)
     DLPipelines.checkmethod_core(method)
     @test_nowarn methodlossfn(method)
     @test_nowarn methodmodel(method, Models.xresnet18())

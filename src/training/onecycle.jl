@@ -15,6 +15,7 @@ to `lrmax` and then goes down to `lrmax/div_final` over the remaining duration.
 """
 function fitonecycle!(
         learner::Learner, nepochs::Int, maxlr=0.1;
+        phases = (TrainingPhase(), ValidationPhase()),
         dataiters=(learner.data.training, learner.data.validation),
         wd=0.,
         kwargs...)
@@ -28,7 +29,11 @@ function fitonecycle!(
     wdoptim = wd > 0 ? decay_optim(learner.optimizer, wd) : learner.optimizer
     withfields(learner, optimizer=wdoptim) do
         withcallbacks(learner, scheduler) do
-            fit!(learner, nepochs, dataiters)
+            for _ in 1:nepochs
+                for (phase, data) in zip(phases, dataiters)
+                    epoch!(learner, phase, data)
+                end
+            end
         end
     end
 end

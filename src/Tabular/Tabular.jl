@@ -5,7 +5,7 @@ using ..FastAI
 using ..FastAI:
     # blocks
     Block, WrapperBlock, AbstractBlock, OneHotTensor, OneHotTensorMulti, Label,
-    LabelMulti, wrapped, Continuous,
+    LabelMulti, wrapped, Continuous, getencodings, getblocks,
     # encodings
     Encoding, StatefulEncoding, OneHot,
     # visualization

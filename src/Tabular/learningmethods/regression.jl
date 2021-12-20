@@ -7,7 +7,7 @@ function TabularRegression(
     return BlockMethod(
         blocks,
         (setup(TabularPreprocessing, blocks[1], tabledata),),
-        outputblock=blocks[2]
+        ŷblock=blocks[2],
     )
 end
 
@@ -45,17 +45,17 @@ end
     td = TableDataset(df)
     targets = [rand(2) for _ in 1:4]
     method = TabularRegression(2, td; catcols=(:B,), contcols=(:A,))
-    testencoding(method.encodings, method.blocks)
+    testencoding(getencodings(method), getblocks(method).sample)
     DLPipelines.checkmethod_core(method)
     @test_nowarn methodlossfn(method)
     @test_nowarn methodmodel(method)
 
     @testset "`encodeinput`" begin
-        row = mockblock(method.blocks[1])
+        row = mockblock(getblocks(method).input)
 
         xtrain = encodeinput(method, Training(), row)
-        @test length(xtrain[1]) == length(method.blocks[1].catcols)
-        @test length(xtrain[2]) == length(method.blocks[1].contcols)
+        @test length(xtrain[1]) == length(getblocks(method).input.catcols)
+        @test length(xtrain[2]) == length(getblocks(method).input.contcols)
 
         @test eltype(xtrain[1]) <: Number
     end
