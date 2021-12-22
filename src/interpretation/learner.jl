@@ -1,5 +1,3 @@
-# High-level plotting functions for use with `BlockMethod` and a `Learner`
-
 
 """
     showoutputs(method, learner[; n = 4, context = Validation()])

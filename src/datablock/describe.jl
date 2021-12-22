@@ -28,14 +28,25 @@ tuplemap(f, args::Vararg{Tuple}) = map((as...) -> tuplemap(f, as...), args...)
 function blockcolumn(encodings, block; decode = false)
     blocks, changed =
         decode ? listdecodeblocks(encodings, block) : listencodeblocks(encodings, block)
+    n = length(blocks)
     blockscol = [
-        tuplemap((b, c) -> c ? "**`$(typeof(b))`**" : "`$(typeof(b))`", bs, ch) for
-        (bs, ch) in zip(blocks, changed)
+        tuplemap((b, c) -> _blockcell(b, c, i), bs, ch) for
+        (i, bs, ch) in zip(1:n, blocks, changed)
     ]
     if block isa Tuple
         blockscol = [join(row, ", ") for row in blockscol]
     end
     return reshape(blockscol, :, 1)
+end
+
+function _blockcell(block, haschanged, i)
+    if haschanged
+        return "**`$(summary(block))`**"
+    elseif i == 1
+        return "`$(summary(block))`"
+    else
+        return ""
+    end
 end
 
 encodingscolumn(encodings) =
@@ -73,38 +84,54 @@ end
 
 function describemethod(method::SupervisedMethod)
     blocks = getblocks(method)
-    input, target, x, ŷ = blocks.input, blocks.target, blocks.x
+    input, target, x, ŷ = blocks.input, blocks.target, blocks.x, blocks.ŷ
 
     encoding = describeencodings(
         getencodings(method),
         getblocks(method).sample,
-        blocknames = ["`$(summary(input))`", "`$(summary(input))`"],
+        blocknames = ["`blocks.input`", "`blocks.target`"],
         inname = "`(input, target)`",
         outname = "`(x, y)`",
     )
 
-    decoding = describeencodings(
+    s = """
+    **`SupervisedMethod` summary**
+
+    Learning method for the supervised task with input `$(summary(input))` and
+    target `$(summary(target))`. Compatible with `model`s that take in
+    `$(summary(x))` and output `$(summary(ŷ))`.
+
+    Encoding a sample (`encode(method, context, sample)`) is done through
+    the following encodings:
+
+    $encoding
+    """
+
+    return Markdown.parse(s)
+end
+
+function describemethod(method::BlockMethod)
+    blocks = getblocks(method)
+
+    encoding = describeencodings(
         getencodings(method),
-        (ŷ,),
-        blocknames = ["`getblocks(method).ŷ`"],
-        inname = "`ŷ`",
-        outname = "`target_pred`",
-        decode = true,
+        (blocks.sample,),
+        blocknames = ["sample"],
+        inname = "`sample`",
+        outname = "`encodedsample`",
     )
 
     s = """
-    #### `LearningMethod` summary
+    **`BlockMethod` summary**
 
-    - Task: `$(summary(input)) -> $(summary(target))`
-    - Model blocks: `$(summary(x)) -> $(summary(ŷ))`
+    Learning method with blocks
 
-    Encoding a sample (`encode(method, context, sample)`)
+    $(join(["- $k: $(summary(v))" for (k, v) in zip(keys(blocks), values(blocks))], '\n'))
+
+    Encoding a sample (`encode(method, context, sample)`) is done through
+    the following encodings:
 
     $encoding
-
-    Decoding a model output (`decode(method, context, ŷ)`)
-
-    $decoding
     """
 
     return Markdown.parse(s)

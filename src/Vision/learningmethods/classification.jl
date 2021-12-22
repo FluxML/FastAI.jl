@@ -8,7 +8,7 @@ function ImageClassificationSingle(
         C=RGB{N0f8},
         computestats=false,
 	) where N
-	return BlockMethod(
+	return SupervisedMethod(
 		blocks,
 		(
 			ProjectiveTransforms(size; augmentations=aug_projections),
@@ -57,7 +57,7 @@ function ImageClassificationMulti(
         C=RGB{N0f8},
         computestats=false,
 	) where N
-	return BlockMethod(
+	return SupervisedMethod(
 		blocks,
 		(
 			ProjectiveTransforms(size; augmentations=aug_projections),

@@ -166,7 +166,7 @@ export
     TabularPreprocessing,
 
     SupervisedMethod,
-    AbstractBlockMethod,
+    BlockMethod,
     describemethod,
     checkblock,
     makebatch,
