@@ -15,12 +15,14 @@ to `lrmax` and then goes down to `lrmax/div_final` over the remaining duration.
 """
 function fitonecycle!(
         learner::Learner, nepochs::Int, maxlr=0.1;
-        phases = (TrainingPhase(), ValidationPhase()),
-        dataiters=(learner.data.training, learner.data.validation),
+        phases = (
+            TrainingPhase() => learner.data.training,
+            ValidationPhase() => learner.data.validation
+        ),
         wd=0.,
         kwargs...)
 
-    nsteps = length(learner.data.training)
+    nsteps = length(phases[1][2])
     scheduler = Scheduler(LearningRate => onecycle(
         nepochs * nsteps,
         maxlr;
@@ -30,7 +32,7 @@ function fitonecycle!(
     withfields(learner, optimizer=wdoptim) do
         withcallbacks(learner, scheduler) do
             for _ in 1:nepochs
-                for (phase, data) in zip(phases, dataiters)
+                for (phase, data) in phases
                     epoch!(learner, phase, data)
                 end
             end
