@@ -6,7 +6,6 @@ learner = methodlearner(method, data, callbacks=[ToGPU()])
 fitonecycle!(learner, 10)
 showoutputs(method, learner)
 </code></pre><p>Each of the five lines encapsulates one part of the deep learning pipeline to give a high-level API while still allowing customization. Let’s have a closer look.</p><h2 id=dataset >Dataset</h2><div class=cellcontainer cell=main lang=julia ><pre class=codecell cell=main lang=julia ><code>data, blocks = loaddataset(&quot;imagenette2-160&quot;, (Image, Label))
-</code></pre><pre class=codeoutput ><code>WARNING: both Makie and Vision export &quot;Image&quot;; uses of it in module FastAI must be qualified
 </code></pre><pre class=coderesult ><code>LoadError("string", 1, UndefVarError(:Image))</code></pre></div><p>This line downloads and loads the <a href=https://github.com/fastai/imagenette title= >ImageNette</a> image classification dataset, a small subset of ImageNet with 10 different classes. <code>data</code> is a <a href=./data_containers.md.html title= >data container</a> that can be used to load individual observations, here of images and the corresponding labels. We can use <code>getobs(data, i)</code> to load the <code>i</code>-th observation and <code>nobs</code> to find out how many observations there are.</p><div class=cellcontainer cell=main lang=julia ><pre class=codecell cell=main lang=julia ><code>image, class = sample =  getobs(data, 1000)
 @show class
 image
