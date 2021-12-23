@@ -129,4 +129,58 @@ typify(t::Tuple) = Tuple{map(typify, t)...}
 typify(block::FastAI.AbstractBlock) = typeof(block)
 
 
-# Continous
+# ## Invariants
+#
+# Invariants allow specifying properties that an instance of a data for a block
+# should have in more detail and such that actionable error messages can be given.
+
+"""
+    invariant_checkblock(block; kwargs...)
+    invariant_checkblock(blocks; kwargs...)
+
+Create a `Invariants.Invariant` that can be used to check whether an
+observation is a valid instance of `block`. This should always agree
+with `checkblock` (i.e. `checkblock(block, obs)` implies that
+`check(invariant_checkblock(block), obs)`). The invariant can however
+be used to give much more detailed information about the problem and
+be used to throw helpful error messages from functions that depend
+on these properties.
+"""
+function invariant_checkblock end
+
+
+# If `invariant_checkblock` is not implemented for a block, default to
+# checking that `checkblock` returns `true`.
+
+function invariant_checkblock(block::AbstractBlock; obsname = "obs", blockname = "block")
+    return BooleanInvariant(
+        obs -> checkblock(block, obs),
+        "`$obsname` should be valid $(typeof(block))",
+        _ -> """Expected `$obsname` to be a valid instance of block $blockname
+        with above type, but `checkblock($blockname, $obsname)` returned `false`.
+        This probably means that `$obsname` is not a valid instance of the
+        block. Check `?$(typeof(block).name.name)` for more information on
+        the block and what data is valid.
+        """,
+    )
+end
+
+# For tuples of blocks, the invariant is composed of the individuals' blocks
+# invariants, passing only if all the child invariants pass.
+
+function invariant_checkblock(blocks::Tuple; obsname = "obss", blockname = "blocks")
+    return AllInvariant(
+        [
+            WithContext(
+                obss -> obss[i],
+                isblockinvariant(
+                    blocks[i];
+                    obsname = "$obsname[$i]",
+                    blockname = "$blockname[$i]",
+                ),
+            ) for (i, block) in enumerate(blocks)
+        ],
+        name = "`$obsname` should be valid `$blockname`",
+        description = "Each `$obsname[i]` is a valid instance of block `$blockname[i]`."
+    )
+end
