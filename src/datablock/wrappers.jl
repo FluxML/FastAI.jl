@@ -2,13 +2,18 @@
 
 abstract type WrapperBlock <: AbstractBlock end
 
-wrapped(w::WrapperBlock) = w.block
+Base.parent(w::WrapperBlock) = w.block
+Base.parent(b::Block) = b
+wrapped(w::WrapperBlock) = wrapped(parent(w))
 wrapped(b::Block) = b
 function setwrapped(w::WrapperBlock, b)
+    # TODO: make recursive
     return Setfield.@set w.block = b
 end
-mockblock(w::WrapperBlock) = mockblock(wrapped(w))
-checkblock(w::WrapperBlock, obs) = checkblock(wrapped(w), obs)
+mockblock(w::WrapperBlock) = mockblock(parent(w))
+checkblock(w::WrapperBlock, obs) = checkblock(parent(w), obs)
+
+# TODO: add way to specify how wrapper blocks compose
 
 # If not overwritten, encodings are applied to the wrapped block
 """
@@ -61,7 +66,7 @@ end
 
 function encodedblock(enc::Encoding, wrapper::WrapperBlock, ::PropagateSameBlock)
     inner = encodedblock(enc, wrapped(wrapper))
-    inner == wrapped(block) && return setwrapped(wrapper, inner)
+    inner == wrapped(wrapper) && return setwrapped(wrapper, inner)
     return inner
 end
 

@@ -50,7 +50,6 @@ function methodlearner(
         backbone=nothing,
         model=nothing,
         callbacks=[],
-        pctgval=0.2,
         batchsize=16,
         optimizer=ADAM(),
         lossfn=methodlossfn(method),

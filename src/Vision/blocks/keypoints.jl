@@ -6,19 +6,19 @@ A block representing an array of size `sz` filled with keypoints of type
 `SVector{N}`.
 """
 struct Keypoints{N,M} <: Block
-    sz::NTuple{M,Int}
+    sz::NTuple{M,DimSize}
 end
 Keypoints{N}(n::Int) where {N} = Keypoints{N,1}((n,))
-Keypoints{N}(t::NTuple{M,Int}) where {N,M} = Keypoints{N,M}(t)
+Keypoints{N}(sz::Tuple) where {N} = Keypoints{N,length(sz)}(sz)
 
 function checkblock(
-    ::Keypoints{N,M},
-    ::AbstractArray{<:Union{SVector{N,T},Nothing},M},
-) where {M,N,T}
-    return true
+    b::Keypoints{N,M},
+    ks::AbstractArray{<:Union{<:SVector{N},Nothing},M},
+) where {M,N}
+    return checksize(b.sz, size(ks))
 end
 
-mockblock(block::Keypoints{N}) where {N} = rand(SVector{N,Float32}, block.sz)
+mockblock(block::Keypoints{N}) where {N} = mockarray(SVector{N,Float32}, block.sz)
 
 
 # ## Visualization
@@ -34,4 +34,16 @@ function showblock!(io, ::ShowText, block::Bounded{2, <:Keypoints{2}}, obs)
         first.(obs), last.(obs),
         xlim=(0, w), ylim=(0, h), marker=:cross)
     print(io, plot)
+end
+
+
+@testset "Keypoints [block]" begin
+    block = Keypoints{2}((10, 10))
+    @test checkblock(block, rand(SVector{2}, 10, 10))
+
+    block = Keypoints{2}((10, :))
+    @test checkblock(block, rand(SVector{2}, 10, 10))
+
+    ks = map(k -> (rand() > .5) ? k : nothing, rand(SVector{2}, 10, 10))
+    @test checkblock(block, ks)
 end

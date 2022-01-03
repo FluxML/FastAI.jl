@@ -24,7 +24,7 @@ using FluxTraining: Learner, handle
 using FluxTraining.Events
 using JLD2: jldsave, jldopen
 using Invariants: BooleanInvariant, WithMessage, AnyInvariant, AllInvariant,
-    SequenceInvariant, check_error, check
+    SequenceInvariant, WithContext, check_error, check
 using Markdown
 using MLDataPattern
 using PrettyTables
@@ -101,6 +101,7 @@ include("fasterai/learningmethods.jl")
 include("fasterai/defaults.jl")
 
 
+include("invariants.jl")
 
 # Domain-specific
 include("Vision/Vision.jl")

@@ -169,18 +169,29 @@ end
 # invariants, passing only if all the child invariants pass.
 
 function invariant_checkblock(blocks::Tuple; obsname = "obss", blockname = "blocks")
-    return AllInvariant(
+    return SequenceInvariant(
         [
-            WithContext(
-                obss -> obss[i],
-                isblockinvariant(
-                    blocks[i];
-                    obsname = "$obsname[$i]",
-                    blockname = "$blockname[$i]",
-                ),
-            ) for (i, block) in enumerate(blocks)
+            BooleanInvariant(
+                obss -> (obss isa Tuple && length(obss) == length(blocks)),
+                "$obsname should be a `Tuple` with $(length(blocks)) elements.",
+                obss -> """Instead, got a `$(sprint(show, typeof(obss)))`"""),
+            AllInvariant(
+                [
+                    WithContext(
+                        obss -> obss[i],
+                        invariant_checkblock(
+                            blocks[i];
+                            obsname = "$obsname[$i]",
+                            blockname = "$blockname[$i]",
+                        ),
+                    ) for (i, block) in enumerate(blocks)
+                ],
+                name = "`$obsname` should be valid `$blockname`",
+                description = ""
+            )
         ],
-        name = "`$obsname` should be valid `$blockname`",
-        description = "Each `$obsname[i]` is a valid instance of block `$blockname[i]`."
+        "For a tuple of blocks, an instance should be a tuple of valid instances",
+        "",
     )
+
 end
