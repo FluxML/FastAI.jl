@@ -9,8 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Made block-based learning method more modular. `SupervisedMethod` now supplants `BlockMethod`.  [PR](https://github.com/FluxML/FastAI.jl/pull/188)
+    - `getencodings` and `getblocks` should now be used to get block information and encodings from a method
+    - See the [new tutorial training a Variational Autoencoder].
+    - See also the docstrings for `AbstractBlockMethod` and `SupervisedMethod`
+
 ### Changed
 
+- `BlockMethod` now deprecated in favor of `SupervisedMethod`
 - (INTERNAL) domain-specific functionality has moved to submodules `FastAI.Vision` (computer vision) and `FastAI.Tabular` (tabular data). Exports of `FastAI` are not affected.
 - (INTERNAL) test suite now runs on InlineTest.jl
 
