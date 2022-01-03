@@ -33,62 +33,118 @@ unet = UNetDynamic(backbone, (256, 256, 3, 1); fdownscalk_out = 10)
 Flux.outputsize(unet, (256, 256, 3, 1)) == (256, 256, 10, 1)
 ```
 """
-function UNetDynamic(backbone, inputsize, final; kwargs...)
+function UNetDynamic(
+    backbone,
+    inputsize,
+    k_out::Int;
+    final = UNetFinalBlock,
+    fdownscale = 0,
+    kwargs...,
+)
     backbonelayers = collect(iterlayers(backbone))
-    unet = unet_from_layers(backbonelayers, inputsize; kwargs...)
-    outsz = Flux.outputsize(unet, inputsize)
-    return Chain(unet, final(outsz))
-end
-
-function UNetDynamic(backbone, inputsize, k_out::Int; kwargs...)
-    final = insz -> convxlayer(insz[end-1], k_out; ks = 1)
-    return UNetDynamic(backbone, inputsize, final; kwargs...)
-end
-
-
-function unet_from_layers(
+    unet = unetlayers(
         backbonelayers,
-        insz;
-        fdownscale = 0,
-        upsample = upsample_block_small,
-        agg = (mx, x) -> cat(mx, x; dims = length(insz)-1),
-        kwargs...)
-    layers = []
-    channeldim = length(insz) - 1
+        inputsize;
+        m_middle = UNetMiddleBlock,
+        skip_upscale = fdownscale,
+        kwargs...,
+    )
+    outsz = Flux.outputsize(unet, inputsize)
+    return Chain(unet, final(outsz[end-1], k_out))
+end
 
 
-    for (i, layer) in enumerate(backbonelayers)
-        outsz = Flux.outputsize(layer, insz)
-        if (insz[1] ÷ 2 == outsz[1])
-            if fdownscale == 0
-                child_unet = unet_from_layers(
-                    backbonelayers[i+1:end],
-                    outsz;
-                    upsample = upsample,
-                    fdownscale = fdownscale,
-                    agg = agg)
-                outsz = Flux.outputsize(child_unet, outsz)
+function catchannels(x1, x2)
+    ndims(x1) == ndims(x2) || error("Expected inputs with same number of dimensions!")
+    cat(x1, x2; dims = ndims(x1) - 1)
+end
 
-                upsample_k_out = insz[channeldim]
-                up = upsample(outsz, upsample_k_out; kwargs...)
 
-                push!(layers, SkipConnection(Chain(layer, child_unet, up), agg))
+function unetlayers(
+    layers,
+    sz;
+    k_out = nothing,
+    skip_upscale = 0,
+    m_middle = _ -> (identity,),
+)
+    isempty(layers) && return m_middle(sz[end-1])
 
-                break
-            else
-                fdownscale -= 1
-            end
-        end
-        push!(layers, layer)
-        insz = outsz
+    layer, layers = layers[1], layers[2:end]
+    outsz = Flux.outputsize(layer, sz)
+    does_downscale = sz[1] ÷ 2 == outsz[1]
+
+    if !does_downscale
+        # If `layer` does not scale down the spatial dimensions, append
+        # it to a Chain
+        return Chain(layer, unetlayers(layers, outsz; k_out, skip_upscale)...)
+    elseif does_downscale && skip_upscale > 0
+        # If `layer` does scale down the spatial dimensions, but we don't
+        # to upsample this one, recurse with modified arguments
+        return Chain(
+            layer,
+            unetlayers(layers, outsz; skip_upscale = skip_upscale - 1, k_out)...,
+        )
+    else
+        # `layer` scales down the spatial dimensions and we add an upsampling block
+        # and a skip connection that scales the dimensions back up
+        childunet = Chain(unetlayers(layers, outsz; skip_upscale)...)
+        outsz = Flux.outputsize(childunet, outsz)
+
+        k_in = sz[end-1]
+        k_mid = outsz[end-1]
+        k_out = isnothing(k_out) ? k_in : k_out
+        return FastAI.Vision.Models.UNetBlock(
+            Chain(layer, childunet),
+            k_in,  # Input channels to upsampling layer
+            k_mid,
+            k_out,
+        )
     end
-
-    unet = length(layers) == 1 ? only(layers) : Chain(layers...)
-    return unet
 end
 
 iterlayers(m::Chain) = Iterators.flatten(iterlayers(l) for l in m.layers)
 iterlayers(m) = (m,)
+
+
+"""
+    UNetBlock(m, k_in)
+
+Given convolutional module `m` that halves the spatial dimensions
+and outputs `k_in` filters, create a module that upsamples the
+spatial dimensions and then aggregates features via  a skip connection.
+"""
+function UNetBlock(m_child, k_in, k_mid, k_out = 2k_in)
+    return Chain(
+        upsample = SkipConnection(
+            Chain(
+                child = m_child,                              # Downsampling and processing
+                upsample = PixelShuffleICNR(k_mid, k_mid),  # Upsampling
+            ),
+            Parallel(catchannels, identity, BatchNorm(k_in)),
+        ),
+        act = xs -> relu.(xs),
+        combine = UNetCombineLayer(k_in + k_mid, k_out),  # Data from both branches is combined
+    )
+end
+
+
+function PixelShuffleICNR(k_in, k_out; r = 2)
+    return Chain(convxlayer(k_in, k_out * (r^2), ks = 1), Flux.PixelShuffle(r))
+end
+
+
+function UNetCombineLayer(k_in, k_out)
+    return Chain(convxlayer(k_in, k_out), convxlayer(k_out, k_out))
+end
+
+function UNetMiddleBlock(k)
+    return Chain(convxlayer(k, 2k), convxlayer(2k, k))
+end
+
+
+function UNetFinalBlock(k_in, k_out)
+    return Chain(ResBlock(1, k_in, k_in), convxlayer(k_in, k_out, ks = 1))
+end
 
 """
     upsample_block_small(insize, k_out)
@@ -97,10 +153,7 @@ An upsampling block that increases the spatial dimensions of the input by 2
 using pixel-shuffle upsampling.
 """
 function upsample_block_small(insize, k_out; ks = 3, kwargs...)
-    return Chain(
-        Flux.PixelShuffle(2),
-        convxlayer(insize[end-1] ÷ 4, k_out; kwargs...)
-    )
+    return Chain(Flux.PixelShuffle(2), convxlayer(insize[end-1] ÷ 4, k_out; kwargs...))
 end
 
 function conv_final(insize, k_out; ks = 1, kwargs...)
