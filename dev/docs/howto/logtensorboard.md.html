@@ -2,9 +2,9 @@
 
 dir = mktempdir()
 backend = TensorBoardBackend(dir)
-</code></pre><pre class=coderesult ><code>TensorBoardBackend(/tmp/jl_JMoyoT)</code></pre></div><p>Then we create callbacks for logging metrics and hyperparameters to that backend:</p><div class=cellcontainer cell=main lang=julia ><pre class=codecell cell=main lang=julia ><code>metricscb = LogMetrics(backend)
+</code></pre><pre class=coderesult ><code>TensorBoardBackend(/tmp/jl_GAZKbL)</code></pre></div><p>Then we create callbacks for logging metrics and hyperparameters to that backend:</p><div class=cellcontainer cell=main lang=julia ><pre class=codecell cell=main lang=julia ><code>metricscb = LogMetrics(backend)
 hparamscb = LogHyperParams(backend)
-</code></pre><pre class=coderesult ><code>LogHyperParams((TensorBoardBackend(/tmp/jl_JMoyoT),))</code></pre></div><p>Like any other callbacks, these can then be passed to a <code>Learner</code> along with other callbacks and we can start training. By using the <a href=../../REFERENCE/FluxTraining.Metrics.html ><code>Metrics</code></a> callback we can log metrics other than the loss.</p><pre lang=julia ><code>
+</code></pre><pre class=coderesult ><code>LogHyperParams((TensorBoardBackend(/tmp/jl_GAZKbL),))</code></pre></div><p>Like any other callbacks, these can then be passed to a <code>Learner</code> along with other callbacks and we can start training. By using the <a href=../../REFERENCE/FluxTraining.Metrics.html ><code>Metrics</code></a> callback we can log metrics other than the loss.</p><pre lang=julia ><code>
 callbacks = [
     metricscb,
     hparamscb,
