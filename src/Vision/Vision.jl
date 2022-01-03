@@ -29,7 +29,7 @@ using ..FastAI
 using ..FastAI:
     # blocks
     Block, WrapperBlock, AbstractBlock, OneHotTensor, OneHotTensorMulti, Label,
-    LabelMulti, wrapped,
+    LabelMulti, wrapped, getencodings, getblocks,
     # encodings
     Encoding, StatefulEncoding, OneHot,
     # visualization

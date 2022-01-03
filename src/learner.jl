@@ -97,7 +97,7 @@ end
 
 
 @testset "methodlearner" begin
-    method = BlockMethod((Label(1:2), Label(1:2)), (OneHot(),))
+    method = SupervisedMethod((Label(1:2), Label(1:2)), (OneHot(),))
     data = (rand(1:2, 1000), rand(1:2, 1000))
     @test_nowarn learner = methodlearner(method, data, model=identity)
 

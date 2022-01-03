@@ -5,7 +5,7 @@ function TabularClassificationSingle(
     tabledata, targetdata = data
     tabledata isa TableDataset || error("`data` needs to be a tuple of a `TableDataset` and targets")
 
-    return BlockMethod(
+    return SupervisedMethod(
         blocks,
         (
             setup(TabularPreprocessing, blocks[1], tabledata),
@@ -49,17 +49,17 @@ end
     td = TableDataset(df)
 
     method = TabularClassificationSingle(["P", "F"], td; catcols=(:B,), contcols=(:A,), )
-    testencoding(method.encodings, method.blocks)
+    testencoding(getencodings(method), getblocks(method).sample)
     DLPipelines.checkmethod_core(method)
     @test_nowarn methodlossfn(method)
     @test_nowarn methodmodel(method)
 
     @testset "`encodeinput`" begin
-        row = mockblock(method.blocks[1])
+        row = mockblock(getblocks(method)[1])
 
         xtrain = encodeinput(method, Training(), row)
-        @test length(xtrain[1]) == length(method.blocks[1].catcols)
-        @test length(xtrain[2]) == length(method.blocks[1].contcols)
+        @test length(xtrain[1]) == length(getblocks(method).input.catcols)
+        @test length(xtrain[2]) == length(getblocks(method).input.contcols)
 
         @test eltype(xtrain[1]) <: Number
     end
