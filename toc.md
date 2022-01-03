@@ -13,6 +13,7 @@
         - [Saving and loading models](notebooks/serialization.ipynb)
     - Advanced
         - [Presizing vision datasets](notebooks/presizing.ipynb)
+        - [Unsupervised learning](notebooks/vae.ipynb)
         - [Custom Learning methods](docs/learning_methods.md)
 - How To
     - [Train your model](notebooks/training.ipynb)

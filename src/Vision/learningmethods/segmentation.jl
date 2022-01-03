@@ -8,7 +8,7 @@ function ImageSegmentation(
         C=RGB{N0f8},
         computestats=false,
 	) where N
-	return BlockMethod(
+	return SupervisedMethod(
 		blocks,
 		(
 			ProjectiveTransforms(size; augmentations=aug_projections),
@@ -49,7 +49,7 @@ registerlearningmethod!(FASTAI_METHOD_REGISTRY, ImageSegmentation, (Image, Mask)
 @testset "ImageSegmentation [method]" begin
     @testset "2D" begin
         method = ImageSegmentation((16, 16), 1:4)
-        testencoding(method.encodings, method.blocks)
+        testencoding(getencodings(method), getblocks(method).sample)
         DLPipelines.checkmethod_core(method)
         @test_nowarn methodlossfn(method)
         @test_nowarn methodmodel(method, Models.xresnet18())
@@ -60,7 +60,7 @@ registerlearningmethod!(FASTAI_METHOD_REGISTRY, ImageSegmentation, (Image, Mask)
         end
     end
     @testset "3D" begin
-        method = BlockMethod(
+        method = SupervisedMethod(
             (Image{3}(), Mask{3}(1:4)),
             (
                 ProjectiveTransforms((16, 16, 16), inferencefactor=8),
@@ -68,7 +68,7 @@ registerlearningmethod!(FASTAI_METHOD_REGISTRY, ImageSegmentation, (Image, Mask)
                 FastAI.OneHot()
             )
         )
-        testencoding(method.encodings, method.blocks)
+        testencoding(getencodings(method), getblocks(method).sample)
         DLPipelines.checkmethod_core(method)
         @test_nowarn methodlossfn(method)
     end

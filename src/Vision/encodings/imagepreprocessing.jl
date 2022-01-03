@@ -22,6 +22,8 @@ function checkblock(block::ImageTensor{N}, a::AbstractArray{T,M}) where {M,N,T}
     return (N + 1 == M) && (size(a, M) == block.nchannels)
 end
 
+Base.summary(io::IO, ::ImageTensor{N}) where N = print(io, "ImageTensor{$N}")
+
 
 """
     ImagePreprocessing([; kwargs...]) <: Encoding

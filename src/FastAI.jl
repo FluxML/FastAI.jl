@@ -165,6 +165,7 @@ export
     augs_projection, augs_lighting,
     TabularPreprocessing,
 
+    SupervisedMethod,
     BlockMethod,
     describemethod,
     checkblock,

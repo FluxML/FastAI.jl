@@ -16,6 +16,8 @@ end
 
 const OneHotLabel{T} = OneHotTensor{0, T}
 
+Base.summary(io::IO, ::OneHotLabel{T}) where T = print(io, "OneHotLabel{$T}")
+
 function checkblock(block::OneHotTensor{N}, a::AbstractArray{T, M}) where {M, N, T}
     return N + 1 == M && last(size(a)) == length(block.classes)
 end
