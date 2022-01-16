@@ -8,7 +8,7 @@ image
 </code></pre><pre class=coderesult ><code>LoadError("string", 1, UndefVarError(:data))</code></pre></div><p><a href=../REFERENCE/FastAI.Datasets.Datasets.loaddataset.html ><code>loaddataset</code></a> makes it easy to a load a data container that is compatible with some block types, but to get a better feel for what it does, let’s look under the hood by creating the same data container using some mid-level APIs.</p><h2 id=creating-data-containers-from-files >Creating data containers from files</h2><p>Before we recreate the data container, <a href=../REFERENCE/FastAI.Datasets.Datasets.datasetpath.html ><code>datasetpath</code></a> downloads a dataset and returns the path to the extracted files.</p><div class=cellcontainer cell=main lang=julia ><pre class=codecell cell=main lang=julia ><code>dir = datasetpath(&quot;imagenette2-160&quot;)
 </code></pre><pre class=codeoutput ><code>
 7-Zip (a) [64] 16.02 : Copyright (c) 1999-2016 Igor Pavlov : 2016-05-21
-p7zip Version 16.02 (locale=C.UTF-8,Utf16=on,HugeFiles=on,64 bits,2 CPUs Intel(R) Xeon(R) CPU E5-2673 v4 @ 2.30GHz (406F1),ASM,AES-NI)
+p7zip Version 16.02 (locale=C.UTF-8,Utf16=on,HugeFiles=on,64 bits,2 CPUs Intel(R) Xeon(R) CPU E5-2673 v3 @ 2.40GHz (306F2),ASM,AES-NI)
 
 
 Extracting archive: 

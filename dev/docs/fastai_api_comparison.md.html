@@ -9,7 +9,6 @@ method = BlockMethod(
     )
 )
 describemethod(method)
-</code></pre><pre class=codeoutput ><code>WARNING: both Makie and Vision export &quot;Image&quot;; uses of it in module FastAI must be qualified
 </code></pre><pre class=coderesult ><code>LoadError("string", 3, UndefVarError(:Image))</code></pre></div><p>From this short definition, many things can be derived:</p><ul><li><p>data encoding</p></li><li><p>model output decoding</p></li><li><p>how to create a model from a backbone</p></li><li><p>the loss function to use</p></li><li><p>how to visualize samples and predictions</p></li></ul><p>Together with a <a href=./data_container.html title= >data container</a> <code>data</code>, we can quickly create a <code>Learner</code> using <a href=../REFERENCE/FastAI.methodlearner.html ><code>methodlearner</code></a> which, like in fastai, handles the training for us. There are no application-specific <code>Learner</code> constructors like <code>cnn_learner</code> or <code>unet_learner</code> in FastAI.jl.</p><pre lang=julia ><code>learner = methodlearner(method, data)
 </code></pre><p>High-level training protocols like the <a href=../notebooks/fitonecycle.ipynb.html title= >one-cycle learning rate schedule</a>, <a href=../notebooks/finetune.ipynb.html title= >fine-tuning</a> and the <a href=../notebooks/lrfind.ipynb.html title= >learning rate finder</a> are then available to us:</p><pre lang=julia ><code>fit!(learner, 10)                  # Basic training for 10 epochs
 finetune!(learner, 5, 1e-3)        # Finetuning regimen for 1+5 epochs with lr=1e-3
