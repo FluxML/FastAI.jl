@@ -55,7 +55,7 @@ function showencodedsample(backend::ShowBackend, method::AbstractBlockMethod, en
     showblockinterpretable(
         backend,
         getencodings(method),
-        getblocks(method).encodedsample,
+        "Encoded sample" => getblocks(method).encodedsample,
         encsample,
     )
 end
