@@ -154,6 +154,7 @@ export
     Many,
     TableRow,
     Continuous,
+    Image,
 
     # encodings
     encode,
