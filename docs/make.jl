@@ -5,7 +5,7 @@ using FastAI.Vision: Image
 Image
 using FluxTraining
 using DLPipelines
-using DataAugmentation
+import DataAugmentation
 using FilePathsBase
 
 import CairoMakie
