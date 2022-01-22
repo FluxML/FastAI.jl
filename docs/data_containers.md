@@ -13,6 +13,7 @@ ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 {cell=main}
 ```julia
 using FastAI
+import FastAI: Image
 data, _ = loaddataset("imagenette2-160", (Image, Label))
 ```
 

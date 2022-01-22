@@ -1,6 +1,7 @@
+using FastAI
+import FastAI: Image
 import CairoMakie
 using Pollen
-using FastAI
 using FluxTraining
 using DLPipelines
 import DataAugmentation

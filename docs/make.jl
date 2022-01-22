@@ -1,4 +1,3 @@
-import CairoMakie
 using Pollen
 using FastAI
 using FluxTraining
