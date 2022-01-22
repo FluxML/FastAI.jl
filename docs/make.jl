@@ -1,10 +1,14 @@
-import CairoMakie
+
 using Pollen
 using FastAI
+using FastAI.Vision: Image
+Image
 using FluxTraining
 using DLPipelines
 using DataAugmentation
 using FilePathsBase
+
+import CairoMakie
 
 ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 
