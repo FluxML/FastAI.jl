@@ -53,13 +53,14 @@ function methodlearner(
         batchsize=16,
         optimizer=ADAM(),
         lossfn=methodlossfn(method),
+        usedefaultcallbacks=true,
         kwargs...,
     )
     if isnothing(model)
         model = isnothing(backbone) ? methodmodel(method) : methodmodel(method, backbone)
     end
     dls = methoddataloaders(traindata, validdata, method, batchsize; kwargs...)
-    return Learner(model, dls, optimizer, lossfn, callbacks...)
+    return Learner(model, dls, optimizer, lossfn, callbacks...; usedefaultcallbacks)
 end
 
 function methodlearner(method, data; pctgval=0.2, kwargs...)
