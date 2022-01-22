@@ -1,9 +1,13 @@
 using Pollen
 using FastAI
+using FastAI: Image
+Image
 using FluxTraining
 using DLPipelines
-using DataAugmentation
+import DataAugmentation
 using FilePathsBase
+
+import CairoMakie
 
 ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 
