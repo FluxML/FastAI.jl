@@ -104,6 +104,8 @@ export Image, Mask, Keypoints, Bounded,
     ImagePreprocessing, KeypointPreprocessing, ProjectiveTransforms,
     # learning methods
     ImageClassificationSingle, ImageClassificationMulti,
-    ImageKeypointRegression, ImageSegmentation
+    ImageKeypointRegression, ImageSegmentation,
+    # helpers
+    augs_projection, augs_lighting
 
 end
