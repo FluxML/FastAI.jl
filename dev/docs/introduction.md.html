@@ -7,23 +7,6 @@ learner = methodlearner(method, data, callbacks=[ToGPU()])
 fitonecycle!(learner, 10)
 showoutputs(method, learner)
 </code></pre><p>Each of the five lines encapsulates one part of the deep learning pipeline to give a high-level API while still allowing customization. Let’s have a closer look.</p><h2 id=dataset >Dataset</h2><div class=cellcontainer cell=main lang=julia ><pre class=codecell cell=main lang=julia ><code>data, blocks = loaddataset(&quot;imagenette2-160&quot;, (Image, Label))
-</code></pre><pre class=codeoutput ><code>
-7-Zip (a) [64] 16.02 : Copyright (c) 1999-2016 Igor Pavlov : 2016-05-21
-p7zip Version 16.02 (locale=C.UTF-8,Utf16=on,HugeFiles=on,64 bits,2 CPUs Intel(R) Xeon(R) Platinum 8171M CPU @ 2.60GHz (50654),ASM,AES-NI)
-
-
-Extracting archive: 
---
-Path = 
-Type = tar
-Code Page = UTF-8
-
-Everything is Ok
-
-Folders: 23
-Files: 13397
-Size:       107794109
-Compressed: 6872064
 </code></pre><pre class=coderesult ><code>((mapobs(loadfile, ["/home/runner/.julia/datadeps/fastai-imagenette2-160/imagenette2-160/train/n014…]), mapobs(parentname, ["/home/runner/.julia/datadeps/fastai-imagenette2-160/imagenette2-160/train/n014…])), (Image{2}(), Label{String}(["n01440764", "n02102040", "n02979186", "n03000684", "n03028079", "n03394916", "n03417042", "n03425413", "n03445777", "n03888257"])))</code></pre></div><p>This line downloads and loads the <a href=https://github.com/fastai/imagenette title= >ImageNette</a> image classification dataset, a small subset of ImageNet with 10 different classes. <code>data</code> is a <a href=./data_containers.md.html title= >data container</a> that can be used to load individual observations, here of images and the corresponding labels. We can use <code>getobs(data, i)</code> to load the <code>i</code>-th observation and <code>nobs</code> to find out how many observations there are.</p><div class=cellcontainer cell=main lang=julia ><pre class=codecell cell=main lang=julia ><code>image, class = sample =  getobs(data, 1000)
 @show class
 image
