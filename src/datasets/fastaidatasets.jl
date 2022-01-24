@@ -87,7 +87,7 @@ const DATASETCONFIGS = [
     FastAIDataset("camvid_tiny", "sample", "cd42a9bdd8ad3e0ce87179749beae05b4beb1ae6ab665841180b1d8022fc230b"),
     FastAIDataset("dogscats", "sample", "b79c0a5e4aa9ba7a0b83abbf61908c61e15bed0e5b236e86a0c4a080c8f70d7c", size="800MiB"),
     FastAIDataset("human_numbers", "sample"),
-    FastAIDataset("imdb_sample", "sample"),
+    FastAIDataset("imdb_sample", "sample", "8e776d995296136b3f9a3cf001796d886cb0b60e86877ce71c7abbdc3c247341", size="4KB"),
     FastAIDataset("mnist_sample", "sample", "b373a14f282298aeba0f7dd56b7cdb6c2401063d4f118c39c54982907760bd38", size="3MB"),
     FastAIDataset("mnist_tiny", "sample", "0d1fedf86243931aa3fc065d2cf4ffab339a972958d8594ae993ee32bd8e15b9", size="300KB"),
     FastAIDataset("movie_lens_sample", "sample"),
