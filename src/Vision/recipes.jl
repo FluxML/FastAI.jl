@@ -126,7 +126,7 @@ const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
         "imagewoof", "imagewoof-160", "imagewoof-320",
         "imagewoof2", "imagewoof2-160", "imagewoof2-320",
         "cifar10", "cifar100", "caltech_101", "mnist_png",
-        "mnist_sample", "CUB_200_2011"
+        "mnist_sample", "CUB_200_2011", "food-101"
     )]...,
     [name => [ImageFolders(filefilterfn=f -> !(occursin("unsup", f)))]
         for name in ("imagewang-160", "imagewang-320", "imagewang")]...,
