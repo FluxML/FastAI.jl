@@ -5,6 +5,7 @@
 {cell=main style="display:none;" result=false}
 ```julia
 using FastAI
+import FastAI: Image
 ```
 
 On the [quickstart page](../notebooks/quickstart.ipynb), we showed how to train models on common tasks in a few lines of code like these:

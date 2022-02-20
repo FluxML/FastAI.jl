@@ -1,8 +1,6 @@
-include("imports.jl")
 
 
-
-@testset ExtendedTestSet "FasterAI" begin
+@testset "FasterAI" begin
     @test length(listdatasources()) > 10
 
     @test !isempty(finddatasets(blocks=(Image, Label)))

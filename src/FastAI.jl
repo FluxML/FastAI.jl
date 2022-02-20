@@ -2,7 +2,6 @@ module FastAI
 
 
 using Base: NamedTuple
-using Colors: colormaps_sequential
 using Reexport
 @reexport using DLPipelines
 @reexport using FluxTraining
@@ -10,16 +9,14 @@ using Reexport
 @reexport using Flux
 
 using Animations
-using Colors
-using DataAugmentation
-using DataAugmentation: getbounds, Bounds
+import DataAugmentation
+import DataAugmentation: getbounds, Bounds
+
 import DLPipelines: methoddataset, methodmodel, methodlossfn, methoddataloaders,
     mockmodel, mocksample, predict, predictbatch, mockmodel, encode, encodeinput,
     encodetarget, decodeŷ, decodey
-using IndirectArrays: IndirectArray
 using LearnBase: getobs, nobs
 using FilePathsBase
-using FixedPointNumbers
 using Flux
 using Flux.Optimise
 import Flux.Optimise: apply!, Optimiser, WeightDecay
@@ -27,9 +24,7 @@ using FluxTraining: Learner, handle
 using FluxTraining.Events
 using JLD2: jldsave, jldopen
 using Markdown
-import ImageInTerminal
 using MLDataPattern
-using Parameters
 using PrettyTables
 using Requires
 using StaticArrays
@@ -41,48 +36,47 @@ import UnicodePlots
 using Statistics
 using InlineTest
 
-include("learner.jl")
 
-# Data block API
+# ## Data block API
 include("datablock/block.jl")
 include("datablock/encoding.jl")
 include("datablock/method.jl")
 include("datablock/describe.jl")
-include("datablock/checks.jl")
 include("datablock/wrappers.jl")
 
-# submodules
-include("datasets/Datasets.jl")
-@reexport using .Datasets
 
-include("models/Models.jl")
-using .Models
+# ## Blocks
+# ### Wrapper blocks
+include("blocks/many.jl")
 
-# Blocks
+# ### Other
+include("blocks/continuous.jl")
 include("blocks/label.jl")
 
-include("blocks/bounded.jl")
+# ## Encodings
+# ### Wrapper encodings
+include("encodings/only.jl")
 
-# Encodings
-include("encodings/tabularpreprocessing.jl")
+# ### Other
 include("encodings/onehot.jl")
-include("encodings/imagepreprocessing.jl")
-include("encodings/projective.jl")
-include("encodings/keypointpreprocessing.jl")
+
 
 # Training interface
 include("datablock/models.jl")
 include("datablock/loss.jl")
 
+
 # Interpretation
 include("interpretation/backend.jl")
 include("interpretation/text.jl")
-include("interpretation/detect.jl")
 include("interpretation/method.jl")
 include("interpretation/showinterpretable.jl")
 include("interpretation/learner.jl")
+include("interpretation/detect.jl")
 
-# training
+
+# Training
+include("learner.jl")
 include("training/paramgroups.jl")
 include("training/discriminativelrs.jl")
 include("training/utils.jl")
@@ -94,20 +88,41 @@ include("training/metrics.jl")
 include("serialization.jl")
 
 
+
+# submodules
+include("datasets/Datasets.jl")
+@reexport using .Datasets
+
+
 include("fasterai/methodregistry.jl")
 include("fasterai/learningmethods.jl")
 include("fasterai/defaults.jl")
 
 
+
+# Domain-specific
+include("Vision/Vision.jl")
+@reexport using .Vision
+export Image
+export Vision
+
+include("Tabular/Tabular.jl")
+@reexport using .Tabular
+
+
+include("interpretation/makie/stub.jl")
 function __init__()
     @require Makie="ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a" begin
         using .Makie
-        include("interpretation/makie/recipes.jl")
         include("interpretation/makie/showmakie.jl")
         include("interpretation/makie/lrfind.jl")
     end
 end
 
+module Models
+    using ..FastAI.Tabular: TabularModel
+    using ..FastAI.Vision.Models: xresnet18, xresnet50, UNetDynamic
+end
 
 
 export
@@ -133,28 +148,25 @@ export
     predictbatch,
 
     # blocks
-    Image,
-    Mask,
+
     Label,
     LabelMulti,
-    Keypoints,
     Many,
     TableRow,
     Continuous,
+    Image,
 
     # encodings
     encode,
     decode,
     setup,
-    ProjectiveTransforms,
-    ImagePreprocessing,
     OneHot,
-    KeypointPreprocessing,
     Only,
     Named,
     augs_projection, augs_lighting,
     TabularPreprocessing,
 
+    SupervisedMethod,
     BlockMethod,
     describemethod,
     checkblock,
@@ -179,10 +191,6 @@ export
 
     # learning methods
     findlearningmethods,
-    ImageClassificationSingle,
-    ImageClassificationMulti,
-    ImageSegmentation,
-    ImageKeypointRegression,
     TabularClassificationSingle,
     TabularRegression,
 

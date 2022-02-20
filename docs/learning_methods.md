@@ -19,6 +19,7 @@ Before we get started, let's load up a [data container](data_containers.md) that
 {cell=main}
 ```julia
 using FastAI, FastAI.DataAugmentation, FastAI.DLPipelines, FastAI.Colors
+import FastAI: Image
 data = Datasets.loadfolderdata(
     datasetpath("imagenette2-160"),
     filterfn=isimagefile,

@@ -35,6 +35,7 @@ We can create a `BlockMethod` (similar to `fastai.DataBlock`) and get informatio
 {cell=main}
 ```julia
 using FastAI
+import FastAI: Image
 
 method = BlockMethod(
     (Image{2}(), Mask{2}(["foreground", "background"])),

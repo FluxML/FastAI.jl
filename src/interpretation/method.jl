@@ -16,11 +16,12 @@ showsample(method, sample)  # select backend automatically
 showsample(ShowText(), method, sample)
 ```
 """
-function showsample(backend::ShowBackend, method::BlockMethod, sample)
-    blocks = ("Input" => method.blocks[1], "Target" => method.blocks[2])
+function showsample(backend::ShowBackend, method::AbstractBlockMethod, sample)
+    blocks = ("Input" => getblocks(method)[1], "Target" => getblocks(method)[2])
     showblock(backend, blocks, sample)
 end
-showsample(method::BlockMethod, sample) = showsample(default_showbackend(), method, sample)
+showsample(method::AbstractBlockMethod, sample) =
+    showsample(default_showbackend(), method, sample)
 
 
 """
@@ -39,39 +40,45 @@ showsamples(method, samples)  # select backend automatically
 showsamples(ShowText(), method, samples)
 ```
 """
-function showsamples(backend::ShowBackend, method::BlockMethod, samples)
-    blocks = ("Input" => method.blocks[1], "Target" => method.blocks[2])
-    showblocks(backend, blocks, samples)
+function showsamples(backend::ShowBackend, method::AbstractBlockMethod, samples)
+    showblocks(backend, "Sample" => getblocks(method).sample, samples)
 end
-showsamples(method::BlockMethod, samples) = showsamples(default_showbackend(), method, sample)
+showsamples(method::AbstractBlockMethod, samples) =
+    showsamples(default_showbackend(), method, sample)
 
 """
     showencodedsample([backend], method, encsample)
 
 Show an encoded sample `encsample` to `backend`.
 """
-function showencodedsample(backend::ShowBackend, method::BlockMethod, encsample)
-    xblock, yblock = encodedblock(method.encodings, method.blocks, true)
+function showencodedsample(backend::ShowBackend, method::AbstractBlockMethod, encsample)
     showblockinterpretable(
         backend,
-        method.encodings,
-        ("x" => xblock, "y" => yblock),
-        encsample)
+        getencodings(method),
+        getblocks(method).encodedsample,
+        encsample,
+    )
 end
-showencodedsample(method, encsample) = showencodedsample(default_showbackend(), method, encsample)
+showencodedsample(method, encsample) =
+    showencodedsample(default_showbackend(), method, encsample)
 
 """
     showencodedsamples([backend], method, encsamples)
 
 Show a vector of encoded samples `encsamples` to `backend`.
 """
-function showencodedsamples(backend::ShowBackend, method::BlockMethod, encsamples::AbstractVector)
-    xblock, yblock = encodedblock(method.encodings, method.blocks, true)
+function showencodedsamples(
+    backend::ShowBackend,
+    method::AbstractBlockMethod,
+    encsamples::AbstractVector,
+)
+    xblock, yblock = encodedblockfilled(getencodings(method), getblocks(method))
     showblocksinterpretable(
         backend,
-        method.encodings,
+        getencodings(method),
         ("x" => xblock, "y" => yblock),
-        encsamples)
+        encsamples,
+    )
 end
 
 """
@@ -79,7 +86,7 @@ end
 
 Show a collated batch of encoded samples to `backend`.
 """
-function showbatch(backend::ShowBackend, method::BlockMethod, batch)
+function showbatch(backend::ShowBackend, method::AbstractBlockMethod, batch)
     encsamples = collect(DataLoaders.obsslices(batch))
     showencodedsamples(backend, method, encsamples)
 end
@@ -90,24 +97,23 @@ showbatch(method, batch) = showbatch(default_showbackend(), method, batch)
     showprediction([backend], method, sample, pred)
 
 Show a prediction `pred`. If a `sample` is also given, show it next to
-the prediction.
+the prediction. ŷ
 """
-function showprediction(backend::ShowBackend, method::BlockMethod, pred)
-    predblock = decodedblock(method.encodings, method.outputblock, true)
-    showblock(backend, "Prediction" => predblock, pred)
+function showprediction(backend::ShowBackend, method::AbstractBlockMethod, pred)
+    showblock(backend, "Prediction" => getblocks(method).pred, pred)
 end
 
-function showprediction(backend::ShowBackend, method::BlockMethod, sample, pred)
-    predblock = decodedblock(method.encodings, method.outputblock, true)
+function showprediction(backend::ShowBackend, method::AbstractBlockMethod, sample, pred)
+    blocks = getblocks(method)
     showblock(
         backend,
-        ("Sample" => method.blocks, "Prediction" => predblock),
-        (sample, pred)
+        ("Sample" => blocks.sample, "Prediction" => blocks.pred),
+        (sample, pred),
     )
 end
 
 
-showprediction(method::BlockMethod, args...) =
+showprediction(method::AbstractBlockMethod, args...) =
     showprediction(default_showbackend(), method, args...)
 
 """
@@ -117,21 +123,21 @@ showprediction(method::BlockMethod, args...) =
 Show predictions `pred`. If `samples` are also given, show them next to
 the prediction.
 """
-function showpredictions(backend::ShowBackend, method::BlockMethod, preds)
-    predblock = decodedblock(method.encodings, method.outputblock, true)
+function showpredictions(backend::ShowBackend, method::AbstractBlockMethod, preds)
+    predblock = decodedblockfilled(getencodings(method), getblocks(method).ŷ)
     showblocks(backend, "Prediction" => predblock, preds)
 end
 
-function showpredictions(backend::ShowBackend, method::BlockMethod, samples, preds)
-    predblock = decodedblock(method.encodings, method.outputblock, true)
+function showpredictions(backend::ShowBackend, method::AbstractBlockMethod, samples, preds)
+    predblock = decodedblockfilled(getencodings(method), getblocks(method).ŷ)
     showblocks(
         backend,
-        ("Sample" => method.blocks, "Prediction" => predblock),
+        ("Sample" => getblocks(method), "Prediction" => predblock),
         collect(zip(samples, preds)),
     )
 end
 
-showpredictions(method::BlockMethod, args...) =
+showpredictions(method::AbstractBlockMethod, args...) =
     showpredictions(default_showbackend(), method, args...)
 
 """
@@ -141,19 +147,25 @@ showpredictions(method::BlockMethod, args...) =
 Show a model output to `backend`. If an encoded sample `encsample` is also
 given, show it next to the output.
 """
-function showoutput(backend::ShowBackend, method::BlockMethod, output)
-    showblockinterpretable(backend, method.encodings, "Output" => method.outputblock, output)
-end
-function showoutput(backend::ShowBackend, method::BlockMethod, encsample, output)
-    encsampleblock = encodedblock(method.encodings, method.blocks, true)
-    outblock = method.outputblock
+function showoutput(backend::ShowBackend, method::AbstractBlockMethod, output)
     showblockinterpretable(
         backend,
-        method.encodings,
-        ("Encoded sample" => encsampleblock, "Output" => outblock),
-        (encsample, output))
+        getencodings(method),
+        "Output" => getblocks(method).ŷ,
+        output,
+    )
 end
-showoutput(method::BlockMethod, args...) = showoutput(default_showbackend(), method, args...)
+function showoutput(backend::ShowBackend, method::AbstractBlockMethod, encsample, output)
+    blocks = getblocks(method)
+    showblockinterpretable(
+        backend,
+        getencodings(method),
+        ("Encoded sample" => blocks.encodedsample, "Output" => blocks.ŷ),
+        (encsample, output),
+    )
+end
+showoutput(method::AbstractBlockMethod, args...) =
+    showoutput(default_showbackend(), method, args...)
 
 """
     showoutputs([backend], method, outputs)
@@ -163,20 +175,26 @@ Show model outputs to `backend`. If a vector of encoded samples `encsamples` is 
 given, show them next to the outputs. Use [`showoutputbatch`](#) to show collated
 batches of outputs.
 """
-function showoutputs(backend::ShowBackend, method::BlockMethod, outputs)
-    showblocks(backend, "Output" => method.outputblock, outputs)
-end
-function showoutputs(backend::ShowBackend, method::BlockMethod, encsamples, outputs)
-    encsampleblock = encodedblock(method.encodings, method.blocks, true)
-    outblock = method.outputblock
+function showoutputs(backend::ShowBackend, method::AbstractBlockMethod, outputs)
     showblocksinterpretable(
         backend,
-        method.encodings,
-        ("Encoded sample" => encsampleblock, "Output" => outblock),
-        collect(zip(encsamples, outputs)))
+        getencodings(method),
+        "Output" => getblocks(method).ŷ,
+        outputs,
+    )
+end
+function showoutputs(backend::ShowBackend, method::AbstractBlockMethod, encsamples, outputs)
+    blocks = getblocks(method)
+    showblocksinterpretable(
+        backend,
+        getencodings(method),
+        ("Encoded sample" => blocks.encodedsample, "Output" => blocks.ŷ),
+        collect(zip(encsamples, outputs)),
+    )
 end
 
-showoutputs(method::BlockMethod, args...) = showoutputs(default_showbackend(), method, args...)
+showoutputs(method::AbstractBlockMethod, args...) =
+    showoutputs(default_showbackend(), method, args...)
 
 
 """
@@ -187,17 +205,23 @@ Show collated batch of outputs to `backend`. If a collated batch of encoded samp
 `batch` is also given, show them next to the outputs. See [`showoutputs`](#) if you
 have vectors of outputs and not collated batches.
 """
-function showoutputbatch(backend::ShowBackend, method::BlockMethod, outputbatch)
+function showoutputbatch(backend::ShowBackend, method::AbstractBlockMethod, outputbatch)
     outputs = collect(DataLoaders.obsslices(outputbatch))
     return showoutputs(backend, method, outputs)
 end
-function showoutputbatch(backend::ShowBackend, method::BlockMethod, batch, outputbatch)
+function showoutputbatch(
+    backend::ShowBackend,
+    method::AbstractBlockMethod,
+    batch,
+    outputbatch,
+)
     encsamples = collect(DataLoaders.obsslices(batch))
     outputs = collect(DataLoaders.obsslices(outputbatch))
     return showoutputs(backend, method, encsamples, outputs)
 end
 
-showoutputbatch(method::BlockMethod, args...) = showoutputbatch(default_showbackend(), method, args...)
+showoutputbatch(method::AbstractBlockMethod, args...) =
+    showoutputbatch(default_showbackend(), method, args...)
 
 # Testing helper
 
@@ -209,14 +233,16 @@ work for `backend`
 
 ## Keyword arguments
 
-- `sample = mockblock(method.blocks)`: Sample data to use for tests.
-- `output = mockblock(method.outputblock)`: Model output data to use for tests.
+- `sample = mockblock(getblocks(method))`: Sample data to use for tests.
+- `output = mockblock(getblocks(method).ŷ)`: Model output data to use for tests.
 """
 function test_method_show(
-        method::LearningMethod, backend::ShowBackend;
-        sample = mockblock(method.blocks),
-        output = mockblock(method.outputblock),
-        context = Training())
+    method::LearningMethod,
+    backend::ShowBackend;
+    sample = mockblock(getblocks(method).sample),
+    output = mockblock(getblocks(method).ŷ),
+    context = Training(),
+)
 
     encsample = encode(method, context, sample)
     pred = decodeŷ(method, context, output)

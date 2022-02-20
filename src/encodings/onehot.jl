@@ -1,8 +1,22 @@
 
 
+"""
+    OneHotTensor{N, T}(classes) <: Block
+
+A block representing a one-hot encoded, N-dimensional array
+categorical variable. For example, a single categorical label
+is a `OneHotTensor{0, T}` (aliased to `OneHotTensor{T}`).
+
+Use the [`OneHot`](#) encoding to one-hot encode [`Label`](#)s
+or [`LabelMulti`](#)s.
+"""
 struct OneHotTensor{N, T} <: Block
     classes::AbstractVector{T}
 end
+
+const OneHotLabel{T} = OneHotTensor{0, T}
+
+Base.summary(io::IO, ::OneHotLabel{T}) where T = print(io, "OneHotLabel{$T}")
 
 function checkblock(block::OneHotTensor{N}, a::AbstractArray{T, M}) where {M, N, T}
     return N + 1 == M && last(size(a)) == length(block.classes)
@@ -52,17 +66,17 @@ OneHot() = OneHot(Float32, 0.5f0)
 
 # ### `Label` implementation
 encodedblock(::OneHot, block::Label{T}) where T = OneHotTensor{0, T}(block.classes)
-decodedblock(::OneHot, block::OneHotTensor{0}) = Label(block.classes)
+decodedblock(::OneHot, block::OneHotLabel) = Label(block.classes)
 
-function encode(enc::OneHot, context, block::Label, data)
-    idx = findfirst(isequal(data), block.classes)
-    isnothing(idx) && error("$data could not be found in `block.classes`: $(block.classes).")
+function encode(enc::OneHot, context, block::Label, obs)
+    idx = findfirst(isequal(obs), block.classes)
+    isnothing(idx) && error("$obs could not be found in `block.classes`: $(block.classes).")
     return DataAugmentation.onehot(enc.T, idx, length(block.classes))
 end
 
 
-function decode(::OneHot, context, block::OneHotTensor{0}, data)
-    return block.classes[argmax(data)]
+function decode(::OneHot, context, block::OneHotLabel, obs)
+    return block.classes[argmax(obs)]
 end
 
 # ### `LabelMulti` implementation
@@ -70,28 +84,31 @@ end
 encodedblock(::OneHot, block::LabelMulti{T}) where T = OneHotTensorMulti{0, T}(block.classes)
 decodedblock(::OneHot, block::OneHotTensorMulti{0}) = LabelMulti(block.classes)
 
-function encode(enc::OneHot, context, block::LabelMulti, data)
-    return collect(enc.T, (c in data for c in block.classes))
+function encode(enc::OneHot, _, block::LabelMulti, obs)
+    return collect(enc.T, (c in obs for c in block.classes))
 end
 
-function decode(enc::OneHot, context, block::OneHotTensorMulti{0}, data)
-    return block.classes[softmax(data) .> enc.threshold]
+function decode(enc::OneHot, _, block::OneHotTensorMulti{0}, obs)
+    return block.classes[softmax(obs) .> enc.threshold]
 end
 
-# ### `Mask` implementation
 
-encodedblock(::OneHot, block::Mask{N, T}) where {N, T} = OneHotTensor{N, T}(block.classes)
-decodedblock(::OneHot, block::OneHotTensor{N, T}) where {N, T} = Mask{N, T}(block.classes)
-
-function encode(enc::OneHot, context, block::Mask, data)
-    tfm = DataAugmentation.OneHot{enc.T}()
-    return apply(tfm, DataAugmentation.MaskMulti(data, block.classes)) |> DataAugmentation.itemdata
+function blocklossfn(outblock::OneHotTensor{0}, yblock::OneHotTensor{0})
+    outblock.classes == yblock.classes || error("Classes of $outblock and $yblock differ!")
+    return Flux.Losses.logitcrossentropy
 end
 
-function decode(enc::OneHot, context, block::OneHotTensor, data)
-    Tidx = length(block.classes) >= 255 ? UInt16 : UInt8
-    classidxs = reshape(
-        map(I -> Tidx(I.I[end]), argmax(data; dims = ndims(data))),
-        size(data)[1:end-1])
-    return IndirectArray(classidxs, block.classes)
+function blocklossfn(outblock::OneHotTensorMulti{0}, yblock::OneHotTensorMulti{0})
+    outblock.classes == yblock.classes || error("Classes of $outblock and $yblock differ!")
+    return Flux.Losses.logitbinarycrossentropy
+end
+
+
+# ## Tests
+
+@testset "OneHot [encoding]" begin
+    enc = OneHot()
+    testencoding(enc, Label(1:10), 1)
+    testencoding(enc, LabelMulti(1:10), [1])
+    testencoding(enc, Mask{2}(1:10), rand(1:10, 50, 50))
 end
