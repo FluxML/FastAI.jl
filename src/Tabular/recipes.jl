@@ -105,6 +105,10 @@ const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
         TableClassificationRecipe(TableDatasetRecipe(file="adult.csv"), :salary),
         TableRegressionRecipe(TableDatasetRecipe(file="adult.csv"), :age),
     ],
+    "imdb_sample" => [
+        TableDatasetRecipe(file="texts.csv"),
+        TableClassificationRecipe(TableDatasetRecipe(file="texts.csv"), :label)
+    ]
 )
 
 

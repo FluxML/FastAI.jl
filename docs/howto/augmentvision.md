@@ -7,6 +7,7 @@ By default, the only augmentation that will be used in computer vision tasks is 
 {cell=main output=false}
 ```julia
 using FastAI
+import FastAI: Image
 import CairoMakie; CairoMakie.activate!(type="png")
 
 data, blocks = loaddataset("imagenette2-160", (Image, Label))
