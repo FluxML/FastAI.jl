@@ -87,3 +87,21 @@ end
 
 xresnet18(; kwargs...) = XResNet(1, [2, 2, 2, 2]; kwargs...)
 xresnet50(; kwargs...) = XResNet(4, [3, 4, 6, 3]; kwargs...)
+
+
+
+@testset "XResNet [model]" begin
+    @testset "Basic" begin
+        @test_nowarn begin
+            model = xresnet18()
+            @test Flux.outputsize(model, (128, 128, 3, 1)) == (4, 4, 512, 1)
+        end
+    end
+
+    @testset "3D" begin
+        @test_nowarn begin
+            model = xresnet18(ndim=3)
+            @test Flux.outputsize(model, (128, 128, 128, 3, 1)) == (4, 4, 4, 512, 1)
+        end
+    end
+end
