@@ -8,6 +8,7 @@ using BSON
 using Flux
 using Zygote
 using DataDeps
+using InlineTest
 
 
 include("layers.jl")
