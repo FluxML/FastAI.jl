@@ -17,7 +17,7 @@ end
 
 FastAI.checkblock(many::Many, obss) =
     all(checkblock(wrapped(many), obs) for obs in obss)
-FastAI.mockblock(many::Many) = [mockblock(wrapped(many)), mockblock(wrapped(many))]
+FastAI.mockblock(many::Many) = [mockblock(wrapped(many)) for _ in 1:rand(1:3)]
 
 function FastAI.encode(enc::Encoding, ctx, many::Many, obss)
     return map(obss) do obs
