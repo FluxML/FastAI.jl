@@ -63,7 +63,7 @@ end
 
 function encodedblock(enc::Encoding, wrapper::WrapperBlock, ::PropagateSameBlock)
     inner = encodedblock(enc, wrapped(wrapper))
-    inner == wrapped(wrapped) && return setwrapped(wrapper, inner)
+    inner == wrapped(wrapper) && return setwrapped(wrapper, inner)
     return inner
 end
 
