@@ -1,3 +1,27 @@
+const DimSize = Union{Int, Colon}
+
+function checksize(targetsz::Tuple, sz::Tuple)
+    length(targetsz) == length(sz) || return false
+    return all(map(_checksizedim, targetsz, sz))
+end
+
+
+_checksizedim(l1::Int, l2::Int) = l1 == l2
+_checksizedim(l1::Colon, l2::Int) = true
+
+mockarray(T, sz) = rand(T, map(l -> l isa Colon ? rand(8:16) : l, sz))
+
+
+@testset "checksize" begin
+    @test checksize((10, 1), (10, 1))
+    @test !checksize((100, 1), (10, 1))
+    @test checksize((:, :, :), (1, 2, 3))
+    @test !checksize((:, :, :), (1, 2))
+    @test checksize((10, :, 1), (10, 20, 1))
+    @test !checksize((10, :, 2), (10, 20, 1))
+end
+
+
 """
     Bounded(block, size) <: WrapperBlock
 
@@ -34,18 +58,25 @@ Bounded(Bounded(block, (16, 16)), (8, 8)) == Bounded(block, (8, 8))
 """
 struct Bounded{N, B<:AbstractBlock} <: WrapperBlock
     block::B
-    size::NTuple{N, Int}
+    size::NTuple{N, DimSize}
 end
 
 
-function Bounded(bounded::Bounded{M}, size::NTuple{N, Int}) where {N, M}
+function Bounded(bounded::Bounded{M}, size::NTuple{N, DimSize}) where {N, M}
     N == M || error("Cannot rewrap a `Bounded` with different dimensionalities $N and $M")
     Bounded(wrapped(bounded), size)
 end
 
 
-InlineTest.@testset "Bounded [block, wrapper]" begin
+function checkblock(bounded::Bounded{N}, a::AbstractArray{N}) where N
+    return checksize(bounded.size, size(a)) && checkblock(parent(bounded), a)
+end
+
+@testset "Bounded [block, wrapper]" begin
     @test_nowarn Bounded(Image{2}(), (16, 16))
     bounded = Bounded(Image{2}(), (16, 16))
+    @test checkblock(bounded, rand(16, 16))
+
+    # composition
     @test Bounded(bounded, (16, 16)) == bounded
 end
