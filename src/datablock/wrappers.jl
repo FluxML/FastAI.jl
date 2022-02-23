@@ -2,7 +2,9 @@
 
 abstract type WrapperBlock <: AbstractBlock end
 
-wrapped(w::WrapperBlock) = w.block
+Base.parent(w::WrapperBlock) = w.block
+Base.parent(b::Block) = b
+wrapped(w::WrapperBlock) = wrapped(parent(w))
 wrapped(b::Block) = b
 function setwrapped(w::WrapperBlock, b)
     return Setfield.@set w.block = b
@@ -61,7 +63,7 @@ end
 
 function encodedblock(enc::Encoding, wrapper::WrapperBlock, ::PropagateSameBlock)
     inner = encodedblock(enc, wrapped(wrapper))
-    inner == wrapped(block) && return setwrapped(wrapper, inner)
+    inner == wrapped(wrapper) && return setwrapped(wrapper, inner)
     return inner
 end
 
