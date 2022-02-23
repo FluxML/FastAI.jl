@@ -6,7 +6,7 @@ finddatasets(blocks=(Image, Mask))
  "camvid_tiny" => FastAI.Vision.ImageSegmentationFolders("images", "labels", "codes.txt")</code></pre></div><p>We can see that the <code>&quot;camvid_tiny&quot;</code> dataset can be loaded so that each sample is a pair of an image and a segmentation mask. Let’s use <a href=../REFERENCE/FastAI.Datasets.Datasets.loaddataset.html ><code>loaddataset</code></a> to load a <a href=./data_containers.md.html title= >data container</a> and concrete blocks.</p><div class=cellcontainer cell=main lang=julia ><pre class=codecell cell=main lang=julia ><code>data, blocks = loaddataset(&quot;camvid_tiny&quot;, (Image, Mask))
 </code></pre><pre class=codeoutput ><code>
 7-Zip (a) [64] 16.02 : Copyright (c) 1999-2016 Igor Pavlov : 2016-05-21
-p7zip Version 16.02 (locale=C.UTF-8,Utf16=on,HugeFiles=on,64 bits,2 CPUs Intel(R) Xeon(R) Platinum 8272CL CPU @ 2.60GHz (50657),ASM,AES-NI)
+p7zip Version 16.02 (locale=C.UTF-8,Utf16=on,HugeFiles=on,64 bits,2 CPUs Intel(R) Xeon(R) CPU E5-2673 v4 @ 2.30GHz (406F1),ASM,AES-NI)
 
 
 Extracting archive: 
@@ -21,7 +21,7 @@ Folders: 3
 Files: 201
 Size:       2315086
 Compressed: 107008
-</code></pre><pre class=coderesult ><code>((mapobs(loadfile, ["/home/runner/.julia/datadeps/fastai-camvid_tiny/camvid_tiny/images/0001TP_0067…]), mapobs(#74, ["/home/runner/.julia/datadeps/fastai-camvid_tiny/camvid_tiny/labels/0001TP_0067…])), (Image{2}(), Mask{2, String}(["Animal", "Archway", "Bicyclist", "Bridge", "Building", "Car", "CartLuggagePram", "Child", "Column_Pole", "Fence"  …  "SUVPickupTruck", "TrafficCone", "TrafficLight", "Train", "Tree", "Truck_Bus", "Tunnel", "VegetationMisc", "Void", "Wall"])))</code></pre></div><p>As with every data container, we can load a sample using <code>getobs</code> which gives us a tuple of an image and a segmentation mask.</p><div class=cellcontainer cell=main lang=julia ><pre class=codecell cell=main lang=julia ><code>image, mask = sample = getobs(data, 1)
+</code></pre><pre class=coderesult ><code>((mapobs(loadfile, ["/home/runner/.julia/datadeps/fastai-camvid_tiny/camvid_tiny/images/0001TP_0067…]), mapobs(#76, ["/home/runner/.julia/datadeps/fastai-camvid_tiny/camvid_tiny/labels/0001TP_0067…])), (Image{2}(), Mask{2, String}(["Animal", "Archway", "Bicyclist", "Bridge", "Building", "Car", "CartLuggagePram", "Child", "Column_Pole", "Fence"  …  "SUVPickupTruck", "TrafficCone", "TrafficLight", "Train", "Tree", "Truck_Bus", "Tunnel", "VegetationMisc", "Void", "Wall"])))</code></pre></div><p>As with every data container, we can load a sample using <code>getobs</code> which gives us a tuple of an image and a segmentation mask.</p><div class=cellcontainer cell=main lang=julia ><pre class=codecell cell=main lang=julia ><code>image, mask = sample = getobs(data, 1)
 size.(sample), eltype.(sample)
 </code></pre><pre class=coderesult ><code>(((96, 128), (96, 128)), (ColorTypes.RGB{FixedPointNumbers.N0f8}, String))</code></pre></div><p><code>loaddataset</code> also returned <code>blocks</code> which are the concrete <code>Block</code> instances for the dataset. We passed in <em>types</em> of blocks (<code>(Image, Mask)</code>) and get back <em>instances</em> since the specifics of some blocks depend on the dataset. For example, the returned target block carries the labels for every class that a pixel can belong to.</p><div class=cellcontainer cell=main lang=julia ><pre class=codecell cell=main lang=julia ><code>inputblock, targetblock = blocks
 targetblock
