@@ -19,10 +19,10 @@ As an example, here is how to train an image classification model:
 ```julia
 using FastAI
 data, blocks = loaddataset("imagenette2-160", (Image, Label))
-method = ImageClassificationSingle(blocks)
-learner = methodlearner(method, data, callbacks=[ToGPU()])
+task = ImageClassificationSingle(blocks)
+learner = tasklearner(task, data, callbacks=[ToGPU()])
 fitonecycle!(learner, 10)
-showoutputs(method, learner)
+showoutputs(task, learner)
 ```
 
 Please read [the documentation](https://fluxml.github.io/FastAI.jl/dev) for more information and see the [setup instructions](docs/setup.md).

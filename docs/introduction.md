@@ -13,10 +13,10 @@ On the [quickstart page](../notebooks/quickstart.ipynb), we showed how to train 
 ```julia
 using FastAI
 data, blocks = loaddataset("imagenette2-160", (Image, Label))
-method = ImageClassificationSingle(blocks)
-learner = methodlearner(method, data, callbacks=[ToGPU()])
+task = ImageClassificationSingle(blocks)
+learner = tasklearner(task, data, callbacks=[ToGPU()])
 fitonecycle!(learner, 10)
-showoutputs(method, learner)
+showoutputs(task, learner)
 ```
 
 Each of the five lines encapsulates one part of the deep learning pipeline to give a high-level API while still allowing customization. Let's have a closer look. 
@@ -44,18 +44,18 @@ image
 blocks
 ```
 
-## Learning method
+## Learning task
 
 {cell=main}
 ```julia
-method = ImageClassificationSingle(blocks)
+task = ImageClassificationSingle(blocks)
 ```
 
-The next line defines a learning method which encapsulates the data preprocessing pipeline and other logic related to the task. `ImageClassificationSingle` is a simple wrapper around `BlockMethod` which takes in blocks and data processing steps, so-called _encodings_. Using it, we can replace the above line with
+The next line defines a learning task which encapsulates the data preprocessing pipeline and other logic related to the task. `ImageClassificationSingle` is a simple wrapper around `BlockMethod` which takes in blocks and data processing steps, so-called _encodings_. Using it, we can replace the above line with
 
 
 ```julia
-method = BlockMethod(
+task = BlockMethod(
     (Image{2}(), Label(classes)),
     (
         ProjectiveTransforms((128, 128)),
@@ -65,7 +65,7 @@ method = BlockMethod(
 )
 ```
 
-Based on the blocks and encodings, the learning method can derive lots of functionality:
+Based on the blocks and encodings, the learning task can derive lots of functionality:
 
 - data processing
 - visualization
@@ -76,20 +76,20 @@ Based on the blocks and encodings, the learning method can derive lots of functi
 
 {cell=main}
 ```julia
-learner = methodlearner(method, data, callbacks=[ToGPU(), Metrics(accuracy)])
+learner = tasklearner(task, data, callbacks=[ToGPU(), Metrics(accuracy)])
 ```
 
 Next we create a [`Learner`](#) that encapsulates everything needed for training, including:
-- parallelized training and validation data loaders using [`methoddataloaders`](#)
-- a loss function using [`methodlossfn`](#)
-- a task-specific model using [`methodmodel`](#)
+- parallelized training and validation data loaders using [`taskdataloaders`](#)
+- a loss function using [`tasklossfn`](#)
+- a task-specific model using [`taskmodel`](#)
 
 The customizable, expanded version of the code looks like this:
 
 ```julia
-dls = methoddataloaders(data, method)
-model = methodmodel(method, Models.xresnet18())
-lossfn = methodlossfn(method)
+dls = taskdataloaders(data, task)
+model = taskmodel(task, Models.xresnet18())
+lossfn = tasklossfn(task)
 learner = Learner(model, dls, ADAM(), lossfn, ToGPU(), Metrics(accuracy))
 ```
 
@@ -112,7 +112,7 @@ Training now is quite simple. You have several options for high-level training s
 ## Visualization
 
 ```julia
-showoutputs(method, learner)
+showoutputs(task, learner)
 ```
 
-Finally, the last line visualizes the predictions of the trained model. It takes some samples from the training data loader, runs them through the model and decodes the outputs. How each piece of data is visualized is also inferred through the blocks in the learning method.
+Finally, the last line visualizes the predictions of the trained model. It takes some samples from the training data loader, runs them through the model and decodes the outputs. How each piece of data is visualized is also inferred through the blocks in the learning task.

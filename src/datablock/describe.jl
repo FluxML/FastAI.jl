@@ -82,13 +82,13 @@ function describeencodings(
 end
 
 
-function describemethod(method::SupervisedMethod)
-    blocks = getblocks(method)
+function describetask(task::SupervisedMethod)
+    blocks = getblocks(task)
     input, target, x, ŷ = blocks.input, blocks.target, blocks.x, blocks.ŷ
 
     encoding = describeencodings(
-        getencodings(method),
-        getblocks(method).sample,
+        getencodings(task),
+        getblocks(task).sample,
         blocknames = ["`blocks.input`", "`blocks.target`"],
         inname = "`(input, target)`",
         outname = "`(x, y)`",
@@ -97,11 +97,11 @@ function describemethod(method::SupervisedMethod)
     s = """
     **`SupervisedMethod` summary**
 
-    Learning method for the supervised task with input `$(summary(input))` and
+    Learning task for the supervised task with input `$(summary(input))` and
     target `$(summary(target))`. Compatible with `model`s that take in
     `$(summary(x))` and output `$(summary(ŷ))`.
 
-    Encoding a sample (`encode(method, context, sample)`) is done through
+    Encoding a sample (`encodesample(task, context, sample)`) is done through
     the following encodings:
 
     $encoding
@@ -110,11 +110,11 @@ function describemethod(method::SupervisedMethod)
     return Markdown.parse(s)
 end
 
-function describemethod(method::BlockMethod)
-    blocks = getblocks(method)
+function describetask(task::BlockMethod)
+    blocks = getblocks(task)
 
     encoding = describeencodings(
-        getencodings(method),
+        getencodings(task),
         (blocks.sample,),
         blocknames = ["sample"],
         inname = "`sample`",
@@ -124,11 +124,11 @@ function describemethod(method::BlockMethod)
     s = """
     **`BlockMethod` summary**
 
-    Learning method with blocks
+    Learning task with blocks
 
     $(join(["- $k: $(summary(v))" for (k, v) in zip(keys(blocks), values(blocks))], '\n'))
 
-    Encoding a sample (`encode(method, context, sample)`) is done through
+    Encoding a sample (`encodesample(task, context, sample)`) is done through
     the following encodings:
 
     $encoding

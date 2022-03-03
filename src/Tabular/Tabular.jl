@@ -5,13 +5,13 @@ using ..FastAI
 using ..FastAI:
     # blocks
     Block, WrapperBlock, AbstractBlock, OneHotTensor, OneHotTensorMulti, Label,
-    LabelMulti, wrapped, Continuous, getencodings, getblocks,
+    LabelMulti, wrapped, Continuous, getencodings, getblocks, encodetarget, encodeinput,
     # encodings
     Encoding, StatefulEncoding, OneHot,
     # visualization
     ShowText,
     # other
-    FASTAI_METHOD_REGISTRY, registerlearningmethod!
+    Context, Training, Validation, FASTAI_METHOD_REGISTRY, registerlearningtask!
 
 # for tests
 using ..FastAI: testencoding
@@ -42,8 +42,8 @@ include("encodings/tabularpreprocessing.jl")
 
 
 include("models.jl")
-include("learningmethods/classification.jl")
-include("learningmethods/regression.jl")
+include("tasks/classification.jl")
+include("tasks/regression.jl")
 include("recipes.jl")
 
 

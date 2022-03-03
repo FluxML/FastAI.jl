@@ -22,7 +22,7 @@ end
 """
     ImageKeypointRegression(size, nkeypoints; kwargs...)
 
-Learning method for regressing a set of `nkeypoints` keypoints from
+Learning task for regressing a set of `nkeypoints` keypoints from
 images. Images are resized to `size` and a class is predicted for every pixel.
 """
 function ImageKeypointRegression(size::NTuple{N,Int}, nkeypoints::Int; kwargs...) where N
@@ -30,17 +30,17 @@ function ImageKeypointRegression(size::NTuple{N,Int}, nkeypoints::Int; kwargs...
     return ImageKeypointRegression(blocks; size = size, kwargs...)
 end
 
-registerlearningmethod!(FASTAI_METHOD_REGISTRY, ImageKeypointRegression, (Image, Keypoints))
+registerlearningtask!(FASTAI_METHOD_REGISTRY, ImageKeypointRegression, (Image, Keypoints))
 
 
 # ## Tests
 
-@testset "ImageKeypointRegression [method]" begin
-    method = ImageKeypointRegression((16, 16), 10)
-    DLPipelines.checkmethod_core(method)
+@testset "ImageKeypointRegression [task]" begin
+    task = ImageKeypointRegression((16, 16), 10)
+    FastAI.checktask_core(task)
     @testset "Show backends" begin
         @testset "ShowText" begin
-            FastAI.test_method_show(method, ShowText(Base.DevNull()))
+            FastAI.test_task_show(task, ShowText(Base.DevNull()))
         end
     end
 end
