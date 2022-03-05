@@ -1,23 +1,23 @@
-struct Text{M,N} <: Block end
-
-function checkblock(::Text{M,N}, obs::AbstractArray{T,2}) where {M,N,T<:Number}
-    size(obs) == (M,N)
+struct TextRow{M,N,T} <: Block
+    catcols::NTuple{M}
+    contcols::NTuple{N}
+    categorydict::T
 end
 
-mockblock(::Text{M,N}) where {M,N} = rand(Float64, (M,N))    
-
-function setup(::Type{Text}, data)
-    # N,M = size(data[1,:,:])
-    N,M = size(getobs(data, 1))
-    return Text{N,M}()
+function TextRow(catcols, contcols, categorydict)
+    TextRow{length(catcols),length(contcols)}(catcols, contcols, categorydict)
 end
 
-# visualization
+function checkblock(block::TextRow{M,N}, x where {M,N,T<:Number}
+end
 
-function showblock!(io, ::ShowText, block::Text, obs)
-    plot = UnicodePlots.lineplot(obs[1,:])
-    for j=2:size(obs,1)
-        UnicodePlots.lineplot!(plot, obs[j,:])
-    end
-    print(io, plot)
+function mockblock(block::TextRow)
+end
+
+function setup(::Type{TextRow}, data)
+end
+
+# ## Interpretation
+
+function showblock!(io, ::ShowText, block::TextRow, obs)
 end
