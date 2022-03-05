@@ -1,20 +1,20 @@
-struct TimeSeries{M,N} <: Block end
+struct Text{M,N} <: Block end
 
-function checkblock(::TimeSeries{M,N}, obs::AbstractArray{T,2}) where {M,N,T<:Number}
+function checkblock(::Text{M,N}, obs::AbstractArray{T,2}) where {M,N,T<:Number}
     size(obs) == (M,N)
 end
 
-mockblock(::TimeSeries{M,N}) where {M,N} = rand(Float64, (M,N))    
+mockblock(::Text{M,N}) where {M,N} = rand(Float64, (M,N))    
 
-function setup(::Type{TimeSeries}, data)
+function setup(::Type{Text}, data)
     # N,M = size(data[1,:,:])
     N,M = size(getobs(data, 1))
-    return TimeSeries{N,M}()
+    return Text{N,M}()
 end
 
 # visualization
 
-function showblock!(io, ::ShowText, block::TimeSeries, obs)
+function showblock!(io, ::ShowText, block::Text, obs)
     plot = UnicodePlots.lineplot(obs[1,:])
     for j=2:size(obs,1)
         UnicodePlots.lineplot!(plot, obs[j,:])
