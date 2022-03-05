@@ -91,17 +91,10 @@ LearnBase.nobs(dataset::TableDataset{<:DataFrame}) = nrow(dataset.table)
 LearnBase.getobs(dataset::TableDataset{<:CSV.File}, idx) = dataset.table[idx]
 LearnBase.nobs(dataset::TableDataset{<:CSV.File}) = length(dataset.table)
 
-# TimeSeries Dataset
+# TimeSeriesDataset
 
 struct TimeSeriesDataset{}
     table::AbstractArray{Float64,3}
-end 
-
-function TimeSeriesDataset(path::AbstractPath)
-    mat = Matrix(DataFrame(CSV.File(path,header=0)))
-    N,M = size(mat)
-    table = reshape(mat, (N,1,M))
-    TimeSeriesDataset(table)
 end 
 
 function LearnBase.getobs(dataset::TimeSeriesDataset, idx)

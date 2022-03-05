@@ -109,6 +109,8 @@ export Vision
 include("Tabular/Tabular.jl")
 @reexport using .Tabular
 
+include("TimeSeries/TimeSeries.jl")
+@reexport using .TimeSeries
 
 include("interpretation/makie/stub.jl")
 function __init__()
@@ -155,6 +157,7 @@ export
     TableRow,
     Continuous,
     Image,
+    TimeSeriesRow,
 
     # encodings
     encode,
