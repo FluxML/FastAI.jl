@@ -90,6 +90,27 @@ LearnBase.nobs(dataset::TableDataset{<:DataFrame}) = nrow(dataset.table)
 
 LearnBase.getobs(dataset::TableDataset{<:CSV.File}, idx) = dataset.table[idx]
 LearnBase.nobs(dataset::TableDataset{<:CSV.File}) = length(dataset.table)
+    
+# Text Dataset
+
+struct TextDataset{}
+    table::AbstractArray{Float64,3}
+end 
+
+function TextDataset(path::AbstractPath)
+    mat = Matrix(DataFrame(CSV.File(path,header=0)))
+    N,M = size(mat)
+    table = reshape(mat, (N,1,M))
+    TextDataset(table)
+end 
+
+function LearnBase.getobs(dataset::TextDataset, idx)
+    dataset.table[idx,:,:]
+end
+
+function LearnBase.nobs(dataset::TextDataset) 
+    size(dataset.table)[1]
+end
 
 
 # ## Tests
