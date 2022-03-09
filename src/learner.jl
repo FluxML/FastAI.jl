@@ -97,7 +97,7 @@ end
 
 
 @testset "tasklearner" begin
-    task = SupervisedMethod((Label(1:2), Label(1:2)), (OneHot(),))
+    task = SupervisedTask((Label(1:2), Label(1:2)), (OneHot(),))
     data = (rand(1:2, 1000), rand(1:2, 1000))
     @test_nowarn learner = tasklearner(task, data, model=identity)
 

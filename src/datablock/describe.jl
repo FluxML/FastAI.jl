@@ -82,7 +82,7 @@ function describeencodings(
 end
 
 
-function describetask(task::SupervisedMethod)
+function describetask(task::SupervisedTask)
     blocks = getblocks(task)
     input, target, x, ŷ = blocks.input, blocks.target, blocks.x, blocks.ŷ
 
@@ -95,7 +95,7 @@ function describetask(task::SupervisedMethod)
     )
 
     s = """
-    **`SupervisedMethod` summary**
+    **`SupervisedTask` summary**
 
     Learning task for the supervised task with input `$(summary(input))` and
     target `$(summary(target))`. Compatible with `model`s that take in
@@ -110,7 +110,7 @@ function describetask(task::SupervisedMethod)
     return Markdown.parse(s)
 end
 
-function describetask(task::BlockMethod)
+function describetask(task::BlockTask)
     blocks = getblocks(task)
 
     encoding = describeencodings(
@@ -122,7 +122,7 @@ function describetask(task::BlockMethod)
     )
 
     s = """
-    **`BlockMethod` summary**
+    **`BlockTask` summary**
 
     Learning task with blocks
 

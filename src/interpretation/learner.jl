@@ -5,7 +5,7 @@
 Run a trained model in `learner` on `n` samples and visualize the
 outputs.
 """
-function showoutputs(task::AbstractBlockMethod, learner::Learner; n=4, context=Validation(), backend = default_showbackend())
+function showoutputs(task::AbstractBlockTask, learner::Learner; n=4, context=Validation(), backend = default_showbackend())
     cb = FluxTraining.getcallback(learner, ToDevice)
     devicefn = isnothing(cb) ? identity : cb.movedatafn
     backfn = isnothing(cb) ? identity : cpu

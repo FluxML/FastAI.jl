@@ -8,7 +8,7 @@ function ImageKeypointRegression(
         C=RGB{N0f8},
         computestats=false,
     ) where N
-    return SupervisedMethod(
+    return SupervisedTask(
         blocks,
         (
 			ProjectiveTransforms(size; augmentations=aug_projections),

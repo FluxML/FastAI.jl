@@ -8,7 +8,7 @@ function ImageSegmentation(
         C=RGB{N0f8},
         computestats=false,
 	) where N
-	return SupervisedMethod(
+	return SupervisedTask(
 		blocks,
 		(
 			ProjectiveTransforms(size; augmentations=aug_projections),
@@ -60,7 +60,7 @@ registerlearningtask!(FASTAI_METHOD_REGISTRY, ImageSegmentation, (Image, Mask))
         end
     end
     @testset "3D" begin
-        task = SupervisedMethod(
+        task = SupervisedTask(
             (Image{3}(), Mask{3}(1:4)),
             (
                 ProjectiveTransforms((16, 16, 16), inferencefactor=8),

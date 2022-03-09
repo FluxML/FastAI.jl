@@ -1,4 +1,4 @@
-# High-level plotting functions for use with `BlockMethod`s
+# High-level plotting functions for use with `BlockTask`s
 
 """
     showsample([backend], task, sample)
@@ -16,11 +16,11 @@ showsample(task, sample)  # select backend automatically
 showsample(ShowText(), task, sample)
 ```
 """
-function showsample(backend::ShowBackend, task::AbstractBlockMethod, sample)
+function showsample(backend::ShowBackend, task::AbstractBlockTask, sample)
     blocks = ("Input" => getblocks(task)[1], "Target" => getblocks(task)[2])
     showblock(backend, blocks, sample)
 end
-showsample(task::AbstractBlockMethod, sample) =
+showsample(task::AbstractBlockTask, sample) =
     showsample(default_showbackend(), task, sample)
 
 
@@ -40,10 +40,10 @@ showsamples(task, samples)  # select backend automatically
 showsamples(ShowText(), task, samples)
 ```
 """
-function showsamples(backend::ShowBackend, task::AbstractBlockMethod, samples)
+function showsamples(backend::ShowBackend, task::AbstractBlockTask, samples)
     showblocks(backend, "Sample" => getblocks(task).sample, samples)
 end
-showsamples(task::AbstractBlockMethod, samples) =
+showsamples(task::AbstractBlockTask, samples) =
     showsamples(default_showbackend(), task, sample)
 
 """
@@ -51,7 +51,7 @@ showsamples(task::AbstractBlockMethod, samples) =
 
 Show an encoded sample `encsample` to `backend`.
 """
-function showencodedsample(backend::ShowBackend, task::AbstractBlockMethod, encsample)
+function showencodedsample(backend::ShowBackend, task::AbstractBlockTask, encsample)
     showblockinterpretable(
         backend,
         getencodings(task),
@@ -69,7 +69,7 @@ Show a vector of encoded samples `encsamples` to `backend`.
 """
 function showencodedsamples(
     backend::ShowBackend,
-    task::AbstractBlockMethod,
+    task::AbstractBlockTask,
     encsamples::AbstractVector,
 )
     xblock, yblock = encodedblockfilled(getencodings(task), getblocks(task))
@@ -86,7 +86,7 @@ end
 
 Show a collated batch of encoded samples to `backend`.
 """
-function showbatch(backend::ShowBackend, task::AbstractBlockMethod, batch)
+function showbatch(backend::ShowBackend, task::AbstractBlockTask, batch)
     encsamples = collect(DataLoaders.obsslices(batch))
     showencodedsamples(backend, task, encsamples)
 end
@@ -99,11 +99,11 @@ showbatch(task, batch) = showbatch(default_showbackend(), task, batch)
 Show a prediction `pred`. If a `sample` is also given, show it next to
 the prediction. ŷ
 """
-function showprediction(backend::ShowBackend, task::AbstractBlockMethod, pred)
+function showprediction(backend::ShowBackend, task::AbstractBlockTask, pred)
     showblock(backend, "Prediction" => getblocks(task).pred, pred)
 end
 
-function showprediction(backend::ShowBackend, task::AbstractBlockMethod, sample, pred)
+function showprediction(backend::ShowBackend, task::AbstractBlockTask, sample, pred)
     blocks = getblocks(task)
     showblock(
         backend,
@@ -113,7 +113,7 @@ function showprediction(backend::ShowBackend, task::AbstractBlockMethod, sample,
 end
 
 
-showprediction(task::AbstractBlockMethod, args...) =
+showprediction(task::AbstractBlockTask, args...) =
     showprediction(default_showbackend(), task, args...)
 
 """
@@ -123,12 +123,12 @@ showprediction(task::AbstractBlockMethod, args...) =
 Show predictions `pred`. If `samples` are also given, show them next to
 the prediction.
 """
-function showpredictions(backend::ShowBackend, task::AbstractBlockMethod, preds)
+function showpredictions(backend::ShowBackend, task::AbstractBlockTask, preds)
     predblock = decodedblockfilled(getencodings(task), getblocks(task).ŷ)
     showblocks(backend, "Prediction" => predblock, preds)
 end
 
-function showpredictions(backend::ShowBackend, task::AbstractBlockMethod, samples, preds)
+function showpredictions(backend::ShowBackend, task::AbstractBlockTask, samples, preds)
     predblock = decodedblockfilled(getencodings(task), getblocks(task).ŷ)
     showblocks(
         backend,
@@ -137,7 +137,7 @@ function showpredictions(backend::ShowBackend, task::AbstractBlockMethod, sample
     )
 end
 
-showpredictions(task::AbstractBlockMethod, args...) =
+showpredictions(task::AbstractBlockTask, args...) =
     showpredictions(default_showbackend(), task, args...)
 
 """
@@ -147,7 +147,7 @@ showpredictions(task::AbstractBlockMethod, args...) =
 Show a model output to `backend`. If an encoded sample `encsample` is also
 given, show it next to the output.
 """
-function showoutput(backend::ShowBackend, task::AbstractBlockMethod, output)
+function showoutput(backend::ShowBackend, task::AbstractBlockTask, output)
     showblockinterpretable(
         backend,
         getencodings(task),
@@ -155,7 +155,7 @@ function showoutput(backend::ShowBackend, task::AbstractBlockMethod, output)
         output,
     )
 end
-function showoutput(backend::ShowBackend, task::AbstractBlockMethod, encsample, output)
+function showoutput(backend::ShowBackend, task::AbstractBlockTask, encsample, output)
     blocks = getblocks(task)
     showblockinterpretable(
         backend,
@@ -164,7 +164,7 @@ function showoutput(backend::ShowBackend, task::AbstractBlockMethod, encsample, 
         (encsample, output),
     )
 end
-showoutput(task::AbstractBlockMethod, args...) =
+showoutput(task::AbstractBlockTask, args...) =
     showoutput(default_showbackend(), task, args...)
 
 """
@@ -175,7 +175,7 @@ Show model outputs to `backend`. If a vector of encoded samples `encsamples` is 
 given, show them next to the outputs. Use [`showoutputbatch`](#) to show collated
 batches of outputs.
 """
-function showoutputs(backend::ShowBackend, task::AbstractBlockMethod, outputs)
+function showoutputs(backend::ShowBackend, task::AbstractBlockTask, outputs)
     showblocksinterpretable(
         backend,
         getencodings(task),
@@ -183,7 +183,7 @@ function showoutputs(backend::ShowBackend, task::AbstractBlockMethod, outputs)
         outputs,
     )
 end
-function showoutputs(backend::ShowBackend, task::AbstractBlockMethod, encsamples, outputs)
+function showoutputs(backend::ShowBackend, task::AbstractBlockTask, encsamples, outputs)
     blocks = getblocks(task)
     showblocksinterpretable(
         backend,
@@ -193,7 +193,7 @@ function showoutputs(backend::ShowBackend, task::AbstractBlockMethod, encsamples
     )
 end
 
-showoutputs(task::AbstractBlockMethod, args...) =
+showoutputs(task::AbstractBlockTask, args...) =
     showoutputs(default_showbackend(), task, args...)
 
 
@@ -205,13 +205,13 @@ Show collated batch of outputs to `backend`. If a collated batch of encoded samp
 `batch` is also given, show them next to the outputs. See [`showoutputs`](#) if you
 have vectors of outputs and not collated batches.
 """
-function showoutputbatch(backend::ShowBackend, task::AbstractBlockMethod, outputbatch)
+function showoutputbatch(backend::ShowBackend, task::AbstractBlockTask, outputbatch)
     outputs = collect(DataLoaders.obsslices(outputbatch))
     return showoutputs(backend, task, outputs)
 end
 function showoutputbatch(
     backend::ShowBackend,
-    task::AbstractBlockMethod,
+    task::AbstractBlockTask,
     batch,
     outputbatch,
 )
@@ -220,7 +220,7 @@ function showoutputbatch(
     return showoutputs(backend, task, encsamples, outputs)
 end
 
-showoutputbatch(task::AbstractBlockMethod, args...) =
+showoutputbatch(task::AbstractBlockTask, args...) =
     showoutputbatch(default_showbackend(), task, args...)
 
 # Testing helper

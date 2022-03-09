@@ -1,7 +1,7 @@
 
 
 """
-    abstract type AbstractBlockMethod <: LearningTask
+    abstract type AbstractBlockTask <: LearningTask
 
 Abstract supertype for learning tasks that derive their
 functionality from [`Block`](#)s and [`Encoding`](#)s.
@@ -12,27 +12,27 @@ stage of the pipeline. Generally, a subtype will have a field
 `blocks` of type `NamedTuple` that contains this information
 and a field `encodings` of encodings that are applied to samples.
 They can be accessed with `getblocks` and `getencodings`
-respectively. For example, [`SupervisedMethod`](#) represents a
+respectively. For example, [`SupervisedTask`](#) represents a
 learning task where each sample consists of an input and a target.
 
 {cell=main}
 ```julia
-task = SupervisedMethod(
+task = SupervisedTask(
     (Image{2}(), Label(["cat", "dog"])),
     (ImagePreprocessing(), OneHot(),)
 )
 getblocks(task)
 ```
 
-To implement a new `AbstractBlockMethod` either
+To implement a new `AbstractBlockTask` either
 
-- use the helper [`BlockMethod`](#) (simpler)
-- or subtype [`AbstractBlockMethod`](#) (allows customization through
+- use the helper [`BlockTask`](#) (simpler)
+- or subtype [`AbstractBlockTask`](#) (allows customization through
     dispatch)
 
 ## Blocks and interfaces
 
-To support different learning task interfaces, a `AbstractBlockMethod`'s
+To support different learning task interfaces, a `AbstractBlockTask`'s
 blocks need to contain different blocks. Below we list first block names
 with descriptions, and afterwards relevant interface functions and which
 blocks are required to use them.
@@ -83,63 +83,63 @@ Testing:
 
 
 """
-abstract type AbstractBlockMethod <: LearningTask end
+abstract type AbstractBlockTask <: LearningTask end
 
-getblocks(task::AbstractBlockMethod) = task.blocks
-getencodings(task::AbstractBlockMethod) = task.encodings
+getblocks(task::AbstractBlockTask) = task.blocks
+getencodings(task::AbstractBlockTask) = task.encodings
 
 # Core interface
 
-function encodesample(task::AbstractBlockMethod, context, sample)
+function encodesample(task::AbstractBlockTask, context, sample)
     encode(getencodings(task), context, getblocks(task).sample, sample)
 end
 
-function encodeinput(task::AbstractBlockMethod, context, input)
+function encodeinput(task::AbstractBlockTask, context, input)
     encode(getencodings(task), context, getblocks(task).input, input)
 end
 
-function encodetarget(task::AbstractBlockMethod, context, target)
+function encodetarget(task::AbstractBlockTask, context, target)
     encode(getencodings(task), context, getblocks(task).target, target)
 end
 
-function decode(task::AbstractBlockMethod, context, encodedsample)
+function decode(task::AbstractBlockTask, context, encodedsample)
     decode(getencodings(task), context, getblocks(task).encodedsample, encodedsample)
 end
 
-function decodeypred(task::AbstractBlockMethod, context, ŷ)
+function decodeypred(task::AbstractBlockTask, context, ŷ)
     decode(getencodings(task), context, getblocks(task).ŷ, ŷ)
 end
 
-function decodey(task::AbstractBlockMethod, context, y)
+function decodey(task::AbstractBlockTask, context, y)
     decode(getencodings(task), context, getblocks(task).y, y)
 end
 
 # Training interface
 
-function taskmodel(task::AbstractBlockMethod, backbone)
+function taskmodel(task::AbstractBlockTask, backbone)
     return blockmodel(getblocks(task).x, getblocks(task).ŷ, backbone)
 end
 
-function taskmodel(task::AbstractBlockMethod)
+function taskmodel(task::AbstractBlockTask)
     backbone = blockbackbone(getblocks(task).x)
     return blockmodel(getblocks(task).x, getblocks(task).ŷ, backbone)
 end
 
-function tasklossfn(task::AbstractBlockMethod)
+function tasklossfn(task::AbstractBlockTask)
     return blocklossfn(getblocks(task).ŷ, getblocks(task).y)
 end
 
 # Testing interface
 
-mocksample(task::AbstractBlockMethod) = mockblock(task, :sample)
-mockblock(task::AbstractBlockMethod, name::Symbol) = mockblock(getblocks(task)[name])
+mocksample(task::AbstractBlockTask) = mockblock(task, :sample)
+mockblock(task::AbstractBlockTask, name::Symbol) = mockblock(getblocks(task)[name])
 
-mockmodel(task::AbstractBlockMethod) =
+mockmodel(task::AbstractBlockTask) =
     mockmodel(getblocks(task).x, getblocks(task).ŷ)
 
 """
     mockmodel(xblock, ŷblock)
-    mockmodel(task::AbstractBlockMethod)
+    mockmodel(task::AbstractBlockTask)
 
 Create a fake model that maps batches of block `xblock` to batches of block
 `ŷblock`. Useful for testing.
@@ -154,35 +154,35 @@ end
 
 # ## Block task
 #
-# `BlockMethod` is a helper to create anonymous block tasks.
+# `BlockTask` is a helper to create anonymous block tasks.
 
 """
-    BlockMethod(blocks, encodings)
+    BlockTask(blocks, encodings)
 
-Create an [`AbstractBlockMethod`](#) directly, passing in a named tuple `blocks`
-and `encodings`. See [`SupervisedMethod`](#) for supervised training tasks.
+Create an [`AbstractBlockTask`](#) directly, passing in a named tuple `blocks`
+and `encodings`. See [`SupervisedTask`](#) for supervised training tasks.
 """
-struct BlockMethod{B<:NamedTuple,E} <: AbstractBlockMethod
+struct BlockTask{B<:NamedTuple,E} <: AbstractBlockTask
     blocks::B
     encodings::E
 end
 
-Base.show(io::IO, task::BlockMethod) = print(io,
-    "BlockMethod(blocks=", keys(getblocks(task)), ")")
+Base.show(io::IO, task::BlockTask) = print(io,
+    "BlockTask(blocks=", keys(getblocks(task)), ")")
 
 
 # ## Supervised learning task
 
 """
-    SupervisedMethod((inputblock, targetblock), encodings)
+    SupervisedTask((inputblock, targetblock), encodings)
 
-A [`AbstractBlockMethod`](#) learning task for the supervised
+A [`AbstractBlockTask`](#) learning task for the supervised
 task of learning to predict a `target` given an `input`. `encodings`
 are applied to samples before being input to the model. Model outputs
 are decoded using those same encodings to get a target prediction.
 
-In addition, to the blocks defined by [`AbstractBlockMethod`](#),
-`getblocks(::SupervisedMethod)` defines the following blocks:
+In addition, to the blocks defined by [`AbstractBlockTask`](#),
+`getblocks(::SupervisedTask)` defines the following blocks:
 
 By default the model output is assumed to be an encoded target, but the
 `ŷblock` keyword argument to overwrite this.
@@ -194,32 +194,32 @@ By default the model output is assumed to be an encoded target, but the
 - `blocks.pred`: A prediction. Usually the same as `blocks.target` but may
     differ if a custom `ŷblock` is specified.
 
-A `SupervisedMethod` also enables some additional functionality:
+A `SupervisedTask` also enables some additional functionality:
 
 - [`encodeinput`](#)
 - [`encodetarget`](#)
 - [`showprediction`](#), [`showpredictions`](#)
 """
-struct SupervisedMethod{B<:NamedTuple,E} <: AbstractBlockMethod
+struct SupervisedTask{B<:NamedTuple,E} <: AbstractBlockTask
     blocks::B
     encodings::E
 end
 
 
-function SupervisedMethod(blocks::Tuple{Any,Any}, encodings; ŷblock = nothing)
+function SupervisedTask(blocks::Tuple{Any,Any}, encodings; ŷblock = nothing)
     sample = input, target = blocks
     x, y = encodedsample = encodedblockfilled(encodings, sample)
     ŷ = isnothing(ŷblock) ? y : ŷblock
     pred = decodedblockfilled(encodings, ŷ)
     blocks = (; input, target, sample, encodedsample, x, y, ŷ, pred)
-    SupervisedMethod(blocks, encodings)
+    SupervisedTask(blocks, encodings)
 end
 
 
-function Base.show(io::IO, task::SupervisedMethod)
+function Base.show(io::IO, task::SupervisedTask)
     print(
         io,
-        "SupervisedMethod(",
+        "SupervisedTask(",
         summary(getblocks(task).input),
         " -> ",
         summary(getblocks(task).target),
@@ -230,4 +230,4 @@ end
 
 # ## Deprecations
 
-Base.@deprecate BlockMethod(blocks::Tuple{Any, Any}, encodings; kwargs...) SupervisedMethod(blocks, encodings; kwargs...)
+Base.@deprecate BlockTask(blocks::Tuple{Any, Any}, encodings; kwargs...) SupervisedTask(blocks, encodings; kwargs...)

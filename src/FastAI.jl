@@ -170,8 +170,8 @@ export
     augs_projection, augs_lighting,
     TabularPreprocessing,
 
-    SupervisedMethod,
-    BlockMethod,
+    SupervisedTask,
+    BlockTask,
     describetask,
     checkblock,
     makebatch,

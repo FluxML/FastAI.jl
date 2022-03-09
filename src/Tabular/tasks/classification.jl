@@ -5,7 +5,7 @@ function TabularClassificationSingle(
     tabledata, targetdata = data
     tabledata isa TableDataset || error("`data` needs to be a tuple of a `TableDataset` and targets")
 
-    return SupervisedMethod(
+    return SupervisedTask(
         blocks,
         (
             setup(TabularPreprocessing, blocks[1], tabledata),

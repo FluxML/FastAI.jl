@@ -8,7 +8,7 @@ function ImageClassificationSingle(
         C=RGB{N0f8},
         computestats=false,
 	) where N
-	return SupervisedMethod(
+	return SupervisedTask(
 		blocks,
 		(
 			ProjectiveTransforms(size; augmentations=aug_projections),
@@ -57,7 +57,7 @@ function ImageClassificationMulti(
         C=RGB{N0f8},
         computestats=false,
 	) where N
-	return SupervisedMethod(
+	return SupervisedTask(
 		blocks,
 		(
 			ProjectiveTransforms(size; augmentations=aug_projections),
@@ -120,7 +120,7 @@ registerlearningtask!(FASTAI_METHOD_REGISTRY, ImageClassificationMulti, (Image, 
         category = 1
         y = encodetarget(task, Training(), category)
         @test y ≈ [1, 0]
-        # depends on buffered interface for `BlockMethod`s and `Encoding`s
+        # depends on buffered interface for `BlockTask`s and `Encoding`s
         #encodetarget!(y, task, Training(), 2)
         #@test y ≈ [0, 1]
     end
