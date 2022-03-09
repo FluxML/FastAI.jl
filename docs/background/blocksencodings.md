@@ -82,13 +82,13 @@ Where do we draw the line between model and data processing? In general, the enc
 
 ## Block learning tasks
 
-[`BlockMethod`](#) creates a learning task from blocks and encodings. You define the sample block (recall for supervised tasks this is a tuple of input and target) and a sequence of encodings that are applied to all blocks.
+[`BlockTask`](#) creates a learning task from blocks and encodings. You define the sample block (recall for supervised tasks this is a tuple of input and target) and a sequence of encodings that are applied to all blocks.
 
 The below example defines the same learning task as [`ImageClassificationSingle`](#) does. The first two encodings only change `Image`, and the last changes only `Label`, so it's simple to understand.
 
 {cell=main}
 ```julia
-task = BlockMethod(
+task = BlockTask(
     (Image{2}(), Label(["cats", "dogs"])),
     (
         ProjectiveTransforms((128, 128)),
@@ -120,7 +120,7 @@ Image segmentation looks almost the same except we use a `Mask` block as target.
 
 {cell=main}
 ```julia
-task = BlockMethod(
+task = BlockTask(
     (Image{2}(), Mask{2}(1:10)),
     (
         ProjectiveTransforms((128, 128)),

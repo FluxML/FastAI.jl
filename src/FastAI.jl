@@ -111,6 +111,20 @@ include("Tabular/Tabular.jl")
 @reexport using .Tabular
 
 
+include("deprecations.jl")
+export
+    methodmodel,
+    methoddataset,
+    methoddataloaders,
+    methodlossfn,
+    BlockMethod,
+    describemethod,
+    findlearningmethods,
+    methodlearner,
+    savemethodmodel,
+    loadmethodmodel
+
+
 include("interpretation/makie/stub.jl")
 function __init__()
     @require Makie="ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a" begin
@@ -131,7 +145,6 @@ export
     Datasets,
     Models,
     datasetpath,
-    loadtaskdata,
     mapobs,
     groupobs,
     filterobs,

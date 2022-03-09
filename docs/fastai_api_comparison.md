@@ -30,14 +30,14 @@ There is no integration (yet!) for text and collaborative filtering applications
 
 FastAI.jl also has a data block API but it differs from fastai's in a number of ways. In the Julia package it only handles the data encoding and decoding part, and doesn't concern itself with creating datasets. For dataset loading, see the [data container API](data_containers.md). As mentioned above, the high-level application-specific logic is also derived from the data block API. To use it you need to specify a tuple of input and target blocks as well as a tuple of encodings that are applied to the data. The encodings  are invertible data-specific data processing steps which correspond to `fastai.Transform`s. As in fastai, dispatch is used to transform applicable data and pass other data through unchanged. Unlike in fastai, there are no default steps associated with a block, allowing greater flexibility.
 
-We can create a `BlockMethod` (similar to `fastai.DataBlock`) and get information about the representations the data goes through. 
+We can create a `BlockTask` (similar to `fastai.DataBlock`) and get information about the representations the data goes through.
 
 {cell=main}
 ```julia
 using FastAI
 import FastAI: Image
 
-task = BlockMethod(
+task = BlockTask(
     (Image{2}(), Mask{2}(["foreground", "background"])),
     (
         ProjectiveTransforms((128, 128)),

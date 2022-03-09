@@ -11,7 +11,7 @@ Quickly get started training and finetuning models using already implemented lea
 - [`fit!`](#)
 - [`fitonecycle!`](#)
 - [`finetune!`](#)
-- [`BlockMethod`](#)
+- [`BlockTask`](#)
 - callbacks
 
 ### Mid-level

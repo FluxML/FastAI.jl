@@ -51,11 +51,11 @@ blocks
 task = ImageClassificationSingle(blocks)
 ```
 
-The next line defines a learning task which encapsulates the data preprocessing pipeline and other logic related to the task. `ImageClassificationSingle` is a simple wrapper around `BlockMethod` which takes in blocks and data processing steps, so-called _encodings_. Using it, we can replace the above line with
+The next line defines a learning task which encapsulates the data preprocessing pipeline and other logic related to the task. `ImageClassificationSingle` is a simple wrapper around `BlockTask` which takes in blocks and data processing steps, so-called _encodings_. Using it, we can replace the above line with
 
 
 ```julia
-task = BlockMethod(
+task = BlockTask(
     (Image{2}(), Label(classes)),
     (
         ProjectiveTransforms((128, 128)),

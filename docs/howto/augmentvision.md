@@ -11,7 +11,7 @@ import FastAI: Image
 import CairoMakie; CairoMakie.activate!(type="png")
 
 data, blocks = loaddataset("imagenette2-160", (Image, Label))
-task = BlockMethod(
+task = BlockTask(
     blocks,
     (
         ProjectiveTransforms((128, 128)),
@@ -28,7 +28,7 @@ Most learning tasks let you pass additional augmentations as keyword arguments. 
 
 {cell=main}
 ```julia
-task2 = BlockMethod(
+task2 = BlockTask(
     blocks,
     (
         ProjectiveTransforms((128, 128), augmentations=augs_projection()),
@@ -45,7 +45,7 @@ Likewise, there is an [`augs_lighting`](#) helper that adds contrast and brightn
 
 {cell=main}
 ```julia
-task3 = BlockMethod(
+task3 = BlockTask(
     blocks,
     (
         ProjectiveTransforms((128, 128), augmentations=augs_projection()),
