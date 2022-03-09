@@ -7,9 +7,10 @@ struct FastAIDataset
     datadepname
     subpath
     size
+    root_url
 end
 
-const ROOT_URL = "https://s3.amazonaws.com/fast-ai-"
+# const ROOT_URL = "https://s3.amazonaws.com/fast-ai-"
 
 function FastAIDataset(
         name, subfolder, checksum="";
@@ -17,8 +18,9 @@ function FastAIDataset(
         description="",
         datadepname=name,
         subpath=name,
-        size="???")
-    return FastAIDataset(name, subfolder, extension, description, checksum, datadepname, subpath, size)
+        size="???",
+        root_url="https://s3.amazonaws.com/fast-ai-")
+    return FastAIDataset(name, subfolder, extension, description, checksum, datadepname, subpath, size, root_url)
 end
 
 DESCRIPTIONS = Dict(
@@ -105,6 +107,9 @@ const DATASETCONFIGS = [
     FastAIDataset("annotations_trainval2017", "coco", datadepname="coco-annotations_trainval2017", extension="zip"),
     FastAIDataset("stuff_annotations_trainval2017", "coco", datadepname="coco-stuff_annotations_trainval2017", extension="zip"),
     FastAIDataset("panoptic_annotations_trainval2017", "coco", datadepname="coco-panoptic_annotations_trainval2017", extension="zip"),
+
+    # time series
+    FastAIDataset("Adiac", "", "9c808bcfc77f3cab0a640bfa23e680ccde91da6981962e63c0f4f0737dcf6390", datadepname="adiac", extension="zip", root_url = "http://www.timeseriesclassification.com/Downloads", subpath="")
 ]
 
 const DATASETS = [d.datadepname for d in DATASETCONFIGS]
@@ -125,7 +130,7 @@ function DataDeps.DataDep(d::FastAIDataset)
 
         Download size: $(d.size)
         """,
-        "$(ROOT_URL)$(d.subfolder)/$(d.name).$(d.extension)",
+        "$(d.root_url)$(d.subfolder)/$(d.name).$(d.extension)",
         d.checksum,
         post_fetch_method=DataDeps.unpack,
     )

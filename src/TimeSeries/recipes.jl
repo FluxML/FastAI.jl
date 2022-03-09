@@ -6,6 +6,7 @@ end
 Datasets.recipeblocks(::Type{TimeSeriesDatasetRecipe}) = Tuple{TimeSeriesRow, Label} 
 
 function Datasets.loadrecipe(recipe::TimeSeriesDatasetRecipe, path)
+    path = convert(String, path)
     datasetpath = joinpath(path, recipe.file)
     df = ARFFFiles.load(DataFrame, datasetpath)
     labels = Array(df[!, recipe.targetcol])

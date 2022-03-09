@@ -25,6 +25,7 @@ import DataFrames: DataFrame, Not, select
 import UnicodePlots
 import ARFFFiles
 
+using FilePathsBase
 using InlineTest
 
 # Blocks
