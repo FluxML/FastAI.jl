@@ -16,7 +16,7 @@ function predict(task, model, input; device = cpu, undevice = cpu, context = Inf
             context = context,
         ) |> only
     else
-        return decodeŷ(
+        return decodeypred(
             task,
             context,
             undevice(model(device(encodeinput(task, context, input)))),
@@ -44,6 +44,6 @@ function predictbatch(
         DataLoaders.collate([copy(encodeinput(task, context, input)) for input in inputs]),
     )
     ŷs = undevice(model(xs))
-    targets = [decodeŷ(task, context, ŷ) for ŷ in DataLoaders.obsslices(ŷs)]
+    targets = [decodeypred(task, context, ŷ) for ŷ in DataLoaders.obsslices(ŷs)]
     return targets
 end

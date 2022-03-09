@@ -5,6 +5,29 @@ Represents a concrete approach for solving a learning task.
 
 A `LearningTask` defines how data is processed encoded and decoded
 before and after going through a model.
+
+
+## Extending
+
+It is recommended to use [`AbstractBlockTask`](#)s like [`BlockTask`](#)
+and [`SupervisedTask`](#) to construct tasks, but you may subtype
+`LearningTask` for lower-level control.
+
+There is a core interface that will allow you to train models and
+perform inference (for supervised tasks). It consists of
+
+- [`encodesample`](#)
+- [`encodeinput`](#)
+- [`decodeypred`](#)
+
+You can optionally implement additional interfaces to get support for
+higher-level features of the library.
+
+- Training interface: [`tasklossfn`](#), [`taskmodel`](#)
+- Testing interface: [`mocksample`](#), [`mockinput`](#), [`mocktarget`](#),
+    [`mockmodel`](#)
+- Batching: [`shouldbatch`](#)
+
 """
 abstract type LearningTask end
 
@@ -55,12 +78,17 @@ function encodeinput end
 function decodeypred end
 const decodeŷ = decodeypred
 
+decodey(args...; kwargs...) = decodeypred(args...; kwargs...)
+
 # ## Buffered encoding interface
+#
+# If not overwritten, applies the non-buffering method.
 
 encodesample!(buf, task, ctx, sample) = encodesample(task, ctx, sample)
 encodeinput!(buf, task, ctx, sample) = encodeinput(task, ctx, sample)
 decodeypred!(buf, task, ctx, ypred) = decodeypred(task, ctx, ypred)
 const decodeŷ! = decodeypred!
+decodey!(args...; kwargs...) = decodeypred!(args...; kwargs...)
 
 
 # ## Training interface

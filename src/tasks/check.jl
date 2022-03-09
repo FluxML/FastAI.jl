@@ -28,11 +28,11 @@ function checktask_core(
                 @test_nowarn ŷ = _predictx(task, model, x, devicefn)
             end
         end
-        @testset "`decodeŷ" begin
+        @testset "`decodeypred" begin
             for context in CONTEXTS
                 x, _ = encodesample(task, context, sample)
                 ŷ = _predictx(task, model, x, devicefn)
-                @test_nowarn decodeŷ(task, context, ŷ)
+                @test_nowarn decodeypred(task, context, ŷ)
             end
         end
     end

@@ -62,7 +62,7 @@ Core:
 - [`encode`](#)`(task, ctx, sample)` requires `sample`. Also enables use of
     [`taskdataset`](#), [`taskdataloaders`](#)
 - [`decode`](#)`(task, ctx, encodedsample)` requires `encodedsample`
-- [`decodeŷ`](#)`(task, ctx, ŷ)` requires `ŷ`
+- [`decodeypred`](#)`(task, ctx, ŷ)` requires `ŷ`
 - [`decodey`](#)`(task, ctx, y)` requires `y`
 
 Training:

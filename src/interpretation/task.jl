@@ -245,7 +245,7 @@ function test_task_show(
 )
 
     encsample = encodesample(task, context, sample)
-    pred = decodeŷ(task, context, output)
+    pred = decodeypred(task, context, output)
 
     Test.@testset "`show*` test suite for learning task $task and backend $(typeof(backend))" begin
         @test (showsample(backend, task, sample); true)
