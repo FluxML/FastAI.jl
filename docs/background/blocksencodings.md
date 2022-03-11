@@ -40,7 +40,7 @@ Where do we draw the line between model and data processing? In general, the enc
     {cell=main}
     ```julia
     using FastAI, Colors
-    using FastAI: ImageTensor
+    using FastAI.Vision: ImageTensor
     enc = ImagePreprocessing()
     data = rand(RGB, 100, 100)
     @show summary(data)
@@ -70,6 +70,7 @@ Where do we draw the line between model and data processing? In general, the enc
     ```
     {cell=main}
     ```julia
+    using FastAI: encodedblockfilled
     encodedblockfilled(enc, Label(1:10)) == Label(1:10)
     ```
 - Encodings can be applied to tuples of blocks. The default behavior is to apply the encoding to each block separately.
@@ -112,7 +113,7 @@ This is equivalent to:
 
 {cell=main}
 ```julia
-x, y = encodesample(task.encodings, Training(), task.blocks, sample)
+x, y = encode(task.encodings, Training(), FastAI.getblocks(task).sample, sample)
 summary(x), summary(y)
 ```
 

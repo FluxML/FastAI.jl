@@ -18,7 +18,7 @@ Before we get started, let's load up a [data container](data_containers.md) that
 
 {cell=main}
 ```julia
-using FastAI, FastAI.DataAugmentation, FastAI.DLPipelines, FastAI.Colors
+using FastAI, FastAI.DataAugmentation, Colors
 import FastAI: Image
 data = Datasets.loadfolderdata(
     datasetpath("imagenette2-160"),
@@ -38,13 +38,11 @@ classes = unique(eachobs(targets))
 
 ### Learning task struct
 
-Now let's get to it! The first thing we need to do is to create a [`DLPipelines.LearningTask`](#) struct. The `LearningTask` `struct` should contain all the configuration needed for encoding and decoding the data. We'll keep it simple here and include a list of the classes and the image dimensions input to the model.
+Now let's get to it! The first thing we need to do is to create a [`LearningTask`](#) struct. The `LearningTask` `struct` should contain all the configuration needed for encoding and decoding the data. We'll keep it simple here and include a list of the classes and the image dimensions input to the model.
 
 {cell=main}
 ```julia
-using FastAI: DLPipelines
-
-struct ImageClassification <: DLPipelines.LearningTask
+struct ImageClassification <: FastAI.LearningTask
     classes
     size
 end
@@ -61,9 +59,9 @@ task = ImageClassification(classes, (128, 128))
 
 There are 3 tasks we need to define before we can use our learning task to train models and make predictions:
 
-- [`DLPipelines.encode`](#) which encodes an image and a class
-- [`DLPipelines.encodeinput`](#) will encode an image so it can be input to a model
-- [`DLPipelines.decodeŷ`](#) (write `\hat<TAB>` for  ` ̂`) decodes a model output into a class label
+- [`encodesample`](#) which encodes an image and a class
+- [`encodeinput`](#) will encode an image so it can be input to a model
+- [`decodeypred`](#) decodes a model output into a class label
 
 Note: These functions always operate on *single* images and classes, even if we want to pass batches to the model later on.
 
@@ -72,7 +70,7 @@ While it's not the focus of this tutorial, let's give a quick recap of how the d
 - Images are cropped to a common size so they can be batched, converted to a 3D array with dimensions (height, width, color channels) and normalized
 - Classes are encoded as one-hot vectors, teaching the model to predict a confidence distribution over all classes. To decode a predicted one-hot vector, we can simply find the index with the highest value and look up the class label.
 
-Each of the tasks also takes a `context::`[`DLPipelines.Context`](#) argument which allows it to behave differently during training, validation and inference. We'll make use of that to choose a different image crop for each situation. During training we'll use a random crop for augmentation, while during validation a center crop will ensure that any metrics we track are the same every epoch. During inference, we won't crop the image so we don't lose any information.
+Each of the tasks also takes a `context::`[`FastAI.Context`](#) argument which allows it to behave differently during training, validation and inference. We'll make use of that to choose a different image crop for each situation. During training we'll use a random crop for augmentation, while during validation a center crop will ensure that any metrics we track are the same every epoch. During inference, we won't crop the image so we don't lose any information.
 
 #### Inputs
 
@@ -80,14 +78,14 @@ We implement [`encodeinput`](#) using [DataAugmentation.jl](https://github.com/l
 
 {cell=main}
 ```julia
-using FastAI: IMAGENET_MEANS, IMAGENET_STDS  # color statistics for normalization
+using FastAI.Vision: IMAGENET_MEANS, IMAGENET_STDS  # color statistics for normalization
 
 # Helper for crop based on context
 getresizecrop(context::Training, sz) = DataAugmentation.RandomResizeCrop(sz)
 getresizecrop(context::Validation, sz) = CenterResizeCrop(sz)
 getresizecrop(context::Inference, sz) = ResizePadDivisible(sz, 32)
 
-function DLPipelines.encodeinput(
+function FastAI.encodeinput(
         task::ImageClassification,
         context::Context,
         image)
@@ -106,7 +104,7 @@ If we test this out on an image, it should give us a 3D array of size `(128, 128
 {cell=main}
 ```julia
 sample = image, class = getobs(data, 1)
-x = encodeinput(task, Training(), image)
+x = FastAI.encodeinput(task, Training(), image)
 summary(x)
 ```
 
@@ -116,7 +114,7 @@ summary(x)
 
 {cell=main}
 ```julia
-function DLPipelines.encodetarget(
+function FastAI.encodetarget(
         task::ImageClassification,
         ::Context,
         class)
@@ -126,7 +124,7 @@ function DLPipelines.encodetarget(
     return v
 end
 
-DLPipelines.encodesample(task::ImageClassification, ctx, (input, target)) = (
+FastAI.encodesample(task::ImageClassification, ctx, (input, target)) = (
     encodeinput(task, ctx, input),
     encodetarget(task, ctx, target),
 )
@@ -136,21 +134,21 @@ DLPipelines.encodesample(task::ImageClassification, ctx, (input, target)) = (
 
 {cell=main}
 ```julia
-y = encodetarget(task, Training(), class)
+y = FastAI.encodetarget(task, Training(), class)
 ```
 
 The same goes for the decoding step:
 
 {cell=main}
 ```julia
-function DLPipelines.decodeŷ(task::ImageClassification, ::Context, ŷ)
-    return task.classes[argmax(ŷ)]
+function FastAI.decodeypred(task::ImageClassification, ::Context, ypred)
+    return task.classes[argmax(ypred)]
 end
 ```
 
 {cell=main}
 ```julia
-decodeŷ(task, Training(), y) == class
+FastAI.decodeypred(task, Training(), y) == class
 ```
 
 ## Training
@@ -201,14 +199,14 @@ Let's start with the loss function. We want to compare two one-hot encoded categ
 
 {cell=main}
 ```
-DLPipelines.tasklossfn(task::ImageClassification) = Flux.Losses.logitcrossentropy
+FastAI.tasklossfn(task::ImageClassification) = Flux.Losses.logitcrossentropy
 ```
 
 For the model, we'll assume we're getting a convolutional feature extractor passed in as a backbone so its output will be of size (height, width, channels, batch size). [`Flux.outputsize`](#) can be used to calculate the output size of arbitrary models without having to evaluate the model. We'll use it to check the number of output channels of the backbone. Then we add a global pooling layer and some dense layers on top to get a classification output. 
 
 {cell=main}
 ```julia
-function DLPipelines.taskmodel(task::ImageClassification, backbone)
+function FastAI.taskmodel(task::ImageClassification, backbone)
     h, w, outch, b = Flux.outputsize(backbone, (256, 256, inblock.nchannels, 1))
     head = Chain(
         AdaptiveMeanPool((1, 1)),

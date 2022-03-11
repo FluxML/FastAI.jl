@@ -78,7 +78,6 @@ Since it is a Julia package, FastAI.jl is not written on top of PyTorch, but a J
 - [Flux.jl](https://github.com/FluxML/Flux.jl) provides models, optimizers, and loss functions, fulfilling a similar role to PyTorch
 - [MLDataPattern.jl](https://github.com/JuliaML/MLDataPattern.jl) gives you tools for building and transforming data containers
 - [DataLoaders.jl](https://github.com/lorenzoh/DataLoaders.jl) takes care of efficient, parallelized iteration of data containers
-- [DLPipelines.jl](https://github.com/lorenzoh/DLPipelines.jl) provides the low-level `LearningTask` interface for defining data pipelines.
 - [DataAugmentation.jl](https://github.com/lorenzoh/DataAugmentation.jl) takes care of the lower levels of high-performance, composable data augmentations.
 - [FluxTraining.jl](https://github.com/lorenzoh/FluxTraining.jl) contributes a highly extensible training loop with 2-way callbacks
 
@@ -111,7 +110,7 @@ The `Block`s also allow implementing task-specific functionality:
 
 - [`blocklossfn`](#) takes a prediction and encoded target block to determine a good loss function to use. For example, for image classification we want to compare two one-hot encoded labels and hence define `blocklossfn(::OneHotTensor{0}, ::OneHotTensor{0}) = logitcrossentropy`.
 - [`blockmodel`](#) constructs a model from a backbone that maps an input block to an output block. For example, for image segmentation we have `ImageTensor{N}()` as the input block and `OneHotTensor{N}` (one-hot encoded N-dimensional masks) as output, so `blockmodel` turns the backbone into a U-Net.
-- [`plotblock!`](#) defines how to visualize a block of data. Note that the block plotting API is not stable yet and may change in the future
+- [`showblock!`](#) defines how to visualize a block of data.
 
 ### Generic optimizer
 
@@ -134,7 +133,7 @@ In FastAI.jl, you are not restricted to a specific type of data iterator and can
 - [`groupobs`](#)`(f, data)` splits a container into groups using a grouping function `f`. For example, `groupobs(grandparentname, files)` creates training splits for files where the grandparent folder indicates the split.
 - [`datasubset`](#)`(data, idxs)` lazily takes a subset of the observations in `data`.
 
-For more information, see the [data container tutorial](data_containers.md) and the [MLDataPattern.jl docs](https://mldatapatternjl.readthedocs.io/en/latest/). At a higher level, there are also convenience functions like [`loadfolderdata`](#) to create data containers.
+For more information, see the [data container tutorial](data_containers.md) and the [MLDataPattern.jl docs](https://mldatapatternjl.readthedocs.io/en/latest/). At a higher level, there are also convenience functions like [`FileDataset`](#) to create data containers.
 
 ### Layers and architectures 
 

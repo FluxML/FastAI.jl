@@ -29,15 +29,6 @@ Enables training and prediction. Prerequisite for other, optional learning task 
 
 For visualizing observations and predictions using [Makie.jl](https://github.com/JuliaPlots/Makie.jl).
 
-{.tight}
-- Required tasks:
-    - [`plotsample!`](#)
-    - [`plotxy!`](#)
-    - [`plotprediction!`](#)
-- Enables use of:
-    - [`plotsamples`](#)
-    - [`plotbatch`](#)
-
 ### Training interface
 
 Convenience for creating [`Learner`](#)s.
