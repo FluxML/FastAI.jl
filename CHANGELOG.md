@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Made block-based learning method more modular. `SupervisedMethod` now supplants `BlockMethod`.  [PR](https://github.com/FluxML/FastAI.jl/pull/188)
   - `getencodings` and `getblocks` should now be used to get block information and encodings from a method
   - See the [new tutorial training a Variational Autoencoder].
-  - See also the docstrings for `AbstractBlockMethod` and `SupervisedMethod`
+  - See also the docstrings for `AbstractBlockTask` and `SupervisedTask`
 
 ### Changed
 
