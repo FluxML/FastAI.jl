@@ -5,7 +5,7 @@ using Base: NamedTuple
 using Reexport
 @reexport using FluxTraining
 @reexport using DataLoaders
-@reexport using Flux
+using Flux
 
 using Animations
 import DataAugmentation
@@ -164,6 +164,7 @@ export
     Training,
     Validation,
     Inference,
+    Context,
 
     # blocks
     Label,

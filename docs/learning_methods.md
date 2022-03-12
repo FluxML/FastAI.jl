@@ -166,7 +166,7 @@ Now, with a makeshift model, an optimizer and a loss function we can create a [`
 
 {cell=main}
 ```julia
-using FastAI: Flux
+using FastAI, Flux
 
 model = Chain(
     Models.xresnet18(),

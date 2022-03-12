@@ -21,7 +21,7 @@ function FastAIDataset(
     return FastAIDataset(name, subfolder, extension, description, checksum, datadepname, subpath, size)
 end
 
-DESCRIPTIONS = Dict(
+const DESCRIPTIONS = Dict(
     "imagenette" => "A subset of 10 easily classified classes from Imagenet: tench, English springer, cassette player, chain saw, church, French horn, garbage truck, gas pump, golf ball, parachute",
     "imagewoof" => "A subset of 10 harder to classify classes from Imagenet (all dog breeds): Australian terrier, Border terrier, Samoyed, beagle, Shih-Tzu, English foxhound, Rhodesian ridgeback, dingo, golden retriever, Old English sheepdog",
     "food-101" => "101 food categories, with 101,000 images; 250 test images and 750 training images per class. The training images were not cleaned. All images were rescaled to have a maximum side length of 512 pixels.",

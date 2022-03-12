@@ -44,8 +44,8 @@ Datasets.recipeblocks(::Type{ImageFolders}) = Tuple{Image{2},Label}
 
 Dataset recipe for loading 2D image segmentation datasets from a common format
 where images and masks are stored as images in two different subfolders
-"<root>/<imagefolder>" and "<root>/<maskfolder>"
-The class labels should be in a newline-delimited file "<root>/<labelfile>".
+`<root>/<imagefolder>` and `<root>/<maskfolder>`
+The class labels should be in a newline-delimited file `<root>/<labelfile>`.
 """
 Base.@kwdef struct ImageSegmentationFolders <: Datasets.DatasetRecipe
     imagefolder::String = "images"

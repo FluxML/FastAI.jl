@@ -13,12 +13,11 @@ Functions for the learning task interfaces always dispatch on a [`LearningTask`]
 Enables training and prediction. Prerequisite for other, optional learning task interfaces.
 
 {.tight}
-- Required tasks:
+- Required methods:
     - [`encode`](#) or both [`encodeinput`](#) and [`encodetarget`](#).
     - [`decodeŷ`](#)
-- Optional tasks:
+- Optional methods:
     - [`shouldbatch`](#)
-    - [`encode!`](#) or both [`encodeinput!`](#) and [`encodetarget!`](#).
 - Enables use of:
     - [`taskdataset`](#)
     - [`taskdataloaders`](#)
@@ -34,7 +33,7 @@ For visualizing observations and predictions using [Makie.jl](https://github.com
 Convenience for creating [`Learner`](#)s.
 
 {.tight}
-- Required tasks:
+- Required methods:
     - [`tasklossfn`](#)
     - [`taskmodel`](#)
 - Enables use of:
@@ -46,7 +45,7 @@ Convenience for creating [`Learner`](#)s.
 Automatically test interfaces.
 
 {.tight}
-- Required tasks: 
+- Required methods: 
     - [`mockmodel`](#)
     - [`mocksample`](#) or both [`mockinput`](#) and [`mocktarget`](#)
 - Enables use of:

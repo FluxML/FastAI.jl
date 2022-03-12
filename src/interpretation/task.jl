@@ -72,7 +72,7 @@ function showencodedsamples(
     task::AbstractBlockTask,
     encsamples::AbstractVector,
 )
-    xblock, yblock = encodedblockfilled(getencodings(task), getblocks(task))
+    xblock, yblock = encodedblockfilled(getencodings(task), getblocks(task).encodedsample)
     showblocksinterpretable(
         backend,
         getencodings(task),
