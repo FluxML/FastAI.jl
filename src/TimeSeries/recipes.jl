@@ -36,3 +36,15 @@ function _registerrecipes()
         Datasets.registerrecipe!(Datasets.FASTAI_DATA_REGISTRY, name, recipe)
     end
 end
+
+
+# ## Tests
+
+
+@testset "TimeSeriesDatasetRecipe [recipe]" begin
+    path = datasetpath("adiac")
+    recipe = TimeSeriesDatasetRecipe(file="Adiac_TRAIN.arff")
+    data, block = loadrecipe(recipe, path)
+    sample = getobs(data, 1)
+    @test checkblock(block, sample)
+end
