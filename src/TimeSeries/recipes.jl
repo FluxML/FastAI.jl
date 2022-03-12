@@ -1,5 +1,5 @@
 Base.@kwdef struct TimeSeriesDatasetRecipe <: Datasets.DatasetRecipe
-    file = ""
+    file
     targetcol = "target"
 end
 

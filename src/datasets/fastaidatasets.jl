@@ -109,7 +109,7 @@ const DATASETCONFIGS = [
     FastAIDataset("panoptic_annotations_trainval2017", "coco", datadepname="coco-panoptic_annotations_trainval2017", extension="zip"),
 
     # time series
-    FastAIDataset("Adiac", "", "9c808bcfc77f3cab0a640bfa23e680ccde91da6981962e63c0f4f0737dcf6390", datadepname="adiac", extension="zip", root_url = "http://www.timeseriesclassification.com/Downloads", subpath="")
+    FastAIDataset("Adiac", "", "9c808bcfc77f3cab0a640bfa23e680ccde91da6981962e63c0f4f0737dcf6390", datadepname="adiac", extension="zip", root_url = "http://www.timeseriesclassification.com/Downloads", subpath="", size="2MB")
 ]
 
 const DATASETS = [d.datadepname for d in DATASETCONFIGS]

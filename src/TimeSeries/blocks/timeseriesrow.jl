@@ -23,7 +23,7 @@ mockblock(::TimeSeriesRow{M,N}) where {M,N} = rand(Float64, (M,N))
 
 function setup(::Type{TimeSeriesRow}, data)
     # N,M = size(data[1,:,:])
-    N,M = size(getobs(data, 1))
+    N, M = size(getobs(data, 1))
     return TimeSeriesRow{N,M}()
 end
 
