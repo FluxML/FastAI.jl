@@ -47,7 +47,7 @@ function TabularModel(
 
     tabularbackbone = Parallel(vcat, catbackbone, contbackbone)
 
-    classifierin = mapreduce(layer -> size(layer.weight)[1], +, catbackbone[2].layers;
+    classifierin = mapreduce(layer -> size(layer.weight)[1], +, Tuple(catbackbone[2].layers);
                              init = contbackbone.chs)
     dropout_rates = Iterators.cycle(dropout_rates)
     classifiers = []
