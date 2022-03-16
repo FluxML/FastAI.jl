@@ -25,7 +25,7 @@ import ..FastAI:
 import DataAugmentation
 import DataFrames: DataFrame
 import Flux
-import Flux: Embedding, Chain, Dropout, Dense, Parallel
+import Flux: Embedding, Chain, Dropout, Dense, Parallel, BatchNorm
 import PrettyTables
 import Requires: @require
 import ShowCases: ShowCase

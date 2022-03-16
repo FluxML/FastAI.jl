@@ -1,5 +1,7 @@
 using Pollen
 using Pkg
+using Crayons
+Crayons.COLORS[:nothing] = 67
 
 using FastAI, Flux, FluxTraining
 import DataAugmentation
@@ -8,10 +10,6 @@ ms = [
     DataAugmentation,
     Flux,
     FluxTraining,
-    FastAI.Vision,
-    FastAI.Models,
-    FastAI.Tabular,
-    FastAI.Datasets,
     m,
 ]
 

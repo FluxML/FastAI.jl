@@ -1,0 +1,29 @@
+{
+    "Overview": "documents/README.md",
+    "Setup": "documents/docs/setup.md",
+    "Quickstart": "documents/notebooks/quickstart.ipynb",
+    "Tutorials": {
+        "Beginner": {
+            "Introduction": "documents/docs/introduction.md",
+            "Discovering functionality": "documents/docs/discovery.md"
+        },
+        "Intermediate": {
+            "Data containers": "documents/docs/data_containers.md"
+        }
+    },
+    "Computer vision": {
+        "Tasks": {
+            "Image segmentation": "documents/notebooks/imagesegmentation.ipynb",
+            "Keypoint regression": "documents/notebooks/keypointregression.ipynb"
+        },
+        "How-To": {
+            "Use augmentations": "documents/docs/augmentvision.md",
+            "Presize vision datasets": "notebooks/presizing.ipynb"
+        }
+    },
+    "Tabular data": {
+        "Tasks": {
+            "Tabular classification": "documents/notebooks/tabularclassification.ipynb"
+        },
+    }
+}
