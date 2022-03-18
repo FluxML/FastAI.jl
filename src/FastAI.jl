@@ -109,6 +109,8 @@ export Vision
 include("Tabular/Tabular.jl")
 @reexport using .Tabular
 
+include("Text/Text.jl")
+@reexport using .Text
 
 include("interpretation/makie/stub.jl")
 function __init__()
@@ -153,6 +155,7 @@ export
     LabelMulti,
     Many,
     TableRow,
+    TextRow,
     Continuous,
     Image,
 
