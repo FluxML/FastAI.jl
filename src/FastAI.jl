@@ -109,7 +109,7 @@ export Vision
 include("Tabular/Tabular.jl")
 @reexport using .Tabular
 
-include("Text/text.jl")
+include("Text/Text.jl")
 @reexport using .Text
 
 include("interpretation/makie/stub.jl")
