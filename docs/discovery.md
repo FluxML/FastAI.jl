@@ -1,6 +1,6 @@
 # Discovery
 
-As you may have seen in [the introduction](./introduction.md), FastAI.jl makes it possible to train models in just 5 lines of code. However, if you have a task in mind, you need to know what datasets you can train on and if there are convenience learning method constructors. For example, the introduction loads the `"imagenette2-160"` dataset and uses [`ImageClassificationSingle`](#) to construct a learning method. Now what if, instead of classifying an image into one class, we want to classify every single pixel into a class (semantic segmentation)? Now we need a dataset with pixel-level annotations and a learning method that can process those segmentation masks.
+As you may have seen in [the introduction](./introduction.md), FastAI.jl makes it possible to train models in just 5 lines of code. However, if you have a task in mind, you need to know what datasets you can train on and if there are convenience learning task constructors. For example, the introduction loads the `"imagenette2-160"` dataset and uses [`ImageClassificationSingle`](#) to construct a learning task. Now what if, instead of classifying an image into one class, we want to classify every single pixel into a class (semantic segmentation)? Now we need a dataset with pixel-level annotations and a learning task that can process those segmentation masks.
 
 For finding both, we can make use of `Block`s. A `Block` represents a kind of data, for example images, labels or keypoints. For supervised learning tasks, we have an input block and a target block. If we wanted to classify whether 2D images contain a cat or a dog, we could use the blocks `(Image{2}(), Label(["cat", "dog"]))`, while for semantic segmentation, we'll have an input `Image` block and a target [`Mask`](#) block.
 
@@ -59,24 +59,24 @@ In short, if you have a learning task in mind and want to load a dataset for tha
 2. List all datasets with `Image` as input block and any target block. (Hint: the supertype of all types is `Any`)
 
 
-## Finding a learning method
+## Finding a learning task
 
-Armed with a dataset, we can go to the next step: creating a learning method. Since we already have blocks defined, this amounts to defining the encodings that are applied to the data before it is used in training. Here, FastAI.jl already defines some convenient constructors for learning methods and you can find them with [`findlearningmethods`](#). Here we can pass in either block types as above or the block instances we got from `loaddataset`.
+Armed with a dataset, we can go to the next step: creating a learning task. Since we already have blocks defined, this amounts to defining the encodings that are applied to the data before it is used in training. Here, FastAI.jl already defines some convenient constructors for learning tasks and you can find them with [`findlearningtasks`](#). Here we can pass in either block types as above or the block instances we got from `loaddataset`.
 
 {cell=main}
 ```julia
-findlearningmethods(blocks)
+findlearningtasks(blocks)
 ```
 
-Looks like we can use the [`ImageSegmentation`](#) function to create a learning method for our learning task. Every function returned can be called with `blocks` and, optionally, some keyword arguments for customization.
+Looks like we can use the [`ImageSegmentation`](#) function to create a learning task for our learning task. Every function returned can be called with `blocks` and, optionally, some keyword arguments for customization.
 
 {cell=main}
 ```julia
-method = ImageSegmentation(blocks; size = (64, 64))
+task = ImageSegmentation(blocks; size = (64, 64))
 ```
 
 And that's the basic workflow for getting started with a supervised task.
 
 ### Exercises
 
-1. Find all learning method functions with images as inputs.
+1. Find all learning task functions with images as inputs.

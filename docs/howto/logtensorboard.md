@@ -34,8 +34,8 @@ callbacks = [
 ]
 
 data = ...
-method = ...
-learner = methodlearner(method, data; callbacks=callbacks)
+task = ...
+learner = tasklearner(task, data; callbacks=callbacks)
 fitonecycle!(learner, 5)
 ```
 

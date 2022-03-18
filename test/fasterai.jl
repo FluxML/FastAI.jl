@@ -7,6 +7,6 @@
     @test !isempty(finddatasets(blocks=(Image, LabelMulti)))
     @test !isempty(finddatasets(blocks=(Image, Mask)))
 
-    @test ImageClassificationSingle ∈ findlearningmethods((Image, Label))
-    @test ImageClassificationMulti ∈ findlearningmethods((Image, LabelMulti))
+    @test ImageClassificationSingle ∈ findlearningtasks((Image, Label))
+    @test ImageClassificationMulti ∈ findlearningtasks((Image, LabelMulti))
 end

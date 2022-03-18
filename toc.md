@@ -14,7 +14,7 @@
     - Advanced
         - [Presizing vision datasets](notebooks/presizing.ipynb)
         - [Unsupervised learning](notebooks/vae.ipynb)
-        - [Custom Learning methods](docs/learning_methods.md)
+        - [Custom Learning tasks](docs/learning_tasks.md)
 - How To
     - [Train your model](notebooks/training.ipynb)
     - [Augment vision data](docs/howto/augmentvision.md)

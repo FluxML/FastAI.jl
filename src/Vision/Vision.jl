@@ -29,13 +29,14 @@ using ..FastAI
 using ..FastAI:
     # blocks
     Block, WrapperBlock, AbstractBlock, OneHotTensor, OneHotTensorMulti, Label,
-    LabelMulti, wrapped, getencodings, getblocks,
+    LabelMulti, wrapped, getencodings, getblocks, encodetarget, encodeinput,
     # encodings
     Encoding, StatefulEncoding, OneHot,
     # visualization
     ShowText,
     # other
-    FASTAI_METHOD_REGISTRY, registerlearningmethod!, Datasets
+    Context, Training, Validation, Inference,
+    FASTAI_METHOD_REGISTRY, registerlearningtask!, Datasets
 import FastAI.Datasets
 
 # for tests
@@ -80,10 +81,10 @@ include("encodings/projective.jl")
 
 include("models/Models.jl")
 include("models.jl")
-include("learningmethods/utils.jl")
-include("learningmethods/classification.jl")
-include("learningmethods/segmentation.jl")
-include("learningmethods/keypointregression.jl")
+include("tasks/utils.jl")
+include("tasks/classification.jl")
+include("tasks/segmentation.jl")
+include("tasks/keypointregression.jl")
 include("recipes.jl")
 
 include("tests.jl")
@@ -102,7 +103,7 @@ end
 export Image, Mask, Keypoints, Bounded,
     # encodings
     ImagePreprocessing, KeypointPreprocessing, ProjectiveTransforms,
-    # learning methods
+    # learning tasks
     ImageClassificationSingle, ImageClassificationMulti,
     ImageKeypointRegression, ImageSegmentation,
     # helpers

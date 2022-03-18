@@ -4,27 +4,27 @@
 
 ### High-level
 
-Quickly get started training and finetuning models using already implemented learning methods and callbacks.
+Quickly get started training and finetuning models using already implemented learning tasks and callbacks.
 
 {.tight}
-- [`methodlearner`](#)
+- [`tasklearner`](#)
 - [`fit!`](#)
 - [`fitonecycle!`](#)
 - [`finetune!`](#)
-- [`BlockMethod`](#)
+- [`BlockTask`](#)
 - callbacks
 
 ### Mid-level
 
 {.tight}
 - [`Learner`](#)
-- [`methodmodel`](#)
-- [`methodlossfn`](#)
+- [`taskmodel`](#)
+- [`tasklossfn`](#)
 
 ### Low-level
 
 {.tight}
-- [`LearningMethod`](#)
+- [`LearningTask`](#)
 - [`encode`](#)
 - [`encodeinput`](#)
 - `decodey`
