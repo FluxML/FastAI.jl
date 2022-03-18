@@ -21,14 +21,14 @@ function TextRow(catcols, contcols, categorydict)
     TextRow{length(catcols),length(contcols)}(catcols, contcols, categorydict)
 end
 
-function checkblock(block::TextRow{M,N}, x where {M,N,T<:Number}
-end
+# function checkblock(block::TextRow{M,N}, x where {M,N,T<:Number}
+# end
 
-function mockblock(block::TextRow)
-end
+# function mockblock(block::TextRow)
+# end
 
-function setup(::Type{TextRow}, data)
-end
+# function setup(::Type{TextRow}, data)
+# end
 
 # ## Interpretation
 
