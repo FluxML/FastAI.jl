@@ -13,10 +13,10 @@ Functions for the learning task interfaces always dispatch on a [`LearningTask`]
 Enables training and prediction. Prerequisite for other, optional learning task interfaces.
 
 {.tight}
-- Required methods:
+- Required tasks:
     - [`encode`](#) or both [`encodeinput`](#) and [`encodetarget`](#).
     - [`decodeŷ`](#)
-- Optional methods:
+- Optional tasks:
     - [`shouldbatch`](#)
 - Enables use of:
     - [`taskdataset`](#)
@@ -45,7 +45,7 @@ Convenience for creating [`Learner`](#)s.
 Automatically test interfaces.
 
 {.tight}
-- Required methods: 
+- Required tasks: 
     - [`mockmodel`](#)
     - [`mocksample`](#) or both [`mockinput`](#) and [`mocktarget`](#)
 - Enables use of:
