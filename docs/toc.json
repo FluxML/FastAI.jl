@@ -9,6 +9,9 @@
         },
         "Intermediate": {
             "Data containers": "documents/docs/data_containers.md"
+        },
+        "Advanced": {
+            "Unsupervised learning tasks": "documents/notebooks/vae.ipynb"
         }
     },
     "Computer vision": {
@@ -24,6 +27,6 @@
     "Tabular data": {
         "Tasks": {
             "Tabular classification": "documents/notebooks/tabularclassification.ipynb"
-        },
+        }
     }
 }
