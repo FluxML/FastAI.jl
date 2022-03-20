@@ -1,9 +1,9 @@
 
 """
-    methodlearner(method, traindata, validdata[; callbacks=[], kwargs...]) -> Learner
-    methodlearner(method, data; pctgval = 0.2, kwargs...)
+    tasklearner(task, traindata, validdata[; callbacks=[], kwargs...]) -> Learner
+    tasklearner(task, data; pctgval = 0.2, kwargs...)
 
-Create a [`Learner`](#) to train a model for learning method `method` using
+Create a [`Learner`](#) to train a model for learning task `task` using
 `data`.
 
 ## Keyword arguments
@@ -11,12 +11,12 @@ Create a [`Learner`](#) to train a model for learning method `method` using
 - `callbacks = []`: [`Callback`](#)s to use during training.
 - `batchsize = 16`: Batch size used for the training data loader.
 - `backbone = nothing`: Backbone model to construct task-specific model from using
-   [`methodmodel`](#)`(method, backbone)`.
+   [`taskmodel`](#)`(task, backbone)`.
 - `model = nothing`: Complete model to use. If given, the `backbone` argument is ignored.
 - `optimizer = ADAM()`: Optimizer passed to `Learner`.
-- `lossfn = `[`methodlossfn`](#)`(method)`: Loss function passed to `Learner`.
+- `lossfn = `[`tasklossfn`](#)`(task)`: Loss function passed to `Learner`.
 
-Any other keyword arguments will be passed to [`methoddataloaders`](#).
+Any other keyword arguments will be passed to [`taskdataloaders`](#).
 
 ## Examples
 
@@ -24,27 +24,27 @@ Full example:
 
 ```julia
 data, blocks = loaddataset("imagenette2-160", (Image, Label))
-method = ImageClassificationSingle(blocks)
-learner = methodlearner(method, data)
+task = ImageClassificationSingle(blocks)
+learner = tasklearner(task, data)
 fitonecycle!(learner, 10)
 ```
 
 Custom training and validation split:
 
 ```julia
-learner = methodlearner(method, traindata, validdata)
+learner = tasklearner(task, traindata, validdata)
 ```
 
 Using callbacks:
 
 ```julia
-learner = methodlearner(method, data; callbacks=[
+learner = tasklearner(task, data; callbacks=[
     ToGPU(), Checkpointer(), LogMetrics(TensorboardBackend())
 ])
 ```
 """
-function methodlearner(
-        method::LearningMethod,
+function tasklearner(
+        task::LearningTask,
         traindata,
         validdata;
         backbone=nothing,
@@ -53,19 +53,19 @@ function methodlearner(
         pctgval=0.2,
         batchsize=16,
         optimizer=ADAM(),
-        lossfn=methodlossfn(method),
+        lossfn=tasklossfn(task),
         kwargs...,
     )
     if isnothing(model)
-        model = isnothing(backbone) ? methodmodel(method) : methodmodel(method, backbone)
+        model = isnothing(backbone) ? taskmodel(task) : taskmodel(task, backbone)
     end
-    dls = methoddataloaders(traindata, validdata, method, batchsize; kwargs...)
+    dls = taskdataloaders(traindata, validdata, task, batchsize; kwargs...)
     return Learner(model, dls, optimizer, lossfn, callbacks...)
 end
 
-function methodlearner(method, data; pctgval=0.2, kwargs...)
+function tasklearner(task, data; pctgval=0.2, kwargs...)
     traindata, validdata = splitobs(shuffleobs(data), at=1 - pctgval)
-    return methodlearner(method, traindata, validdata; kwargs...)
+    return tasklearner(task, traindata, validdata; kwargs...)
 end
 
 
@@ -96,28 +96,28 @@ end
 end
 
 
-@testset "methodlearner" begin
-    method = SupervisedMethod((Label(1:2), Label(1:2)), (OneHot(),))
+@testset "tasklearner" begin
+    task = SupervisedTask((Label(1:2), Label(1:2)), (OneHot(),))
     data = (rand(1:2, 1000), rand(1:2, 1000))
-    @test_nowarn learner = methodlearner(method, data, model=identity)
+    @test_nowarn learner = tasklearner(task, data, model=identity)
 
     @testset "batch sizes" begin
-        learner = methodlearner(method, data, model=identity, batchsize=100)
+        learner = tasklearner(task, data, model=identity, batchsize=100)
         @test length(learner.data.training) == 8
         @test length(learner.data.validation) == 1
 
-        learner = methodlearner(method, data, model=identity, pctgval=0.4, batchsize=100)
+        learner = tasklearner(task, data, model=identity, pctgval=0.4, batchsize=100)
         @test length(learner.data.training) == 6
         @test length(learner.data.validation) == 2
 
-        learner = methodlearner(method, data, model=identity, batchsize=100, validbsfactor=1)
+        learner = tasklearner(task, data, model=identity, batchsize=100, validbsfactor=1)
         @test length(learner.data.training) == 8
         @test length(learner.data.validation) == 2
     end
 
     @testset "callbacks" begin
-        learner = methodlearner(
-            method, data, model=identity,
+        learner = tasklearner(
+            task, data, model=identity,
             callbacks=[ToGPU(), Checkpointer(mktempdir())])
         @test !isnothing(FluxTraining.getcallback(learner, Checkpointer))
 

@@ -5,7 +5,7 @@ function TabularClassificationSingle(
     tabledata, targetdata = data
     tabledata isa TableDataset || error("`data` needs to be a tuple of a `TableDataset` and targets")
 
-    return SupervisedMethod(
+    return SupervisedTask(
         blocks,
         (
             setup(TabularPreprocessing, blocks[1], tabledata),
@@ -17,7 +17,7 @@ end
 """
     TabularClassificationSingle(blocks, data)
 
-Learning method for single-label tabular classification. Continuous columns are
+Learning task for single-label tabular classification. Continuous columns are
 normalized and missing values are filled, categorical columns are label encoded
 taking into account any missing values which might be present. The target value
 is predicted from `classes`. `blocks` should be an input and target block
@@ -25,7 +25,7 @@ is predicted from `classes`. `blocks` should be an input and target block
 
     TabularClassificationSingle(classes, tabledata [; catcols, contcols])
 
-Construct learning method with `classes` to classify into and a `TableDataset`
+Construct learning task with `classes` to classify into and a `TableDataset`
 `tabledata`. The column names can be passed in or guessed from the data.
 """
 function TabularClassificationSingle(
@@ -44,29 +44,29 @@ end
 
 # ## Tests
 
-@testset "TabularClassificationSingle [method]" begin
+@testset "TabularClassificationSingle [task]" begin
     df = DataFrame(A = 1:4, B = ["M", "F", "F", "M"], C = ["P", "F", "P", "F"])
     td = TableDataset(df)
 
-    method = TabularClassificationSingle(["P", "F"], td; catcols=(:B,), contcols=(:A,), )
-    testencoding(getencodings(method), getblocks(method).sample)
-    DLPipelines.checkmethod_core(method)
-    @test_nowarn methodlossfn(method)
-    @test_nowarn methodmodel(method)
+    task = TabularClassificationSingle(["P", "F"], td; catcols=(:B,), contcols=(:A,), )
+    testencoding(getencodings(task), getblocks(task).sample)
+    FastAI.checktask_core(task)
+    @test_nowarn tasklossfn(task)
+    @test_nowarn taskmodel(task)
 
     @testset "`encodeinput`" begin
-        row = mockblock(getblocks(method)[1])
+        row = mockblock(getblocks(task)[1])
 
-        xtrain = encodeinput(method, Training(), row)
-        @test length(xtrain[1]) == length(getblocks(method).input.catcols)
-        @test length(xtrain[2]) == length(getblocks(method).input.contcols)
+        xtrain = encodeinput(task, Training(), row)
+        @test length(xtrain[1]) == length(getblocks(task).input.catcols)
+        @test length(xtrain[2]) == length(getblocks(task).input.contcols)
 
         @test eltype(xtrain[1]) <: Number
     end
 
     @testset "`encodetarget`" begin
         category = "P"
-        y = encodetarget(method, Training(), category)
+        y = encodetarget(task, Training(), category)
         @test y ≈ [1, 0]
     end
 
@@ -74,5 +74,5 @@ end
     @test_nowarn TabularClassificationSingle(["P", "F"], td)
     @test TabularClassificationSingle(["P", "F"], td).blocks[1].catcols == (:B, :C)
 
-    FastAI.test_method_show(method, ShowText(Base.DevNull()))
+    FastAI.test_task_show(task, ShowText(Base.DevNull()))
 end

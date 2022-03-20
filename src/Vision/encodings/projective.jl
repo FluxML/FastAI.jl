@@ -13,16 +13,16 @@ Encodes all spatial blocks, preserving the block type:
 The behavior differs based on the `context` of encoding:
 
 {.tight}
-- [`DLPipelines.Training`](#):
+- [`Training`](#):
     1. Resizes the data so the smallest side equals
     a side length in `sz` while keeping the aspect ratio.
     2. Applies `augmentations`.
     3. Crops a random `sz`-sized portion of the data
-- [`DLPipelines.Validation`](#):
+- [`Validation`](#):
     1. Resizes the data so the smallest side equals
     a side length in `sz` while keeping the aspect ratio.
     2. Crops a `sz`-sized portion from the center.
-- [`DLPipelines.Inference`](#):
+- [`Inference`](#):
     1. Resizes the data so the smallest side equals
     a side length in `sz` while keeping the aspect ratio.
         Note that in this context, the data does not have
