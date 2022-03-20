@@ -10,7 +10,6 @@ is valid if it satisfies the `AbstractRow` interface in Tables.jl, values
 present in indices for categorical and continuous columns are consistent,
 and `data` is indexable by the elements of `catcols` and `contcols`.
 """
-
 struct TextRow{M,N,T} <: Block
     catcols::NTuple{M}
     contcols::NTuple{N}
