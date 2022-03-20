@@ -35,6 +35,9 @@ using InlineTest
 # Blocks
 include("blocks/textrow.jl")
 
+# Encodings
+include("recipes.jl")
+
 export TextRow
 
 end
