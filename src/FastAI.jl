@@ -110,6 +110,9 @@ export Vision
 include("Tabular/Tabular.jl")
 @reexport using .Tabular
 
+include("Text/Text.jl")
+@reexport using .Text
+
 
 include("deprecations.jl")
 export
@@ -170,6 +173,7 @@ export
     LabelMulti,
     Many,
     TableRow,
+    TextRow,
     Continuous,
     Image,
 
