@@ -37,6 +37,7 @@ using ..FastAI:
     # other
     Context, Training, Validation, Inference,
     FASTAI_METHOD_REGISTRY, registerlearningtask!, Datasets
+import Flux
 import FastAI.Datasets
 
 # for tests
@@ -55,7 +56,7 @@ import FixedPointNumbers: N0f8
 import DataAugmentation
 import DataAugmentation: apply, Identity, ToEltype, ImageToTensor, Normalize,
     BufferedThreadsafe, ScaleKeepAspect, PinOrigin, RandomCrop, CenterResizeCrop,
-    AdjustBrightness, AdjustContrast, Maybe,
+    AdjustBrightness, AdjustContrast, Maybe, FlipX, FlipY, WarpAffine, Rotate, Zoom,
     ResizePadDivisible, itemdata
 import ImageInTerminal
 import IndirectArrays: IndirectArray

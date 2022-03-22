@@ -17,11 +17,12 @@ learning task where each sample consists of an input and a target.
 
 {cell=main}
 ```julia
+using FastAI
 task = SupervisedTask(
     (Image{2}(), Label(["cat", "dog"])),
     (ImagePreprocessing(), OneHot(),)
 )
-getblocks(task)
+FastAI.getblocks(task)
 ```
 
 To implement a new `AbstractBlockTask` either

@@ -117,7 +117,7 @@ _emb_sz_rule(n_cat) = min(600, round(Int, 1.6 * n_cat^0.56))
 
 Given a vector of `cardinalities` of each categorical column
 (i.e. each element of `cardinalities` is the number of classes in that categorical column),
-compute the output embedding size according to [`emb_sz_rule`](#).
+compute the output embedding size according to [`_emb_sz_rule`](#).
 Return a vector of tuples where each element is `(in_size, out_size)` for an embedding layer.
 
 ## Keyword arguments

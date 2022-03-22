@@ -37,16 +37,16 @@ Quickly download and load task data containers from the fastai dataset library.
 
 {.tight}
 - `load
-- [`Datasets.DATASETS`](#)
+- [`FastAI.Datasets.DATASETS`](#)
 
 ### Mid-level
 
 Load and transform data containers.
 
 {.tight}
-- [`Datasets.datasetpath`](#)
-- [`Datasets.FileDataset`](#)
-- [`Datasets.TableDataset`](#)
+- [`FastAI.Datasets.datasetpath`](#)
+- [`FastAI.Datasets.FileDataset`](#)
+- [`FastAI.Datasets.TableDataset`](#)
 - [`mapobs`](#)
 - [`groupobs`](#)
 - [`joinobs`](#)
