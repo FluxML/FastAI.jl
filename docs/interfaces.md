@@ -18,7 +18,6 @@ Enables training and prediction. Prerequisite for other, optional learning task 
     - [`decodeŷ`](#)
 - Optional tasks:
     - [`shouldbatch`](#)
-    - [`encode!`](#) or both [`encodeinput!`](#) and [`encodetarget!`](#).
 - Enables use of:
     - [`taskdataset`](#)
     - [`taskdataloaders`](#)
@@ -34,7 +33,7 @@ For visualizing observations and predictions using [Makie.jl](https://github.com
 Convenience for creating [`Learner`](#)s.
 
 {.tight}
-- Required tasks:
+- Required methods:
     - [`tasklossfn`](#)
     - [`taskmodel`](#)
 - Enables use of:

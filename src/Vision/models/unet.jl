@@ -9,12 +9,6 @@ channels.
 
 ## Keyword arguments
 
-- `upsample`: A *constructor* for an upsampling block callable with `upsample(insize, k_out)`.
-    If `insize` is `(h, w, k, b)`, then the output should have size `(2h, 2w, k_out, b)`.
-    Defaults to [`FastAI.Models.upsample_block_small`](#).
-- `agg`: Aggregation function for skip connection. Default concatenates in the
-  channel dimension. Use `+` for summing and see [`Flux.SkipConnection`](#) for more
-  details.
 - `fdownscale = 0`: Number of upsampling steps to leave out. By default there will be one
     upsampling step for every downsampling step in `backbone`. Hence if the input spatial
     size is `(h, w)`, the output size will be `(h/2^fdownscale, w/2^fdownscale)`, i.e.

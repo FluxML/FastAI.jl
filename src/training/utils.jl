@@ -96,7 +96,7 @@ end
     makebatch(task, data, [idxs; context]) -> (xs, ys)
 
 Create a batch of encoded data by loading `idxs` from data container `data`.
-Useful for inspection and as input to [`plotbatch`](#). Samples are encoded
+Useful for inspection and as input to [`showbatch`](#). Samples are encoded
 in `context` which defaults to `Training`.
 """
 function makebatch(task::LearningTask, data, idxs = 1:8; context = Training())
