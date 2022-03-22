@@ -1,0 +1,1 @@
+{"attributes":{"kind":"function","backlinks":[],"methods":[{"line":118,"file":"/home/runner/.julia/packages/FluxTraining/2sFqe/src/callbacks/callbacks.jl","method_id":"FastAI.ToGPU_1","symbol_id":"FastAI.ToGPU","signature":"ToGPU()"}],"name":"ToGPU","title":"ToGPU","symbol_id":"FastAI.ToGPU","public":true,"module_id":"FastAI"},"tag":"documentation","children":[]}
