@@ -1,6 +1,6 @@
 # FastAI
 
-Docs: [Stable](https://FluxML.github.io/FastAI.jl/stable) | [Dev](https://FluxML.github.io/FastAI.jl/dev)
+Docs: [Dev](https://FluxML.github.io/FastAI.jl/dev/i)
 
 FastAI.jl is inspired by [fastai](https://github.com/fastai/fastai), and is a repository of best practices for deep learning in Julia. Its goal is to easily enable creating state-of-the-art models. FastAI enables the design, training, and delivery of deep learning models that compete with the best in class, using few lines of code.
 
