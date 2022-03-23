@@ -2,6 +2,7 @@ using Pollen
 using Pkg
 using Crayons
 Crayons.COLORS[:nothing] = 67
+ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 
 using FastAI, Flux, FluxTraining
 import DataAugmentation
