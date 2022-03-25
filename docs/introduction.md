@@ -23,7 +23,12 @@ Each of the five lines encapsulates one part of the deep learning pipeline to gi
 
 ## Dataset
 
-{cell=main}
+{cell=main, result=false, output=false style="display:none;"}
+```julia
+ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
+```
+
+{cell=main, output=false}
 ```julia
 data, blocks = loaddataset("imagenette2-160", (Image, Label))
 ```

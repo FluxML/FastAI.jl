@@ -10,7 +10,7 @@ In the [quickstart](quickstart.md) section, you have already come in contact wit
 ```julia
 ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 ```
-{cell=main}
+{cell=main, output=false}
 ```julia
 using FastAI
 import FastAI: Image

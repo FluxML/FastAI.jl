@@ -4,6 +4,11 @@ Data augmentation is important to train models with good generalization ability,
 
 By default, the only augmentation that will be used in computer vision tasks is a random crop, meaning that after images, keypoints and masks are resized to a similar size a random portion will be cropped during training. We can demonstrate this on the image classification task.
 
+{cell=main, result=false, output=false style="display:none;"}
+```julia
+ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
+```
+
 {cell=main output=false}
 ```julia
 using FastAI
