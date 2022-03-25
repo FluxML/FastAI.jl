@@ -17,7 +17,12 @@ finddatasets(blocks=(Image, Mask))
 
 We can see that the `"camvid_tiny"` dataset can be loaded so that each sample is a pair of an image and a segmentation mask. Let's use [`loaddataset`](#) to load a [data container](data_containers.md) and concrete blocks.
 
-{cell=main}
+{cell=main, result=false, output=false style="display:none;"}
+```julia
+ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
+```
+
+{cell=main, output=false}
 ```julia
 data, blocks = loaddataset("camvid_tiny", (Image, Mask))
 ```
