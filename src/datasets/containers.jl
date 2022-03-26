@@ -38,6 +38,8 @@ function loadfile(file::String)
         return FileIO.load(file, view = true)
     elseif endswith(file, ".csv")
         return DataFrame(CSV.File(file))
+    elseif endswith(file, ".txt")
+        return String(read(file))
     else
         return FileIO.load(file)
     end

@@ -45,6 +45,8 @@ matches(re::Regex) = f -> matches(re, f)
 matches(re::Regex, f) = !isnothing(match(re, f))
 const RE_IMAGEFILE = r".*\.(gif|jpe?g|tiff?|png|webp|bmp)$"i
 isimagefile(f) = matches(RE_IMAGEFILE, f)
+const RE_TEXTFILE = r".*\.(txt|csv|json|md|html?|xml|yaml|toml)$"i
+istextfile(f) = matches(RE_TEXTFILE, f)
 
 
 maskfromimage(a::AbstractArray{<:Gray{T}}, classes) where T = maskfromimage(reinterpret(T, a), classes)
