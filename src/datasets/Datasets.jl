@@ -67,6 +67,7 @@ export
 
     # utilities
     isimagefile,
+    istextfile,
     matches,
     loadfile,
     loadmask,
