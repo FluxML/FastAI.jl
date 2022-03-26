@@ -74,11 +74,11 @@ removecol(block::TextRow, col) = TextRow(
 
 const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
     "ag_news_csv" => [
-        TableDatasetRecipe(file="train.csv"),
+        TextDatasetRecipe(file="train.csv"),
         # TableClassificationRecipe(TableDatasetRecipe(file="train.csv"), :salary),
     ],
     "amazon_review_full_csv" => [
-        TableDatasetRecipe(file="train.csv"),
+        TextDatasetRecipe(file="train.csv"),
         # TableClassificationRecipe(TableDatasetRecipe(file="train.csv"), :label)
     ]
 )
