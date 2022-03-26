@@ -13,10 +13,11 @@ and `data` is indexable by the elements of `catcols` and `contcols`.
 struct TextRow{M,N} <: Block
     catcols::NTuple{M}
     contcols::NTuple{N}
+    categorydict::T
 end
 
 function TextRow(catcols, contcols)
-    TextRow{length(catcols),length(contcols)}(catcols, contcols)
+    TextRow{length(catcols),length(contcols)}(catcols, contcols, categorydict)
 end
 
 function checkblock(block::TextRow, x)
