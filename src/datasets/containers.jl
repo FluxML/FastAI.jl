@@ -1,6 +1,6 @@
 # FileDataset
 
-function FileDataset(dir, pattern = "*")
+function FileDataset(dir, pattern="*")
     return rglob(pattern, string(dir))
 end
 
@@ -14,7 +14,7 @@ pathname(p::String) = splitdir(p)[2]
 
 Recursive glob up to 6 layers deep.
 """
-function rglob(filepattern = "*", dir = pwd(), depth = 4)
+function rglob(filepattern="*", dir=pwd(), depth=4)
     patterns = [
         "$filepattern",
         "*/$filepattern",
@@ -35,7 +35,7 @@ Load a file from disk into the appropriate format.
 function loadfile(file::String)
     if isimagefile(file)
         # faster image loading
-        return FileIO.load(file, view = true)
+        return FileIO.load(file, view=true)
     elseif endswith(file, ".csv")
         return DataFrame(CSV.File(file))
     else
@@ -92,6 +92,18 @@ LearnBase.getobs(dataset::TableDataset{<:CSV.File}, idx) = dataset.table[idx]
 LearnBase.nobs(dataset::TableDataset{<:CSV.File}) = length(dataset.table)
 
 
+#TextDataset
+
+struct TextDataset{T}
+    table::T #Should implement Tables.jl interface
+    TextDataset{T}(table::T) where {T} =
+        Tables.istable(table) ? new{T}(table) :
+        error("Object doesn't implement Tables.jl interface")
+end
+
+TextDataset(table::T) where {T} = TextDataset{T}(table)
+TextDataset(path::AbstractPath) = TextDataset(DataFrame(CSV.File(path)))
+
 # ## Tests
 
 @testset "TableDataset" begin
@@ -121,12 +133,12 @@ LearnBase.nobs(dataset::TableDataset{<:CSV.File}) = length(dataset.table)
 
     @testset "TableDataset from DataFrames" begin
         testtable = DataFrame(
-            col1 = [1, 2, 3, 4, 5],
-            col2 = ["a", "b", "c", "d", "e"],
-            col3 = [10, 20, 30, 40, 50],
-            col4 = ["A", "B", "C", "D", "E"],
-            col5 = [100.0, 200.0, 300.0, 400.0, 500.0],
-            split = ["train", "train", "train", "valid", "valid"],
+            col1=[1, 2, 3, 4, 5],
+            col2=["a", "b", "c", "d", "e"],
+            col3=[10, 20, 30, 40, 50],
+            col4=["A", "B", "C", "D", "E"],
+            col5=[100.0, 200.0, 300.0, 400.0, 500.0],
+            split=["train", "train", "train", "valid", "valid"],
         )
         td = TableDataset(testtable)
         @test td isa TableDataset{<:DataFrame}
