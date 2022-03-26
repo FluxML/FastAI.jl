@@ -2,6 +2,7 @@ module Text
 
 
 using ..FastAI
+using DataFrames
 using ..FastAI:
     # blocks
     Block, WrapperBlock, AbstractBlock, OneHotTensor, OneHotTensorMulti, Label,
