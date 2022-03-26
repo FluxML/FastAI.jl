@@ -44,7 +44,7 @@ struct TextClassificationRecipe <: Datasets.DatasetRecipe
     targetcol
 end
 
-Datasets.recipeblocks(::Type{TextClassificationRecipe}) = (TableRow, Label)
+Datasets.recipeblocks(::Type{TextClassificationRecipe}) = (TextRow, Label)
 
 
 function Datasets.loadrecipe(recipe::TextClassificationRecipe, args...; kwargs...)
@@ -63,7 +63,7 @@ end
 # Utils
 
 
-removecol(block::TableRow, col) = TableRow(
+removecol(block::TextRow, col) = TextRow(
     Tuple(cat for cat in block.catcols if cat != col),
     Tuple(cont for cont in block.contcols if cat != col),
     Dict(catcol => cats for (catcol, cats) in block.categorydict if catcol != col)
