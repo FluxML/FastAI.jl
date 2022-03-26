@@ -39,6 +39,9 @@ using InlineTest
 include("blocks/textrow.jl")
 
 # Encodings
+include("encodings/tabularpreprocessing.jl")
+
+
 include("recipes.jl")
 
 
