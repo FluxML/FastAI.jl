@@ -1,5 +1,8 @@
 """
-    TextDatasetRecipe(textfile; labelfn = parentname, split = false)
+    TextFolders(textfile; labelfn = parentname, split = false)
+
+Recipe for loading a single-label text classification dataset
+stored in hierarchical folder format. 
 """
 
 Base.@kwdef struct TextFolders <: Datasets.DatasetRecipe
@@ -7,6 +10,8 @@ Base.@kwdef struct TextFolders <: Datasets.DatasetRecipe
     split::Bool = false
     filefilterfn = _ -> true
 end
+
+Datasets.recipeblocks(::Type{TextFolders}) = Tuple{TextBlock,Label}
 
 function Datasets.loadrecipe(recipe::TextFolders, path)
     isdir(path) || error("$path is not a directory")
@@ -24,7 +29,7 @@ function Datasets.loadrecipe(recipe::TextFolders, path)
     return data, blocks
 end
 
-Datasets.recipeblocks(::Type{TextFolders}) = Tuple{TextBlock,Label}
+# Registering recipes
 
 const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
     "imdb" => [TextFolders()],
