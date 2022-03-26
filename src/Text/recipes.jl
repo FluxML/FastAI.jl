@@ -21,7 +21,12 @@ function Datasets.loadrecipe(recipe::TextDatasetRecipe, path)
     table = recipe.loadfn(tablepath)
     Tables.istable(table) || error("Expected `recipe.loadfn($(tablepath))` to return a table, instead got type $(typeof(table))")
     data = TextDataset(table)
-
+    columns = names(data.table)
+    appendRow = replace(columns, columns[1] => parse(Int64, columns[1]))
+    rename!(data.table, columns[1] => :"rating")
+    rename!(data.table, columns[2] => :"title")
+    rename!(data.table, columns[3] => :"news")
+    push!(data.table, appendRow)
     catcols, contcols = if isnothing(recipe.catcols) || isnothing(recipe.contcols)
         cat, cont = getcoltypes(data)
         cat = isnothing(recipe.catcols) ? cat : recipe.catcols
@@ -75,14 +80,13 @@ removecol(block::TextRow, col) = TextRow(
 const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
     "ag_news_csv" => [
         TextDatasetRecipe(file="train.csv"),
-        # TableClassificationRecipe(TableDatasetRecipe(file="train.csv"), :salary),
+        TableClassificationRecipe(TableDatasetRecipe(file="train.csv"), :rating),
     ],
     "amazon_review_full_csv" => [
         TextDatasetRecipe(file="train.csv"),
-        # TableClassificationRecipe(TableDatasetRecipe(file="train.csv"), :label)
+        TableClassificationRecipe(TableDatasetRecipe(file="train.csv"), :rating),
     ]
 )
-
 
 
 function _registerrecipes()

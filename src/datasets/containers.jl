@@ -104,6 +104,39 @@ end
 TextDataset(table::T) where {T} = TextDataset{T}(table)
 TextDataset(path::AbstractPath) = TextDataset(DataFrame(CSV.File(path)))
 
+function LearnBase.getobs(dataset::FastAI.Datasets.TextDataset, idx)
+    if Tables.rowaccess(dataset.table)
+        row, _ = Iterators.peel(Iterators.drop(Tables.rows(dataset.table), idx - 1))
+        return row
+    elseif Tables.columnaccess(dataset.table)
+        colnames = Tables.columnnames(dataset.table)
+        rowvals = [Tables.getcolumn(dataset.table, i)[idx] for i = 1:length(colnames)]
+        return (; zip(colnames, rowvals)...)
+    else
+        error(
+            "The Tables.jl implementation used should have either rowaccess or columnaccess.",
+        )
+    end
+end
+
+function LearnBase.nobs(dataset::TextDataset)
+    if Tables.columnaccess(dataset.table)
+        return length(Tables.getcolumn(dataset.table, 1))
+    elseif Tables.rowaccess(dataset.table)
+        return length(Tables.rows(dataset.table)) # length might not be defined, but has to be for this to work.
+    else
+        error(
+            "The Tables.jl implementation used should have either rowaccess or columnaccess.",
+        )
+    end
+end
+
+LearnBase.getobs(dataset::TextDataset{<:DataFrame}, idx) = dataset.table[idx, :]
+LearnBase.nobs(dataset::TextDataset{<:DataFrame}) = nrow(dataset.table)
+
+LearnBase.getobs(dataset::TextDataset{<:CSV.File}, idx) = dataset.table[idx]
+LearnBase.nobs(dataset::TextDataset{<:CSV.File}) = length(dataset.table)
+
 # ## Tests
 
 @testset "TableDataset" begin
