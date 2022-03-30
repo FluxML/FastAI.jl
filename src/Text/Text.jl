@@ -29,6 +29,7 @@ function __init__()
     end
 end
 
-export TextBlock, TextFolders, replace_all_caps, replace_sentence_case
+export TextBlock, TextFolders, replace_all_caps, replace_sentence_case,
+    convert_lowercase
 end
 

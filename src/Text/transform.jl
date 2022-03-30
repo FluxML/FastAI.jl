@@ -19,3 +19,7 @@ function replace_sentence_case(t::String)
     t = replace(t, r"(?<!\w)([A-Z][A-Z0-9]*[a-z0-9]+)(?!\w)" => s"xxmaj \1")
     t = replace(t, r"(?<!\w)([A-Z][A-Z0-9]*[a-z0-9]+)(?!\w)" => lowercase)
 end
+
+function convert_lowercase(t::String)
+    string("xxbos ", lowercase(t))
+end

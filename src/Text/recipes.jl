@@ -11,13 +11,13 @@ Base.@kwdef struct TextFolders <: Datasets.DatasetRecipe
     filefilterfn = _ -> true
 end
 
-Datasets.recipeblocks(::Type{TextFolders}) = Tuple{TextBlock,Label}
+Datasets.recipeblocks(::Type{TextFolders}) = Tuple{TextBlock, Label}
 
 function Datasets.loadrecipe(recipe::TextFolders, path)
     isdir(path) || error("$path is not a directory")
     data = loadfolderdata(
         path,
-        filterfn=f -> istextfile(f) && recipe.filefilterfn(f) && !contains(f, "tmp_clas") && !contains(f, "tmp_lm") && !contains(f, "unsup"),
+        filterfn=f -> istextfile(f) && recipe.filefilterfn(f),
         loadfn=(loadfile, recipe.labelfn),
         splitfn=recipe.split ? grandparentname : nothing)
 
@@ -32,7 +32,9 @@ end
 # Registering recipes
 
 const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
-    "imdb" => [TextFolders()],
+    "imdb" => [TextFolders(
+        filefilterfn = f->!contains(f, "tmp_clas") && !contains(f, "tmp_lm") && !contains(f, "unsup")
+        )],
 )
 
 function _registerrecipes()
