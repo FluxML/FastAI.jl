@@ -35,7 +35,7 @@ function _datasetregistry(; name = "Datasets")
             loader = Field(
                 DatasetLoader,
                 "Dataset loader",
-                formatfn = x -> "$(typeof(x))(...)",),
+                formatfn = x -> "$(typeof(x).name.name)(...)",),
             package = Field(
                 Module,
                 "Package"),

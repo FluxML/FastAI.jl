@@ -46,7 +46,7 @@ registerlearningtask!(FASTAI_METHOD_REGISTRY, ImageSegmentation, (Image, Mask))
 _tasks["imagesegmentation"] = (
     id = "vision/imagesegmentation",
     name = "Image segmentation",
-    constructor = ImageKeypointRegression,
+    constructor = ImageSegmentation,
     blocks = (Image, Mask),
     category = "supervised",
     description = """
