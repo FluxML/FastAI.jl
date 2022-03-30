@@ -82,6 +82,8 @@ include("encodings/projective.jl")
 
 include("models/Models.jl")
 include("models.jl")
+
+const _tasks = Dict{String, Any}()
 include("tasks/utils.jl")
 include("tasks/classification.jl")
 include("tasks/segmentation.jl")
@@ -93,6 +95,11 @@ include("tests.jl")
 
 function __init__()
     _registerrecipes()
+    foreach(values(_tasks)) do t
+        if !haskey(TASKS, t.id)
+            push!(TASKS, t)
+        end
+    end
     @require Makie="ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a" begin
         import .Makie
         import .Makie: @recipe, @lift

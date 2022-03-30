@@ -14,7 +14,8 @@ function _taskregistry(; name = "Learning tasks")
                 Any,
                 "Block types",
                 description = "Types of the blocks that are compatible with this task",
-                getfilterfn = filterblocks,),
+                getfilterfn = filterblocks,
+                formatfn = _formatblock),
             category = Field(
                 String,
                 "Category",

@@ -22,7 +22,8 @@ function _datareciperegistry(datasetregistry; name = "Dataset recipes")
                 Any,
                 "Block types",
                 description = "Types of blocks of the data container that this recipe loads.",
-                getfilterfn = filterblocks,),
+                getfilterfn = filterblocks,
+                formatfn = _formatblock),
             description = Field(
                 String,
                 "Description",
@@ -43,6 +44,7 @@ function _datareciperegistry(datasetregistry; name = "Dataset recipes")
             recipe = Field(
                 Datasets.DatasetRecipe,
                 "Recipe",
+                formatfn = x -> "$(typeof(x).name.name)(...)"
             )
         );
         loadfn = function loadrecipeentry(row)

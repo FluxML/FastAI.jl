@@ -43,6 +43,21 @@ end
 
 registerlearningtask!(FASTAI_METHOD_REGISTRY, ImageSegmentation, (Image, Mask))
 
+_tasks["imagesegmentation"] = (
+    id = "vision/imagesegmentation",
+    name = "Image segmentation",
+    constructor = ImageKeypointRegression,
+    blocks = (Image, Mask),
+    category = "supervised",
+    description = """
+        Semantic segmentation task in which every pixel in an image is
+        classified.
+        """,
+    package=@__MODULE__,
+)
+
+
+
 
 # ## Tests
 
