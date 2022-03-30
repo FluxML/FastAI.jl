@@ -17,6 +17,7 @@ import Requires: @require
 
 include("recipes.jl")
 include("blocks/text.jl")
+include("transform.jl")
 
 function __init__()
     _registerrecipes()
@@ -28,6 +29,7 @@ function __init__()
     end
 end
 
-export TextBlock, TextFolders
+export TextBlock, TextFolders, spec_add_spaces, remove_useless_spaces,
+    fix_html, replace_all_caps, replace_sentence_case
 end
 
