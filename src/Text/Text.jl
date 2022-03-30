@@ -29,7 +29,6 @@ function __init__()
     end
 end
 
-export TextBlock, TextFolders, spec_add_spaces, remove_useless_spaces,
-    fix_html, replace_all_caps, replace_sentence_case
+export TextBlock, TextFolders, replace_all_caps, replace_sentence_case
 end
 
