@@ -50,7 +50,7 @@ const DATASETCONFIGS = [
     FastAIDataset("imagewoof", "imageclas", description=DESCRIPTIONS["imagewoof"]),
     FastAIDataset("imagewoof2-160", "imageclas", "663c22f69c2802d85e2a67103c017e047096702ffddf9149a14011b7002539bf", description=DESCRIPTIONS["imagewoof"]),
     FastAIDataset("imagewoof2-320", "imageclas", "7db6120fdb9ae079e26346f89e7b00d7f184f8137791609b97fd0405d3f92305", description=DESCRIPTIONS["imagewoof"], size="313MB"),
-    FastAIDataset("imagewoof2", "imageclas", description=DESCRIPTIONS["imagewoof"]),
+    FastAIDataset("imagewoof2", "imageclas", "de3f58c4ea3e042cf3f8365fbc699288cfe1d8c151059040d181c221bd5a55b8", description=DESCRIPTIONS["imagewoof"], size="1.25GiB"),
     FastAIDataset("mnist_png", "imageclas", "9e18edaa3a08b065d8f80a019ca04329e6d9b3e391363414a9bd1ada30563672"),
     FastAIDataset("mnist_var_size_tiny", "imageclas", "8a0f6ca04c2d31810dc08e739c7fa9b612e236383f70dd9fc6e5a62e672e2283"),
     FastAIDataset("oxford-102-flowers", "imageclas"),

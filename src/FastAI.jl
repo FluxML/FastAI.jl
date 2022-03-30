@@ -99,6 +99,10 @@ include("datasets/Datasets.jl")
 include("fasterai/taskregistry.jl")
 include("fasterai/defaults.jl")
 
+include("Registries/Registries.jl")
+@reexport using .Registries
+
+
 
 
 # Domain-specific

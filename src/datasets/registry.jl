@@ -130,7 +130,6 @@ function registerrecipe!(reg::DatasetRegistry, dataset::String, recipe::DatasetR
 end
 
 function blocksmatch(recipe::DatasetRecipe, TBlocks)
-    @show recipeblocks(recipe), TBlocks
 	return recipeblocks(recipe) <: TBlocks
 end
 

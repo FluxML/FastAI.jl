@@ -48,6 +48,8 @@ include("recipe.jl")
 include("registry.jl")
 include("fastairegistry.jl")
 
+include("loaders.jl")
+
 
 export
     # reexports from MLDataPattern
@@ -75,7 +77,7 @@ export
     grandparentname,
 
     # datasets
-    DATASETS,
+    #DATASETS,
     loadfolderdata,
     datasetpath,
 
