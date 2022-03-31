@@ -19,16 +19,6 @@ include("recipes.jl")
 include("blocks/text.jl")
 include("transform.jl")
 
-function __init__()
-    _registerrecipes()
-    @require Makie="ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a" begin
-        import .Makie
-        import .Makie: @recipe, @lift
-        import .FastAI: ShowMakie
-        include("makie.jl")
-    end
-end
-
 export TextBlock
 end
 
