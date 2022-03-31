@@ -63,9 +63,11 @@ export
     # primitive containers
     FileDataset,
     TableDataset,
+    TextDataset,
 
     # utilities
     isimagefile,
+    istextfile,
     matches,
     loadfile,
     loadmask,
