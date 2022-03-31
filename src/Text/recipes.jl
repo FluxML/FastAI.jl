@@ -85,7 +85,32 @@ const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
     "amazon_review_full_csv" => [
         TextDatasetRecipe(file="train.csv"),
         TextClassificationRecipe(TextDatasetRecipe(file="train.csv"), :rating),
+    ],
+    "amazon_review_polarity_csv" => [
+        TextDatasetRecipe(file="train.csv"),
+        TextClassificationRecipe(TextDatasetRecipe(file="train.csv"), :rating),
+    ],
+    "dbpedia_csv" => [
+        TextDatasetRecipe(file="train.csv"),
+        TextClassificationRecipe(TextDatasetRecipe(file="train.csv"), :rating),
+    ],
+    "yahoo_answers_csv" => [
+        TextDatasetRecipe(file="train.csv"),
+        TextClassificationRecipe(TextDatasetRecipe(file="train.csv"), :rating),
+    ],
+    "sogou_news_csv" => [
+        TextDatasetRecipe(file="train.csv"),
+        TextClassificationRecipe(TextDatasetRecipe(file="train.csv"), :rating),
+    ],
+    "yelp_review_full_csv" => [
+        TextDatasetRecipe(file="train.csv"),
+        TextClassificationRecipe(TextDatasetRecipe(file="train.csv"), :rating),
+    ],
+    "yelp_review_polarity_csv" => [
+        TextDatasetRecipe(file="train.csv"),
+        TextClassificationRecipe(TextDatasetRecipe(file="train.csv"), :rating),
     ]
+
 )
 
 
