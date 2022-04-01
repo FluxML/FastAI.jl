@@ -16,4 +16,4 @@ Example valid TextBlocks:
 
 struct TextBlock <: Block end
 
-checkblock(::TextBlock, ::String) = true
+FastAI.checkblock(::TextBlock, ::String) = true
