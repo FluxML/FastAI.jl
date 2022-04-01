@@ -32,7 +32,7 @@ end
 
 const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
     "imdb" => [TextFolders(
-        filefilterfn = f->!contains(f, "tmp_clas") && !contains(f, "tmp_lm") && !contains(f, "unsup")
+        filefilterfn = f -> !occursin(f, "tmp_clas|tmp_lm|unsup")
         )],
 )
 
