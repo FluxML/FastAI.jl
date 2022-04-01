@@ -19,6 +19,10 @@ include("recipes.jl")
 include("blocks/text.jl")
 include("transform.jl")
 
+function __init__()
+    _registerrecipes()
+end
+
 export TextBlock
 end
 
