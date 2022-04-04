@@ -10,7 +10,7 @@ Base.@kwdef struct TextFolders <: Datasets.DatasetRecipe
     filefilterfn = _ -> true
 end
 
-Datasets.recipeblocks(::Type{TextFolders}) = Tuple{TextBlock, Label}
+Datasets.recipeblocks(::Type{TextFolders}) = Tuple{Paragraph, Label}
 
 function Datasets.loadrecipe(recipe::TextFolders, path)
     isdir(path) || error("$path is not a directory")
@@ -23,7 +23,7 @@ function Datasets.loadrecipe(recipe::TextFolders, path)
     (recipe.split ? length(data) > 0 : nobs(data) > 0) || error("No text files found in $path")
 
     labels = recipe.split ? first(values(data))[2] : data[2]
-    blocks = (TextBlock(), Label(unique(eachobs(labels))))
+    blocks = (Paragraph(), Label(unique(eachobs(labels))))
     length(blocks[2].classes) > 1 || error("Expected multiple different labels, got: $(blocks[2].classes))")
     return data, blocks
 end

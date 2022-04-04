@@ -175,7 +175,7 @@ export
     TableRow,
     Continuous,
     Image,
-    TextBlock,
+    Paragraph,
 
     # encodings
     encode,

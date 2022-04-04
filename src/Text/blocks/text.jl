@@ -1,19 +1,19 @@
 """
-    TextBlock() <: Block
+    Paragraph() <: Block
 
 [`Block`](#) for a text paragraph containing one or more
 sentences (basically, a single observation in the textual dataset). 
-`data` is valid for `TextBlock` if it is of type string.
+`data` is valid for `Paragraph` if it is of type string.
 
-Example valid TextBlocks:
+Example valid Paragraphs:
 
 ```julia
-@test checkblock(TextBlock(), "Hello world!")
-@test checkblock(TextBlock(), "Hello world!, How are you?")
+@test checkblock(Paragraph(), "Hello world!")
+@test checkblock(Paragraph(), "Hello world!, How are you?")
 ```
 
 """
 
-struct TextBlock <: Block end
+struct Paragraph <: Block end
 
-FastAI.checkblock(::TextBlock, ::String) = true
+FastAI.checkblock(::Paragraph, ::String) = true

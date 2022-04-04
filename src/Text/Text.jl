@@ -23,6 +23,6 @@ function __init__()
     _registerrecipes()
 end
 
-export TextBlock
+export Paragraph
 end
 
