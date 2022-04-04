@@ -1,4 +1,4 @@
-module Text
+module Textual
 
 
 using ..FastAI

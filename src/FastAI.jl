@@ -110,8 +110,8 @@ export Vision
 include("Tabular/Tabular.jl")
 @reexport using .Tabular
 
-include("Text/Text.jl")
-@reexport using .Text
+include("Textual/Textual.jl")
+@reexport using .Textual
 
 include("deprecations.jl")
 export
