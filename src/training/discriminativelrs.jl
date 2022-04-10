@@ -23,7 +23,7 @@ dlro = DiscriminativeLRs(paramgroups, Dict(1 => 0., 2 => 1.))
 o = Optimiser(dlro, Descent(0.1))
 ```
 """
-struct DiscriminativeLRs
+struct DiscriminativeLRs <: Flux.Optimise.AbstractOptimiser
     pg::ParamGroups
     factorfn
 end
