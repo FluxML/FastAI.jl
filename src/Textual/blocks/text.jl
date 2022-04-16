@@ -17,3 +17,4 @@ Example valid Paragraphs:
 struct Paragraph <: Block end
 
 FastAI.checkblock(::Paragraph, ::String) = true
+FastAI.mockblock(::Paragraph) = randstring(" ABCEEFGHIJKLMNOPQESRUVWXYZ 1234567890abcdefghijklmnopqrstynwxyz\n\t.,", 20)

@@ -8,6 +8,7 @@ using Reexport
 using Flux
 
 using Animations
+using Random
 import DataAugmentation
 import DataAugmentation: getbounds, Bounds
 
