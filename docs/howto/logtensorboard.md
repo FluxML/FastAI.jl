@@ -33,8 +33,8 @@ callbacks = [
     Metrics(accuracy)
 ]
 
-data = ...
-task = ...
+data = _
+task = _
 learner = tasklearner(task, data; callbacks=callbacks)
 fitonecycle!(learner, 5)
 ```
