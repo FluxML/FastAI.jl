@@ -37,3 +37,15 @@ function checktask_core(
         end
     end
 end
+
+
+function _predictx(method, model, x, device = identity)
+    if shouldbatch(method)
+        x = DataLoaders.collate([x])
+    end
+    ŷs = device(model)(device(x))
+    if shouldbatch(method)
+        ŷ = ŷs[((:) for _ in 1:ndims(ŷs)-1)..., 1]
+    end
+    return ŷ
+end
