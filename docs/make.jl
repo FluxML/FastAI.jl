@@ -15,7 +15,7 @@ Pollen.rewritesources!(project)
 
 @info "Writing to disk at \"$DIR\"..."
 builder = Pollen.FileBuilder(
-    Pollen.JSON(),
+    Pollen.JSONFormat(),
     DIR,
 )
 Pollen.build(
