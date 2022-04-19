@@ -76,9 +76,11 @@ julia = "1.6"
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
-[publish]
-theme = "theme"
-title = "FastAI.jl"
 
 [targets]
 test = ["Test"]
+
+
+[pollen]
+title = "FastAI.jl"
+url = "https://github.com/FluxML/FastAI.jl"
