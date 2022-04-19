@@ -8,7 +8,6 @@ from there.
 If `learner` does not have a `Scheduler` callback yet, adds it.
 
 ```julia
-learner = ...
 fit!(learner, 1)
 setschedules!(learner, onecycle(1, 0.01))
 fit!(learner, 1)

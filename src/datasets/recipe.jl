@@ -25,7 +25,7 @@ For example implementations, see [`Vision.ImageFolders`](#).
 Given
 
 ```julia
-data, blocks = loadrecipe(recipe, args....; kwargs...)
+data, blocks = loadrecipe(recipe, args...; kwargs...)
 ```
 
 the following must hold:
