@@ -107,12 +107,12 @@ showblocks!(grid, backend::ShowMakie, block, obss::AbstractVector) =
 
 function showblock!(grid, ::ShowMakie, block::Label, obs)
     ax = cleanaxis(grid[1, 1])
-    text!(ax, string(obs), space = :data)
+    M.text!(ax, string(obs), space = :data)
 end
 
 function showblock!(grid, ::ShowMakie, block::LabelMulti, obs)
     ax = cleanaxis(grid[1, 1])
-    text!(ax, join(string.(obs), "\n"), space = :data)
+    M.text!(ax, join(string.(obs), "\n"), space = :data)
 end
 
 
