@@ -1,16 +1,24 @@
-using Pollen
-using FastAI
-using FastAI: Image
-Image
-using FluxTraining
-using DLPipelines
-import DataAugmentation
-using FilePathsBase
-
-import CairoMakie
-
 ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
+using Pkg
+using Pollen
 
-refmodules = [FastAI, FluxTraining, DLPipelines, DataAugmentation, FastAI.Datasets, FastAI.Models]
-project = Pollen.documentationproject(FastAI; refmodules = refmodules)
-Pollen.fullbuild(project, Pollen.FileBuilder(Pollen.HTML(), p"dev/"))
+# Create target folder
+DIR = abspath(mkpath(ARGS[1]))
+
+
+# Create Project
+project = include("project.jl")
+
+
+@info "Rewriting documents..."
+Pollen.rewritesources!(project)
+
+@info "Writing to disk at \"$DIR\"..."
+builder = Pollen.FileBuilder(
+    Pollen.JSONFormat(),
+    DIR,
+)
+Pollen.build(
+    builder,
+    project,
+)

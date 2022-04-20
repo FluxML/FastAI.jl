@@ -4,9 +4,9 @@ FastAI.jl is in many ways similar to the original Python [fastai](docs.fast.ai),
 
 ## Applications
 
-FastAI.jl's own data block API makes it possible to derive every part of a high-level interface with a unified API across tasks. Instead it suffices to create a learning method and based on the blocks and encodings specified the proper model builder, loss function, and visualizations are implemented (see below). For a high-level API, a complete `Learner` can be constructed using [`methodlearner`](#) without much boilerplate. There are some helper functions for  creating these learning methods, for example [`ImageClassificationSingle`](#) and [`ImageSegmentation`](#).
+FastAI.jl's own data block API makes it possible to derive every part of a high-level interface with a unified API across tasks. Instead it suffices to create a learning task and based on the blocks and encodings specified the proper model builder, loss function, and visualizations are implemented (see below). For a high-level API, a complete `Learner` can be constructed using [`tasklearner`](#) without much boilerplate. There are some helper functions for  creating these learning tasks, for example [`ImageClassificationSingle`](#) and [`ImageSegmentation`](#).
 
-FastAI.jl additionally has a unified API for registering and discovering functionality across applications also based on the data block abstraction.  `finddatasets` and `loaddataset` let you quickly load common datasets matching some data modality and `findlearningmethod` lets you find learning method helpers for common tasks. See [the discovery tutorial](discovery.md) for more info.
+FastAI.jl additionally has a unified API for registering and discovering functionality across applications also based on the data block abstraction.  `finddatasets` and `loaddataset` let you quickly load common datasets matching some data modality and `findlearningtask` lets you find learning task helpers for common tasks. See [the discovery tutorial](discovery.md) for more info.
 
 ### Vision
 
@@ -18,7 +18,7 @@ Support for tabular data is merged into master but is lacking documentation whic
 
 ### Deployment
 
-Through FastAI.jl's [`LearningMethod` interface](./learning_methods.md), the data processing logic is decoupled from the dataset creation and training and can be easily serialized and loaded to make predictions. See the tutorial on [saving and loading models](../notebooks/serialization.ipynb).
+Through FastAI.jl's [`LearningTask` interface](./learning_tasks.md), the data processing logic is decoupled from the dataset creation and training and can be easily serialized and loaded to make predictions. See the tutorial on [saving and loading models](../notebooks/serialization.ipynb).
 
 ---
 
@@ -30,14 +30,14 @@ There is no integration (yet!) for text and collaborative filtering applications
 
 FastAI.jl also has a data block API but it differs from fastai's in a number of ways. In the Julia package it only handles the data encoding and decoding part, and doesn't concern itself with creating datasets. For dataset loading, see the [data container API](data_containers.md). As mentioned above, the high-level application-specific logic is also derived from the data block API. To use it you need to specify a tuple of input and target blocks as well as a tuple of encodings that are applied to the data. The encodings  are invertible data-specific data processing steps which correspond to `fastai.Transform`s. As in fastai, dispatch is used to transform applicable data and pass other data through unchanged. Unlike in fastai, there are no default steps associated with a block, allowing greater flexibility.
 
-We can create a `BlockMethod` (similar to `fastai.DataBlock`) and get information about the representations the data goes through. 
+We can create a `BlockTask` (similar to `fastai.DataBlock`) and get information about the representations the data goes through.
 
 {cell=main}
 ```julia
 using FastAI
 import FastAI: Image
 
-method = BlockMethod(
+task = BlockTask(
     (Image{2}(), Mask{2}(["foreground", "background"])),
     (
         ProjectiveTransforms((128, 128)),
@@ -45,7 +45,7 @@ method = BlockMethod(
         OneHot(),
     )
 )
-describemethod(method)
+describetask(task)
 ```
 
 From this short definition, many things can be derived:
@@ -56,10 +56,10 @@ From this short definition, many things can be derived:
 - the loss function to use
 - how to visualize samples and predictions
 
-Together with a [data container](data_container) `data`, we can quickly create a `Learner` using [`methodlearner`](#) which, like in fastai, handles the training for us. There are no application-specific `Learner` constructors like `cnn_learner` or `unet_learner` in FastAI.jl.
+Together with a [data container](data_container) `data`, we can quickly create a `Learner` using [`tasklearner`](#) which, like in fastai, handles the training for us. There are no application-specific `Learner` constructors like `cnn_learner` or `unet_learner` in FastAI.jl.
 
 ```julia
-learner = methodlearner(method, data)
+learner = tasklearner(task, data)
 ```
 
 High-level training protocols like the [one-cycle learning rate schedule](../notebooks/fitonecycle.ipynb), [fine-tuning](../notebooks/finetune.ipynb) and the [learning rate finder](../notebooks/lrfind.ipynb) are then available to us:
@@ -78,7 +78,6 @@ Since it is a Julia package, FastAI.jl is not written on top of PyTorch, but a J
 - [Flux.jl](https://github.com/FluxML/Flux.jl) provides models, optimizers, and loss functions, fulfilling a similar role to PyTorch
 - [MLDataPattern.jl](https://github.com/JuliaML/MLDataPattern.jl) gives you tools for building and transforming data containers
 - [DataLoaders.jl](https://github.com/lorenzoh/DataLoaders.jl) takes care of efficient, parallelized iteration of data containers
-- [DLPipelines.jl](https://github.com/lorenzoh/DLPipelines.jl) provides the low-level `LearningMethod` interface for defining data pipelines.
 - [DataAugmentation.jl](https://github.com/lorenzoh/DataAugmentation.jl) takes care of the lower levels of high-performance, composable data augmentations.
 - [FluxTraining.jl](https://github.com/lorenzoh/FluxTraining.jl) contributes a highly extensible training loop with 2-way callbacks
 
@@ -105,13 +104,13 @@ The training loop also supports two-way callbacks. See the [FluxTraining.jl docs
 
 ### Encodings and blocks
 
-In the paper, this subsection is in the low-level section (named Transforms and Pipelines), but I'm putting it here since it is the core of FastAI.jl's data block API. FastAI.jl provides `Encoding`s and `Block`s which correspond to fastai's `Transform`s and `Block`s. Encodings implement an `encode` (and optionally `decode`) function that describes how data corresponding to some blocks is transformed and how that transformation can be inverted. There is also support for stateful encodings like [`ProjectiveTransforms`](#) which need to use the same random state to augment every data point. Additionally, encodings describe what kind of block data is returned from encoding, allowing inspection of the whole data pipeline. The `Block`s are used to dispatch in the `encode` function to implement block-specific transformations. If no `encode` method is implemented for a pair of encoding and block, the default is to pass the data through unchanged like in fastai.
+In the paper, this subsection is in the low-level section (named Transforms and Pipelines), but I'm putting it here since it is the core of FastAI.jl's data block API. FastAI.jl provides `Encoding`s and `Block`s which correspond to fastai's `Transform`s and `Block`s. Encodings implement an `encode` (and optionally `decode`) function that describes how data corresponding to some blocks is transformed and how that transformation can be inverted. There is also support for stateful encodings like [`ProjectiveTransforms`](#) which need to use the same random state to augment every data point. Additionally, encodings describe what kind of block data is returned from encoding, allowing inspection of the whole data pipeline. The `Block`s are used to dispatch in the `encode` function to implement block-specific transformations. If no `encode` task is implemented for a pair of encoding and block, the default is to pass the data through unchanged like in fastai.
 
 The `Block`s also allow implementing task-specific functionality:
 
 - [`blocklossfn`](#) takes a prediction and encoded target block to determine a good loss function to use. For example, for image classification we want to compare two one-hot encoded labels and hence define `blocklossfn(::OneHotTensor{0}, ::OneHotTensor{0}) = logitcrossentropy`.
 - [`blockmodel`](#) constructs a model from a backbone that maps an input block to an output block. For example, for image segmentation we have `ImageTensor{N}()` as the input block and `OneHotTensor{N}` (one-hot encoded N-dimensional masks) as output, so `blockmodel` turns the backbone into a U-Net.
-- [`plotblock!`](#) defines how to visualize a block of data. Note that the block plotting API is not stable yet and may change in the future
+- [`showblock!`](#) defines how to visualize a block of data.
 
 ### Generic optimizer
 
@@ -134,7 +133,7 @@ In FastAI.jl, you are not restricted to a specific type of data iterator and can
 - [`groupobs`](#)`(f, data)` splits a container into groups using a grouping function `f`. For example, `groupobs(grandparentname, files)` creates training splits for files where the grandparent folder indicates the split.
 - [`datasubset`](#)`(data, idxs)` lazily takes a subset of the observations in `data`.
 
-For more information, see the [data container tutorial](data_containers.md) and the [MLDataPattern.jl docs](https://mldatapatternjl.readthedocs.io/en/latest/). At a higher level, there are also convenience functions like [`loadfolderdata`](#) to create data containers.
+For more information, see the [data container tutorial](data_containers.md) and the [MLDataPattern.jl docs](https://mldatapatternjl.readthedocs.io/en/latest/). At a higher level, there are also convenience functions like [`FileDataset`](#) to create data containers.
 
 ### Layers and architectures 
 
@@ -169,8 +168,8 @@ FastAI.jl does not support GPU-accelerated augmentation (yet). Please open an is
 
 Much of the convenience provided by fastai is not required in Julia:
 
-- `@delegates`: Due to the absence of deep class hierarchies, keyword arguments are seldom passed around (the only instance where this happens in FastAI.jl is [`methodlearner`](#)).
-- `@patch`: since Julia is built around multiple dispatch, not classes, you just implement the method for a type, no patching needed
+- `@delegates`: Due to the absence of deep class hierarchies, keyword arguments are seldom passed around (the only instance where this happens in FastAI.jl is [`tasklearner`](#)).
+- `@patch`: since Julia is built around multiple dispatch, not classes, you just implement the task for a type, no patching needed
 - `L`: due to first-class array support such a wrapper list container isn't needed
 
 ## nbdev

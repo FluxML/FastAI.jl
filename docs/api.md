@@ -4,27 +4,27 @@
 
 ### High-level
 
-Quickly get started training and finetuning models using already implemented learning methods and callbacks.
+Quickly get started training and finetuning models using already implemented learning tasks and callbacks.
 
 {.tight}
-- [`methodlearner`](#)
+- [`tasklearner`](#)
 - [`fit!`](#)
 - [`fitonecycle!`](#)
 - [`finetune!`](#)
-- [`BlockMethod`](#)
+- [`BlockTask`](#)
 - callbacks
 
 ### Mid-level
 
 {.tight}
 - [`Learner`](#)
-- [`methodmodel`](#)
-- [`methodlossfn`](#)
+- [`taskmodel`](#)
+- [`tasklossfn`](#)
 
 ### Low-level
 
 {.tight}
-- [`LearningMethod`](#)
+- [`LearningTask`](#)
 - [`encode`](#)
 - [`encodeinput`](#)
 - `decodey`
@@ -37,16 +37,16 @@ Quickly download and load task data containers from the fastai dataset library.
 
 {.tight}
 - `load
-- [`Datasets.DATASETS`](#)
+- [`FastAI.Datasets.DATASETS`](#)
 
 ### Mid-level
 
 Load and transform data containers.
 
 {.tight}
-- [`Datasets.datasetpath`](#)
-- [`Datasets.FileDataset`](#)
-- [`Datasets.TableDataset`](#)
+- [`FastAI.Datasets.datasetpath`](#)
+- [`FastAI.Datasets.FileDataset`](#)
+- [`FastAI.Datasets.TableDataset`](#)
 - [`mapobs`](#)
 - [`groupobs`](#)
 - [`joinobs`](#)

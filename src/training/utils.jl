@@ -8,7 +8,6 @@ from there.
 If `learner` does not have a `Scheduler` callback yet, adds it.
 
 ```julia
-learner = ...
 fit!(learner, 1)
 setschedules!(learner, onecycle(1, 0.01))
 fit!(learner, 1)
@@ -93,13 +92,13 @@ end
 
 
 """
-    makebatch(method, data, [idxs; context]) -> (xs, ys)
+    makebatch(task, data, [idxs; context]) -> (xs, ys)
 
 Create a batch of encoded data by loading `idxs` from data container `data`.
-Useful for inspection and as input to [`plotbatch`](#). Samples are encoded
+Useful for inspection and as input to [`showbatch`](#). Samples are encoded
 in `context` which defaults to `Training`.
 """
-function makebatch(method::LearningMethod, data, idxs = 1:8; context = Training())
-    xys = [deepcopy(encode(method, context, getobs(data, i))) for i in idxs]
+function makebatch(task::LearningTask, data, idxs = 1:8; context = Training())
+    xys = [deepcopy(encodesample(task, context, getobs(data, i))) for i in idxs]
     return DataLoaders.collate(xys)
 end
