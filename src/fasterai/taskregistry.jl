@@ -27,7 +27,7 @@ Find learning tasks compatible with block types `TBlocks` in
 
 #### Examples
 
-```julia
+```julia-repl
 julia> findlearningtasks((Image, Label))
 [ImageClassificationSingle,]
 

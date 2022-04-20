@@ -21,6 +21,7 @@ project = Project(
         Pollen.ParseCode(),
         Pollen.ExecuteCode(),
         Pollen.PackageDocumentation(ms),
+        Pollen.StaticResources(),
         Pollen.DocumentGraph(),
         Pollen.SearchIndex(),
         Pollen.SaveAttributes((:title,)),

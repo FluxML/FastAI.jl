@@ -52,6 +52,7 @@ import ..FastAI:
 
 import Colors: colormaps_sequential, Colorant, Color, Gray, Normed, RGB,
     alphacolor, deuteranopic, distinguishable_colors
+using ColorVectorSpace
 import FixedPointNumbers: N0f8
 import DataAugmentation
 import DataAugmentation: apply, Identity, ToEltype, ImageToTensor, Normalize,
@@ -60,6 +61,7 @@ import DataAugmentation: apply, Identity, ToEltype, ImageToTensor, Normalize,
     ResizePadDivisible, itemdata
 import ImageInTerminal
 import IndirectArrays: IndirectArray
+import ProgressMeter: Progress, next!
 import Requires: @require
 import StaticArrays: SVector
 import Statistics: mean, std

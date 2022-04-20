@@ -38,7 +38,7 @@ function visionhead(
     acts = vcat([relu for _ ∈ 1:n-2], [identity])
     pool = concat_pool ? AdaptiveConcatPool((1, 1)) : AdaptiveMeanPool((1, 1))
 
-    layers = [pool, flatten]
+    layers = [pool, Flux.flatten]
 
     for (h_in, h_out, act) in zip(hs, hs[2:end], acts)
         push!(layers, linbndrop(h_in, h_out, act=act, p=p))
