@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New documentation frontend based on Pollen.jl: https://fluxml.ai/FastAI.jl/dev/i/
 - Now supports Flux.jl v0.13 (https://github.com/FluxML/FastAI.jl/pull/202)
 
+### Changed
+
+- Now has ImageIO.jl as a dependency to ensure that fast jpg loading using JpegTurbo.jl is used
+
 ## v0.4.0 (2022-03-19)
 
 ### Added
