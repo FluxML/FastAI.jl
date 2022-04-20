@@ -10,7 +10,7 @@ Base.@kwdef struct TextFolders <: Datasets.DatasetRecipe
     filefilterfn = _ -> true
 end
 
-Datasets.recipeblocks(::Type{TextFolders}) = Tuple{Paragraph, Label}
+Datasets.recipeblocks(::Type{TextFolders}) = Tuple{Paragraph,Label}
 
 function Datasets.loadrecipe(recipe::TextFolders, path)
     isdir(path) || error("$path is not a directory")
@@ -32,8 +32,8 @@ end
 
 const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
     "imdb" => [TextFolders(
-        filefilterfn = f -> !occursin(r"tmp_clas|tmp_lm|unsup", f)
-        )],
+        filefilterfn=f -> !occursin(r"tmp_clas|tmp_lm|unsup", f)
+    )],
 )
 
 function _registerrecipes()
@@ -41,4 +41,11 @@ function _registerrecipes()
         Datasets.registerrecipe!(Datasets.FASTAI_DATA_REGISTRY, name, recipe)
     end
 end
-    
+
+
+## Tests
+
+
+@testset "TextFolders [Recipe]" begin
+    @test length(Datasets.FASTAI_DATA_REGISTRY.recipes["imdb"]) == 1
+end

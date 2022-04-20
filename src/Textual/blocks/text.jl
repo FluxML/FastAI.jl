@@ -12,9 +12,18 @@ Example valid Paragraphs:
 @test checkblock(Paragraph(), "Hello world!, How are you?")
 ```
 
+You can create a random observation using [`mockblock`](#):
+
+{cell=main}
+```julia
+using FastAI
+FastAI.mockblock(Paragraph())
+```
+
+
 """
 
 struct Paragraph <: Block end
 
 FastAI.checkblock(::Paragraph, ::String) = true
-FastAI.mockblock(::Paragraph) = randstring(" ABCEEFGHIJKLMNOPQESRUVWXYZ 1234567890abcdefghijklmnopqrstynwxyz\n\t.,", 20)
+FastAI.mockblock(::Paragraph) = randstring(" ABCEEFGHIJKLMNOPQESRUVWXYZ 1234567890abcdefghijklmnopqrstynwxyz\n\t.,", 40)
