@@ -16,24 +16,36 @@ function checktask_core(
     sample = mocksample(task),
     devicefn = identity,
 )
-    @testset "Core interface" begin
-        @testset "`encode`" begin
+    Test.@testset "Core interface" begin
+        Test.@testset "`encode`" begin
             for context in CONTEXTS
-                @test_nowarn encodesample(task, context, sample)
+                Test.@test_nowarn encodesample(task, context, sample)
             end
         end
-        @testset "Model compatibility" begin
+        Test.@testset "Model compatibility" begin
             for context in CONTEXTS
                 x, _ = encodesample(task, context, sample)
-                @test_nowarn ŷ = _predictx(task, model, x, devicefn)
+                Test.@test_nowarn ŷ = _predictx(task, model, x, devicefn)
             end
         end
-        @testset "`decodeypred" begin
+        Test.@testset "`decodeypred" begin
             for context in CONTEXTS
                 x, _ = encodesample(task, context, sample)
                 ŷ = _predictx(task, model, x, devicefn)
-                @test_nowarn decodeypred(task, context, ŷ)
+                Test.@test_nowarn decodeypred(task, context, ŷ)
             end
         end
     end
+end
+
+
+function _predictx(method, model, x, device = identity)
+    if shouldbatch(method)
+        x = DataLoaders.collate([x])
+    end
+    ŷs = device(model)(device(x))
+    if shouldbatch(method)
+        ŷ = ŷs[((:) for _ in 1:ndims(ŷs)-1)..., 1]
+    end
+    return ŷ
 end

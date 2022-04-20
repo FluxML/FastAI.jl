@@ -2,16 +2,26 @@
     "Overview": "documents/README.md",
     "Setup": "documents/docs/setup.md",
     "Quickstart": "documents/notebooks/quickstart.ipynb",
-    "Tutorials": {
-        "Beginner": {
+    "Core": {
+        "Tutorials": {
             "Introduction": "documents/docs/introduction.md",
-            "Discovering functionality": "documents/docs/discovery.md"
+            "Discovering functionality": "documents/docs/discovery.md",
+            "Intermediate": {
+                "Data containers": "documents/docs/data_containers.md"
+            },
+            "Advanced": {
+                "Unsupervised learning with VAEs": "documents/notebooks/vae.ipynb"
+            }
         },
-        "Intermediate": {
-            "Data containers": "documents/docs/data_containers.md"
+        "How-to": {
+            "Train a model": "documents/notebooks/training.ipynb",
+            "Load and save models": "documents/notebooks/serialization.ipynb",
+            "Log to TensorBoard": "documents/notebooks/training.ipynb"
         },
-        "Advanced": {
-            "Unsupervised learning tasks": "documents/notebooks/vae.ipynb"
+        "Background": {
+            "Comparison to fast.ai": "documents/docs/fastai_api_comparison.md",
+            "Performant data pipelines": "documents/docs/background/datapipelines.md",
+            "Blocks and Encodings": "documents/docs/background/blocksencodings.md"
         }
     },
     "Computer vision": {
@@ -20,8 +30,8 @@
             "Keypoint regression": "documents/notebooks/keypointregression.ipynb"
         },
         "How-To": {
-            "Use augmentations": "documents/docs/augmentvision.md",
-            "Presize vision datasets": "notebooks/presizing.ipynb"
+            "Use augmentations": "documents/docs/howto/augmentvision.md",
+            "Presize vision datasets": "documents/notebooks/presizing.ipynb"
         }
     },
     "Tabular data": {

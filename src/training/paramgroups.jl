@@ -32,7 +32,7 @@ getgroup(pg::ParamGroups, x::AbstractArray) = get(pg.map, x, nothing)
 
 function assigngroups!(pg::ParamGroups, grouper, m)
     for (group, m_) in group(grouper, m)
-        for p in params(m_)
+        for p in Flux.params(m_)
             pg.map[p] = group
         end
     end

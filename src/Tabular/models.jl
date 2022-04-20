@@ -47,7 +47,7 @@ function TabularModel(
 
     tabularbackbone = Parallel(vcat, catbackbone, contbackbone)
 
-    classifierin = mapreduce(layer -> size(layer.weight)[1], +, catbackbone[2].layers;
+    classifierin = mapreduce(layer -> size(layer.weight)[1], +, Tuple(catbackbone[2].layers);
                              init = contbackbone.chs)
     dropout_rates = Iterators.cycle(dropout_rates)
     classifiers = []
@@ -139,7 +139,7 @@ function tabular_embedding_backbone(embedding_sizes, dropout_rate=0.)
     emb_drop = iszero(dropout_rate) ? identity : Dropout(dropout_rate)
     Chain(
         x -> tuple(eachrow(x)...),
-        Parallel(vcat, embedslist),
+        Parallel(vcat, embedslist...),
         emb_drop
     )
 end
