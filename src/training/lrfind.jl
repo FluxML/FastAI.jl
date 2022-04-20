@@ -46,7 +46,7 @@ function lrfind(
     withfields(
         learner,
         model = modelcheckpoint,
-        params = params(modelcheckpoint),
+        params = Flux.params(modelcheckpoint),
         optimizer = deepcopy(learner.optimizer)
         ) do
 
