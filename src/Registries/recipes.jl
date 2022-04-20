@@ -54,4 +54,5 @@ function _datareciperegistry(datasetregistry; name = "Dataset recipes")
     )
 end
 
-DATARECIPES = _datareciperegistry(DATASETS)
+const DATARECIPES = _datareciperegistry(DATASETS)
+datarecipes(; kwargs...) = isempty(kwargs) ? DATARECIPES : find(DATARECIPES; kwargs...)

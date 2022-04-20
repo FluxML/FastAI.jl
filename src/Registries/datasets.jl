@@ -46,7 +46,8 @@ function _datasetregistry(; name = "Datasets")
 end
 
 
-DATASETS = _datasetregistry()
+const DATASETS = _datasetregistry()
+datasets(; kwargs...) = isempty(kwargs) ? DATASETS : find(DATASETS; kwargs...)
 
 
 function _registerdatasets(registry::Registry)

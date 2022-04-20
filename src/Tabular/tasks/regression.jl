@@ -38,6 +38,19 @@ function TabularRegression(
 end
 
 
+_tasks["tabularregression"] = (
+    id = "tabular/regression",
+    name = "Tabular regression",
+    constructor = TabularClassificationSingle,
+    blocks = (TableRow, Continuous),
+    category = "supervised",
+    description = """
+        Task where a number of continuous variables are regressed from a table row
+        with categorical and continuous variables.
+        """,
+    package=@__MODULE__,
+)
+
 # ## Tests
 
 @testset "TabularRegression [task]" begin

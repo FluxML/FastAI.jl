@@ -43,6 +43,8 @@ include("encodings/tabularpreprocessing.jl")
 
 
 include("models.jl")
+
+const _tasks = Dict{String, Any}()
 include("tasks/classification.jl")
 include("tasks/regression.jl")
 include("recipes.jl")
@@ -50,6 +52,11 @@ include("recipes.jl")
 
 function __init__()
     _registerrecipes()
+    foreach(values(_tasks)) do t
+        if !haskey(learningtasks(), t.id)
+            push!(learningtasks(), t)
+        end
+    end
     @require Makie="ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a" begin
         import .Makie
         import .Makie: @recipe, @lift

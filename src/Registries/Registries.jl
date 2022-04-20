@@ -21,9 +21,9 @@ include("recipes.jl")
 
 
 
-export DATASETS,
-    TASKS,
-    DATARECIPES,
+export datasets,
+    learningtasks,
+    datarecipes,
     find,
     info,
     load

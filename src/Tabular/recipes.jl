@@ -116,6 +116,16 @@ const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
 function _registerrecipes()
     for (name, recipes) in RECIPES, recipe in recipes
         Datasets.registerrecipe!(Datasets.FASTAI_DATA_REGISTRY, name, recipe)
+
+        if !haskey(datarecipes(), "tabular/$name")
+            push!(datarecipes(), (
+                id = "tabular/$name",
+                datasetid = "fastai/$name",
+                blocks = Datasets.recipeblocks(recipe),
+                package = @__MODULE__,
+                recipe = recipe,
+            ))
+        end
     end
 end
 

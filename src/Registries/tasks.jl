@@ -38,4 +38,5 @@ function _taskregistry(; name = "Learning tasks")
     )
 end
 
-TASKS = _taskregistry()
+const TASKS = _taskregistry()
+learningtasks(; kwargs...) = isempty(kwargs) ? TASKS : find(TASKS; kwargs...)

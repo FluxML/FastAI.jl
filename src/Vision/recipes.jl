@@ -141,9 +141,9 @@ function _registerrecipes()
     for (name, recipes) in RECIPES, recipe in recipes
         Datasets.registerrecipe!(Datasets.FASTAI_DATA_REGISTRY, name, recipe)
 
-        if !haskey(DATARECIPES, "fastai/$name")
-            push!(DATARECIPES, (
-                id = "fastai/$name",
+        if !haskey(datarecipes(), "vision/$name")
+            push!(datarecipes(), (
+                id = "vision/$name",
                 datasetid = "fastai/$name",
                 blocks = Datasets.recipeblocks(recipe),
                 package = @__MODULE__,
