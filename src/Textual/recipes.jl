@@ -41,3 +41,11 @@ function _registerrecipes()
         Datasets.registerrecipe!(Datasets.FASTAI_DATA_REGISTRY, name, recipe)
     end
 end
+
+
+## Tests
+
+
+@testset "TextFolders [Recipe]" begin
+    @test length(Datasets.FASTAI_DATA_REGISTRY.recipes["imdb"]) == 1
+end

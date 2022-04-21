@@ -15,6 +15,9 @@ using ..FastAI:
 
 import Requires: @require
 
+using InlineTest
+using Random
+
 include("recipes.jl")
 include("blocks/text.jl")
 include("transform.jl")
