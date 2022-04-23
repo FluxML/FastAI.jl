@@ -26,4 +26,4 @@ FastAI.mockblock(Paragraph())
 struct Paragraph <: Block end
 
 FastAI.checkblock(::Paragraph, ::String) = true
-FastAI.mockblock(::Paragraph) = randstring(" ABCEEFGHIJKLMNOPQESRUVWXYZ 1234567890 abcdefghijklmnopqrstynwxyz\n\t.,", 40)
+FastAI.mockblock(::Paragraph) = randstring(" ABCEEFGHIJKLMNOPQESRUVWXYZ 1234567890 abcdefghijklmnopqrstynwxyz\n\t.,", rand(10:40))
