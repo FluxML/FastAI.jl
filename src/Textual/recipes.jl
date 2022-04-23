@@ -47,5 +47,5 @@ end
 
 
 @testset "TextFolders [Recipe]" begin
-    @test length(Datasets.FASTAI_DATA_REGISTRY.recipes["imdb"]) == 1
+    @test length(finddatasets(name="imdb")) >= 1
 end
