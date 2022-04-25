@@ -1,6 +1,6 @@
 Base.@kwdef struct TimeSeriesDatasetRecipe <: Datasets.DatasetRecipe
     file
-    targetcol = "target"
+    loadfn = loadfile
 end
 
 Datasets.recipeblocks(::Type{TimeSeriesDatasetRecipe}) = Tuple{TimeSeriesRow, Label} 
@@ -8,18 +8,13 @@ Datasets.recipeblocks(::Type{TimeSeriesDatasetRecipe}) = Tuple{TimeSeriesRow, La
 function Datasets.loadrecipe(recipe::TimeSeriesDatasetRecipe, path)
     path = convert(String, path)
     datasetpath = joinpath(path, recipe.file)
-    df = ARFFFiles.load(DataFrame, datasetpath)
-    labels = Array(df[!, recipe.targetcol])
-    rows = Matrix(select(df, Not(:target)))
-    N,M = size(rows)
-    rows = reshape(rows, (N,1,M))
+    rows, labels = recipe.loadfn(datasetpath)
     rows = TimeSeriesDataset(rows)
     data = rows, labels
     blocks = (
         setup(TimeSeriesRow,rows),
         Label(unique(eachobs(labels))),
     )
-
     return data, blocks
 end
 
@@ -27,8 +22,14 @@ end
 
 const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
     "adiac" => [
-        TimeSeriesDatasetRecipe(file="Adiac_TRAIN.arff")
-    ]
+        TimeSeriesDatasetRecipe(file="Adiac_TRAIN.ts")
+    ],
+    "ecg5000" => [
+        TimeSeriesDatasetRecipe(file="ECG5000_TRAIN.ts")
+    ],
+    "natops" => [
+        TimeSeriesDatasetRecipe(file="NATOPS_TRAIN.ts")
+    ],
 )
 
 function _registerrecipes()
@@ -38,8 +39,7 @@ function _registerrecipes()
 end
 
 
-# ## Tests
-
+## Tests
 
 @testset "TimeSeriesDatasetRecipe [recipe]" begin
     path = datasetpath("adiac")

@@ -33,6 +33,7 @@ using Tables
 using CSV
 using ShowCases
 using InlineTest
+using ARFFFiles
 
 include("fastaidatasets.jl")
 
