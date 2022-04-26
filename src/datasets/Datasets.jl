@@ -19,7 +19,6 @@ using ..FastAI: typify
 using DataDeps
 using Glob
 using FilePathsBase
-import JpegTurbo
 import DataAugmentation
 using FilePathsBase: filename
 import FileIO
