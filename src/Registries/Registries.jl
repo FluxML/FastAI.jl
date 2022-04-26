@@ -6,7 +6,6 @@ using ..FastAI.Datasets: DatasetLoader, DataDepLoader, isavailable, loaddata
 import Markdown
 using DataDeps
 using FeatureRegistries
-using FeatureRegistries: Field
 
 filterblocks(query) = supported -> FastAI.blocktypesmatch(supported, query)
 
@@ -18,7 +17,6 @@ _formatblock(B::T) where T = T
 include("datasets.jl")
 include("tasks.jl")
 include("recipes.jl")
-
 
 
 export datasets,
