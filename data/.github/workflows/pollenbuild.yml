@@ -2,53 +2,32 @@ name: pollenbuild
 
 on:
   push:
-    branches: ['pollen']
+    branches: ['master', 'main']
 
 jobs:
   pollen:
-    name: "Pollen documentation build"
+    name: "Pollen - build documentation data"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
         with:
           ref: pollen
-          path: data
-      - uses: actions/checkout@v2
+          path: pollen
+      - uses: julia-actions/setup-julia@latest
         with:
-          ref: "gh-pages"
-          path: "pages"
-      - uses: actions/checkout@v2
-        with:
-          repository: lorenzoh/pollenjl-frontend
-          path: frontend
-          ref: main
-      - name: Move Pollen data to static folder
+          version: '1.7'
+      - name: "Install package and docs dependencies"
         run: |
-          ls
-          rm -rf data/.git
-          cp -r data/ frontend/static/
-      - uses: actions/setup-node@v2
-      - name: Install dependencies
-        run: |
-          cd frontend
-          npm install
+          julia --color=yes --project=./docs -e 'using Pkg; Pkg.add([Pkg.PackageSpec(path="."), Pkg.PackageSpec(url="https://github.com/c42f/JuliaSyntax.jl"), Pkg.PackageSpec(url="https://github.com/lorenzoh/ModuleInfo.jl"), Pkg.PackageSpec(url="https://github.com/lorenzoh/Pollen.jl", rev="main")]); Pkg.instantiate();'
       - name: Build
         run: |
-          cd frontend
-          npm run build
-      - name: Build search index
+          julia --color=yes --project=./docs ./docs/make.jl ./pollen/dev/
+      - name: Deploy
         run: |
-          cd frontend
-          cat static/data/dev/documents.json | node buildindex.cjs > ../data/dev/searchindex.json
-      - name: Deploy changes
-        run: |
-          ls -lt
-          rm -r frontend/build/data
-          cp -r frontend/build/** pages
-          cp -r data pages/
-          cd pages
+          cd pollen
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git add -f .
-          git commit -m "Deploy documentation (Pollen.jl)"
+          git add .
+          git commit -m "Build documentation data (Pollen.jl)"
           git push
