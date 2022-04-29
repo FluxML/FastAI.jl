@@ -14,17 +14,16 @@ ms = [
     m,
 ]
 
-
 project = Project(
     Pollen.Rewriter[
-        Pollen.DocumentFolder(pkgdir(m), prefix = "documents"),
-        Pollen.ParseCode(),
-        Pollen.ExecuteCode(),
-        Pollen.PackageDocumentation(ms),
-        Pollen.StaticResources(),
-        Pollen.DocumentGraph(),
-        Pollen.SearchIndex(),
-        Pollen.SaveAttributes((:title,)),
-        Pollen.LoadFrontendConfig(pkgdir(m))
+        DocumentFolder(Pkg.pkgdir(m), prefix = "documents"),
+        ParseCode(),
+        ExecuteCode(),
+        PackageDocumentation(ms),
+        StaticResources(),
+        DocumentGraph(),
+        SearchIndex(),
+        SaveAttributes((:title,)),
+        LoadFrontendConfig(Pkg.pkgdir(m))
     ],
 )
