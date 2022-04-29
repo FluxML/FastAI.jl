@@ -4,6 +4,7 @@ authors = ["Lorenz Ohly", "Julia Community"]
 version = "0.4.2"
 
 [deps]
+ARFFFiles = "da404889-ca92-49ff-9e8b-0aa6b4d38dc8"
 Animations = "27a7e980-b3e6-11e9-2bcd-0b925532e340"
 BSON = "fbb218c0-5317-5bc6-957e-2ee96dd4b1f0"
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"

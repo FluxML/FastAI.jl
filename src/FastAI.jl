@@ -110,6 +110,8 @@ export Vision
 include("Tabular/Tabular.jl")
 @reexport using .Tabular
 
+include("TimeSeries/TimeSeries.jl")
+@reexport using .TimeSeries
 
 include("deprecations.jl")
 export
@@ -173,6 +175,7 @@ export
     TableRow,
     Continuous,
     Image,
+    TimeSeriesRow,
 
     # encodings
     encode,
