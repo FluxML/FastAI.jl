@@ -40,7 +40,22 @@ function _datasetregistry(; name = "Datasets")
                 name = "Package"),
         );
         name,
-        loadfn = row -> loaddata(row.loader),
+        loadfn = function (row)
+            if row.loader isa DataDepLoader && startswith(row.loader.datadep, "fastai-")
+                # Change download format for fastai datasets without having to redownload
+                # The download process was slightly changed; this saves having to
+                # redownload to update.
+                dir = Datasets.loaddata(row.loader)
+                if isdir(joinpath(dir, row.name))
+                    cd(dir) do
+                        temp = mktempdir()
+                        mv(joinpath(dir, row.name), temp, force=true)
+                        mv(temp, pwd(), force=true)
+                    end
+                end
+            end
+            loaddata(row.loader)
+        end
     )
     return registry
 end

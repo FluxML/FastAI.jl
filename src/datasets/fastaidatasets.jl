@@ -127,7 +127,13 @@ function DataDeps.DataDep(d::FastAIDataset)
         """,
         "$(ROOT_URL)$(d.subfolder)/$(d.name).$(d.extension)",
         d.checksum,
-        post_fetch_method=DataDeps.unpack,
+        post_fetch_method=function (f)
+            DataDeps.unpack(f)
+            extracted = readdir(pwd())[1]
+            temp = mktempdir()
+            mv(extracted, temp, force=true)
+            mv(temp, pwd(), force=true)
+        end,
     )
 end
 

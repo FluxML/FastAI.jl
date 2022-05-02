@@ -64,7 +64,7 @@ Load dataset with any recipe:
 data, blocks = loaddataset(name)
 ```
 """
-loaddataset(name::String; blocks = Any) = findfirst(datarecipes(); name, blocks)
+loaddataset(name::String, blocks = Any) = load(findfirst(datarecipes(); id = name, blocks))
 
 """
     listdatasources()
@@ -86,4 +86,4 @@ listdatasources() = getfield(datasets(), :data).id
 (Down)load registered dataset source named `name` from the dataset registry.
 Use [`listdatasources`](#) for a list of all dataset sources.
 """
-datasetpath(name::String) = joinpath(load(datasets()["fastai/$name"]), name)
+datasetpath(name::String) = load(datasets()["fastai/$name"])

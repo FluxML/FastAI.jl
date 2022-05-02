@@ -44,7 +44,7 @@ end
 isavailable(loader::DataDepLoader) = !isnothing(DataDeps.try_determine_load_path(loader.datadep, @__FILE__))
 
 function makeavailable(loader::DataDepLoader)
-    isavailable(loader) || return DataDeps.resolve(loader.datadep, @__FILE__)
+    return DataDeps.resolve(loader.datadep, @__FILE__)
 end
 
 function loaddata(loader::DataDepLoader)
