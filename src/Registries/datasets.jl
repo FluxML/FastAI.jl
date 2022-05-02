@@ -1,45 +1,45 @@
 
 function _datasetregistry(; name = "Datasets")
     registry = Registry(
-        name,
         (
-            id = Field(String, "ID"),
+            id = Field(String, name = "ID"),
             name = Field(
-                String,
-                "Name",
+                String;
+                name = "Name",
                 description = "The name of the dataset",
                 computefn = (row, key) -> get(row, key, row.id)),
             size = Field(
-                String,
-                "Size",
+                String;
+                name = "Size",
                 description = "Download size of the dataset",
                 optional = true),
             downloaded = Field(
-                Bool,
-                "Is downloaded",
+                Bool;
+                name = "Is downloaded",
                 description = """
                     Whether the dataset has been downloaded and is available locally.
                     Updates after session restart.
                 """,
                 computefn = (row, key) -> isavailable(row.loader)),
             tags = Field(
-                Vector{String},
-                "Tags",
+                Vector{String};
+                name = "Tags",
                 defaultfn = (row, key) -> String[]),
             description = Field(
-                String,
-                "Description",
+                String;
+                name = "Description",
                 optional = true,
                 description = "More information about the dataset",
                 formatfn=x -> ismissing(x) ? x : Markdown.parse(x)),
             loader = Field(
-                DatasetLoader,
-                "Dataset loader",
+                DatasetLoader;
+                name = "Dataset loader",
                 formatfn = x -> "$(typeof(x).name.name)(...)",),
             package = Field(
-                Module,
-                "Package"),
-        ),
+                Module;
+                name = "Package"),
+        );
+        name,
         loadfn = row -> loaddata(row.loader),
     )
     return registry

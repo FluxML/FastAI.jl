@@ -139,8 +139,6 @@ const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
 
 function _registerrecipes()
     for (name, recipes) in RECIPES, recipe in recipes
-        Datasets.registerrecipe!(Datasets.FASTAI_DATA_REGISTRY, name, recipe)
-
         if !haskey(datarecipes(), "vision/$name")
             push!(datarecipes(), (
                 id = "vision/$name",

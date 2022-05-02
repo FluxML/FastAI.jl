@@ -23,7 +23,7 @@ project = Project(
         StaticResources(),
         DocumentGraph(),
         SearchIndex(),
-        SaveAttributes((:title,)),
+        SaveAttributes((:title,), useoutputs=false),
         LoadFrontendConfig(Pkg.pkgdir(m))
     ],
 )

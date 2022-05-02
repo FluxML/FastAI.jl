@@ -44,7 +44,6 @@ function ImageClassificationSingle(size::NTuple{N,Int}, classes::AbstractVector;
     return ImageClassificationSingle(blocks, size=size)
 end
 
-registerlearningtask!(FASTAI_METHOD_REGISTRY, ImageClassificationSingle, (Image, Label))
 
 _tasks["imageclfsingle"] = (
     id = "vision/imageclfsingle",
@@ -106,7 +105,6 @@ function ImageClassificationMulti(size::NTuple{N,Int}, classes::AbstractVector; 
 end
 
 
-registerlearningtask!(FASTAI_METHOD_REGISTRY, ImageClassificationMulti, (Image, LabelMulti))
 
 _tasks["imageclfmulti"] = (
     id = "vision/imageclfmulti",

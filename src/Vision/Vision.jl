@@ -36,7 +36,7 @@ using ..FastAI:
     ShowText,
     # other
     Context, Training, Validation, Inference,
-    FASTAI_METHOD_REGISTRY, registerlearningtask!, Datasets
+    Datasets
 import Flux
 import FastAI.Datasets
 

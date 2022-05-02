@@ -30,7 +30,6 @@ function ImageKeypointRegression(size::NTuple{N,Int}, nkeypoints::Int; kwargs...
     return ImageKeypointRegression(blocks; size = size, kwargs...)
 end
 
-registerlearningtask!(FASTAI_METHOD_REGISTRY, ImageKeypointRegression, (Image, Keypoints))
 
 
 _tasks["imagekeypoint"] = (

@@ -1,14 +1,11 @@
 
 function _datareciperegistry(datasetregistry; name = "Dataset recipes")
     Registry(
-        name,
         (;
-            id = Field(
-                String,
-                "ID"),
+            id = Field(String, name = "ID"),
             datasetid = Field(
                 String,
-                "Dataset ID",
+                name = "Dataset ID",
                 description = "ID of the dataset this recipe is based on.",
                 computefn = function (row, key)
                     val = row[key]
@@ -20,19 +17,19 @@ function _datareciperegistry(datasetregistry; name = "Dataset recipes")
             ),
             blocks = Field(
                 Any,
-                "Block types",
+                name = "Block types",
                 description = "Types of blocks of the data container that this recipe loads.",
-                getfilterfn = filterblocks,
+                filterfn = blocktypesmatch,
                 formatfn = _formatblock),
             description = Field(
                 String,
-                "Description",
+                name = "Description",
                 optional = true,
                 description = "More information about the dataset recipe",
                 formatfn=x -> ismissing(x) ? x : Markdown.parse(x)),
             downloaded = Field(
                 Bool,
-                "Is downloaded",
+                name = "Is downloaded",
                 description = """
                     Whether the dataset this recipe is based has been downloaded and is
                     available locally.
@@ -40,13 +37,14 @@ function _datareciperegistry(datasetregistry; name = "Dataset recipes")
                 computefn = (row, key) -> isavailable(datasetregistry[row.datasetid].loader)),
             package = Field(
                 Module,
-                "Package"),
+                name = "Package"),
             recipe = Field(
                 Datasets.DatasetRecipe,
-                "Recipe",
+                name = "Recipe",
                 formatfn = x -> "$(typeof(x).name.name)(...)"
             )
         );
+        name,
         loadfn = function loadrecipeentry(row)
             dataset = load(datasetregistry[row.datasetid])
             Datasets.loadrecipe(row.recipe, dataset)

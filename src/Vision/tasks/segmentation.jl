@@ -41,7 +41,6 @@ function ImageSegmentation(size::NTuple{N,Int}, classes::AbstractVector; kwargs.
     return ImageSegmentation(blocks; size=size, kwargs...)
 end
 
-registerlearningtask!(FASTAI_METHOD_REGISTRY, ImageSegmentation, (Image, Mask))
 
 _tasks["imagesegmentation"] = (
     id = "vision/imagesegmentation",

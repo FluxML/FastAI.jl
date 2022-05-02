@@ -11,7 +11,7 @@ using ..FastAI:
     # visualization
     ShowText,
     # other
-    Context, Training, Validation, FASTAI_METHOD_REGISTRY, registerlearningtask!
+    Context, Training, Validation
 
 # for tests
 using ..FastAI: testencoding
