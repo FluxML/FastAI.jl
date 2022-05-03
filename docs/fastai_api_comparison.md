@@ -6,7 +6,7 @@ FastAI.jl is in many ways similar to the original Python [fastai](docs.fast.ai),
 
 FastAI.jl's own data block API makes it possible to derive every part of a high-level interface with a unified API across tasks. Instead it suffices to create a learning task and based on the blocks and encodings specified the proper model builder, loss function, and visualizations are implemented (see below). For a high-level API, a complete `Learner` can be constructed using [`tasklearner`](#) without much boilerplate. There are some helper functions for  creating these learning tasks, for example [`ImageClassificationSingle`](#) and [`ImageSegmentation`](#).
 
-FastAI.jl additionally has a unified API for registering and discovering functionality across applications also based on the data block abstraction.  `finddatasets` and `loaddataset` let you quickly load common datasets matching some data modality and `findlearningtask` lets you find learning task helpers for common tasks. See [the discovery tutorial](discovery.md) for more info.
+FastAI.jl additionally has a unified API for registering and discovering functionality across applications also based on the data block abstraction.  [`datasets`](#) and [`datarecipes`](#) let you quickly load common datasets matching some data modality and [`learningtasks`] lets you find learning task helpers for common tasks. See [the discovery tutorial](discovery.md) for more info.
 
 ### Vision
 
@@ -122,7 +122,7 @@ Metrics are handled by the [`Metrics`](#) callback which takes in reducing metri
 
 ### fastai.data.external
 
-FastAI.jl makes all the same datasets available in `fastai.data.external` available. See `FastAI.Datasets.DATASETS` for a list of all datasets and use [`datasetpath`](#)`(name)` to download and extract a dataset.
+FastAI.jl makes all the same datasets available in `fastai.data.external` available. See [`datasets`](#) for a list of all datasets that can be downloaded.
 
 ### funcs_kwargs and DataLoader, fastai.data.core
 

@@ -1,6 +1,7 @@
 using Pollen
 using Pkg
 using Crayons
+using ImageShow
 Crayons.COLORS[:nothing] = 67
 ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 

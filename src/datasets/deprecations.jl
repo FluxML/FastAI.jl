@@ -86,4 +86,4 @@ listdatasources() = getfield(datasets(), :data).id
 (Down)load registered dataset source named `name` from the dataset registry.
 Use [`listdatasources`](#) for a list of all dataset sources.
 """
-datasetpath(name::String) = load(datasets()["fastai/$name"])
+datasetpath(name::String) = load(datasets()[name])

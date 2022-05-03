@@ -26,8 +26,8 @@ using DataLoaders: batchviewcollated
 using FastAI
 using FastAI.Datasets
 
-data = loadtaskdata(datasetpath("imagenette2-320"), ImageClassification)
-task = ImageClassification(Datasets.getclassesclassification("imagenette2-320"), (224, 224))
+data, blocks = load(datarecipes()["imagenette2-320"])
+task = ImageClassificationSingle(blocks, size=(224, 224))
 
 # maps data processing over `data`
 taskdata = taskdataset(data, task, Training())
@@ -68,7 +68,8 @@ using FastAI
 using FastAI.Datasets
 using FluxTraining: step!
 
-data = loaddataset("imagenette2-320", (Image, Label))
+
+data, blocks = load(datarecipes()["imagenette2-320"])
 task = ImageClassificationSingle(blocks)
 learner = tasklearner(task, data)
 
@@ -130,13 +131,14 @@ If the data loading is still slowing down training, you'll probably have to spee
 For many computer vision tasks, you will resize and crop images to a specific size during training for GPU performance reasons. If the images themselves are large, loading them from disk itself can take some time. If your dataset consists of 1920x1080 resolution images but you're resizing them to 256x256 during training, you're wasting a lot of time loading the large images. *Presizing* means saving resized versions of each image to disk once, and then loading these smaller versions during training. We can see the performance difference using ImageNette since it comes in 3 sizes: original, 360px and 180px.
 
 ```julia
-data_orig, _ = loaddataset("imagenette2", (Image, Label))
+
+data_orig = load(datarecipes()["imagenette2"])
 @time eachobsparallel(data_orig, buffered = false)
 
-data_320px, _ = loaddataset("imagenette2-320", (Image, Label))
+data_320px = load(datarecipes()["imagenette2-320"])
 @time eachobsparallel(data_320px, buffered = false)
 
-data_160px, _ = loaddataset("imagenette2-160", (Image, Label))
+data_160px = load(datarecipes()["imagenette2-160"])
 @time eachobsparallel(data_160px, buffered = false)
 ```
 

@@ -17,7 +17,7 @@ As an example, here is how to train an image classification model:
 
 ```julia
 using FastAI
-data, blocks = loaddataset("imagenette2-160", (Image, Label))
+data, blocks = load(datarecipes()["imagenette2-160"])
 task = ImageClassificationSingle(blocks)
 learner = tasklearner(task, data, callbacks=[ToGPU()])
 fitonecycle!(learner, 10)

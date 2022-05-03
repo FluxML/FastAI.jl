@@ -139,10 +139,10 @@ const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
 
 function _registerrecipes()
     for (name, recipes) in RECIPES, recipe in recipes
-        if !haskey(datarecipes(), "vision/$name")
+        if !haskey(datarecipes(), name)
             push!(datarecipes(), (
-                id = "vision/$name",
-                datasetid = "fastai/$name",
+                id = name,
+                datasetid = name,
                 blocks = Datasets.recipeblocks(recipe),
                 package = @__MODULE__,
                 recipe = recipe,

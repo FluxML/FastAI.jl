@@ -33,7 +33,7 @@ julia> findlearningtasks((Image, Any))
 [ImageClassificationSingle, ImageClassificationMulti, ImageSegmentation, ImageKeypointRegression, ...]
 ```
 """
-findlearningtasks(blocktypes) = learningtasks(blocks=blocktypes).data.instance
+findlearningtasks(blocktypes) = learningtasks(blocks=blocktypes).data.constructor
 
 
 @testset "Datasets [registry]" begin
