@@ -74,7 +74,6 @@ function cleanaxis(f; kwargs...)
     ax.yzoomlock = true
     ax.xrectzoom = false
     ax.yrectzoom = false
-    ax.panbutton = nothing
     ax.xpanlock = true
     ax.ypanlock = true
     ax.bottomspinevisible = false
