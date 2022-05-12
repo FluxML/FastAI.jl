@@ -17,6 +17,6 @@ include("xresnet.jl")
 include("unet.jl")
 
 
-export xresnet18, xresnet50, UNetDynamic, TabularModel
+export xresnet18, xresnet50, UNetDynamic
 
 end

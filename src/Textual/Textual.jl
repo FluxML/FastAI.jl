@@ -11,7 +11,7 @@ using ..FastAI:
     # visualization
     ShowText,
     # other
-    Context, Training, Validation, FASTAI_METHOD_REGISTRY, registerlearningtask!
+    Context, Training, Validation
 
 import Requires: @require
 
@@ -28,4 +28,3 @@ end
 
 export Paragraph
 end
-

@@ -12,7 +12,7 @@ On the [quickstart page](../notebooks/quickstart.ipynb), we showed how to train 
 
 ```julia
 using FastAI
-data, blocks = loaddataset("imagenette2-160", (Image, Label))
+data, blocks = load(datarecipes()["imagenette2-160"])
 task = ImageClassificationSingle(blocks)
 learner = tasklearner(task, data, callbacks=[ToGPU()])
 fitonecycle!(learner, 10)
@@ -30,7 +30,7 @@ ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 
 {cell=main, output=false}
 ```julia
-data, blocks = loaddataset("imagenette2-160", (Image, Label))
+data, blocks = load(datarecipes()["imagenette2-160"])
 ```
 
 This line downloads and loads the [ImageNette](https://github.com/fastai/imagenette) image classification dataset, a small subset of ImageNet with 10 different classes. `data` is a [data container](data_containers.md) that can be used to load individual observations, here of images and the corresponding labels. We can use `getobs(data, i)` to load the `i`-th observation and `nobs` to find out how many observations there are.

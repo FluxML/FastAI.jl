@@ -44,7 +44,19 @@ function ImageClassificationSingle(size::NTuple{N,Int}, classes::AbstractVector;
     return ImageClassificationSingle(blocks, size=size)
 end
 
-registerlearningtask!(FASTAI_METHOD_REGISTRY, ImageClassificationSingle, (Image, Label))
+
+_tasks["imageclfsingle"] = (
+    id = "vision/imageclfsingle",
+    name = "Image classification (single-label)",
+    constructor = ImageClassificationSingle,
+    blocks = (Image, Label),
+    category = "supervised",
+    description = """
+        Single-label image classification task where every image has a single
+        class label associated with it.
+        """,
+    package=@__MODULE__,
+)
 
 # ---
 
@@ -93,7 +105,20 @@ function ImageClassificationMulti(size::NTuple{N,Int}, classes::AbstractVector; 
 end
 
 
-registerlearningtask!(FASTAI_METHOD_REGISTRY, ImageClassificationMulti, (Image, LabelMulti))
+
+_tasks["imageclfmulti"] = (
+    id = "vision/imageclfmulti",
+    name = "Image classification (multi-label)",
+    constructor = ImageClassificationMulti,
+    blocks = (Image, LabelMulti),
+    category = "supervised",
+    description = """
+        Multi-label image classification task where every image can
+        have multiple class labels associated with it.
+        """,
+    package=@__MODULE__,
+)
+
 
 
 # ## Tests

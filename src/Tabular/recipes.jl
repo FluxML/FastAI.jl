@@ -84,9 +84,6 @@ function Datasets.loadrecipe(recipe::TableRegressionRecipe, args...; kwargs...)
 end
 
 
-
-
-
 # Utils
 
 
@@ -115,7 +112,15 @@ const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
 
 function _registerrecipes()
     for (name, recipes) in RECIPES, recipe in recipes
-        Datasets.registerrecipe!(Datasets.FASTAI_DATA_REGISTRY, name, recipe)
+        if !haskey(datarecipes(), name)
+            push!(datarecipes(), (
+                id = name,
+                datasetid = name,
+                blocks = Datasets.recipeblocks(recipe),
+                package = @__MODULE__,
+                recipe = recipe,
+            ))
+        end
     end
 end
 
