@@ -110,6 +110,8 @@ export Vision
 include("Tabular/Tabular.jl")
 @reexport using .Tabular
 
+include("Textual/Textual.jl")
+@reexport using .Textual
 
 include("deprecations.jl")
 export
@@ -127,7 +129,7 @@ export
 
 include("interpretation/makie/stub.jl")
 function __init__()
-    @require Makie="ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a" begin
+    @require Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a" begin
         import .Makie as M
         include("interpretation/makie/showmakie.jl")
         include("interpretation/makie/lrfind.jl")
@@ -135,8 +137,8 @@ function __init__()
 end
 
 module Models
-    using ..FastAI.Tabular: TabularModel
-    using ..FastAI.Vision.Models: xresnet18, xresnet50, UNetDynamic
+using ..FastAI.Tabular: TabularModel
+using ..FastAI.Vision.Models: xresnet18, xresnet50, UNetDynamic
 end
 
 
@@ -173,6 +175,7 @@ export
     TableRow,
     Continuous,
     Image,
+    Paragraph,
 
     # encodings
     encode,
@@ -182,9 +185,7 @@ export
     Only,
     Named,
     augs_projection, augs_lighting,
-    TabularPreprocessing,
-
-    SupervisedTask,
+    TabularPreprocessing, SupervisedTask,
     BlockTask,
     describetask,
     checkblock,
@@ -222,9 +223,7 @@ export
     lrfind,
     savetaskmodel,
     loadtaskmodel,
-    accuracy_thresh,
-
-    gpu,
+    accuracy_thresh, gpu,
     plot
 
 

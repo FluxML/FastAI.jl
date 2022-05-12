@@ -5,6 +5,7 @@ version = "0.4.2"
 
 [deps]
 Animations = "27a7e980-b3e6-11e9-2bcd-0b925532e340"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 BSON = "fbb218c0-5317-5bc6-957e-2ee96dd4b1f0"
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 ColorVectorSpace = "c3611d14-8923-5661-9e6a-0046d554d3a4"
