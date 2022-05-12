@@ -2,7 +2,7 @@
     TextFolders(textfile; labelfn = parentname, split = false)
 
 Recipe for loading a single-label text classification dataset
-stored in hierarchical folder format. 
+stored in hierarchical folder format.
 """
 Base.@kwdef struct TextFolders <: Datasets.DatasetRecipe
     labelfn = parentname
@@ -38,7 +38,15 @@ const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
 
 function _registerrecipes()
     for (name, recipes) in RECIPES, recipe in recipes
-        Datasets.registerrecipe!(Datasets.FASTAI_DATA_REGISTRY, name, recipe)
+        if !haskey(datarecipes(), name)
+            push!(datarecipes(), (
+                id = name,
+                datasetid = name,
+                blocks = Datasets.recipeblocks(recipe),
+                package = @__MODULE__,
+                recipe = recipe,
+            ))
+        end
     end
 end
 
