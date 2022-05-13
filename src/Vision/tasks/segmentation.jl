@@ -41,7 +41,21 @@ function ImageSegmentation(size::NTuple{N,Int}, classes::AbstractVector; kwargs.
     return ImageSegmentation(blocks; size=size, kwargs...)
 end
 
-registerlearningtask!(FASTAI_METHOD_REGISTRY, ImageSegmentation, (Image, Mask))
+
+_tasks["imagesegmentation"] = (
+    id = "vision/imagesegmentation",
+    name = "Image segmentation",
+    constructor = ImageSegmentation,
+    blocks = (Image, Mask),
+    category = "supervised",
+    description = """
+        Semantic segmentation task in which every pixel in an image is
+        classified.
+        """,
+    package=@__MODULE__,
+)
+
+
 
 
 # ## Tests

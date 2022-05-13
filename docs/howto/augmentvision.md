@@ -15,7 +15,7 @@ using FastAI
 import FastAI: Image
 import CairoMakie; CairoMakie.activate!(type="png")
 
-data, blocks = loaddataset("imagenette2-160", (Image, Label))
+data, blocks = load(datarecipes()["imagenette2-160"])
 task = BlockTask(
     blocks,
     (

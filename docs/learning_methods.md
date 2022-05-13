@@ -21,7 +21,7 @@ Before we get started, let's load up a [data container](data_containers.md) that
 using FastAI, FastAI.DataAugmentation, Colors
 import FastAI: Image
 data = Datasets.loadfolderdata(
-    datasetpath("imagenette2-160"),
+    load(datasets()["imagenette2-160"]),
     filterfn=isimagefile,
     loadfn=(loadfile, parentname))
 ```
@@ -172,7 +172,7 @@ model = Chain(
     Models.xresnet18(),
     Chain(
             AdaptiveMeanPool((1,1)),
-            flatten,
+            Flux.flatten,
             Dense(512, length(task.classes)),
     )
 )

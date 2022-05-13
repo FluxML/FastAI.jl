@@ -101,9 +101,8 @@ task = BlockTask(
 
 Now `encode` expects a sample and just runs the encodings over that, giving us an encoded input `x` and an encoded target `y`.
 
-{cell=main}
 ```julia
-data = loadfolderdata(joinpath(datasetpath("dogscats"), "train"), filterfn=isimagefile, loadfn=(loadfile, parentname))
+data = loadfolderdata(joinpath(load(datasets()["dogscats"]), "train"), filterfn=isimagefile, loadfn=(loadfile, parentname))
 sample = getobs(data, 1)
 x, y = encodesample(task, Training(), sample)
 summary(x), summary(y)
@@ -111,7 +110,6 @@ summary(x), summary(y)
 
 This is equivalent to:
 
-{cell=main}
 ```julia
 x, y = encode(task.encodings, Training(), FastAI.getblocks(task).sample, sample)
 summary(x), summary(y)
@@ -119,7 +117,6 @@ summary(x), summary(y)
 
 Image segmentation looks almost the same except we use a `Mask` block as target. We're also using `OneHot` here, because it also has an `encode` task for `Mask`s. For this task, `ProjectiveTransforms` will be applied to both the `Image` and the `Mask`, using the same random state for cropping and augmentation.
 
-{cell=main}
 ```julia
 task = BlockTask(
     (Image{2}(), Mask{2}(1:10)),
@@ -133,19 +130,16 @@ task = BlockTask(
 
 The easiest way to understand how encodings are applied to each block is to use [`describetask`](#) and [`describeencodings`](#) which print a table of how each encoding is applied successively to each block. Rows where a block is **bolded** indicate that the data was transformed by that encoding.
 
-{cell=main}
 ```julia
 describetask(task)
 ```
 
 The above tables make it clear what happens during training ("encoding a sample") and inference (encoding an input and "decoding an output"). The more general form [`describeencodings`](#) takes in encodings and blocks directly and can be useful for building an understanding of how encodings apply to some blocks.
 
-{cell=main}
 ```julia
 FastAI.describeencodings(task.encodings, (Image{2}(),))
 ```
 
-{cell=main}
 ```julia
 FastAI.describeencodings((OneHot(),), (Label(1:10), Mask{2}(1:10), Image{2}()))
 ```

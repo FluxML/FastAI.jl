@@ -6,16 +6,16 @@ For finding both, we can make use of `Block`s. A `Block` represents a kind of da
 
 ## Finding a dataset
 
-To find a dataset with compatible samples, we can pass the types of these blocks to [`finddatasets`](#) which will return a list of dataset names and recipes to load them in a suitable way.
+To find a dataset with compatible samples, we can pass the types of these blocks as a filter to [`datasets`](#) which will show us only dataset recipes for loading those blocks.
 
 {cell=main}
 ```julia
 using FastAI
 import FastAI: Image
-finddatasets(blocks=(Image, Mask))
+datarecipes(blocks=(Image, Mask))
 ```
 
-We can see that the `"camvid_tiny"` dataset can be loaded so that each sample is a pair of an image and a segmentation mask. Let's use [`loaddataset`](#) to load a [data container](data_containers.md) and concrete blocks.
+We can see that the `"camvid_tiny"` dataset can be loaded so that each sample is a pair of an image and a segmentation mask. Let's use a data recipe to load a [data container](data_containers.md) and concrete blocks.
 
 {cell=main, result=false, output=false style="display:none;"}
 ```julia
@@ -24,7 +24,7 @@ ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 
 {cell=main, output=false}
 ```julia
-data, blocks = loaddataset("camvid_tiny", (Image, Mask))
+data, blocks = load(findfirst(datarecipes(id="camvid_tiny", blocks=(Image, Mask))))
 ```
 
 As with every data container, we can load a sample using `getobs` which gives us a tuple of an image and a segmentation mask.
@@ -35,7 +35,7 @@ image, mask = sample = getobs(data, 1)
 size.(sample), eltype.(sample)
 ```
 
-`loaddataset` also returned `blocks` which are the concrete `Block` instances for the dataset. We passed in _types_ of blocks (`(Image, Mask)`) and get back _instances_ since the specifics of some blocks depend on the dataset. For example, the returned target block carries the labels for every class that a pixel can belong to.
+Loading the dataset recipe also returned `blocks`, which are the concrete [`Block`] instances for the dataset. We passed in _types_ of blocks (`(Image, Mask)`) and get back _instances_ since the specifics of some blocks depend on the dataset. For example, the returned target block carries the labels for every class that a pixel can belong to.
 
 {cell=main}
 ```julia
@@ -55,8 +55,8 @@ checkblock((inputblock, targetblock), (image, mask))
 In short, if you have a learning task in mind and want to load a dataset for that task, then
 
 1. define the types of input and target block, e.g. `blocktypes = (Image, Label)`,
-2. use [`finddatasets`](#)`(blocks=blocktypes)` to find compatbile datasets; and
-3. run [`loaddataset`](#)`(datasetname, blocktypes)` to load a data container and the concrete blocks
+2. use `filter(`[`datarecipes`](#)`(), blocks=blocktypes)` to find compatbile dataset recipes; and
+3. run `load(`[`datarecipes`](#)`()[id])` to load a data container and the concrete blocks
 
 ### Exercises
 
@@ -66,14 +66,14 @@ In short, if you have a learning task in mind and want to load a dataset for tha
 
 ## Finding a learning task
 
-Armed with a dataset, we can go to the next step: creating a learning task. Since we already have blocks defined, this amounts to defining the encodings that are applied to the data before it is used in training. Here, FastAI.jl already defines some convenient constructors for learning tasks and you can find them with [`findlearningtasks`](#). Here we can pass in either block types as above or the block instances we got from `loaddataset`.
+Armed with a dataset, we can go to the next step: creating a learning task. Since we already have blocks defined, this amounts to defining the encodings that are applied to the data before it is used in training. Here, FastAI.jl already defines some convenient constructors for learning tasks and you can find them with [`learningtasks`](#). Here we can pass in either block types as above or the block instances:
 
 {cell=main}
 ```julia
-findlearningtasks(blocks)
+learningtasks(blocks=blocks)
 ```
 
-Looks like we can use the [`ImageSegmentation`](#) function to create a learning task for our learning task. Every function returned can be called with `blocks` and, optionally, some keyword arguments for customization.
+Looks like we can use the [`ImageSegmentation`](#) function to create a learning task. Every function returned can be called with `blocks` and, optionally, some keyword arguments for customization.
 
 {cell=main}
 ```julia

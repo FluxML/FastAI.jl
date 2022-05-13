@@ -41,6 +41,19 @@ function TabularClassificationSingle(
     return TabularClassificationSingle(blocks, (tabledata, nothing))
 end
 
+_tasks["tabularclfsingle"] = (
+    id = "tabular/clfsingle",
+    name = "Tabular classification (single-label)",
+    constructor = TabularClassificationSingle,
+    blocks = (TableRow, Label),
+    category = "supervised",
+    description = """
+        Task where a table row with categorical and continuous variables is classified
+        as one of a number of classes.
+        """,
+    package=@__MODULE__,
+)
+
 
 # ## Tests
 
