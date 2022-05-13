@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.4.3
+
+### Added 
+
+- Feature registries let you find datasets, data recipes and learning tasks for your projects. It is now easier to search for functionality related to kinds of data and load it. See the updated [discovery tutorial](https://fluxml.ai/FastAI.jl/dev/i/?id=documents%2Fdocs%2Fdiscovery.md&id=references%2FFastAI.Registries.learningtasks)
+- @Chandu-444 added first support for text datasets, adding the `Paragraph` block and `FastAI.Textual` submodule (https://github.com/FluxML/FastAI.jl/pull/207)
+
+### Removed
+
+- the old APIs for registries have been removed and functionality for accessing them (`finddatasets`, `loaddataset`) has been deprecated. See the updated docs for how to find functionality using the new feature registries.
+
+
+## v0.4.2
+
+### Added
+
+- Compatibility with FluxTraining.jl v0.3 (https://github.com/FluxML/FastAI.jl/pull/223)
+
 ## v0.4.1
 
 ### Added

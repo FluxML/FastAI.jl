@@ -1,7 +1,7 @@
 name = "FastAI"
 uuid = "5d0beca9-ade8-49ae-ad0b-a3cf890e669f"
 authors = ["Lorenz Ohly", "Julia Community"]
-version = "0.4.2"
+version = "0.4.3"
 
 [deps]
 Animations = "27a7e980-b3e6-11e9-2bcd-0b925532e340"
