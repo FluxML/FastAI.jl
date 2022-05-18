@@ -1,10 +1,36 @@
-# FastAI
+# FastAI.jl
 
-Docs: [Dev](https://FluxML.github.io/FastAI.jl/dev/i)
+![](fastai-julia-logo.png)
 
-FastAI.jl is inspired by [fastai](https://github.com/fastai/fastai), and is a repository of best practices for deep learning in Julia. Its goal is to easily enable creating state-of-the-art models. FastAI enables the design, training, and delivery of deep learning models that compete with the best in class, using few lines of code.
+FastAI.jl is a Julia library for training state-of-the art deep learning models.
 
-Install with
+From loading datasets and creating data preprocessing pipelines to training, FastAI.jl takes the boilerplate out of deep learning projects. It equips you with reusable components for every part of your project while remaining customizable at every layer. FastAI.jl comes with support for common computer vision and tabular data learning tasks, with more to come.
+
+FastAI.jl's high-level workflows combine functionality from many packages in the ecosystem, most notably [Flux.jl](https://github.com/FluxML/Flux.jl), [FluxTraining.jl](https://github.com/FluxML/FluxTraining.jl), [DataAugmentation.jl](https://github.com/lorenzoh/DataAugmentation.jl) and [MLUtils.jl](https://github.com/JuliaML/MLUtils.jl).
+
+See our [**documentation**](https://FluxML.github.io/FastAI.jl/dev/i) to find out more.
+
+## Features
+
+- [download commmon datasets](TODO: `datasets`) or [bring your own](TODO: data_containers.md)
+- 
+
+## Example
+
+As an example, here is how to train an image classification model:
+
+```julia
+using FastAI
+data, blocks = load(datarecipes()["imagenette2-320"])
+task = ImageClassificationSingle(blocks)
+learner = tasklearner(task, data, callbacks=[ToGPU()])
+fitonecycle!(learner, 10)
+showoutputs(task, learner)
+```
+
+## Setup
+
+To get started, install FastAI.jl using the Julia package manager: 
 
 ```julia
 using Pkg
@@ -13,15 +39,22 @@ Pkg.add("FastAI")
 
 or try it out with this [Google Colab template](https://colab.research.google.com/gist/lorenzoh/2fdc91f9e42a15e633861c640c68e5e8).
 
-As an example, here is how to train an image classification model:
+## Getting started
 
-```julia
-using FastAI
-data, blocks = load(datarecipes()["imagenette2-160"])
-task = ImageClassificationSingle(blocks)
-learner = tasklearner(task, data, callbacks=[ToGPU()])
-fitonecycle!(learner, 10)
-showoutputs(task, learner)
-```
+To dive in, you may be interested in
 
-Please read [the documentation](https://fluxml.github.io/FastAI.jl/dev) for more information and see the [setup instructions](docs/setup.md).
+- an [overview of the high-level API](https://fluxml.ai/FastAI.jl/dev/i/?id=documents%2Fdocs%2Fintroduction.md),
+- seeing some [example learning tasks](https://fluxml.ai/FastAI.jl/dev/i/?id=documents%2Fnotebooks%2Fquickstart.ipynb),
+- finding out [how you can search for and find datasets and other functionality](https://fluxml.ai/FastAI.jl/dev/i/?id=documents%2Fdocs%2Fdiscovery.md); or
+- [our contributor guide](CONTRIBUTING.md)
+
+## Get in touch
+
+You can get in touch here on GitHub or on the JuliaLang Zulip in the [`#ml-ecosystem` channel](https://julialang.zulipchat.com/#narrow/stream/237432-ml-contributers).
+
+---
+## Acknowledgements
+
+FastAI.jl takes inspiration from the fantastic [fastai](http://docs.fast.ai) library for Python. Jeremy Howard and the fastai team kindly approved this project and its use of the fastai name.
+
+This project also builds on many packages in the Julia ecosystem.
