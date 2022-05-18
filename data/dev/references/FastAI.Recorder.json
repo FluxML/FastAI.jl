@@ -1,1 +1,0 @@
-{"attributes":{"kind":"struct","backlinks":[],"methods":[{"line":15,"file":"/home/runner/.julia/packages/FluxTraining/2sFqe/src/callbacks/recorder.jl","method_id":"FastAI.Recorder_1","symbol_id":"FastAI.Recorder","signature":"Recorder()"}],"name":"Recorder","title":"Recorder","symbol_id":"FastAI.Recorder","public":true,"module_id":"FastAI"},"tag":"documentation","children":[]}

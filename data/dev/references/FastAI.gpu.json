@@ -1,1 +1,0 @@
-{"attributes":{"kind":"function","backlinks":[],"methods":[{"line":175,"file":"/home/runner/.julia/packages/Flux/qAdFM/src/functor.jl","method_id":"FastAI.gpu_1","symbol_id":"FastAI.gpu","signature":"gpu(x)"}],"name":"gpu","title":"gpu","symbol_id":"FastAI.gpu","public":true,"module_id":"FastAI"},"tag":"documentation","children":[]}

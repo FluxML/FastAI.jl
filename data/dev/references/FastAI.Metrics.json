@@ -1,1 +1,0 @@
-{"attributes":{"kind":"struct","backlinks":[],"methods":[{"line":37,"file":"/home/runner/.julia/packages/FluxTraining/2sFqe/src/callbacks/metrics.jl","method_id":"FastAI.Metrics_1","symbol_id":"FastAI.Metrics","signature":"Metrics(metrics...)"}],"name":"Metrics","title":"Metrics","symbol_id":"FastAI.Metrics","public":true,"module_id":"FastAI"},"tag":"documentation","children":[]}
