@@ -1,0 +1,1 @@
+import{S as t,i as n,s as r}from"../../chunks/index-832d6c3c.js";import{b as o}from"../../chunks/paths-396f020f.js";const i=!0;async function c({params:e}){const{version:s}=e;return{status:301,redirect:`${o}/${s}/documents/README.md`}}class l extends t{constructor(s){super(),n(this,s,null,null,r,{})}}export{l as default,c as load,i as prerender};
