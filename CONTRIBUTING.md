@@ -1,6 +1,6 @@
 # Contributor guide for FastAI.jl
 
-First off, thank you for considering to contribute to FastAI.jl. We welcome contributions and are happy to work with you!
+First off, thank you for considering contributing to FastAI.jl. We welcome contributions and are happy to work with you!
 
 FastAI.jl is part of the FluxML GitHub organization and follows the same guidelines laid out in [Flux.jl's CONTRIBUTING.md](https://github.com/FluxML/Flux.jl/blob/master/CONTRIBUTING.md). That guide also includes a lot of tips for first-time contributors to open source.
 

@@ -84,7 +84,7 @@ Both formats support the [Markdown syntax of Publish.jl](https://michaelhatherly
 
 ### Linking to documentation 
 
-For a new documentation file to be discoverable, you have to add an entry to the nested Markdown list in `toc.md`, which corresponds to the sidebar in the documentation (Updating the sidebar currently requires interrupting and reincluding the file that starts the development server).
+For a new documentation file to be discoverable, you have to add an entry to the nested Markdown list in `toc.md`, which corresponds to the sidebar in the documentation _(updating the sidebar currently requires interrupting and reincluding the file that starts the development server)_.
 
 Documentation pages can also link to each other using standard Markdown link syntax.
 

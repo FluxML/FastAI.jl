@@ -49,7 +49,7 @@ To dive in, you may be interested in
 
 ## Get in touch
 
-You can get in touch here on GitHub or on the JuliaLang Zulip in the [`#ml-ecosystem` channel](https://julialang.zulipchat.com/#narrow/stream/237432-ml-contributers).
+You can get in touch here on GitHub or on the JuliaLang Zulip in the [`#ml-contributors` channel](https://julialang.zulipchat.com/#narrow/stream/237432-ml-contributers).
 
 ---
 ## Acknowledgements
