@@ -1,14 +1,13 @@
 # FastAI.jl
 
 ![](fastai-julia-logo.png)
-
 FastAI.jl is a Julia library for training state-of-the art deep learning models.
 
 From loading datasets and creating data preprocessing pipelines to training, FastAI.jl takes the boilerplate out of deep learning projects. It equips you with reusable components for every part of your project while remaining customizable at every layer. FastAI.jl comes with support for common computer vision and tabular data learning tasks, with more to come.
 
 FastAI.jl's high-level workflows combine functionality from many packages in the ecosystem, most notably [Flux.jl](https://github.com/FluxML/Flux.jl), [FluxTraining.jl](https://github.com/FluxML/FluxTraining.jl), [DataAugmentation.jl](https://github.com/lorenzoh/DataAugmentation.jl) and [MLUtils.jl](https://github.com/JuliaML/MLUtils.jl).
 
-See our [**documentation**](https://FluxML.github.io/FastAI.jl/dev/i) to find out more.
+See our [**documentation**](https://fluxml.ai/FastAI.jl) to find out more.
 
 ## Features
 
@@ -50,7 +49,7 @@ To dive in, you may be interested in
 
 ## Get in touch
 
-You can get in touch here on GitHub or on the JuliaLang Zulip in the [`#ml-ecosystem` channel](https://julialang.zulipchat.com/#narrow/stream/237432-ml-contributers).
+You can get in touch here on GitHub or on the JuliaLang Zulip in the [`#ml-contributors` channel](https://julialang.zulipchat.com/#narrow/stream/237432-ml-contributers).
 
 ---
 ## Acknowledgements
