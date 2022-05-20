@@ -9,11 +9,6 @@ FastAI.jl's high-level workflows combine functionality from many packages in the
 
 See our [**documentation**](https://fluxml.ai/FastAI.jl) to find out more.
 
-## Features
-
-- [download commmon datasets](TODO: `datasets`) or [bring your own](TODO: data_containers.md)
-- 
-
 ## Example
 
 As an example, here is how to train an image classification model:
