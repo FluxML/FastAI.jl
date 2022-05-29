@@ -41,7 +41,7 @@ end
 
 function _predictx(method, model, x, device = identity)
     if shouldbatch(method)
-        x = DataLoaders.collate([x])
+        x = MLUtils.batch([x])
     end
     ŷs = device(model)(device(x))
     if shouldbatch(method)

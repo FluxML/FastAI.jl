@@ -100,5 +100,5 @@ in `context` which defaults to `Training`.
 """
 function makebatch(task::LearningTask, data, idxs = 1:8; context = Training())
     xys = [deepcopy(encodesample(task, context, getobs(data, i))) for i in idxs]
-    return DataLoaders.collate(xys)
+    return MLUtils.batch(xys)
 end

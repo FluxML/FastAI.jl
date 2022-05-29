@@ -64,7 +64,7 @@ function tasklearner(
 end
 
 function tasklearner(task, data; pctgval=0.2, kwargs...)
-    traindata, validdata = splitobs(shuffleobs(data), at=1 - pctgval)
+    traindata, validdata = splitobs(data, at=1 - pctgval)
     return tasklearner(task, traindata, validdata; kwargs...)
 end
 
@@ -78,11 +78,10 @@ or validation data if `validation = true`. If `n` take only the first
 
 """
 function getbatch(learner; context = Training(), n = nothing)
-    dl = context==Validation() ? learner.data.validation : learner.data.training
-    batch = first(learner.data.validation)
-    bs = DataLoaders._batchsize(batch, DataLoaders.BatchDimLast())
-    b = isnothing(n) ? bs : min(n, bs)
-    batch = DataLoaders.collate([s for (s, _) in zip(DataLoaders.obsslices(batch), 1:b)])
+    dl = context == Validation() ? learner.data.validation : learner.data.training
+    batch = first(dl)
+    b = min(isnothing(n) ? Inf : n, Datasets.batchsize(batch))
+    batch = MLUtils.batch([s for (s, _) in zip(Datasets.unbatch(batch), 1:b)])
     return batch
 end
 
