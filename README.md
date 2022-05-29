@@ -1,6 +1,7 @@
 # FastAI.jl
 
 ![](fastai-julia-logo.png)
+
 FastAI.jl is a Julia library for training state-of-the art deep learning models.
 
 From loading datasets and creating data preprocessing pipelines to training, FastAI.jl takes the boilerplate out of deep learning projects. It equips you with reusable components for every part of your project while remaining customizable at every layer. FastAI.jl comes with support for common computer vision and tabular data learning tasks, with more to come.
