@@ -4,7 +4,6 @@ module Models
 using Base: Bool, Symbol
 using ..FastAI
 
-using BSON
 using Flux
 using Zygote
 using DataDeps

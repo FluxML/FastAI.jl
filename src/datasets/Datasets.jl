@@ -7,7 +7,6 @@ import MLUtils: MLUtils, getobs, numobs, filterobs, groupobs, mapobs
 import MLDatasets: FileDataset
 using MLUtils: mapobs, groupobs
 using DataDeps
-using Glob
 using FilePathsBase
 import DataAugmentation
 using FilePathsBase: filename
@@ -23,20 +22,17 @@ using InlineTest
 
 include("fastaidatasets.jl")
 
-function __init__()
-    initdatadeps()
-end
-
-include("containers.jl")
 include("batching.jl")
-
+include("containers.jl")
 include("load.jl")
+include("loaders.jl")
 include("recipe.jl")
 
 include("deprecations.jl")
 
-include("loaders.jl")
-
+function __init__()
+    initdatadeps()
+end
 
 export
     # primitive containers
