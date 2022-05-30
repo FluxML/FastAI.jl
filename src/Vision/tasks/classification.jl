@@ -8,7 +8,7 @@ function ImageClassificationSingle(
         C=RGB{N0f8},
         computestats=false,
 	) where N
-	return SupervisedMethod(
+	return SupervisedTask(
 		blocks,
 		(
 			ProjectiveTransforms(size; augmentations=aug_projections),
@@ -23,7 +23,7 @@ end
     ImageClassificationSingle(size, classes; kwargs...)
     ImageClassificationSingle(blocks[, data]; kwargs...)
 
-Learning method for single-label image classification. Images are
+Learning task for single-label image classification. Images are
 resized to `size` and classified into one of `classes`.
 
 Use [`ImageClassificationMulti`](#) for the multi-class setting.
@@ -44,7 +44,19 @@ function ImageClassificationSingle(size::NTuple{N,Int}, classes::AbstractVector;
     return ImageClassificationSingle(blocks, size=size)
 end
 
-registerlearningmethod!(FASTAI_METHOD_REGISTRY, ImageClassificationSingle, (Image, Label))
+
+_tasks["imageclfsingle"] = (
+    id = "vision/imageclfsingle",
+    name = "Image classification (single-label)",
+    constructor = ImageClassificationSingle,
+    blocks = (Image, Label),
+    category = "supervised",
+    description = """
+        Single-label image classification task where every image has a single
+        class label associated with it.
+        """,
+    package=@__MODULE__,
+)
 
 # ---
 
@@ -57,7 +69,7 @@ function ImageClassificationMulti(
         C=RGB{N0f8},
         computestats=false,
 	) where N
-	return SupervisedMethod(
+	return SupervisedTask(
 		blocks,
 		(
 			ProjectiveTransforms(size; augmentations=aug_projections),
@@ -71,7 +83,7 @@ end
 """
     ImageClassificationMulti(size, classes; kwargs...)
 
-Learning method for multi-label image classification. Images are
+Learning task for multi-label image classification. Images are
 resized to `size` and classified into multiple of `classes`.
 
 Use [`ImageClassificationSingle`](#) for the single-class setting.
@@ -93,60 +105,73 @@ function ImageClassificationMulti(size::NTuple{N,Int}, classes::AbstractVector; 
 end
 
 
-registerlearningmethod!(FASTAI_METHOD_REGISTRY, ImageClassificationMulti, (Image, LabelMulti))
+
+_tasks["imageclfmulti"] = (
+    id = "vision/imageclfmulti",
+    name = "Image classification (multi-label)",
+    constructor = ImageClassificationMulti,
+    blocks = (Image, LabelMulti),
+    category = "supervised",
+    description = """
+        Multi-label image classification task where every image can
+        have multiple class labels associated with it.
+        """,
+    package=@__MODULE__,
+)
+
 
 
 # ## Tests
 
-@testset "ImageClassificationSingle [method]" begin
-    method = ImageClassificationSingle((16, 16), [1, 2])
-    testencoding(getencodings(method), getblocks(method).sample)
-    DLPipelines.checkmethod_core(method)
-    @test_nowarn methodlossfn(method)
-    @test_nowarn methodmodel(method, Models.xresnet18())
+@testset "ImageClassificationSingle [task]" begin
+    task = ImageClassificationSingle((16, 16), [1, 2])
+    testencoding(getencodings(task), getblocks(task).sample)
+    FastAI.checktask_core(task)
+    @test_nowarn tasklossfn(task)
+    @test_nowarn taskmodel(task, Models.xresnet18())
 
     @testset "`encodeinput`" begin
         image = rand(RGB, 32, 48)
 
-        xtrain = encodeinput(method, Training(), image)
+        xtrain = encodeinput(task, Training(), image)
         @test size(xtrain) == (16, 16, 3)
         @test eltype(xtrain) == Float32
 
-        xinference = encodeinput(method, Inference(), image)
+        xinference = encodeinput(task, Inference(), image)
         @test size(xinference) == (16, 24, 3)
         @test eltype(xinference) == Float32
     end
     @testset "`encodetarget`" begin
         category = 1
-        y = encodetarget(method, Training(), category)
+        y = encodetarget(task, Training(), category)
         @test y ≈ [1, 0]
-        # depends on buffered interface for `BlockMethod`s and `Encoding`s
-        #encodetarget!(y, method, Training(), 2)
+        # depends on buffered interface for `BlockTask`s and `Encoding`s
+        #encodetarget!(y, task, Training(), 2)
         #@test y ≈ [0, 1]
     end
     @testset "Show backends" begin
         @testset "ShowText" begin
-            #@test_broken FastAI.test_method_show(method, ShowText(Base.DevNull()))
+            #@test_broken FastAI.test_task_show(task, ShowText(Base.DevNull()))
         end
     end
 
     @testset "blockmodel" begin
-        method = ImageClassificationSingle((Image{2}(), Label(1:2)))
-        @test_nowarn methodmodel(method)
+        task = ImageClassificationSingle((Image{2}(), Label(1:2)))
+        @test_nowarn taskmodel(task)
     end
 end
 
-@testset "ImageClassificationMulti [method]" begin
+@testset "ImageClassificationMulti [task]" begin
 
-    method = ImageClassificationMulti((16, 16), [1, 2])
+    task = ImageClassificationMulti((16, 16), [1, 2])
 
-    testencoding(getencodings(method), getblocks(method).sample)
-    DLPipelines.checkmethod_core(method)
-    @test_nowarn methodlossfn(method)
-    @test_nowarn methodmodel(method, Models.xresnet18())
+    testencoding(getencodings(task), getblocks(task).sample)
+    FastAI.checktask_core(task)
+    @test_nowarn tasklossfn(task)
+    @test_nowarn taskmodel(task, Models.xresnet18())
     @testset "Show backends" begin
         @testset "ShowText" begin
-            FastAI.test_method_show(method, ShowText(Base.DevNull()))
+            FastAI.test_task_show(task, ShowText(Base.DevNull()))
         end
     end
 end

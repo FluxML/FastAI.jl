@@ -84,9 +84,6 @@ function Datasets.loadrecipe(recipe::TableRegressionRecipe, args...; kwargs...)
 end
 
 
-
-
-
 # Utils
 
 
@@ -105,13 +102,25 @@ const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
         TableClassificationRecipe(TableDatasetRecipe(file="adult.csv"), :salary),
         TableRegressionRecipe(TableDatasetRecipe(file="adult.csv"), :age),
     ],
+    "imdb_sample" => [
+        TableDatasetRecipe(file="texts.csv"),
+        TableClassificationRecipe(TableDatasetRecipe(file="texts.csv"), :label)
+    ]
 )
 
 
 
 function _registerrecipes()
     for (name, recipes) in RECIPES, recipe in recipes
-        Datasets.registerrecipe!(Datasets.FASTAI_DATA_REGISTRY, name, recipe)
+        if !haskey(datarecipes(), name)
+            push!(datarecipes(), (
+                id = name,
+                datasetid = name,
+                blocks = Datasets.recipeblocks(recipe),
+                package = @__MODULE__,
+                recipe = recipe,
+            ))
+        end
     end
 end
 

@@ -1,0 +1,43 @@
+{
+    "Overview": "documents/README.md",
+    "Setup": "documents/docs/setup.md",
+    "Quickstart": "documents/notebooks/quickstart.ipynb",
+    "Core": {
+        "Tutorials": {
+            "Introduction": "documents/docs/introduction.md",
+            "Discovering functionality": "documents/docs/discovery.md",
+            "Intermediate": {
+                "Data containers": "documents/docs/data_containers.md"
+            },
+            "Advanced": {
+                "Unsupervised learning with VAEs": "documents/notebooks/vae.ipynb"
+            }
+        },
+        "How-to": {
+            "Train a model": "documents/notebooks/training.ipynb",
+            "Find functionality": "documents/docs/howto/findfunctionality.md",
+            "Load and save models": "documents/notebooks/serialization.ipynb",
+            "Log to TensorBoard": "documents/notebooks/training.ipynb"
+        },
+        "Background": {
+            "Comparison to fast.ai": "documents/docs/fastai_api_comparison.md",
+            "Performant data pipelines": "documents/docs/background/datapipelines.md",
+            "Blocks and Encodings": "documents/docs/background/blocksencodings.md"
+        }
+    },
+    "Computer vision": {
+        "Tasks": {
+            "Image segmentation": "documents/notebooks/imagesegmentation.ipynb",
+            "Keypoint regression": "documents/notebooks/keypointregression.ipynb"
+        },
+        "How-To": {
+            "Use augmentations": "documents/docs/howto/augmentvision.md",
+            "Presize vision datasets": "documents/notebooks/presizing.ipynb"
+        }
+    },
+    "Tabular data": {
+        "Tasks": {
+            "Tabular classification": "documents/notebooks/tabularclassification.ipynb"
+        }
+    }
+}

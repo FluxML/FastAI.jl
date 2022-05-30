@@ -29,13 +29,15 @@ using ..FastAI
 using ..FastAI:
     # blocks
     Block, WrapperBlock, AbstractBlock, OneHotTensor, OneHotTensorMulti, Label,
-    LabelMulti, wrapped, getencodings, getblocks,
+    LabelMulti, wrapped, getencodings, getblocks, encodetarget, encodeinput,
     # encodings
     Encoding, StatefulEncoding, OneHot,
     # visualization
     ShowText,
     # other
-    FASTAI_METHOD_REGISTRY, registerlearningmethod!, Datasets
+    Context, Training, Validation, Inference,
+    Datasets
+import Flux
 import FastAI.Datasets
 
 # for tests
@@ -50,14 +52,16 @@ import ..FastAI:
 
 import Colors: colormaps_sequential, Colorant, Color, Gray, Normed, RGB,
     alphacolor, deuteranopic, distinguishable_colors
+using ColorVectorSpace
 import FixedPointNumbers: N0f8
 import DataAugmentation
 import DataAugmentation: apply, Identity, ToEltype, ImageToTensor, Normalize,
     BufferedThreadsafe, ScaleKeepAspect, PinOrigin, RandomCrop, CenterResizeCrop,
-    AdjustBrightness, AdjustContrast, Maybe,
+    AdjustBrightness, AdjustContrast, Maybe, FlipX, FlipY, WarpAffine, Rotate, Zoom,
     ResizePadDivisible, itemdata
 import ImageInTerminal
 import IndirectArrays: IndirectArray
+import ProgressMeter: Progress, next!
 import Requires: @require
 import StaticArrays: SVector
 import Statistics: mean, std
@@ -80,10 +84,12 @@ include("encodings/projective.jl")
 
 include("models/Models.jl")
 include("models.jl")
-include("learningmethods/utils.jl")
-include("learningmethods/classification.jl")
-include("learningmethods/segmentation.jl")
-include("learningmethods/keypointregression.jl")
+
+const _tasks = Dict{String, Any}()
+include("tasks/utils.jl")
+include("tasks/classification.jl")
+include("tasks/segmentation.jl")
+include("tasks/keypointregression.jl")
 include("recipes.jl")
 
 include("tests.jl")
@@ -91,6 +97,11 @@ include("tests.jl")
 
 function __init__()
     _registerrecipes()
+    foreach(values(_tasks)) do t
+        if !haskey(FastAI.learningtasks(), t.id)
+            push!(FastAI.learningtasks(), t)
+        end
+    end
     @require Makie="ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a" begin
         import .Makie
         import .Makie: @recipe, @lift
@@ -102,8 +113,10 @@ end
 export Image, Mask, Keypoints, Bounded,
     # encodings
     ImagePreprocessing, KeypointPreprocessing, ProjectiveTransforms,
-    # learning methods
+    # learning tasks
     ImageClassificationSingle, ImageClassificationMulti,
-    ImageKeypointRegression, ImageSegmentation
+    ImageKeypointRegression, ImageSegmentation,
+    # helpers
+    augs_projection, augs_lighting
 
 end

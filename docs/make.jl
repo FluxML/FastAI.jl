@@ -1,13 +1,28 @@
-import CairoMakie
-using Pollen
-using FastAI
-using FluxTraining
-using DLPipelines
-using DataAugmentation
-using FilePathsBase
+"""
+This script builds the Pollen.jl documentation so that it can be loaded
+by the frontend. It accepts one argument: the path where the generated
+files should be stored.
 
-ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
+    > julia docs/make.jl DIR
 
-refmodules = [FastAI, FluxTraining, DLPipelines, DataAugmentation, FastAI.Datasets, FastAI.Models]
-project = Pollen.documentationproject(FastAI; refmodules = refmodules)
-Pollen.fullbuild(project, Pollen.FileBuilder(Pollen.HTML(), p"dev/"))
+Use `./serve.jl` for interactive development.
+"""
+
+# Create target folder
+isempty(ARGS) && error("Please pass a file path to make.jl:\n\t> julia docs/make.jl DIR ")
+DIR = abspath(mkpath(ARGS[1]))
+
+# Create Project
+project = include("project.jl")
+
+@info "Rewriting documents..."
+Pollen.rewritesources!(project)
+
+@info "Writing to disk at \"$DIR\"..."
+Pollen.build(
+    FileBuilder(
+        JSONFormat(),
+        DIR,
+    ),
+    project,
+)

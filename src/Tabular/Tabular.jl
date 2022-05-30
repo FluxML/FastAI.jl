@@ -5,13 +5,13 @@ using ..FastAI
 using ..FastAI:
     # blocks
     Block, WrapperBlock, AbstractBlock, OneHotTensor, OneHotTensorMulti, Label,
-    LabelMulti, wrapped, Continuous, getencodings, getblocks,
+    LabelMulti, wrapped, Continuous, getencodings, getblocks, encodetarget, encodeinput,
     # encodings
     Encoding, StatefulEncoding, OneHot,
     # visualization
     ShowText,
     # other
-    FASTAI_METHOD_REGISTRY, registerlearningmethod!
+    Context, Training, Validation
 
 # for tests
 using ..FastAI: testencoding
@@ -24,7 +24,8 @@ import ..FastAI:
 
 import DataAugmentation
 import DataFrames: DataFrame
-import Flux: Embedding, Chain, Dropout, Dense, Parallel
+import Flux
+import Flux: Embedding, Chain, Dropout, Dense, Parallel, BatchNorm
 import PrettyTables
 import Requires: @require
 import ShowCases: ShowCase
@@ -42,13 +43,20 @@ include("encodings/tabularpreprocessing.jl")
 
 
 include("models.jl")
-include("learningmethods/classification.jl")
-include("learningmethods/regression.jl")
+
+const _tasks = Dict{String, Any}()
+include("tasks/classification.jl")
+include("tasks/regression.jl")
 include("recipes.jl")
 
 
 function __init__()
     _registerrecipes()
+    foreach(values(_tasks)) do t
+        if !haskey(learningtasks(), t.id)
+            push!(learningtasks(), t)
+        end
+    end
     @require Makie="ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a" begin
         import .Makie
         import .Makie: @recipe, @lift

@@ -129,14 +129,15 @@ If `progress = true`, show a progress bar.
 function imagedatasetstats(
         data,
         C;
-        progress=true,
-        progressfn=progress ? tqdm : identity)
+        progress=true)
     means, stds = imagestats(getobs(data, 1), C)
     loaderfn = d -> eachobsparallel(d, buffered=false, useprimary=true)
 
-    for (means_, stds_) in mapobs(img -> imagestats(img, C), data) |> loaderfn |> progressfn
+    p = Progress(nobs(data), enabled=progress)
+    for (means_, stds_) in mapobs(img -> imagestats(img, C), data) |> loaderfn
         means .+= means_
         stds .+= stds_
+        next!(p)
     end
     return means ./ nobs(data), stds ./ nobs(data)
 end

@@ -1,23 +1,18 @@
 """
-    UNetDynamic(backbone, inputsize[; kwargs...])
+    UNetDynamic(backbone, inputsize, k_out[; kwargs...])
 
 Create a U-Net model from convolutional `backbone` architecture. After every
 downsampling layer (i.e. pooling or strided convolution), a skip connection and
 an upsampling block are inserted, resulting in a convolutional network with
-the same spatial output dimensions as its input.
+the same spatial output dimensions as its input. Outputs an array with `k_out`
+channels.
 
 ## Keyword arguments
 
-- `upsample`: A *constructor* for an upsampling block callable with `upsample(insize, k_out)`.
-    If `insize` is `(h, w, k, b)`, then the output should have size `(2h, 2w, k_out, b)`.
-    Defaults to [`FastAI.Models.upsample_block_small`](#).
-- `agg`: Aggregation function for skip connection. Default concatenates in the
-  channel dimension. Use `+` for summing and see [`Flux.SkipConnection`](#) for more
-  details.
-- `fdownsample = 0`: Number of upsampling steps to leave out. By default there will be one
+- `fdownscale = 0`: Number of upsampling steps to leave out. By default there will be one
     upsampling step for every downsampling step in `backbone`. Hence if the input spatial
-    size is `(h, w)`, the output size will be `(h/2^fdownsample, w/2^fdownsample)`, i.e.
-    to get outputs at half the resolution, set `fdownsample = 1`.
+    size is `(h, w)`, the output size will be `(h/2^fdownscale, w/2^fdownscale)`, i.e.
+    to get outputs at half the resolution, set `fdownscale = 1`.
 - `kwargs...`: Other keyword arguments are passed through to `upsample`.
 
 ## Examples
@@ -158,4 +153,15 @@ end
 
 function conv_final(insize, k_out; ks = 1, kwargs...)
     return convxlayer(insize[end-1], k_out; ks = ks, kwargs...)
+end
+
+
+@testset "UNetDynamic [model]" begin
+    @test_nowarn begin
+        model = UNetDynamic(Models.xresnet18(), (128, 128, 3, 1), 4)
+        @test Flux.outputsize(model, (128, 128, 3, 1)) == (128, 128, 4, 1)
+
+        model = UNetDynamic(Models.xresnet18(), (128, 128, 3, 1), 4, fdownscale=1)
+        @test Flux.outputsize(model, (128, 128, 3, 1)) == (64, 64, 4, 1)
+    end
 end

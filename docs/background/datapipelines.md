@@ -26,14 +26,14 @@ using DataLoaders: batchviewcollated
 using FastAI
 using FastAI.Datasets
 
-data = loadtaskdata(datasetpath("imagenette2-320"), ImageClassification)
-method = ImageClassification(Datasets.getclassesclassification("imagenette2-320"), (224, 224))
+data, blocks = load(datarecipes()["imagenette2-320"])
+task = ImageClassificationSingle(blocks, size=(224, 224))
 
 # maps data processing over `data`
-methoddata = methoddataset(data, method, Training())
+taskdata = taskdataset(data, task, Training())
 
 # creates a data container of collated batches
-batchdata = batchviewcollated(methoddata, 16)
+batchdata = batchviewcollated(taskdata, 16)
 
 NBATCHES = 200
 
@@ -50,7 +50,7 @@ end
 
 Running each timer twice to forego compilation time, the sequential iterator takes 20 seconds while the parallel iterator using 11 background threads only takes 2.5 seconds. This certainly isn't a proper benchmark, but it shows the performance can be improved by an order of magnitude with no effort.
 
-Beside increasing the amount of compute available with worker threads as above, the data loading performance can also be improved by reducing the time it takes to load a single batch. Since a batch is made up of some number of observations, this usually boils down to reducing the loading time of a single observation. If you're using the `LearningMethod` API, this can be further broken down into the loading and encoding part.
+Beside increasing the amount of compute available with worker threads as above, the data loading performance can also be improved by reducing the time it takes to load a single batch. Since a batch is made up of some number of observations, this usually boils down to reducing the loading time of a single observation. If you're using the `LearningTask` API, this can be further broken down into the loading and encoding part.
 
 ## Measuring performance
 
@@ -68,9 +68,10 @@ using FastAI
 using FastAI.Datasets
 using FluxTraining: step!
 
-data = loaddataset("imagenette2-320", (Image, Label))
-method = ImageClassificationSingle(blocks)
-learner = methodlearner(method, data)
+
+data, blocks = load(datarecipes()["imagenette2-320"])
+task = ImageClassificationSingle(blocks)
+learner = tasklearner(task, data)
 
 NBATCHES = 100
 
@@ -110,17 +111,17 @@ end
 # Time it takes to encode an `(image, class)` observation into `(x, y)`
 obss = [getobs(data, i) for i in 1:N]
 @btime for i in 1:N
-    encode(method, Training(), obss[i])
+    encodesample(task, Training(), obss[i])
 end
 ```
 
-This will give you a pretty good idea of where the performance bottleneck is. Note that the encoding performance is often dependent of the method configuration. If we used `ImageClassification` with input size `(64, 64)` it would be much faster.
+This will give you a pretty good idea of where the performance bottleneck is. Note that the encoding performance is often dependent of the task configuration. If we used `ImageClassification` with input size `(64, 64)` it would be much faster.
 
 ## Improving performance
 
 So, you've identified the data pipeline as a performance bottleneck. What now? Before anything else, make sure you're doing the following:
 
-- Use `DataLoaders.DataLoader` as a data iterator. If you're using [`methoddataloaders`](#) or [`methodlearner`](#), this is already the case.
+- Use `DataLoaders.DataLoader` as a data iterator. If you're using [`taskdataloaders`](#) or [`tasklearner`](#), this is already the case.
 - Start Julia with multiple threads by specifying the `-t n`/`-t auto` flag when starting Julia. If it is successful, `Threads.nthreads()` should be larger than `1`.
 
 If the data loading is still slowing down training, you'll probably have to speed up the loading of each observation. As mentioned above, this can be broken down into observation loading and encoding. The exact strategy will depend on your use case, but here are some examples.
@@ -130,19 +131,20 @@ If the data loading is still slowing down training, you'll probably have to spee
 For many computer vision tasks, you will resize and crop images to a specific size during training for GPU performance reasons. If the images themselves are large, loading them from disk itself can take some time. If your dataset consists of 1920x1080 resolution images but you're resizing them to 256x256 during training, you're wasting a lot of time loading the large images. *Presizing* means saving resized versions of each image to disk once, and then loading these smaller versions during training. We can see the performance difference using ImageNette since it comes in 3 sizes: original, 360px and 180px.
 
 ```julia
-data_orig, _ = loaddataset("imagenette2", (Image, Label))
+
+data_orig = load(datarecipes()["imagenette2"])
 @time eachobsparallel(data_orig, buffered = false)
 
-data_320px, _ = loaddataset("imagenette2-320", (Image, Label))
+data_320px = load(datarecipes()["imagenette2-320"])
 @time eachobsparallel(data_320px, buffered = false)
 
-data_160px, _ = loaddataset("imagenette2-160", (Image, Label))
+data_160px = load(datarecipes()["imagenette2-160"])
 @time eachobsparallel(data_160px, buffered = false)
 ```
 
 ### Reducing allocations with inplace operations
 
-When implementing the `LearningMethod` interface, you have the option to implement `encode!(buf, method, context, sample)`, an inplace version of `encode` that reuses a buffer to avoid allocations. Reducing allocations often speeds up the encoding step and can also reduce the frequency of garbage collector pauses during training which can reduce GPU utilization.
+When implementing the `LearningTask` interface, you have the option to implement `encode!(buf, task, context, sample)`, an inplace version of `encode` that reuses a buffer to avoid allocations. Reducing allocations often speeds up the encoding step and can also reduce the frequency of garbage collector pauses during training which can reduce GPU utilization.
 
 ### Using efficient data augmentation
 

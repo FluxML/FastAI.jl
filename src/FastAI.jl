@@ -3,19 +3,15 @@ module FastAI
 
 using Base: NamedTuple
 using Reexport
-@reexport using DLPipelines
 @reexport using FluxTraining
 @reexport using DataLoaders
-@reexport using Flux
+using Flux
 
 using Animations
 import DataAugmentation
 import DataAugmentation: getbounds, Bounds
 
-import DLPipelines: methoddataset, methodmodel, methodlossfn, methoddataloaders,
-    mockmodel, mocksample, predict, predictbatch, mockmodel, encode, encodeinput,
-    encodetarget, decodeŷ, decodey
-using LearnBase: getobs, nobs
+import LearnBase
 using FilePathsBase
 using Flux
 using Flux.Optimise
@@ -39,10 +35,16 @@ using Statistics
 using InlineTest
 
 
+# ## Learning task API (previously DLPipelines.jl)
+include("tasks/task.jl")
+include("tasks/taskdata.jl")
+include("tasks/predict.jl")
+include("tasks/check.jl")
+
 # ## Data block API
 include("datablock/block.jl")
 include("datablock/encoding.jl")
-include("datablock/method.jl")
+include("datablock/task.jl")
 include("datablock/describe.jl")
 include("datablock/wrappers.jl")
 
@@ -71,7 +73,7 @@ include("datablock/loss.jl")
 # Interpretation
 include("interpretation/backend.jl")
 include("interpretation/text.jl")
-include("interpretation/method.jl")
+include("interpretation/task.jl")
 include("interpretation/showinterpretable.jl")
 include("interpretation/learner.jl")
 include("interpretation/detect.jl")
@@ -96,9 +98,10 @@ include("datasets/Datasets.jl")
 @reexport using .Datasets
 
 
-include("fasterai/methodregistry.jl")
-include("fasterai/learningmethods.jl")
-include("fasterai/defaults.jl")
+include("Registries/Registries.jl")
+@reexport using .Registries
+
+
 
 
 include("invariants.jl")
@@ -112,19 +115,35 @@ export Vision
 include("Tabular/Tabular.jl")
 @reexport using .Tabular
 
+include("Textual/Textual.jl")
+@reexport using .Textual
+
+include("deprecations.jl")
+export
+    methodmodel,
+    methoddataset,
+    methoddataloaders,
+    methodlossfn,
+    BlockMethod,
+    describemethod,
+    findlearningmethods,
+    methodlearner,
+    savemethodmodel,
+    loadmethodmodel
+
 
 include("interpretation/makie/stub.jl")
 function __init__()
-    @require Makie="ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a" begin
-        using .Makie
+    @require Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a" begin
+        import .Makie as M
         include("interpretation/makie/showmakie.jl")
         include("interpretation/makie/lrfind.jl")
     end
 end
 
 module Models
-    using ..FastAI.Tabular: TabularModel
-    using ..FastAI.Vision.Models: xresnet18, xresnet50, UNetDynamic
+using ..FastAI.Tabular: TabularModel
+using ..FastAI.Vision.Models: xresnet18, xresnet50, UNetDynamic
 end
 
 
@@ -133,30 +152,35 @@ export
     Datasets,
     Models,
     datasetpath,
-    loadtaskdata,
     mapobs,
     groupobs,
     filterobs,
     shuffleobs,
     datasubset,
 
-    # method API
-    methodmodel,
-    methoddataset,
-    methoddataloaders,
-    methodlossfn,
+    # task API
+    taskmodel,
+    taskdataset,
+    taskdataloaders,
+    tasklossfn,
     getobs,
     nobs,
+    encodesample,
     predict,
     predictbatch,
+    Training,
+    Validation,
+    Inference,
+    Context,
 
     # blocks
-
     Label,
     LabelMulti,
     Many,
     TableRow,
     Continuous,
+    Image,
+    Paragraph,
 
     # encodings
     encode,
@@ -166,11 +190,9 @@ export
     Only,
     Named,
     augs_projection, augs_lighting,
-    TabularPreprocessing,
-
-    SupervisedMethod,
-    BlockMethod,
-    describemethod,
+    TabularPreprocessing, SupervisedTask,
+    BlockTask,
+    describetask,
     checkblock,
     makebatch,
     getbatch,
@@ -191,24 +213,22 @@ export
     showprediction,
     showpredictions,
 
-    # learning methods
-    findlearningmethods,
+    # learning tasks
+    findlearningtasks,
     TabularClassificationSingle,
     TabularRegression,
 
 
     # training
-    methodlearner,
+    tasklearner,
     Learner,
     fit!,
     fitonecycle!,
     finetune!,
     lrfind,
-    savemethodmodel,
-    loadmethodmodel,
-    accuracy_thresh,
-
-    gpu,
+    savetaskmodel,
+    loadtaskmodel,
+    accuracy_thresh, gpu,
     plot
 
 

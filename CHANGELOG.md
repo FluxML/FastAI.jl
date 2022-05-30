@@ -5,17 +5,57 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v0.4.0 (Unreleased)
+## v0.4.3
+
+### Added 
+
+- Feature registries let you find datasets, data recipes and learning tasks for your projects. It is now easier to search for functionality related to kinds of data and load it. See the updated [discovery tutorial](https://fluxml.ai/FastAI.jl/dev/i/?id=documents%2Fdocs%2Fdiscovery.md&id=references%2FFastAI.Registries.learningtasks)
+- @Chandu-444 added first support for text datasets, adding the `Paragraph` block and `FastAI.Textual` submodule (https://github.com/FluxML/FastAI.jl/pull/207)
+
+### Removed
+
+- the old APIs for registries have been removed and functionality for accessing them (`finddatasets`, `loaddataset`) has been deprecated. See the updated docs for how to find functionality using the new feature registries.
+
+
+## v0.4.2
+
+### Added
+
+- Compatibility with FluxTraining.jl v0.3 (https://github.com/FluxML/FastAI.jl/pull/223)
+
+## v0.4.1
+
+### Added
+
+- New documentation frontend based on Pollen.jl: https://fluxml.ai/FastAI.jl/dev/i/
+- Now supports Flux.jl v0.13 (https://github.com/FluxML/FastAI.jl/pull/202)
+
+### Changed
+
+- Now has ImageIO.jl as a dependency to ensure that fast jpg loading using JpegTurbo.jl is used
+
+## v0.4.0 (2022-03-19)
 
 ### Added
 
 - Made block-based learning method more modular. `SupervisedMethod` now supplants `BlockMethod`.  [PR](https://github.com/FluxML/FastAI.jl/pull/188)
-    - `getencodings` and `getblocks` should now be used to get block information and encodings from a method
-    - See the [new tutorial training a Variational Autoencoder].
-    - See also the docstrings for `AbstractBlockMethod` and `SupervisedMethod`
+  - `getencodings` and `getblocks` should now be used to get block information and encodings from a method
+  - See the [new tutorial training a Variational Autoencoder].
+  - See also the docstrings for `AbstractBlockTask` and `SupervisedTask`
 
 ### Changed
 
+- (BREAKING): all learning method names have been renamed to task, i.e `method*` -> `task*` and `Method*` -> `Task*`. Specifically, these exported symbols are affected:
+  - `BlockMethod` -> `BlockTask`,
+  - `describemethod` -> `describetask`,
+  - `methodmodel` -> `taskmodel`,
+  - `methoddataset` -> `taskdataset`,
+  - `methoddataloaders` -> `taskdataloaders`,
+  - `methodlossfn` -> `tasklossfn`,
+  - `findlearningmethods` -> `findlearningtasks`,
+  - `methodlearner` -> `tasklearner`,
+  - `savemethodmodel` -> `savetaskmodel`,
+  - `loadmethodmodel` -> `loadtaskmodel`
 - `BlockMethod` now deprecated in favor of `SupervisedMethod`
 - (INTERNAL) domain-specific functionality has moved to submodules `FastAI.Vision` (computer vision) and `FastAI.Tabular` (tabular data). Exports of `FastAI` are not affected.
 - (INTERNAL) test suite now runs on InlineTest.jl

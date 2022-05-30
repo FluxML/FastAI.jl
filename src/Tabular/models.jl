@@ -47,7 +47,7 @@ function TabularModel(
 
     tabularbackbone = Parallel(vcat, catbackbone, contbackbone)
 
-    classifierin = mapreduce(layer -> size(layer.weight)[1], +, catbackbone[2].layers;
+    classifierin = mapreduce(layer -> size(layer.weight)[1], +, Tuple(catbackbone[2].layers);
                              init = contbackbone.chs)
     dropout_rates = Iterators.cycle(dropout_rates)
     classifiers = []
@@ -117,7 +117,7 @@ _emb_sz_rule(n_cat) = min(600, round(Int, 1.6 * n_cat^0.56))
 
 Given a vector of `cardinalities` of each categorical column
 (i.e. each element of `cardinalities` is the number of classes in that categorical column),
-compute the output embedding size according to [`emb_sz_rule`](#).
+compute the output embedding size according to [`_emb_sz_rule`](#).
 Return a vector of tuples where each element is `(in_size, out_size)` for an embedding layer.
 
 ## Keyword arguments
@@ -139,7 +139,7 @@ function tabular_embedding_backbone(embedding_sizes, dropout_rate=0.)
     emb_drop = iszero(dropout_rate) ? identity : Dropout(dropout_rate)
     Chain(
         x -> tuple(eachrow(x)...),
-        Parallel(vcat, embedslist),
+        Parallel(vcat, embedslist...),
         emb_drop
     )
 end

@@ -8,7 +8,7 @@ function ImageSegmentation(
         C=RGB{N0f8},
         computestats=false,
 	) where N
-	return SupervisedMethod(
+	return SupervisedTask(
 		blocks,
 		(
 			ProjectiveTransforms(size; augmentations=aug_projections),
@@ -22,7 +22,7 @@ end
 """
     ImageSegmentation(size, classes; kwargs...)
 
-Learning method for image segmentation. Images are
+Learning task for image segmentation. Images are
 resized to `size` and a class is predicted for every pixel.
 
 ## Keyword arguments
@@ -41,26 +41,40 @@ function ImageSegmentation(size::NTuple{N,Int}, classes::AbstractVector; kwargs.
     return ImageSegmentation(blocks; size=size, kwargs...)
 end
 
-registerlearningmethod!(FASTAI_METHOD_REGISTRY, ImageSegmentation, (Image, Mask))
+
+_tasks["imagesegmentation"] = (
+    id = "vision/imagesegmentation",
+    name = "Image segmentation",
+    constructor = ImageSegmentation,
+    blocks = (Image, Mask),
+    category = "supervised",
+    description = """
+        Semantic segmentation task in which every pixel in an image is
+        classified.
+        """,
+    package=@__MODULE__,
+)
+
+
 
 
 # ## Tests
 
-@testset "ImageSegmentation [method]" begin
+@testset "ImageSegmentation [task]" begin
     @testset "2D" begin
-        method = ImageSegmentation((16, 16), 1:4)
-        testencoding(getencodings(method), getblocks(method).sample)
-        DLPipelines.checkmethod_core(method)
-        @test_nowarn methodlossfn(method)
-        @test_nowarn methodmodel(method, Models.xresnet18())
+        task = ImageSegmentation((16, 16), 1:4)
+        testencoding(getencodings(task), getblocks(task).sample)
+        FastAI.checktask_core(task)
+        @test_nowarn tasklossfn(task)
+        @test_nowarn taskmodel(task, Models.xresnet18())
         @testset "Show backends" begin
             @testset "ShowText" begin
-                FastAI.test_method_show(method, ShowText(Base.DevNull()))
+                FastAI.test_task_show(task, ShowText(Base.DevNull()))
             end
         end
     end
     @testset "3D" begin
-        method = SupervisedMethod(
+        task = SupervisedTask(
             (Image{3}(), Mask{3}(1:4)),
             (
                 ProjectiveTransforms((16, 16, 16), inferencefactor=8),
@@ -68,9 +82,9 @@ registerlearningmethod!(FASTAI_METHOD_REGISTRY, ImageSegmentation, (Image, Mask)
                 FastAI.OneHot()
             )
         )
-        testencoding(getencodings(method), getblocks(method).sample)
-        DLPipelines.checkmethod_core(method)
-        @test_nowarn methodlossfn(method)
+        testencoding(getencodings(task), getblocks(task).sample)
+        FastAI.checktask_core(task)
+        @test_nowarn tasklossfn(task)
     end
 
 end

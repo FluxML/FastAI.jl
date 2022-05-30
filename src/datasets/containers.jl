@@ -35,9 +35,11 @@ Load a file from disk into the appropriate format.
 function loadfile(file::String)
     if isimagefile(file)
         # faster image loading
-        return FileIO.load(file, view = true)
+        return FileIO.load(file)
     elseif endswith(file, ".csv")
         return DataFrame(CSV.File(file))
+    elseif endswith(file, ".txt")
+        return read(file, String)
     else
         return FileIO.load(file)
     end

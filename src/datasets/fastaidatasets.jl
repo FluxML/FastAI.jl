@@ -21,7 +21,7 @@ function FastAIDataset(
     return FastAIDataset(name, subfolder, extension, description, checksum, datadepname, subpath, size)
 end
 
-DESCRIPTIONS = Dict(
+const DESCRIPTIONS = Dict(
     "imagenette" => "A subset of 10 easily classified classes from Imagenet: tench, English springer, cassette player, chain saw, church, French horn, garbage truck, gas pump, golf ball, parachute",
     "imagewoof" => "A subset of 10 harder to classify classes from Imagenet (all dog breeds): Australian terrier, Border terrier, Samoyed, beagle, Shih-Tzu, English foxhound, Rhodesian ridgeback, dingo, golden retriever, Old English sheepdog",
     "food-101" => "101 food categories, with 101,000 images; 250 test images and 750 training images per class. The training images were not cleaned. All images were rescaled to have a maximum side length of 512 pixels.",
@@ -48,9 +48,9 @@ const DATASETCONFIGS = [
     FastAIDataset("imagewoof-160", "imageclas", "a0d360f9d8159055b3bf2b8926a51d19b2f1ff98a1eef6034e4b891c59ca3f1a", description=DESCRIPTIONS["imagewoof"]),
     FastAIDataset("imagewoof-320", "imageclas", description=DESCRIPTIONS["imagewoof"]),
     FastAIDataset("imagewoof", "imageclas", description=DESCRIPTIONS["imagewoof"]),
-    FastAIDataset("imagewoof2-160", "imageclas", "663c22f69c2802d85e2a67103c017e047096702ffddf9149a14011b7002539bf", description=DESCRIPTIONS["imagewoof"]),
+    FastAIDataset("imagewoof2-160", "imageclas", "b5ffa16037e07f60882434f55b7814a3d44483f2a484129f251604bc0d0f8172", description=DESCRIPTIONS["imagewoof"]),
     FastAIDataset("imagewoof2-320", "imageclas", "7db6120fdb9ae079e26346f89e7b00d7f184f8137791609b97fd0405d3f92305", description=DESCRIPTIONS["imagewoof"], size="313MB"),
-    FastAIDataset("imagewoof2", "imageclas", description=DESCRIPTIONS["imagewoof"]),
+    FastAIDataset("imagewoof2", "imageclas", "de3f58c4ea3e042cf3f8365fbc699288cfe1d8c151059040d181c221bd5a55b8", description=DESCRIPTIONS["imagewoof"], size="1.25GiB"),
     FastAIDataset("mnist_png", "imageclas", "9e18edaa3a08b065d8f80a019ca04329e6d9b3e391363414a9bd1ada30563672"),
     FastAIDataset("mnist_var_size_tiny", "imageclas", "8a0f6ca04c2d31810dc08e739c7fa9b612e236383f70dd9fc6e5a62e672e2283"),
     FastAIDataset("oxford-102-flowers", "imageclas"),
@@ -87,7 +87,7 @@ const DATASETCONFIGS = [
     FastAIDataset("camvid_tiny", "sample", "cd42a9bdd8ad3e0ce87179749beae05b4beb1ae6ab665841180b1d8022fc230b"),
     FastAIDataset("dogscats", "sample", "b79c0a5e4aa9ba7a0b83abbf61908c61e15bed0e5b236e86a0c4a080c8f70d7c", size="800MiB"),
     FastAIDataset("human_numbers", "sample"),
-    FastAIDataset("imdb_sample", "sample"),
+    FastAIDataset("imdb_sample", "sample", "8e776d995296136b3f9a3cf001796d886cb0b60e86877ce71c7abbdc3c247341", size="4KB"),
     FastAIDataset("mnist_sample", "sample", "b373a14f282298aeba0f7dd56b7cdb6c2401063d4f118c39c54982907760bd38", size="3MB"),
     FastAIDataset("mnist_tiny", "sample", "0d1fedf86243931aa3fc065d2cf4ffab339a972958d8594ae993ee32bd8e15b9", size="300KB"),
     FastAIDataset("movie_lens_sample", "sample"),
@@ -127,7 +127,13 @@ function DataDeps.DataDep(d::FastAIDataset)
         """,
         "$(ROOT_URL)$(d.subfolder)/$(d.name).$(d.extension)",
         d.checksum,
-        post_fetch_method=DataDeps.unpack,
+        post_fetch_method=function (f)
+            DataDeps.unpack(f)
+            extracted = readdir(pwd())[1]
+            temp = mktempdir()
+            mv(extracted, temp, force=true)
+            mv(temp, pwd(), force=true)
+        end,
     )
 end
 

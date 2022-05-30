@@ -44,8 +44,8 @@ Datasets.recipeblocks(::Type{ImageFolders}) = Tuple{Image{2},Label}
 
 Dataset recipe for loading 2D image segmentation datasets from a common format
 where images and masks are stored as images in two different subfolders
-"<root>/<imagefolder>" and "<root>/<maskfolder>"
-The class labels should be in a newline-delimited file "<root>/<labelfile>".
+`<root>/<imagefolder>` and `<root>/<maskfolder>`
+The class labels should be in a newline-delimited file `<root>/<labelfile>`.
 """
 Base.@kwdef struct ImageSegmentationFolders <: Datasets.DatasetRecipe
     imagefolder::String = "images"
@@ -126,7 +126,7 @@ const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
         "imagewoof", "imagewoof-160", "imagewoof-320",
         "imagewoof2", "imagewoof2-160", "imagewoof2-320",
         "cifar10", "cifar100", "caltech_101", "mnist_png",
-        "mnist_sample", "CUB_200_2011"
+        "mnist_sample", "CUB_200_2011", "food-101"
     )]...,
     [name => [ImageFolders(filefilterfn=f -> !(occursin("unsup", f)))]
         for name in ("imagewang-160", "imagewang-320", "imagewang")]...,
@@ -139,8 +139,17 @@ const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
 
 function _registerrecipes()
     for (name, recipes) in RECIPES, recipe in recipes
-        Datasets.registerrecipe!(Datasets.FASTAI_DATA_REGISTRY, name, recipe)
+        if !haskey(datarecipes(), name)
+            push!(datarecipes(), (
+                id = name,
+                datasetid = name,
+                blocks = Datasets.recipeblocks(recipe),
+                package = @__MODULE__,
+                recipe = recipe,
+            ))
+        end
     end
+
 end
 
 

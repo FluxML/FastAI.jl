@@ -4,7 +4,7 @@ function TabularRegression(
         data)
     tabledata, targetdata = data
     tabledata isa TableDataset || error("`data` needs to be a tuple of a `TableDataset` and targets")
-    return SupervisedMethod(
+    return SupervisedTask(
         blocks,
         (setup(TabularPreprocessing, blocks[1], tabledata),),
         ŷblock=blocks[2],
@@ -14,14 +14,14 @@ end
 """
     TabularRegression(blocks, data)
 
-Learning method for tabular regression. Continuous columns are
+Learning task for tabular regression. Continuous columns are
 normalized and missing values are filled, categorical columns are label encoded
 taking into account any missing values which might be present.
  `blocks` should be an input and target block `(TableRow(...), Continuous(...))`.
 
     TabularRegression(n, tabledata [; catcols, contcols])
 
-Construct learning method with `classes` to classify into and a `TableDataset`
+Construct learning task with `classes` to classify into and a `TableDataset`
 `tabledata`. The column names can be passed in or guessed from the data. The
 regression target is a vector of `n` values.
 """
@@ -38,35 +38,48 @@ function TabularRegression(
 end
 
 
+_tasks["tabularregression"] = (
+    id = "tabular/regression",
+    name = "Tabular regression",
+    constructor = TabularClassificationSingle,
+    blocks = (TableRow, Continuous),
+    category = "supervised",
+    description = """
+        Task where a number of continuous variables are regressed from a table row
+        with categorical and continuous variables.
+        """,
+    package=@__MODULE__,
+)
+
 # ## Tests
 
-@testset "TabularRegression [method]" begin
+@testset "TabularRegression [task]" begin
     df = DataFrame(A = 1:4, B = ["M", "F", "F", "M"], C = 10:13)
     td = TableDataset(df)
     targets = [rand(2) for _ in 1:4]
-    method = TabularRegression(2, td; catcols=(:B,), contcols=(:A,))
-    testencoding(getencodings(method), getblocks(method).sample)
-    DLPipelines.checkmethod_core(method)
-    @test_nowarn methodlossfn(method)
-    @test_nowarn methodmodel(method)
+    task = TabularRegression(2, td; catcols=(:B,), contcols=(:A,))
+    testencoding(getencodings(task), getblocks(task).sample)
+    FastAI.checktask_core(task)
+    @test_nowarn tasklossfn(task)
+    @test_nowarn taskmodel(task)
 
     @testset "`encodeinput`" begin
-        row = mockblock(getblocks(method).input)
+        row = mockblock(getblocks(task).input)
 
-        xtrain = encodeinput(method, Training(), row)
-        @test length(xtrain[1]) == length(getblocks(method).input.catcols)
-        @test length(xtrain[2]) == length(getblocks(method).input.contcols)
+        xtrain = encodeinput(task, Training(), row)
+        @test length(xtrain[1]) == length(getblocks(task).input.catcols)
+        @test length(xtrain[2]) == length(getblocks(task).input.contcols)
 
         @test eltype(xtrain[1]) <: Number
     end
 
     @testset "`encodetarget`" begin
         target = 11
-        y = encodetarget(method, Training(), target)
+        y = encodetarget(task, Training(), target)
         @test target == y
     end
 
-    @test_nowarn method = TabularRegression(2, td)
+    @test_nowarn task = TabularRegression(2, td)
 
-    FastAI.test_method_show(method, ShowText(Base.DevNull()))
+    FastAI.test_task_show(task, ShowText(Base.DevNull()))
 end

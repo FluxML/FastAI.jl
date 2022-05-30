@@ -10,10 +10,10 @@ In the [quickstart](quickstart.md) section, you have already come in contact wit
 ```julia
 ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 ```
-{cell=main}
+{cell=main, output=false}
 ```julia
 using FastAI
-data, _ = loaddataset("imagenette2-160", (Image, Label))
+data, _ = load(findfirst(datarecipes(datasetid="imagenette2-160")))
 ```
 
 A data container is any type that holds observations of data and allows us to load them with `getobs` and query the number of observations with `nobs`. In this case, each observation is a tuple of an image and the corresponding class; after all, we want to use it for image classification. 
@@ -30,15 +30,15 @@ image
 nobs(data)
 ```
 
-[`loaddataset`](#) makes it easy to a load a data container that is compatible with some block types, but to get a better feel for what it does, let's look under the hood by creating the same data container using some mid-level APIs.
+`load(`[`datasets`](#)`[id])` makes it easy to a load a data container that is compatible with some block types, but to get a better feel for what it does, let's look under the hood by creating the same data container using some mid-level APIs.
 
 ## Creating data containers from files
 
-Before we recreate the data container, [`datasetpath`](#) downloads a dataset and returns the path to the extracted files.
+Before we recreate the data container, we'll download the dataset and get the path where the files are saved to:
 
 {cell=main}
 ```julia
-dir = datasetpath("imagenette2-160")
+dir = load(datasets()["imagenette2-160"])
 ```
 
 Now we'll start with [`FileDataset`](#) which creates a data container (here a `Vector`) of files given a path. We'll use the path of the downloaded dataset:
@@ -126,12 +126,16 @@ Using this official split, it will be easier to compare the performance of your 
 
 ## Dataset recipes
 
-We saw above how different image classification datasets can be loaded with the same logic as long as they are in a common format. To encapsulate the logic for loading common dataset formats, FastAI.jl has `DatasetRecipe`s. When we used [`finddatasets`](#) in the [discovery tutorial](discovery.md), it returned pairs of a dataset name and a `DatasetRecipe`. For example, `"imagenette2-160"` has an associated [`ImageFolders`](#) recipe and we can load it using [`loadrecipe`] and the path to the downloaded dataset:
+We saw above how different image classification datasets can be loaded with the same logic as long as they are in a common format. To encapsulate the logic for loading common dataset formats, FastAI.jl has [`DatasetRecipe`](#)s. When we used [`datarecipes`](#) in the [discovery tutorial](discovery.md), it showed us such recipes that allow loading a dataset for a specific task. For example, `"imagenette2-160"` has an associated [`ImageFolders`](#) recipe which we can load by getting the entry and calling `load` on it:
 
 {cell=main}
 ```julia
-name, recipe = finddatasets(blocks=(Image, Label), name="imagenette2-160")[1]
-data, blocks = loadrecipe(recipe, datasetpath(name))
+entry = datarecipes()["imagenette2-160"]
+```
+
+{cell=main}
+```julia
+data, blocks = load(entry)
 ```
 
 These recipes also take care of loading the data block information for the dataset. Read the [discovery tutorial](discovery.md) to find out more about that.

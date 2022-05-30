@@ -1,22 +1,26 @@
-import CairoMakie
+"""
+This script serves the Pollen.jl documentation on a local file server
+so that it can be loaded by the frontend in development mode.
+files should be stored.
+
+    > julia docs/serve.jl
+
+Use `./make.jl` to export the generated documents to disk.
+
+There are two modes for interactive development: Lazy and Regular.
+In lazy mode, each document will be built only if it is requested in
+the frontend, while for Regular mode, each document will be built
+once before serving.
+"""
+
 using Pollen
-using FastAI
-using FluxTraining
-using DLPipelines
-import DataAugmentation
-using FilePathsBase
-using Colors
 
-function serve(lazy=true; kwargs...)
-    refmodules = [FastAI, FluxTraining, DLPipelines, DataAugmentation, DataLoaders, FastAI.Datasets]
-    project = Pollen.documentationproject(FastAI; refmodules, watchpackage=true, kwargs...)
-    Pollen.serve(project, lazy=lazy)
-end
-serve()
-
-##
+project = include("project.jl")
 
 
-#=
-project = Pollen.documentationproject(FastAI; refmodules, inlineincludes = false, )
-=#
+Pollen.serve(
+    project;
+    lazy = get(ENV, "POLLEN_LAZY", "false") == "true",
+    port = Base.parse(Int, get(ENV, "POLLEN_PORT", "8000")),
+    format = JSONFormat()
+)

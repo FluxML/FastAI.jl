@@ -8,7 +8,7 @@ _Unstructured notes on blocks and encodings_
 
 - For example, for supervised learning tasks, there is an input block and a target block and we want to learn to predict targets from inputs. Learning to predict a cat/dog label (`Label(["cat", "dog"])`) from 2D images (`Image{2}()`) is a supervised image classification task.
 - A block is not a piece of data itself. Instead it describes the meaning of a piece of data in a context. That a piece of data is a block can be checked using [`checkblock`]`(block, data)`. A piece of data for the `Label` block above needs to be one of the labels, so `checkblock(Label(["cat", "dog"]), "cat") == true`, but `checkblock(Label(["cat", "dog"]), "cat") == false`.
-- We can say that a data container is compatible with a learning method if every observation in it is a valid sample of the sample block of the learning method. The sample block for supervised tasks is `sampleblock = (inputblock, targetblock)` so `sample = getobs(data, i)` from a compatible data container implies that `checkblock(sampleblock, sample)`. This also means that any data stored in blocks must not depend on individual samples; we can store the names of possible classes inside the `Label` block because they are the same across the whole dataset.
+- We can say that a data container is compatible with a learning task if every observation in it is a valid sample of the sample block of the learning task. The sample block for supervised tasks is `sampleblock = (inputblock, targetblock)` so `sample = getobs(data, i)` from a compatible data container implies that `checkblock(sampleblock, sample)`. This also means that any data stored in blocks must not depend on individual samples; we can store the names of possible classes inside the `Label` block because they are the same across the whole dataset.
 
 
 ## Data pipelines
@@ -40,7 +40,7 @@ Where do we draw the line between model and data processing? In general, the enc
     {cell=main}
     ```julia
     using FastAI, Colors
-    using FastAI: ImageTensor
+    using FastAI.Vision: ImageTensor
     enc = ImagePreprocessing()
     data = rand(RGB, 100, 100)
     @show summary(data)
@@ -70,6 +70,7 @@ Where do we draw the line between model and data processing? In general, the enc
     ```
     {cell=main}
     ```julia
+    using FastAI: encodedblockfilled
     encodedblockfilled(enc, Label(1:10)) == Label(1:10)
     ```
 - Encodings can be applied to tuples of blocks. The default behavior is to apply the encoding to each block separately.
@@ -80,15 +81,15 @@ Where do we draw the line between model and data processing? In general, the enc
 
 - Applying a tuple of encodings will encode the data by applying one encoding after the other. When decoding, the order is reversed.
 
-## Block learning methods
+## Block learning tasks
 
-[`BlockMethod`](#) creates a learning method from blocks and encodings. You define the sample block (recall for supervised tasks this is a tuple of input and target) and a sequence of encodings that are applied to all blocks.
+[`BlockTask`](#) creates a learning task from blocks and encodings. You define the sample block (recall for supervised tasks this is a tuple of input and target) and a sequence of encodings that are applied to all blocks.
 
-The below example defines the same learning method as [`ImageClassificationSingle`](#) does. The first two encodings only change `Image`, and the last changes only `Label`, so it's simple to understand.
+The below example defines the same learning task as [`ImageClassificationSingle`](#) does. The first two encodings only change `Image`, and the last changes only `Label`, so it's simple to understand.
 
 {cell=main}
 ```julia
-method = BlockMethod(
+task = BlockTask(
     (Image{2}(), Label(["cats", "dogs"])),
     (
         ProjectiveTransforms((128, 128)),
@@ -100,27 +101,24 @@ method = BlockMethod(
 
 Now `encode` expects a sample and just runs the encodings over that, giving us an encoded input `x` and an encoded target `y`.
 
-{cell=main}
 ```julia
-data = loadfolderdata(joinpath(datasetpath("dogscats"), "train"), filterfn=isimagefile, loadfn=(loadfile, parentname))
+data = loadfolderdata(joinpath(load(datasets()["dogscats"]), "train"), filterfn=isimagefile, loadfn=(loadfile, parentname))
 sample = getobs(data, 1)
-x, y = encode(method, Training(), sample)
+x, y = encodesample(task, Training(), sample)
 summary(x), summary(y)
 ```
 
 This is equivalent to:
 
-{cell=main}
 ```julia
-x, y = encode(method.encodings, Training(), method.blocks, sample)
+x, y = encode(task.encodings, Training(), FastAI.getblocks(task).sample, sample)
 summary(x), summary(y)
 ```
 
-Image segmentation looks almost the same except we use a `Mask` block as target. We're also using `OneHot` here, because it also has an `encode` method for `Mask`s. For this method, `ProjectiveTransforms` will be applied to both the `Image` and the `Mask`, using the same random state for cropping and augmentation.
+Image segmentation looks almost the same except we use a `Mask` block as target. We're also using `OneHot` here, because it also has an `encode` task for `Mask`s. For this task, `ProjectiveTransforms` will be applied to both the `Image` and the `Mask`, using the same random state for cropping and augmentation.
 
-{cell=main}
 ```julia
-method = BlockMethod(
+task = BlockTask(
     (Image{2}(), Mask{2}(1:10)),
     (
         ProjectiveTransforms((128, 128)),
@@ -130,21 +128,18 @@ method = BlockMethod(
 )
 ```
 
-The easiest way to understand how encodings are applied to each block is to use [`describemethod`](#) and [`describeencodings`](#) which print a table of how each encoding is applied successively to each block. Rows where a block is **bolded** indicate that the data was transformed by that encoding.
+The easiest way to understand how encodings are applied to each block is to use [`describetask`](#) and [`describeencodings`](#) which print a table of how each encoding is applied successively to each block. Rows where a block is **bolded** indicate that the data was transformed by that encoding.
 
-{cell=main}
 ```julia
-describemethod(method)
+describetask(task)
 ```
 
 The above tables make it clear what happens during training ("encoding a sample") and inference (encoding an input and "decoding an output"). The more general form [`describeencodings`](#) takes in encodings and blocks directly and can be useful for building an understanding of how encodings apply to some blocks.
 
-{cell=main}
 ```julia
-FastAI.describeencodings(method.encodings, (Image{2}(),))
+FastAI.describeencodings(task.encodings, (Image{2}(),))
 ```
 
-{cell=main}
 ```julia
 FastAI.describeencodings((OneHot(),), (Label(1:10), Mask{2}(1:10), Image{2}()))
 ```

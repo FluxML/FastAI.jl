@@ -5,12 +5,21 @@ function checksize(targetsz::Tuple, sz::Tuple)
     return all(map(_checksizedim, targetsz, sz))
 end
 
-#checksize(targetsz::Tuple{N, <:DimSize}, sz::NTuple{M, Int}) where {N, M} = false
 
 _checksizedim(l1::Int, l2::Int) = l1 == l2
 _checksizedim(l1::Colon, l2::Int) = true
 
 mockarray(T, sz) = rand(T, map(l -> l isa Colon ? rand(8:16) : l, sz))
+
+
+@testset "checksize" begin
+    @test checksize((10, 1), (10, 1))
+    @test !checksize((100, 1), (10, 1))
+    @test checksize((:, :, :), (1, 2, 3))
+    @test !checksize((:, :, :), (1, 2))
+    @test checksize((10, :, 1), (10, 20, 1))
+    @test !checksize((10, :, 2), (10, 20, 1))
+end
 
 
 """
@@ -59,7 +68,6 @@ end
 function checkblock(bounded::Bounded{N}, a::AbstractArray{N}) where N
     return checksize(bounded.size, size(a)) && checkblock(parent(bounded), a)
 end
-
 
 @testset "Bounded [block, wrapper]" begin
     @test_nowarn Bounded(Image{2}(), (16, 16))

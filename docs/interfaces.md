@@ -2,26 +2,25 @@
 
 FastAI.jl provides many interfaces that allow extending its functionality. 
 
-## Learning method interfaces
+## Learning task interfaces
 
-Learning methods form the core of FastAI.jl's high-level API. See [this tutorial](learning_methods.md) for a motivation and introduction.
+Learning tasks form the core of FastAI.jl's high-level API. See [this tutorial](learning_tasks.md) for a motivation and introduction.
 
-Functions for the learning method interfaces always dispatch on a [`LearningMethod`](#). A `LearningMethod` defines everything that needs to happen to turn an input into a target and much more. `LearningMethod` should be a `struct` containing configuration.
+Functions for the learning task interfaces always dispatch on a [`LearningTask`](#). A `LearningTask` defines everything that needs to happen to turn an input into a target and much more. `LearningTask` should be a `struct` containing configuration.
 
 ### Core interface
 
-Enables training and prediction. Prerequisite for other, optional learning method interfaces.
+Enables training and prediction. Prerequisite for other, optional learning task interfaces.
 
 {.tight}
-- Required methods:
+- Required tasks:
     - [`encode`](#) or both [`encodeinput`](#) and [`encodetarget`](#).
     - [`decodeŷ`](#)
-- Optional methods:
+- Optional tasks:
     - [`shouldbatch`](#)
-    - [`encode!`](#) or both [`encodeinput!`](#) and [`encodetarget!`](#).
 - Enables use of:
-    - [`methoddataset`](#)
-    - [`methoddataloaders`](#)
+    - [`taskdataset`](#)
+    - [`taskdataloaders`](#)
     - [`predict`](#)
     - [`predictbatch`](#)
 
@@ -29,25 +28,16 @@ Enables training and prediction. Prerequisite for other, optional learning metho
 
 For visualizing observations and predictions using [Makie.jl](https://github.com/JuliaPlots/Makie.jl).
 
-{.tight}
-- Required methods:
-    - [`plotsample!`](#)
-    - [`plotxy!`](#)
-    - [`plotprediction!`](#)
-- Enables use of:
-    - [`plotsamples`](#)
-    - [`plotbatch`](#)
-
 ### Training interface
 
 Convenience for creating [`Learner`](#)s.
 
 {.tight}
 - Required methods:
-    - [`methodlossfn`](#)
-    - [`methodmodel`](#)
+    - [`tasklossfn`](#)
+    - [`taskmodel`](#)
 - Enables use of:
-    - [`methodlearner`](#)
+    - [`tasklearner`](#)
 
 
 ### Testing interface
@@ -55,11 +45,11 @@ Convenience for creating [`Learner`](#)s.
 Automatically test interfaces.
 
 {.tight}
-- Required methods: 
+- Required tasks: 
     - [`mockmodel`](#)
     - [`mocksample`](#) or both [`mockinput`](#) and [`mocktarget`](#)
 - Enables use of:
-    - [`checkmethod_core`](#)
+    - [`checktask_core`](#)
 
 
 ## Callback interface

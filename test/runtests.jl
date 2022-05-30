@@ -6,13 +6,14 @@ using FastAI
 using ReTest
 FastAI.runtests([ReTest.fail, ReTest.not(ReTest.pass)])
 
+
 module FastAITests
 
 using InlineTest
 
 using ..FastAI
 import ..FastAI: Block, Encoding, encodedblock, decodedblock, encode, decode,
-    testencoding, test_method_show, checkblock
+    testencoding, test_task_show, checkblock
 using ..FastAI.Tabular: EncodedTableRow
 using Flux.Optimise: Optimiser, ADAM, apply!
 import Makie

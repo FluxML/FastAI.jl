@@ -45,8 +45,10 @@ include("transformations.jl")
 
 include("load.jl")
 include("recipe.jl")
-include("registry.jl")
-include("fastairegistry.jl")
+
+include("deprecations.jl")
+
+include("loaders.jl")
 
 
 export
@@ -66,6 +68,7 @@ export
 
     # utilities
     isimagefile,
+    istextfile,
     matches,
     loadfile,
     loadmask,
@@ -75,7 +78,7 @@ export
     grandparentname,
 
     # datasets
-    DATASETS,
+    #DATASETS,
     loadfolderdata,
     datasetpath,
 

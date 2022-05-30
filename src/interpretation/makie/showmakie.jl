@@ -4,8 +4,8 @@ import FastAI: createhandle, showblock!
 
 
 function createhandle(backend::ShowMakie; kwargs...)
-    fig = Figure(; kwargs..., backend.kwargs...)
-    grid = fig[1, 1] = GridLayout()
+    fig = M.Figure(; kwargs..., backend.kwargs...)
+    grid = fig[1, 1] = M.GridLayout()
     return grid
 end
 
@@ -36,25 +36,25 @@ function showblock!(grid, backend::ShowMakie, blocks::Tuple, obss::Tuple)
     header = [block isa Pair ? first(block) : "" for block in blocks]
     blocks = Tuple(block isa Pair ? last(block) : block for block in blocks)
 
-    rowsize!(grid, 1, Makie.Fixed(backend.size[2]))
+    M.rowsize!(grid, 1, M.Fixed(backend.size[2]))
 
 
     # Show blocks in a row
     col = 1
     for (i, (block, obs)) in enumerate(zip(blocks, obss))
         w = _nblocks(block)
-        subgrid = grid[1, col:col+w-1] = GridLayout(tellheight = false)
+        subgrid = grid[1, col:col+w-1] = M.GridLayout(tellheight = false)
         showblock!(subgrid, backend, block, obs)
         for j = col:col+w-1
-            colsize!(grid, j, Makie.Fixed(backend.size[1]))
+            M.colsize!(grid, j, M.Fixed(backend.size[1]))
         end
         col += w
     end
 
     # Add titles to named blocks
-    Makie.Label(grid[0, 1], "", tellwidth = false, textsize = 25)
+    M.Label(grid[0, 1], "", tellwidth = false, textsize = 25)
     for (i, title) in enumerate(header)
-        Makie.Label(grid[1, i], title, tellwidth = false, textsize = 25)
+        M.Label(grid[1, i], title, tellwidth = false, textsize = 25)
     end
 
 end
@@ -81,21 +81,21 @@ function showblocks!(grid, backend::ShowMakie, blocks::Tuple, obss::AbstractVect
 
     # Show each sample in one row
     for (i, obs) in enumerate(obss)
-        subgrid = grid[i, 1:n] = GridLayout(tellheight = false)
-        rowsize!(grid, i, Makie.Fixed(backend.size[2]))
+        subgrid = grid[i, 1:n] = M.GridLayout(tellheight = false)
+        M.rowsize!(grid, i, M.Fixed(backend.size[2]))
         showblock!(subgrid, backend, blocks, obs)
     end
 
     for i = 1:n
-        colsize!(grid, i, Makie.Fixed(backend.size[1]))
+        M.colsize!(grid, i, M.Fixed(backend.size[1]))
     end
 
     # Add titles to named blocks
-    Makie.Label(grid[0, 1], "", textsize = 25)
+    M.Label(grid[0, 1], "", textsize = 25)
     col = 1
     for (i, (title, block)) in enumerate(zip(header, blocks))
         w = _nblocks(block)
-        Makie.Label(grid[1, col:col+w-1], title, tellwidth = false, textsize = 25)
+        M.Label(grid[1, col:col+w-1], title, tellwidth = false, textsize = 25)
         col += w
     end
 end
@@ -107,12 +107,12 @@ showblocks!(grid, backend::ShowMakie, block, obss::AbstractVector) =
 
 function showblock!(grid, ::ShowMakie, block::Label, obs)
     ax = cleanaxis(grid[1, 1])
-    text!(ax, string(obs), space = :data)
+    M.text!(ax, string(obs), space = :data)
 end
 
 function showblock!(grid, ::ShowMakie, block::LabelMulti, obs)
     ax = cleanaxis(grid[1, 1])
-    text!(ax, join(string.(obs), "\n"), space = :data)
+    M.text!(ax, join(string.(obs), "\n"), space = :data)
 end
 
 
@@ -125,14 +125,14 @@ function showblock!(
     if !(sum(obs) ≈ 1)
         obs = softmax(obs)
     end
-    ax = Axis(grid[1, 1], yticks = (1:length(block.classes), string.(block.classes)))
-    barplot!(ax, obs, direction = :x)
-    hidespines!(ax)
+    ax = M.Axis(grid[1, 1], yticks = (1:length(block.classes), string.(block.classes)))
+    M.barplot!(ax, obs, direction = :x)
+    M.hidespines!(ax)
 end
 
 
 function default_showbackend()
-    if ismissing(Makie.current_backend[])
+    if ismissing(M.current_backend[])
         return ShowText()
     else
         return ShowMakie()
@@ -148,20 +148,19 @@ end
 Create a `Makie.Axis` with no interactivity, decorations and aspect distortion.
 """
 function cleanaxis(f; kwargs...)
-    ax = Makie.Axis(f; kwargs...)
-    ax.aspect = Makie.DataAspect()
+    ax = M.Axis(f; kwargs...)
+    ax.aspect = M.DataAspect()
     ax.xzoomlock = true
     ax.yzoomlock = true
     ax.xrectzoom = false
     ax.yrectzoom = false
-    ax.panbutton = nothing
     ax.xpanlock = true
     ax.ypanlock = true
     ax.bottomspinevisible = false
     ax.leftspinevisible = false
     ax.rightspinevisible = false
     ax.topspinevisible = false
-    Makie.hidedecorations!(ax)
+    M.hidedecorations!(ax)
 
     return ax
 end
