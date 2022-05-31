@@ -13,6 +13,8 @@ using ..FastAI:
     # other
     Context, Training, Validation
 
+using ..FastAI.Datasets
+
 import Requires: @require
 
 using InlineTest
