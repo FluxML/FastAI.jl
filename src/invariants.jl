@@ -78,53 +78,90 @@ end
 =#
 
 
+"""
+    is_data(data)
+
+Check that `data` implements the data container interface and give detailed info on missing
+functionality if not.
+
+"""
 function is_data(data; kwargs...)
     inv = invariant_datacontainer(; kwargs...)
     return check(inv, data)
 end
 
 
-function invariant_datacontainer(; symbol = :data)
+"""
+    is_data(data, block)
+
+Check that `data` implements the data container interface and its observations are valid
+instances of `block`, giving detailed errors if not.
+"""
+function is_data(data, block; kwargs...)
+    inv = invariant_datacontainer_block(block; kwargs...)
+    return check(inv, data)
+end
+
+is_data(::Type{Bool}, args...; kwargs...) = convert(Bool, is_data(args...; kwargs...))
+
+
+function invariant_datacontainer(; var = :data)
     invariant([
-        __invariant_numobs(; symbol),
-        __invariant_getobs(; symbol),
-    ], "`$symbol` implements the data container interface.",
-    description="""A data container stores a number of observations and allows loading
-        individual observations. See
-        [the tutorial](/documents/docs/tutorials/data_containers.md) for more
+        __invariant_numobs(; var),
+        invariant("`$var` contains at least one observation") do data
+            n = numobs(data)
+            if n <= 0
+                return "Instead, got a data container with $n observations."
+            end
+        end,
+        __invariant_getobs(; var),
+    ],
+    "`$var` implements the data container interface.",
+    :seq;
+    description="""A data container stores observations and allows (1) getting
+        the number of observation and (2) loading an observation.
+        See [the tutorial](/documents/docs/tutorials/data_containers.md) for more
         information.""" |> md)
 end
 
-__invariant_getobs(; symbol = :data) = invariant([
+function invariant_datacontainer_block(block;
+                                       datavar = "data", blockvar = "data", obsvar = "obs")
+    return invariant([
+        invariant_datacontainer(; var = datavar),
+        invariant(
+            invariant_checkblock(block; blockname = blockvar, obsname = obsvar);
+            inputfn = data -> getobs(data, 1)
+        )
+        ],
+        "`$datavar` is a data container with valid observations for block `$(nameof(block))`",
+        :seq)
+
+
+end
+
+__invariant_getobs(; var = :data) = invariant([
         Invariants.hasmethod_invariant(Base.getindex, :data, :idx => 1)
         Invariants.hasmethod_invariant(MLUtils.getobs, :data, :idx => 1)
     ],
-    "`$symbol` implements the `getobs` interface",
+    "`$var` implements the `getobs` interface",
     :any;
     description=Invariants.md("""
-        `$symbol` must provide a way load an observation by implementing **either**
-        (1) `Base.getindex($symbol, idx::Int)` (preferred) or (2) `MLUtils.getobs($symbol, idx::Int)`
+        `$var` must provide a way load an observation by implementing **either**
+        (1) `Base.getindex($var, idx::Int)` (preferred) or (2) `MLUtils.getobs($var, idx::Int)`
         (if regular indexing is already used and has different semantics).
         """),
     inputfn=data -> (; data),
 )
 
-__invariant_numobs(; symbol = :data) = invariant([
+__invariant_numobs(; var = :data) = invariant([
         Invariants.hasmethod_invariant(Base.length, :data)
         Invariants.hasmethod_invariant(MLUtils.numobs, :data)
-        invariant("`$symbol` is not empty") do input
-            n = numobs(input.data)
-            if n <= 0
-                return "Instead, got a data container with $n observations."
-            end
-        end
     ],
-    "`$symbol` implements the `numobs` interface",
+    "`$var` implements the `numobs` interface",
     :any;
     description=Invariants.md("""
-        `$symbol` must provide a way get the number of observations it contains implementing either
-        `Base.length($symbol)` (preferred) or `MLUtils.numobs($symbol, idx::Int)`
-        It must also be non-empty, i.e. contain at least one observation.
+        `$var` must provide a way get the number of observations it contains implementing either
+        `Base.length($var)` (preferred) or `MLUtils.numobs($var, idx::Int)`
         """),
     inputfn=data -> (; data),
 )
