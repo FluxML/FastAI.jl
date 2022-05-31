@@ -1,5 +1,14 @@
 # # Wrapper blocks
 
+"""
+    abstract type WrapperBlock
+
+Supertype for blocks that "wrap" an existing block, inheriting its
+functionality, allowing you to override just parts of its interface.
+
+For examples of `WrapperBlock`, see [`Bounded`](#)
+
+"""
 abstract type WrapperBlock <: AbstractBlock end
 
 Base.parent(w::WrapperBlock) = w.block
@@ -13,9 +22,6 @@ end
 mockblock(w::WrapperBlock) = mockblock(parent(w))
 checkblock(w::WrapperBlock, obs) = checkblock(parent(w), obs)
 
-# TODO: add way to specify how wrapper blocks compose
-
-# If not overwritten, encodings are applied to the wrapped block
 """
     abstract type PropagateWrapper
 
@@ -50,6 +56,7 @@ struct PropagateAlways <: PropagateWrapper end
 struct PropagateSameBlock <: PropagateWrapper end
 struct PropagateNever <: PropagateWrapper end
 
+# If not overwritten, encodings are applied to the wrapped block
 propagatewrapper(::WrapperBlock) = PropagateAlways()
 
 encodedblock(enc::Encoding, wrapper::WrapperBlock) =

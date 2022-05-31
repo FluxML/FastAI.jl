@@ -59,8 +59,10 @@ import DataAugmentation: apply, Identity, ToEltype, ImageToTensor, Normalize,
     BufferedThreadsafe, ScaleKeepAspect, PinOrigin, RandomCrop, CenterResizeCrop,
     AdjustBrightness, AdjustContrast, Maybe, FlipX, FlipY, WarpAffine, Rotate, Zoom,
     ResizePadDivisible, itemdata
+import ImageCore: colorview
 import ImageInTerminal
 import IndirectArrays: IndirectArray
+import Invariants: invariant, md
 import ProgressMeter: Progress, next!
 import Requires: @require
 import StaticArrays: SVector

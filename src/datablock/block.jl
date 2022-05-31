@@ -128,6 +128,7 @@ typify(T::Type) = T
 typify(t::Tuple) = Tuple{map(typify, t)...}
 typify(block::FastAI.AbstractBlock) = typeof(block)
 
+Base.nameof(::B) where {B<:AbstractBlock} = nameof(B)
 
 # ## Invariants
 #
@@ -138,7 +139,7 @@ typify(block::FastAI.AbstractBlock) = typeof(block)
     invariant_checkblock(block; kwargs...)
     invariant_checkblock(blocks; kwargs...)
 
-Create a `Invariants.Invariant` that can be used to check whether an
+Create an `Invariants.Invariant` that can be used to check whether an
 observation is a valid instance of `block`. This should always agree
 with `checkblock` (i.e. `checkblock(block, obs)` implies that
 `check(invariant_checkblock(block), obs)`). The invariant can however
@@ -152,46 +153,39 @@ function invariant_checkblock end
 # If `invariant_checkblock` is not implemented for a block, default to
 # checking that `checkblock` returns `true`.
 
-function invariant_checkblock(block::AbstractBlock; obsname = "obs", blockname = "block")
-    return BooleanInvariant(
-        obs -> checkblock(block, obs),
-        "`$obsname` should be valid $(typeof(block))",
-        _ -> """Expected `$obsname` to be a valid instance of block $blockname
-        with above type, but `checkblock($blockname, $obsname)` returned `false`.
-        This probably means that `$obsname` is not a valid instance of the
-        block. Check `?$(typeof(block).name.name)` for more information on
-        the block and what data is valid.
-        """,
-    )
+function invariant_checkblock(block::B; obsname = "obs", blockname = "block") where {B<:AbstractBlock}
+    return invariant(__inv_checkblock_title(block, blockname, obsname),) do obs
+        if !checkblock(block, obs)
+            """Expected `$obsname` to be a block with above type, but
+            `checkblock($blockname, $obsname)` returned `false`.
+            This probably means that `$obsname` is not a valid instance of the
+            block. Check `?$(string(parentmodule(B))).$(nameof(B))` for more information on
+            the block and what data is valid.
+            """ |> md
+        end
+    end
 end
 
+__inv_checkblock_title(b, bname, oname) = "`$oname` is a valid observation for `$(bname) <: $(nameof(b))`"
 # For tuples of blocks, the invariant is composed of the individuals' blocks
 # invariants, passing only if all the child invariants pass.
 
-function invariant_checkblock(blocks::Tuple; obsname = "obss", blockname = "blocks")
-    return SequenceInvariant(
+function invariant_checkblock(blocks::Tuple; dataname = "obss", blockname = "blocks")
+    return invariant(
         [
-            BooleanInvariant(
-                obss -> (obss isa Tuple && length(obss) == length(blocks)),
-                "$obsname should be a `Tuple` with $(length(blocks)) elements.",
-                obss -> """Instead, got a `$(sprint(show, typeof(obss)))`"""),
-            AllInvariant(
-                [
-                    WithContext(
-                        obss -> obss[i],
-                        invariant_checkblock(
-                            blocks[i];
-                            obsname = "$obsname[$i]",
-                            blockname = "$blockname[$i]",
-                        ),
-                    ) for (i, block) in enumerate(blocks)
-                ],
-                name = "`$obsname` should be valid `$blockname`",
-                description = ""
-            )
+            invariant(
+                invariant_checkblock(
+                    blocks[i],
+                    obsname = "$dataname[$i]",
+                    blockname = "$blockname[$i]"
+                ),
+                inputfn = obss -> obss[i]
+            ) for (i, block) in enumerate(blocks)
         ],
-        "For a tuple of blocks, an instance should be a tuple of valid instances",
-        "",
+        "`$dataname` are valid instances of blocks `$blockname`",
+        description = md("""The given observations `obss` should be valid instances of the
+            blocks `$blockname`. Since `$blockname` is a tuple of blocks, each observation
+            `$dataname[i]` should be a valid instance of the block `$blockname[i]`.
+            See `?Block` for more background on blocks.""")
     )
-
 end

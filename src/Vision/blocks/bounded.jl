@@ -58,6 +58,7 @@ struct Bounded{N, B<:AbstractBlock} <: WrapperBlock
     size::NTuple{N, DimSize}
 end
 
+Base.nameof(b::Bounded) = "Bounded($(nameof(parent(b))))"
 
 function Bounded(bounded::Bounded{M}, size::NTuple{N, DimSize}) where {N, M}
     N == M || error("Cannot rewrap a `Bounded` with different dimensionalities $N and $M")
@@ -68,6 +69,17 @@ end
 function checkblock(bounded::Bounded{N}, a::AbstractArray{N}) where N
     return checksize(bounded.size, size(a)) && checkblock(parent(bounded), a)
 end
+
+
+function FastAI.invariant_checkblock(block::Bounded{N}; blockname = "block", obsname = "obs") where N
+    return invariant([
+            FastAI.invariant_checkblock(parent(block)),
+        ],
+        FastAI.__inv_checkblock_title(block, blockname, obsname),
+        :seq
+    )
+end
+
 
 @testset "Bounded [block, wrapper]" begin
     @test_nowarn Bounded(Image{2}(), (16, 16))

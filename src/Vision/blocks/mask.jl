@@ -17,6 +17,39 @@ end
 
 mockblock(mask::Mask{N, T}) where {N, T} = rand(mask.classes, ntuple(_ -> 16, N))::AbstractArray{T, N}
 
+Base.nameof(::Mask{N}) where N = "Mask{$N}"
+
+function FastAI.invariant_checkblock(block::Mask{N}; blockname = "block", obsname = "obs") where N
+    return invariant([
+            invariant("`$obsname` is an `AbstractArray`",
+                description = md("`$obsname` should be of type `AbstractArray`.")) do obs
+                if !(obs isa AbstractArray)
+                    return "Instead, got invalid type `$(nameof(typeof(obs)))`." |> md
+                end
+            end,
+            invariant("`$obsname` is `$N`-dimensional") do obs
+                if ndims(obs) != N
+                    return "Instead, got invalid dimensionality `$N`." |> md
+                end
+            end,
+            invariant("All elements are valid labels") do obs
+                valid = ∈(block.classes).(obs)
+                if !(all(valid))
+                    unknown = unique(obs[valid .== false])
+                    return md("""`$obsname` should contain only valid labels,
+                    i.e. `∀ y ∈ $obsname: y ∈ $blockname.classes`, but `$obsname` includes
+                    unknown labels: `$(sprint(show, unknown))`.
+
+                    Valid classes are:
+                    `$(sprint(show, block.classes, context=:limit => true))`""")
+                end
+            end,
+        ],
+        FastAI.__inv_checkblock_title(block, blockname, obsname),
+        :seq
+    )
+end
+
 
 # Visualization
 

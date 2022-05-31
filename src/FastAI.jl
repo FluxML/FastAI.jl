@@ -10,6 +10,7 @@ using Flux
 using Animations
 import DataAugmentation
 import DataAugmentation: getbounds, Bounds
+import Invariants: Invariants, invariant, check, check_throw, md
 
 import LearnBase
 using FilePathsBase
@@ -19,8 +20,6 @@ import Flux.Optimise: apply!, Optimiser, WeightDecay
 using FluxTraining: Learner, handle
 using FluxTraining.Events
 using JLD2: jldsave, jldopen
-using Invariants: BooleanInvariant, WithMessage, AnyInvariant, AllInvariant,
-    SequenceInvariant, WithContext, check_error, check
 using Markdown
 using MLDataPattern
 using PrettyTables
