@@ -20,7 +20,7 @@ function Datasets.loadrecipe(recipe::TextFolders, path)
         loadfn=(loadfile, recipe.labelfn),
         splitfn=recipe.split ? grandparentname : nothing)
 
-    (recipe.split ? length(data) > 0 : nobs(data) > 0) || error("No text files found in $path")
+    (recipe.split ? length(data) > 0 : numobs(data) > 0) || error("No text files found in $path")
 
     labels = recipe.split ? first(values(data))[2] : data[2]
     blocks = (Paragraph(), Label(unique(eachobs(labels))))

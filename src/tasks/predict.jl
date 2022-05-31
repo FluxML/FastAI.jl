@@ -41,9 +41,9 @@ function predictbatch(
     context = Inference(),
 )
     xs = device(
-        DataLoaders.collate([copy(encodeinput(task, context, input)) for input in inputs]),
+        MLUtils.batch([copy(encodeinput(task, context, input)) for input in inputs]),
     )
     ŷs = undevice(model(xs))
-    targets = [decodeypred(task, context, ŷ) for ŷ in DataLoaders.obsslices(ŷs)]
+    targets = [decodeypred(task, context, ŷ) for ŷ in Datasets.unbatch(ŷs)]
     return targets
 end

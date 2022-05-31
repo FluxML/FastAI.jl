@@ -30,9 +30,9 @@ data, blocks = loadrecipe(recipe, args...; kwargs...)
 
 the following must hold:
 
-- `∀i ∈ [1..nobs(data)]: checkblock(blocks, getobs(data, i))`, i.e.
+- `∀i ∈ 1:numobs(data): checkblock(blocks, data[i])`, i.e.
     `data` must be a data container of observations that are valid `blocks`.
-- `nobs(data) ≥ 1`, i.e. there is at least one observation if the data was loaded
+- `numobs(data) ≥ 1`, i.e. there is at least one observation if the data was loaded
     without error.
 """
 abstract type DatasetRecipe end

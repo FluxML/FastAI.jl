@@ -28,7 +28,7 @@ function Datasets.loadrecipe(recipe::ImageFolders, path)
         loadfn=(loadfile, recipe.labelfn),
         splitfn=recipe.split ? grandparentname : nothing)
 
-    (recipe.split ? length(data) > 0 : nobs(data) > 0) || error("No image files found in $path")
+    (recipe.split ? length(data) > 0 : numobs(data) > 0) || error("No image files found in $path")
 
     labels = recipe.split ? first(values(data))[2] : data[2]
     blocks = Image{2}(), Label(unique(eachobs(labels)))
@@ -68,8 +68,8 @@ function Datasets.loadrecipe(recipe::ImageSegmentationFolders, path)
 
     images = loadfolderdata(imagepath, filterfn=isimagefile, loadfn=loadfile)
     masks = loadfolderdata(maskpath, filterfn=isimagefile, loadfn=f -> loadmask(f, classes))
-    nobs(images) == nobs(masks) || error("Expected the same number of images and masks, but found $(nobs(images)) images and $(nobs(masks)) masks")
-    nobs(images) > 0 || error("No images or masks found in folders $imagepath and $maskpath")
+    numobs(images) == numobs(masks) || error("Expected the same number of images and masks, but found $(numobs(images)) images and $(numobs(masks)) masks")
+    numobs(images) > 0 || error("No images or masks found in folders $imagepath and $maskpath")
 
     blocks = Image{2}(), Mask{2}(classes)
     return (images, masks), blocks
@@ -104,7 +104,7 @@ function Datasets.loadrecipe(recipe::ImageTableMultiLabel, path)
     data = (images, labels)
     blocks = Image{2}(), LabelMulti(unique(Iterators.flatten(labels)))
     if recipe.split
-        idxs = 1:nobs(data)
+        idxs = 1:numobs(data)
         splits = df[:, recipe.splitcol]
         data = Dict(
             "train" => datasubset(data, idxs[splits]),

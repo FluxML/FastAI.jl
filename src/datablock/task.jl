@@ -47,7 +47,7 @@ and an instance of data from a block is referred to as `\$name`.
 - `blocks.sample`: The most important block, representing one full
     observation of unprocessed data. Data containers used with a learning
     task should have compatible observations, i.e.
-    `checkblock(blocks.sample, getobs(data, i))`.
+    `checkblock(blocks.sample, data[i])`.
 - `blocks.x`: Data that will be fed into the model, i.e. (neglecting batching)
     `model(x)` should work
 - `blocks.ŷ`: Data that is output by the model, i.e. (neglecting batching)
@@ -145,11 +145,9 @@ mockmodel(task::AbstractBlockTask) =
 Create a fake model that maps batches of block `xblock` to batches of block
 `ŷblock`. Useful for testing.
 """
-function mockmodel(xblock, ŷblock)
+function mockmodel(_, ŷblock)
     return function mockmodel_block(xs)
-        out = mockblock(ŷblock)
-        bs = DataLoaders._batchsize(xs, DataLoaders.BatchDimLast())
-        return DataLoaders.collate([out for _ in 1:bs])
+        return MLUtils.batch([mockblock(ŷblock) for _ in 1:Datasets.batchsize(xs)])
     end
 end
 

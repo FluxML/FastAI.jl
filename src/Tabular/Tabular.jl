@@ -24,6 +24,7 @@ import ..FastAI:
 
 import DataAugmentation
 import DataFrames: DataFrame
+import MLUtils: MLUtils, eachobs, getobs, numobs
 import Flux
 import Flux: Embedding, Chain, Dropout, Dense, Parallel, BatchNorm
 import PrettyTables

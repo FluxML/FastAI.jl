@@ -11,7 +11,7 @@ Show an unprocessed `sample` for `LearningTask` `task` to
 ```julia
 data, blocks = loaddataset("imagenette2-160", (Image, Label))
 task = ImageClassificationSingle(data)
-sample = getobs(data, 1)
+sample = data[1]
 showsample(task, sample)  # select backend automatically
 showsample(ShowText(), task, sample)
 ```
@@ -35,7 +35,7 @@ Show a vector of unprocessed `samples` for `LearningTask` `task` to
 ```julia
 data, blocks = loaddataset("imagenette2-160", (Image, Label))
 task = ImageClassificationSingle(data)
-samples = [getobs(data, i) for i in 1:4]
+samples = [data[i] for i in 1:4]
 showsamples(task, samples)  # select backend automatically
 showsamples(ShowText(), task, samples)
 ```
@@ -87,8 +87,7 @@ end
 Show a collated batch of encoded samples to `backend`.
 """
 function showbatch(backend::ShowBackend, task::AbstractBlockTask, batch)
-    encsamples = collect(DataLoaders.obsslices(batch))
-    showencodedsamples(backend, task, encsamples)
+    showencodedsamples(backend, task, Datasets.unbatch(batch))
 end
 showbatch(task, batch) = showbatch(default_showbackend(), task, batch)
 
@@ -206,8 +205,7 @@ Show collated batch of outputs to `backend`. If a collated batch of encoded samp
 have vectors of outputs and not collated batches.
 """
 function showoutputbatch(backend::ShowBackend, task::AbstractBlockTask, outputbatch)
-    outputs = collect(DataLoaders.obsslices(outputbatch))
-    return showoutputs(backend, task, outputs)
+    return showoutputs(backend, task, Datasets.unbatch(outputbatch))
 end
 function showoutputbatch(
     backend::ShowBackend,
@@ -215,9 +213,7 @@ function showoutputbatch(
     batch,
     outputbatch,
 )
-    encsamples = collect(DataLoaders.obsslices(batch))
-    outputs = collect(DataLoaders.obsslices(outputbatch))
-    return showoutputs(backend, task, encsamples, outputs)
+    return showoutputs(backend, task, Datasets.unbatch(batch), Datasets.unbatch(outputbatch))
 end
 
 showoutputbatch(task::AbstractBlockTask, args...) =

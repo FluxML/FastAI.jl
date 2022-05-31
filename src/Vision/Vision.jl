@@ -38,6 +38,7 @@ using ..FastAI:
     Context, Training, Validation, Inference,
     Datasets
 import Flux
+import MLUtils: getobs, numobs, mapobs, eachobs
 import FastAI.Datasets
 
 # for tests

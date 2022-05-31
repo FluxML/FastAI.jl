@@ -1,30 +1,3 @@
-# FileDataset
-
-function FileDataset(dir, pattern = "*")
-    return rglob(pattern, string(dir))
-end
-
-pathparent(p::String) = splitdir(p)[1]
-pathname(p::String) = splitdir(p)[2]
-
-# File utilities
-
-"""
-    rglob(filepattern, dir = pwd(), depth = 4)
-
-Recursive glob up to 6 layers deep.
-"""
-function rglob(filepattern = "*", dir = pwd(), depth = 4)
-    patterns = [
-        "$filepattern",
-        "*/$filepattern",
-        "*/*/$filepattern",
-        "*/*/*/$filepattern",
-        "*/*/*/*/$filepattern",
-        "*/*/*/*/*/$filepattern",
-    ]
-    return vcat([glob(pattern, dir) for pattern in patterns[1:depth]]...)
-end
 
 
 """
@@ -60,7 +33,7 @@ end
 TableDataset(table::T) where {T} = TableDataset{T}(table)
 TableDataset(path::AbstractPath) = TableDataset(DataFrame(CSV.File(path)))
 
-function LearnBase.getobs(dataset::FastAI.Datasets.TableDataset, idx)
+function Base.getindex(dataset::FastAI.Datasets.TableDataset, idx)
     if Tables.rowaccess(dataset.table)
         row, _ = Iterators.peel(Iterators.drop(Tables.rows(dataset.table), idx - 1))
         return row
@@ -75,7 +48,7 @@ function LearnBase.getobs(dataset::FastAI.Datasets.TableDataset, idx)
     end
 end
 
-function LearnBase.nobs(dataset::TableDataset)
+function Base.length(dataset::TableDataset)
     if Tables.columnaccess(dataset.table)
         return length(Tables.getcolumn(dataset.table, 1))
     elseif Tables.rowaccess(dataset.table)
@@ -87,11 +60,11 @@ function LearnBase.nobs(dataset::TableDataset)
     end
 end
 
-LearnBase.getobs(dataset::TableDataset{<:DataFrame}, idx) = dataset.table[idx, :]
-LearnBase.nobs(dataset::TableDataset{<:DataFrame}) = nrow(dataset.table)
+Base.getindex(dataset::TableDataset{<:DataFrame}, idx) = dataset.table[idx, :]
+Base.length(dataset::TableDataset{<:DataFrame}) = nrow(dataset.table)
 
-LearnBase.getobs(dataset::TableDataset{<:CSV.File}, idx) = dataset.table[idx]
-LearnBase.nobs(dataset::TableDataset{<:CSV.File}) = length(dataset.table)
+Base.getindex(dataset::TableDataset{<:CSV.File}, idx) = dataset.table[idx]
+Base.length(dataset::TableDataset{<:CSV.File}) = length(dataset.table)
 
 
 # ## Tests
@@ -104,8 +77,8 @@ LearnBase.nobs(dataset::TableDataset{<:CSV.File}) = length(dataset.table)
         testtable = Tables.table([1 4.0 "7"; 2 5.0 "8"; 3 6.0 "9"])
         td = TableDataset(testtable)
 
-        @test all(getobs(td, 1) .== [1, 4.0, "7"])
-        @test nobs(td) == 3
+        @test all(td[1] .== [1, 4.0, "7"])
+        @test length(td) == 3
     end
 
     @testset "TableDataset from columnaccess table" begin
@@ -115,10 +88,10 @@ LearnBase.nobs(dataset::TableDataset{<:CSV.File}) = length(dataset.table)
         testtable = Tables.table([1 4.0 "7"; 2 5.0 "8"; 3 6.0 "9"])
         td = TableDataset(testtable)
 
-        @test [data for data in getobs(td, 2)] == [2, 5.0, "8"]
-        @test nobs(td) == 3
+        @test [data for data in td[2]] == [2, 5.0, "8"]
+        @test length(td) == 3
 
-        @test getobs(td, 1) isa NamedTuple
+        @test td[1] isa NamedTuple
     end
 
     @testset "TableDataset from DataFrames" begin
@@ -133,8 +106,8 @@ LearnBase.nobs(dataset::TableDataset{<:CSV.File}) = length(dataset.table)
         td = TableDataset(testtable)
         @test td isa TableDataset{<:DataFrame}
 
-        @test [data for data in getobs(td, 1)] == [1, "a", 10, "A", 100.0, "train"]
-        @test nobs(td) == 5
+        @test [data for data in td[1]] == [1, "a", 10, "A", 100.0, "train"]
+        @test length(td) == 5
     end
 
     @testset "TableDataset from CSV" begin
@@ -144,8 +117,8 @@ LearnBase.nobs(dataset::TableDataset{<:CSV.File}) = length(dataset.table)
         testtable = CSV.File("test.csv")
         td = TableDataset(testtable)
         @test td isa TableDataset{<:CSV.File}
-        @test [data for data in getobs(td, 1)] == [1, "a", 10, "A", 100.0, "train"]
-        @test nobs(td) == 1
+        @test [data for data in td[1]] == [1, "a", 10, "A", 100.0, "train"]
+        @test length(td) == 1
         rm("test.csv")
     end
 end
