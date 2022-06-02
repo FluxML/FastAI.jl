@@ -153,39 +153,40 @@ function invariant_checkblock end
 # If `invariant_checkblock` is not implemented for a block, default to
 # checking that `checkblock` returns `true`.
 
-function invariant_checkblock(block::B; obsname = "obs", blockname = "block") where {B<:AbstractBlock}
-    return invariant(__inv_checkblock_title(block, blockname, obsname),) do obs
+function invariant_checkblock(block::AbstractBlock; obsvar = "obs", blockvar = "block")
+    return invariant(__inv_checkblock_title(block, blockvar, obsvar),) do obs
         if !checkblock(block, obs)
-            """Expected `$obsname` to be a block with above type, but
-            `checkblock($blockname, $obsname)` returned `false`.
-            This probably means that `$obsname` is not a valid instance of the
-            block. Check `?$(string(parentmodule(B))).$(nameof(B))` for more information on
+            """Expected `$obsvar` to be a valid observation for block `$(nameof(block))`,
+            but `checkblock($blockvar, $obsvar)` returned `false`.
+            This probably means that `$obsvar` is not a valid instance of the
+            block. Check `?$(__typename_qualified(block))` for more information on
             the block and what data is valid.
             """ |> md
         end
     end
 end
 
+__typename_qualified(::T) where T = "$(string(parentmodule(T))).$(nameof(T))"
 __inv_checkblock_title(b, bname, oname) = "`$oname` is a valid observation for `$(bname) <: $(nameof(b))`"
 # For tuples of blocks, the invariant is composed of the individuals' blocks
 # invariants, passing only if all the child invariants pass.
 
-function invariant_checkblock(blocks::Tuple; dataname = "obss", blockname = "blocks")
+function invariant_checkblock(blocks::Tuple; obsvar = "obss", blockvar = "blocks")
     return invariant(
         [
             invariant(
                 invariant_checkblock(
                     blocks[i],
-                    obsname = "$dataname[$i]",
-                    blockname = "$blockname[$i]"
+                    obsvar = "$obsvar[$i]",
+                    blockvar = "$blockvar[$i]"
                 ),
                 inputfn = obss -> obss[i]
             ) for (i, block) in enumerate(blocks)
         ],
-        "`$dataname` are valid instances of blocks `$blockname`",
+        "`$obsvar` are valid instances of blocks `$blockvar`",
         description = md("""The given observations `obss` should be valid instances of the
-            blocks `$blockname`. Since `$blockname` is a tuple of blocks, each observation
-            `$dataname[i]` should be a valid instance of the block `$blockname[i]`.
+            blocks `$blockvar`. Since `$blockvar` is a tuple of blocks, each observation
+            `$obsvar[i]` should be a valid instance of the block `$blockvar[i]`.
             See `?Block` for more background on blocks.""")
     )
 end

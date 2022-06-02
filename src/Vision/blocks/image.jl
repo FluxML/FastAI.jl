@@ -62,57 +62,57 @@ showblock!(io, ::ShowText, block::Image{2}, obs::AbstractMatrix{<:Real}) =
     ImageInTerminal.imshow(io, colorview(Gray, obs))
 
 
-function FastAI.invariant_checkblock(block::Image{N}; blockname = "block", obsname = "obs") where N
+function FastAI.invariant_checkblock(block::Image{N}; blockvar = "block", obsvar = "obs") where N
     return invariant([
-            invariant("`$obsname` is an `AbstractArray`",
-                description = md("`$obsname` should be of type `AbstractArray`.")) do obs
+            invariant("`$obsvar` is an `AbstractArray`",
+                description = md("`$obsvar` should be of type `AbstractArray`.")) do obs
                 if !(obs isa AbstractArray)
                     return "Instead, got invalid type `$(nameof(typeof(obs)))`." |> md
                 end
             end,
-            invariant("`$obsname` is `$N`-dimensional") do obs
+            invariant("`$obsvar` is `$N`-dimensional") do obs
                 if ndims(obs) != N
                     return "Instead, got invalid dimensionality `$N`." |> md
                 end
             end,
-            invariant("`$obsname` should have a color or numerical element type") do obs
+            invariant("`$obsvar` should have a color or numerical element type") do obs
                 if !((eltype(obs) <: Color) ||(eltype(obs) <: Real))
                     return "Instead, got invalid element type `$(eltype(obs))`." |> md
                 end
             end,
         ],
-        FastAI.__inv_checkblock_title(block, blockname, obsname),
+        FastAI.__inv_checkblock_title(block, blockvar, obsvar),
         :seq
     )
 end
 
 #=
 
-function isblockinvariant(block::Image{N}; dataname = "data", blockname = "block") where {N}
+function isblockinvariant(block::Image{N}; obsvar = "data", blockvar = "block") where {N}
     return SequenceInvariant(
         [
             BooleanInvariant(
                 obs -> obs isa AbstractArray,
                 name = "Image data is an array",
-                messagefn = obs -> """Expected `$dataname` to be a subtype of
+                messagefn = obs -> """Expected `$obsvar` to be a subtype of
                     `AbstractArray`, but instead got type `$(typeof(obs))`.""",
             ),
             BooleanInvariant(
                 obs -> ndims(obs) == N,
                 name = "Image data is `$N`-dimensional",
-                messagefn = obs -> """Expected `$dataname` to be an `$N`-dimensional array,
+                messagefn = obs -> """Expected `$obsvar` to be an `$N`-dimensional array,
                     but instead got a `$(ndims(obs))`-dimensional array.""",
             ),
             BooleanInvariant(
                 obs -> eltype(obs) <: Color || eltype(obs) <: Number,
                 name = "Image data has a color or numerical type.",
-                messagefn = obs -> """Expected `$dataname` to have an element type that is a
-                    color (`eltype($dataname) <: Color`) or a number (`eltype($dataname)
-                    <: Color`), but instead found `eltype($dataname) == $(eltype(obs)).`
+                messagefn = obs -> """Expected `$obsvar` to have an element type that is a
+                    color (`eltype($obsvar) <: Color`) or a number (`eltype($obsvar)
+                    <: Color`), but instead found `eltype($obsvar) == $(eltype(obs)).`
                     """
             )
         ],
-        "`$dataname` is a valid `$(typeof(block))`",
+        "`$obsvar` is a valid `$(typeof(block))`",
         ""
     )
 end

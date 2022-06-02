@@ -22,30 +22,30 @@ function blocklossfn(outblock::Continuous, yblock::Continuous)
 end
 
 
-function invariant_checkblock(block::Continuous; blockname = "block", obsname = "obs")
+function invariant_checkblock(block::Continuous; blockvar = "block", obsvar = "obs")
     return SequenceInvariant(
         [
             BooleanInvariant(
                 obs -> obs isa AbstractVector,
-                name = "`$obsname` should be an `AbstractVector`",
-                messagefn = obs -> """`$obsname` should be an `AbstractVector`, instead
+                name = "`$obsvar` should be an `AbstractVector`",
+                messagefn = obs -> """`$obsvar` should be an `AbstractVector`, instead
                 got type `$(typeof(obs))`.
                 """
             ),
             BooleanInvariant(
                 obs -> length(obs) == block.size,
-                name = "length(`$obsname`) should be $(block.size)",
-                messagefn = obs -> """`$obsname` should have $(block.size) features, instead
+                name = "length(`$obsvar`) should be $(block.size)",
+                messagefn = obs -> """`$obsvar` should have $(block.size) features, instead
                 found a vector with $(length(obs)) features.
                 """
             ),
             BooleanInvariant(
                 obs -> eltype(obs) <: Number,
-                name = "`eltype($obsname)` should be a subtype of `Number`",
+                name = "`eltype($obsvar)` should be a subtype of `Number`",
                 messagefn = obs -> """Found a non-numerical element type $(eltype(obs))"""
             ),
         ],
-        "`$obsname` should be a valid `$(summary(block))`",
+        "`$obsvar` should be a valid `$(summary(block))`",
         "",
     )
 end

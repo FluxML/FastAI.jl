@@ -116,7 +116,7 @@ function invariant_datacontainer(; var = :data)
         end,
         __invariant_getobs(; var),
     ],
-    "`$var` implements the data container interface.",
+    "`$var` implements the data container interface",
     :seq;
     description="""A data container stores observations and allows (1) getting
         the number of observation and (2) loading an observation.
@@ -129,7 +129,7 @@ function invariant_datacontainer_block(block;
     return invariant([
         invariant_datacontainer(; var = datavar),
         invariant(
-            invariant_checkblock(block; blockname = blockvar, obsname = obsvar);
+            invariant_checkblock(block; blockvar = blockvar, obsvar = obsvar);
             inputfn = data -> getobs(data, 1)
         )
         ],

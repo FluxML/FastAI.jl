@@ -39,14 +39,14 @@ setup(::Type{Label}, data) = Label(unique(eachobs(data)))
 Base.summary(io::IO, ::Label{T}) where {T} = print(io, "Label{", T, "}")
 
 
-function invariant_checkblock(block::Label; blockname = "block", obsname = "obs")
+function invariant_checkblock(block::Label; blockvar = "block", obsvar = "obs")
     return invariant(
-            __inv_checkblock_title(block, blockname, obsname),
-            description=md("""`$obsname` should be a valid label, i.e. one of
+            __inv_checkblock_title(block, blockvar, obsvar),
+            description=md("""`$obsvar` should be a valid label, i.e. one of
                 `$(sprint(show, block.classes, context=:limit => true))`."""),
     ) do obs
         if !(obs ∈ block.classes)
-            return md("Instead, got invalid value `$obs`.")
+            return md("Instead, got invalid value `$(sprint(show, obs))`.")
         end
     end
 end
@@ -102,10 +102,10 @@ Base.summary(io::IO, ::LabelMulti{T}) where {T} = print(io, "LabelMulti{", T, "}
 
 
 
-function invariant_checkblock(block::LabelMulti; blockname = "block", obsname = "obs")
+function invariant_checkblock(block::LabelMulti; blockvar = "block", obsvar = "obs")
     return invariant([
-            invariant("`$obsname` is an `AbstractVector`",
-                description = md("`$obsname` should be of type `AbstractVector`.")) do obs
+            invariant("`$obsvar` is an `AbstractVector`",
+                description = md("`$obsvar` should be of type `AbstractVector`.")) do obs
                 if !(obs isa AbstractVector)
                     return md("Instead, got invalid type `$(nameof(typeof(obs)))`.")
                 end
@@ -114,8 +114,8 @@ function invariant_checkblock(block::LabelMulti; blockname = "block", obsname = 
                 valid = ∈(block.classes).(obs)
                 if !(all(valid))
                     unknown = unique(obs[valid .== false])
-                    return md("""`$obsname` should contain only valid labels,
-                    i.e. `∀ y ∈ $obsname: y ∈ $blockname.classes`, but `$obsname` includes
+                    return md("""`$obsvar` should contain only valid labels,
+                    i.e. `∀ y ∈ $obsvar: y ∈ $blockvar.classes`, but `$obsvar` includes
                     unknown labels: `$(sprint(show, unknown))`.
 
                     Valid classes are:
@@ -123,7 +123,7 @@ function invariant_checkblock(block::LabelMulti; blockname = "block", obsname = 
                 end
             end
         ],
-        __inv_checkblock_title(block, blockname, obsname),
+        __inv_checkblock_title(block, blockvar, obsvar),
         :seq
     )
 end

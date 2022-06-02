@@ -29,6 +29,9 @@ decode them [`decode`]
 """
 abstract type Encoding end
 
+invertible(::Encoding) = true
+
+Base.nameof(::E) where {E<:Encoding} = nameof(E)
 
 """
     fillblock(inblocks, outblocks)
@@ -260,4 +263,65 @@ function testencoding(encoding, block, obs = mockblock(block))
             end
         end
     end
+end
+
+
+function invariant_encoding(encoding, block; context = Validation(), encvar = "encoding", blockvar = "block", obsvar = "obs")
+    B = __typename_qualified(block)
+    E = __typename_qualified(encoding)
+    return invariant([
+            invariant_checkblock(block; blockvar, obsvar),
+            invariant("`$encvar` is implemented for `$blockvar`") do _
+                if isnothing(encodedblock(encoding, block))
+                    return """Expected `encodedblock($encvar, $blockvar)` to return a block,
+                    indicating that the encoding does transform observations for block
+                    `$blockvar`. Instead, it returned `nothing` which indicates that the
+                    encoding does not transform observations of block`$B`.
+
+                    If the encoding should modify the block, this may mean that a method
+                    for `FastAI.encodedblock` is missing. To fix this, implement a method
+                    and return a block from it:
+
+                    ```julia
+                    FastAI.encodedblock(::$E, ::$B)
+                    ```
+                    """ |> md
+                end
+            end,
+            invariant(invariant_checkblock(encodedblockfilled(encoding, block);
+                                           blockvar = "enc$blockvar", obsvar = "enc$obsvar");
+                      title = "Encoded `$obsvar` is a valid instance of encoded `$blockvar`",
+                      inputfn = obs -> encode(encoding, context, block, obs),
+                      description = """The encoded observation
+                      `encobs = encode($encvar, $context, $blockvar, $obsvar)`
+                      should be a valid observation for the encoded block
+                      `enc$blockvar = encodedblock($encvar, $blockvar)`.
+                      """ |> md),
+            invariant([
+                    invariant("`$encvar <: $E` is not invertible") do _
+                        if invertible(encoding)
+                            return "The encoding *is* invertible." |> md
+                        end
+                    end,
+                    invariant([
+
+                        invariant("`$encvar <: $E` is not invertible") do _
+                            if invertible(encoding)
+                                return "The encoding *is* invertible." |> md
+                            end
+                        end,
+                        invariant("`$encvar <: $E` is not invertible") do _
+                            if invertible(encoding)
+                                return "The encoding *is* invertible." |> md
+                            end
+                        end,
+                    ])
+                ],
+                "Unless `$encvar <: $E` is not invertible, decoding should return the original block",
+                :any
+            )
+        ],
+        "Encoding `$(nameof(encoding))` is implemented for block `$(nameof(block))`",
+        :seq;
+        description = "Description" |> md)
 end

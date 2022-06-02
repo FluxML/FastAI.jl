@@ -19,15 +19,15 @@ mockblock(mask::Mask{N, T}) where {N, T} = rand(mask.classes, ntuple(_ -> 16, N)
 
 Base.nameof(::Mask{N}) where N = "Mask{$N}"
 
-function FastAI.invariant_checkblock(block::Mask{N}; blockname = "block", obsname = "obs") where N
+function FastAI.invariant_checkblock(block::Mask{N}; blockvar = "block", obsvar = "obs") where N
     return invariant([
-            invariant("`$obsname` is an `AbstractArray`",
-                description = md("`$obsname` should be of type `AbstractArray`.")) do obs
+            invariant("`$obsvar` is an `AbstractArray`",
+                description = md("`$obsvar` should be of type `AbstractArray`.")) do obs
                 if !(obs isa AbstractArray)
                     return "Instead, got invalid type `$(nameof(typeof(obs)))`." |> md
                 end
             end,
-            invariant("`$obsname` is `$N`-dimensional") do obs
+            invariant("`$obsvar` is `$N`-dimensional") do obs
                 if ndims(obs) != N
                     return "Instead, got invalid dimensionality `$N`." |> md
                 end
@@ -36,8 +36,8 @@ function FastAI.invariant_checkblock(block::Mask{N}; blockname = "block", obsnam
                 valid = ∈(block.classes).(obs)
                 if !(all(valid))
                     unknown = unique(obs[valid .== false])
-                    return md("""`$obsname` should contain only valid labels,
-                    i.e. `∀ y ∈ $obsname: y ∈ $blockname.classes`, but `$obsname` includes
+                    return md("""`$obsvar` should contain only valid labels,
+                    i.e. `∀ y ∈ $obsvar: y ∈ $blockvar.classes`, but `$obsvar` includes
                     unknown labels: `$(sprint(show, unknown))`.
 
                     Valid classes are:
@@ -45,7 +45,7 @@ function FastAI.invariant_checkblock(block::Mask{N}; blockname = "block", obsnam
                 end
             end,
         ],
-        FastAI.__inv_checkblock_title(block, blockname, obsname),
+        FastAI.__inv_checkblock_title(block, blockvar, obsvar),
         :seq
     )
 end
