@@ -17,7 +17,7 @@
             "Train a model": "documents/notebooks/training.ipynb",
             "Find functionality": "documents/docs/howto/findfunctionality.md",
             "Load and save models": "documents/notebooks/serialization.ipynb",
-            "Log to TensorBoard": "documents/notebooks/training.ipynb"
+            "Log to TensorBoard": "documents/docs/howto/logtensorboard.md"
         },
         "Background": {
             "Comparison to fast.ai": "documents/docs/fastai_api_comparison.md",
