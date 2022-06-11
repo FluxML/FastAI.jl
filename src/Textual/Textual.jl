@@ -3,6 +3,7 @@ module Textual
 
 using ..FastAI
 using ..FastAI:
+    Datasets,
     # blocks
     Block, WrapperBlock, AbstractBlock, OneHotTensor, OneHotTensorMulti, Label,
     LabelMulti, wrapped, Continuous, getencodings, getblocks, encodetarget, encodeinput,
@@ -12,6 +13,7 @@ using ..FastAI:
     ShowText,
     # other
     Context, Training, Validation
+using ..FastAI.Datasets
 
 import Requires: @require
 

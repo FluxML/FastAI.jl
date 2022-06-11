@@ -23,7 +23,6 @@ include("testdata.jl")
 
 
 include("encodingapi.jl")
-include("fasterai.jl")
 include("training.jl")
 
 include("makie.jl")

@@ -12,6 +12,8 @@ using ..FastAI:
     ShowText,
     # other
     Context, Training, Validation
+import ..FastAI: Datasets
+using ..FastAI.Datasets
 
 # for tests
 using ..FastAI: testencoding
