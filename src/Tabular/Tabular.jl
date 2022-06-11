@@ -20,8 +20,10 @@ using ..FastAI: testencoding
 
 # extending
 import ..FastAI:
+    Datasets,
     blockmodel, blockbackbone, blocklossfn, encode, decode, checkblock,
     encodedblock, decodedblock, showblock!, mockblock, setup
+using ..FastAI.Datasets
 
 
 import DataAugmentation

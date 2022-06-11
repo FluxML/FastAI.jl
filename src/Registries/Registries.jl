@@ -1,7 +1,7 @@
 module Registries
 
 using ..FastAI
-using ..FastAI: Datasets
+using ..FastAI.Datasets
 using ..FastAI.Datasets: DatasetLoader, DataDepLoader, isavailable, loaddata, typify
 
 import Markdown

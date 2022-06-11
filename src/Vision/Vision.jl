@@ -39,7 +39,7 @@ using ..FastAI:
     Datasets
 import Flux
 import MLUtils: getobs, numobs, mapobs, eachobs
-using FastAI.Datasets
+using ..FastAI.Datasets
 
 # for tests
 using ..FastAI: testencoding
