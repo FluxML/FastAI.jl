@@ -6,10 +6,11 @@
 
 In the [quickstart](quickstart.md) section, you have already come in contact with data containers. The following code was used to load a data container for image classification:
 
-{cell=main, result=false, output=false style="display:none;"}
+{cell=main, show=false resultshow=false}
 ```julia
-ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
+ENV["DATADEPS_ALWAYS_ACCEPT"] = "true";
 ```
+
 {cell=main, output=false}
 ```julia
 using FastAI
@@ -79,7 +80,7 @@ Finally, we use [`mapobs`](#) to lazily transform each observation and have a da
 data = mapobs(loadimageclass, files);
 ```
 
-### Exercises
+### Exercises 
 
 1. Using [`mapobs`](#) and [`loadfile`](#), create a data container where every observation is only an image.
 2. Change the above code to run on a different dataset from the list in `Datasets.DATASETS_IMAGECLASSIFICATION`.
