@@ -24,7 +24,7 @@ project = Project(
         StaticResources(),
         DocumentGraph(),
         SearchIndex(),
-        SaveAttributes((:title,), useoutputs=true),
+        SaveAttributes((:title,), useoutputs=false),
         LoadFrontendConfig(Pkg.pkgdir(m))
     ],
 )
