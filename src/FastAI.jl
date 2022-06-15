@@ -90,7 +90,7 @@ include("serialization.jl")
 
 # submodules
 include("datasets/Datasets.jl")
-using .Datasets
+@reexport using .Datasets
 
 
 include("Registries/Registries.jl")
@@ -148,6 +148,7 @@ export
     datasetpath,
     getobs,
     numobs,
+    mapobs, eachobs, groupobs, shuffleobs, splitobs, ObsView,
 
     # task API
     taskmodel,

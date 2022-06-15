@@ -22,7 +22,7 @@ function loadfolderdata(
         splitfn = nothing,
         filterfn = nothing,
         loadfn = nothing)
-    data = FileDataset(identity, dir, pattern)
+    data = MLDatasets.FileDataset(identity, dir, pattern)
     if filterfn !== nothing && !isempty(data)
         data = filterobs(filterfn, data)
     end

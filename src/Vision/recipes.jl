@@ -107,8 +107,8 @@ function Datasets.loadrecipe(recipe::ImageTableMultiLabel, path)
         idxs = 1:numobs(data)
         splits = df[:, recipe.splitcol]
         data = Dict(
-            "train" => datasubset(data, idxs[splits]),
-            "valid" => datasubset(data, idxs[(!).(splits)])
+            "train" => MLUtils.ObsView(data, idxs[splits]),
+            "valid" => MLUtils.ObsView(data, idxs[(!).(splits)])
         )
     end
     return data, blocks

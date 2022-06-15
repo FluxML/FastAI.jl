@@ -89,9 +89,9 @@ function taskdataloaders(
         validbsfactor = 2,
         kwargs...)
     return (
-        DataLoader(taskdataset(traindata, task, Training()); batchsize, shuffle, kwargs...),
+        DataLoader(taskdataset(traindata, task, Training()); batchsize, shuffle, collate = true, kwargs...),
         DataLoader(taskdataset(validdata, task, Validation());
-                   batchsize = validbsfactor * batchsize, kwargs...),
+                   batchsize = validbsfactor * batchsize, collate = true, kwargs...),
     )
 end
 

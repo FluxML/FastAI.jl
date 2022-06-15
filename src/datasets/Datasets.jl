@@ -3,8 +3,9 @@ module Datasets
 using ..FastAI
 using ..FastAI: typify
 
-import MLUtils: MLUtils, getobs, numobs, filterobs, groupobs, mapobs
-import MLDatasets: FileDataset
+import MLUtils: MLUtils, getobs, numobs, filterobs, groupobs, mapobs,
+    shuffleobs, groupobs, eachobs, ObsView
+import MLDatasets
 using MLUtils: mapobs, groupobs
 using DataDeps
 using FilePathsBase
@@ -37,6 +38,8 @@ end
 export
     # primitive containers
     TableDataset,
+
+    mapobs, eachobs, groupobs, shuffleobs, ObsView
 
     # utilities
     isimagefile,
