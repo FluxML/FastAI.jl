@@ -6,7 +6,7 @@ Terms commonly used in *FastAI.jl*.
 
 In many docstrings, generic types are abbreviated with the following symbols. Many of these refer to a learning task; the context should make clear which task is meant.
 
-- `DC{T}`: A [data container](#data-container) of type T, meaning a type that implements the data container interface `getobs` and `nobs` where `getobs : (DC{T}, Int) -> Int`, that is, each observation is of type `T`.
+- `DC{T}`: A [data container](data_containers.md) of type T, meaning a type that implements the data container interface `getindex`/`getobs` and `length`/`numobs` where `getobs : (DC{T}, Int) -> Int`, that is, each observation is of type `T`.
 - `I`: Type of the unprocessed input in the context of a task.
 - `T`: Type of the target variable.
 - `X`: Type of the processed input. This is fed into a `model`, though it may be batched beforehand. `Xs` represents a batch of processed inputs.
@@ -23,7 +23,7 @@ Some examples of these in use:
 
 ### Data container
 
-A data structure that is used to load a number of data observations separately and lazily. It defines how many observations it holds with `nobs` and how to load a single observation with `getobs`.
+A data structure that is used to load a number of data observations separately and lazily. It defines how many observations it holds with `numobs` and how to load a single observation with `getobs`.
 
 ### Learning task
 

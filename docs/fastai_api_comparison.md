@@ -1,6 +1,6 @@
 # fastai API comparison 
 
-FastAI.jl is in many ways similar to the original Python [fastai](docs.fast.ai), but also has its differences. This reference goes through all the sections in the [fastai: A Layered API for Deep Learning](https://arxiv.org/abs/2002.04688) paper and comments what the interfaces for the same functionality in FastAI.jl are, and where they differ or functionality is still missing.
+FastAI.jl is in many ways similar to the original Python [fastai](http://docs.fast.ai), but also has its differences. This reference goes through all the sections in the [fastai: A Layered API for Deep Learning](https://arxiv.org/abs/2002.04688) paper and comments what the interfaces for the same functionality in FastAI.jl are, and where they differ or functionality is still missing.
 
 ## Applications
 
@@ -10,15 +10,16 @@ FastAI.jl additionally has a unified API for registering and discovering functio
 
 ### Vision
 
-Computer vision is the most developed part of FastAI.jl with good support for different tasks and optimized data pipelines with N-dimensional images, masks and keypoints. See the tutorial section for many examples.
+Computer vision is well-supported in FastAI.jl with different tasks and optimized data pipelines for N-dimensional images, masks and keypoints. See the tutorial section for many examples.
 
 ### Tabular
 
-Support for tabular data is merged into master but is lacking documentation which will come with the next release (0.2.0).
+FastAI.jl also has support for tabular data.
 
 ### Deployment
 
-Through FastAI.jl's [`LearningTask` interface](./learning_tasks.md), the data processing logic is decoupled from the dataset creation and training and can be easily serialized and loaded to make predictions. See the tutorial on [saving and loading models](../notebooks/serialization.ipynb).
+Through FastAI.jl's [`LearningTask`](#) interface, the data processing logic is decoupled from the dataset creation and training and can be easily serialized and loaded to make predictions. See the tutorial on [saving and loading models](../notebooks/serialization.ipynb).
+
 
 ---
 
@@ -76,8 +77,7 @@ res = lrfind(learner); plot(res)   # Run learning rate finder and plot suggestio
 Since it is a Julia package, FastAI.jl is not written on top of PyTorch, but a Julia library for deep learning: [Flux.jl](http://www.fluxml.ai). In any case, the point of this section is to note that the abstractions in fastai are decoupled and existing projects can easily be reused. This is also the case for FastAI.jl as it is built on top of several decoupled libraries. Many of these were built specifically for FastAI.jl, but they are unaware of each other and useful in their own right:
 
 - [Flux.jl](https://github.com/FluxML/Flux.jl) provides models, optimizers, and loss functions, fulfilling a similar role to PyTorch
-- [MLDataPattern.jl](https://github.com/JuliaML/MLDataPattern.jl) gives you tools for building and transforming data containers
-- [DataLoaders.jl](https://github.com/lorenzoh/DataLoaders.jl) takes care of efficient, parallelized iteration of data containers
+- [MLUtils.jl](https://github.com/JuliaML/MLUtils.jl) gives you tools for building and transforming data containers. Also, it takes care of efficient, parallelized iteration of data containers.
 - [DataAugmentation.jl](https://github.com/lorenzoh/DataAugmentation.jl) takes care of the lower levels of high-performance, composable data augmentations.
 - [FluxTraining.jl](https://github.com/lorenzoh/FluxTraining.jl) contributes a highly extensible training loop with 2-way callbacks
 
@@ -126,14 +126,14 @@ FastAI.jl makes all the same datasets available in `fastai.data.external` availa
 
 ### funcs_kwargs and DataLoader, fastai.data.core
 
-In FastAI.jl, you are not restricted to a specific type of data iterator and can pass any iterator over batches to `Learner`. In cases where performance is important [`DataLoader`](#) can speed up data iteration by loading and batching samples in parallel on background threads. All transformations of data happen through the data container interface which requires a type to implement `LearnBase.getobs` and `LearnBase.nobs`, similar to PyTorch's `torch.utils.data.Dataset`. Data containers are then transformed into other data containers. Some examples:
+In FastAI.jl, you are not restricted to a specific type of data iterator and can pass any iterator over batches to `Learner`. In cases where performance is important [`DataLoader`](#) can speed up data iteration by loading and batching samples in parallel on background threads. All transformations of data happen through the data container interface which requires a type to implement `Base.getindex`/`MLUtils.getobs` and `Base.length`/`MLUtils.numobs`, similar to PyTorch's `torch.utils.data.Dataset`. Data containers are then transformed into other data containers. Some examples:
 
 - [`mapobs`](#)`(f, data)` lazily maps a function `f` of over `data` such that `getobs(mapobs(f, data), idx) == f(getobs(data, idx))`. For example `mapobs(loadfile, files)` turns a vector of image files into a data container of images.
-- `DataLoader(data, batchsize)` is a wrapper around `batchviewcollated` which turns a data container of samples into one of collated batches and `eachobsparallel` which creates a parallel, buffered iterator over the observations (here batches) in the resulting container.
+- `DataLoader(data; batchsize)` is a wrapper around [`BatchView`](#) which turns a data container of samples into one of collated batches and `eachobsparallel` which creates a parallel, buffered iterator over the observations (here batches) in the resulting container.
 - [`groupobs`](#)`(f, data)` splits a container into groups using a grouping function `f`. For example, `groupobs(grandparentname, files)` creates training splits for files where the grandparent folder indicates the split.
-- [`datasubset`](#)`(data, idxs)` lazily takes a subset of the observations in `data`.
+- [`MLUtils.ObsView`](#)`(data, idxs)` lazily takes a subset of the observations in `data`.
 
-For more information, see the [data container tutorial](data_containers.md) and the [MLDataPattern.jl docs](https://mldatapatternjl.readthedocs.io/en/latest/). At a higher level, there are also convenience functions like [`FileDataset`](#) to create data containers.
+For more information, see the [data container tutorial](data_containers.md) and the [MLUtils.jl docs](https://juliaml.github.io/MLUtils.jl/dev/). At a higher level, there are also convenience functions like `loadfolderdata` to create data containers.
 
 ### Layers and architectures 
 

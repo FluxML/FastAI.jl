@@ -38,7 +38,7 @@ batchdata = batchviewcollated(taskdata, 16)
 NBATCHES = 200
 
 # sequential data iterator
-@time for (i, batch) in enumerate(getobs(batchdata, i) for i in 1:nobs(batchdata))
+@time for (i, batch) in enumerate(getobs(batchdata, i) for i in 1:numobs(batchdata))
     i != NBATCHES || break
 end
 
@@ -96,11 +96,11 @@ To find performance bottlenecks in the loading of each observation, you'll want 
 ```julia
 using BenchmarkTools
 using FastAI
-using FastAI.Datasets
+using FastAI.Datasets, FastAI.MLUtils
 
 # Since loading times can vary per observation, we'll average the measurements over multiple observations
 N = 10
-data = datasubset(data, 1:N)
+data = MLUtils.ObsView(data, 1:N)
 
 # Time it takes to load an `(image, class)` observation
 @btime for i in 1:N
