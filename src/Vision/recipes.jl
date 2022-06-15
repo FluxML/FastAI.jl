@@ -15,7 +15,7 @@ Tuple{Image{2}, Label}
 ```
 """
 Base.@kwdef struct ImageFolders <: Datasets.DatasetRecipe
-    labelfn = parentname
+    labelfn = Datasets.parentname
     split::Bool = false
     filefilterfn = _ -> true
 end

@@ -39,7 +39,7 @@ export
     # primitive containers
     TableDataset,
 
-    mapobs, eachobs, groupobs, shuffleobs, ObsView
+    mapobs, eachobs, groupobs, shuffleobs, ObsView,
 
     # utilities
     isimagefile,

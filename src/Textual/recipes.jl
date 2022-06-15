@@ -5,7 +5,7 @@ Recipe for loading a single-label text classification dataset
 stored in hierarchical folder format.
 """
 Base.@kwdef struct TextFolders <: Datasets.DatasetRecipe
-    labelfn = parentname
+    labelfn = Datasets.parentname
     split::Bool = false
     filefilterfn = _ -> true
 end
