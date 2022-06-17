@@ -87,11 +87,13 @@ function taskdataloaders(
         batchsize = 16;
         shuffle = true,
         validbsfactor = 2,
+        parallel = true,
+        collate = true,
         kwargs...)
     return (
-        DataLoader(taskdataset(traindata, task, Training()); batchsize, shuffle, collate = true, kwargs...),
+        DataLoader(taskdataset(traindata, task, Training()); batchsize, shuffle, collate, parallel, kwargs...),
         DataLoader(taskdataset(validdata, task, Validation());
-                   batchsize = validbsfactor * batchsize, collate = true, kwargs...),
+                   batchsize = validbsfactor * batchsize, collate, parallel, kwargs...),
     )
 end
 
