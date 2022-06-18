@@ -38,12 +38,14 @@ end
 export
     # primitive containers
     TableDataset,
+    TimeSeriesDataset,
 
     mapobs, eachobs, groupobs, shuffleobs, ObsView,
 
     # utilities
     isimagefile,
     istextfile,
+    istimeseriesfile,
     matches,
     loadfile,
     loadmask,

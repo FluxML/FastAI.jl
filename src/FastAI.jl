@@ -109,6 +109,9 @@ include("Tabular/Tabular.jl")
 include("Textual/Textual.jl")
 @reexport using .Textual
 
+include("TimeSeries/TimeSeries.jl")
+@reexport using .TimeSeries
+
 include("deprecations.jl")
 export
     methodmodel,
@@ -168,6 +171,7 @@ export
     Continuous,
     Image,
     Paragraph,
+    TimeSeriesRow,
 
     # encodings
     encode,
