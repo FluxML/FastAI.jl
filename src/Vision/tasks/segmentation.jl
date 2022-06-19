@@ -87,4 +87,10 @@ _tasks["imagesegmentation"] = (
         @test_nowarn tasklossfn(task)
     end
 
+    @testset "taskdataloaders" begin
+        data, blocks = load(datarecipes()["camvid_tiny"])
+        traindl, _ = taskdataloaders(data, ImageSegmentation(blocks))
+        @test_nowarn for batch in traindl
+        end
+    end
 end

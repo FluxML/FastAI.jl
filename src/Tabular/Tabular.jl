@@ -12,18 +12,23 @@ using ..FastAI:
     ShowText,
     # other
     Context, Training, Validation
+import ..FastAI: Datasets
+using ..FastAI.Datasets
 
 # for tests
 using ..FastAI: testencoding
 
 # extending
 import ..FastAI:
+    Datasets,
     blockmodel, blockbackbone, blocklossfn, encode, decode, checkblock,
     encodedblock, decodedblock, showblock!, mockblock, setup
+using ..FastAI.Datasets
 
 
 import DataAugmentation
 import DataFrames: DataFrame
+import MLUtils: MLUtils, eachobs, getobs, numobs
 import Flux
 import Flux: Embedding, Chain, Dropout, Dense, Parallel, BatchNorm
 import PrettyTables

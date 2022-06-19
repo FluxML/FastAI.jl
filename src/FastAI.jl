@@ -4,14 +4,12 @@ module FastAI
 using Base: NamedTuple
 using Reexport
 @reexport using FluxTraining
-@reexport using DataLoaders
+import MLUtils
+using MLUtils: getobs, numobs, splitobs, eachobs, DataLoader
 using Flux
 
-using Animations
 import DataAugmentation
 import DataAugmentation: getbounds, Bounds
-
-import LearnBase
 using FilePathsBase
 using Flux
 using Flux.Optimise
@@ -20,7 +18,6 @@ using FluxTraining: Learner, handle
 using FluxTraining.Events
 using JLD2: jldsave, jldopen
 using Markdown
-using MLDataPattern
 using PrettyTables
 using Requires
 using StaticArrays
@@ -100,9 +97,6 @@ include("Registries/Registries.jl")
 @reexport using .Registries
 
 
-
-
-
 # Domain-specific
 include("Vision/Vision.jl")
 @reexport using .Vision
@@ -149,19 +143,15 @@ export
     Datasets,
     Models,
     datasetpath,
-    mapobs,
-    groupobs,
-    filterobs,
-    shuffleobs,
-    datasubset,
+    getobs,
+    numobs,
+    mapobs, eachobs, groupobs, shuffleobs, splitobs, ObsView,
 
     # task API
     taskmodel,
     taskdataset,
     taskdataloaders,
     tasklossfn,
-    getobs,
-    nobs,
     encodesample,
     predict,
     predictbatch,
