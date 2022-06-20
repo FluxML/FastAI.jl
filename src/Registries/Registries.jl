@@ -33,17 +33,17 @@ blocktypesmatch(BSupported::Type{Any}, ::Type{Any}) = true
 blocktypesmatch(bsupported, bwanted) = blocktypesmatch(typify(bsupported), typify(bwanted))
 
 @testset "`blocktypesmatch`" begin
-    @test blocktypesmatch(FastAI.Image, FastAI.Image{2})
-    @test blocktypesmatch(FastAI.Image, FastAI.Image)
-    @test blocktypesmatch(FastAI.Image{2}, FastAI.Image)
-    @test blocktypesmatch(Tuple{FastAI.Image}, Tuple{FastAI.Image})
-    @test blocktypesmatch(Tuple{FastAI.Image{2}}, Tuple{FastAI.Image})
-    @test blocktypesmatch(Tuple{FastAI.Image{2}}, Any)
-    @test blocktypesmatch(FastAI.Image{2}(), FastAI.Image{2})
-    @test blocktypesmatch(FastAI.Image, FastAI.Image{2}())
-    @test blocktypesmatch((FastAI.Image{2}(), FastAI.Label(1:10)), (FastAI.Image, FastAI.Label))
-    @test blocktypesmatch((FastAI.Image{2}(), FastAI.AbstractBlock), (FastAI.Image, FastAI.Label))
-    @test !blocktypesmatch(FastAI.Image{2}(), Label(1:10))
+    @test blocktypesmatch(FastAI.Label, FastAI.Label{String})
+    @test blocktypesmatch(FastAI.Label, FastAI.Label)
+    @test blocktypesmatch(FastAI.Label{String}, FastAI.Label)
+    @test blocktypesmatch(Tuple{FastAI.Label}, Tuple{FastAI.Label})
+    @test blocktypesmatch(Tuple{FastAI.Label{String}}, Tuple{FastAI.Label})
+    @test blocktypesmatch(Tuple{FastAI.Label{String}}, Any)
+    @test blocktypesmatch(FastAI.Label{String}(["x", "y"]), FastAI.Label{String})
+    @test blocktypesmatch(FastAI.Label, FastAI.Label{String}(["x", "y"]))
+    @test blocktypesmatch((FastAI.Label{String}(["x", "y"]), FastAI.Label(1:10)), (FastAI.Label, FastAI.Label))
+    @test blocktypesmatch((FastAI.Label{String}(["x", "y"]), FastAI.AbstractBlock), (FastAI.Label, FastAI.Label))
+    @test !blocktypesmatch(FastAI.Label{String}(["x", "y"]), Label(1:10))
 end
 
 

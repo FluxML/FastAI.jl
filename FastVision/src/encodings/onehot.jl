@@ -18,6 +18,11 @@ function decode(::OneHot, context, block::OneHotTensor, obs)
 end
 
 
+function mockblock(block::OneHotTensor{N}) where N
+    maskblock = Mask{N}(block.classes)
+    return encode(OneHot(), Validation(), maskblock, mockblock(maskblock))
+end
+
 # ## Loss function
 
 function blocklossfn(outblock::OneHotTensor{N}, yblock::OneHotTensor{N}) where N

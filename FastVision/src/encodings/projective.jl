@@ -226,7 +226,7 @@ end
     @testset "image" begin
         encoding = ProjectiveTransforms((32, 32))
         image = rand(RGB, 64, 96)
-        block = FastAI.Image{2}()
+        block = Image{2}()
 
         ## We run `ProjectiveTransforms` in the different [`Context`]s:
         imagetrain = encode(encoding, Training(), block, image)
@@ -246,7 +246,7 @@ end
     @testset "keypoints" begin
         encoding = ProjectiveTransforms((32, 48))
         ks = [SVector(0.0, 0), SVector(64, 96)]
-        block = FastAI.Keypoints{2}(10)
+        block = Keypoints{2}(10)
         bounds = DataAugmentation.Bounds((1:32, 1:48))
         r = DataAugmentation.getrandstate(encoding.tfms.training)
         kstrain = encode(encoding, Training(), block, ks; state = (bounds, r))
@@ -260,7 +260,7 @@ end
         encoding = ProjectiveTransforms((32, 32))
         image = rand(RGB, 64, 96)
         ks = [SVector(0.0, 0), SVector(64, 96)]
-        blocks = (FastAI.Image{2}(), FastAI.Keypoints{2}(10))
+        blocks = (Image{2}(), Keypoints{2}(10))
 
         @test_nowarn encode(encoding, Training(), blocks, (image, ks))
         @test_nowarn encode(encoding, Validation(), blocks, (image, ks))

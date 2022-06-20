@@ -88,7 +88,7 @@ function unetlayers(
         k_in = sz[end-1]
         k_mid = outsz[end-1]
         k_out = isnothing(k_out) ? k_in : k_out
-        return FastAI.Vision.Models.UNetBlock(
+        return UNetBlock(
             Chain(layer, childunet),
             k_in,  # Input channels to upsampling layer
             k_mid,

@@ -35,7 +35,7 @@ end
 # ## Tests
 
 @testset "Many [block]" begin
-    enc = ImagePreprocessing()
-    block = Many(Image{2}())
+    enc = OneHot()
+    block = Many(Label(1:10))
     FastAI.testencoding(enc, block)
 end

@@ -1,3 +1,4 @@
+
 # ## [`DatasetRecipe`] implementations
 
 """
@@ -157,31 +158,31 @@ end
 
 
 @testset "ImageFolders [recipe]" begin
-    path = joinpath(datasetpath("mnist_var_size_tiny"), "train")
+    path = joinpath(load(datasets()["mnist_var_size_tiny"]), "train")
 
     @testset "Basic configuration" begin
-        recipe = Vision.ImageFolders()
-        data, blocks = loadrecipe(recipe, path)
+        recipe = ImageFolders()
+        data, blocks = Datasets.loadrecipe(recipe, path)
         Datasets.testrecipe(recipe, data, blocks)
         @test blocks[1] isa Image
         @test blocks[2].classes == ["3", "7"]
     end
 
     @testset "Split configuration" begin
-        recipe = Vision.ImageFolders(split=true)
-        data, blocks = loadrecipe(recipe, path)
+        recipe = ImageFolders(split=true)
+        data, blocks = Datasets.loadrecipe(recipe, path)
         Datasets.testrecipe(recipe, data["train"], blocks)
     end
 
     @testset "Error cases" begin
         @testset "Empty directory" begin
-            recipe = Vision.ImageFolders(split=true)
-            @test_throws ErrorException loadrecipe(recipe, mktempdir())
+            recipe = ImageFolders(split=true)
+            @test_throws ErrorException Datasets.loadrecipe(recipe, mktempdir())
         end
 
         @testset "Only one label" begin
-            recipe = Vision.ImageFolders(labelfn=x -> "1")
-            @test_throws ErrorException loadrecipe(recipe, path)
+            recipe = ImageFolders(labelfn=x -> "1")
+            @test_throws ErrorException Datasets.loadrecipe(recipe, path)
         end
     end
 
@@ -189,11 +190,11 @@ end
 
 
 @testset "ImageSegmentationFolders [recipe]" begin
-    path = datasetpath("camvid_tiny")
+    path = load(datasets()["camvid_tiny"])
 
     @testset "Basic configuration" begin
         recipe = ImageSegmentationFolders()
-        data, blocks = loadrecipe(recipe, path)
+        data, blocks = Datasets.loadrecipe(recipe, path)
         Datasets.testrecipe(recipe, data, blocks)
         @test blocks[1] isa Image
         @test blocks[2] isa Mask
@@ -202,12 +203,12 @@ end
     @testset "Error cases" begin
         @testset "Empty directory" begin
             recipe = ImageSegmentationFolders()
-            @test_throws ErrorException loadrecipe(recipe, mktempdir())
+            @test_throws ErrorException Datasets.loadrecipe(recipe, mktempdir())
         end
 
         @testset "Only one label" begin
             recipe = ImageSegmentationFolders(labelfile="idontexist")
-            @test_throws ErrorException loadrecipe(recipe, path)
+            @test_throws ErrorException Datasets.loadrecipe(recipe, path)
         end
     end
 end

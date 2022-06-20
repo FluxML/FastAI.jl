@@ -25,10 +25,6 @@ end
 mockblock(block::OneHotTensor{0}) = encode(
     OneHot(), Validation(), Label(block.classes), rand(block.classes))
 
-function mockblock(block::OneHotTensor{N}) where N
-    maskblock = Mask{N}(block.classes)
-    return encode(OneHot(), Validation(), maskblock, mockblock(maskblock))
-end
 
 struct OneHotTensorMulti{N, T} <: Block
     classes::AbstractVector{T}
@@ -68,10 +64,8 @@ OneHot() = OneHot(Float32, 0.5f0)
 encodedblock(::OneHot, block::Label{T}) where T = OneHotTensor{0, T}(block.classes)
 decodedblock(::OneHot, block::OneHotLabel) = Label(block.classes)
 
-function encode(enc::OneHot, context, block::Label, obs)
-    idx = findfirst(isequal(obs), block.classes)
-    isnothing(idx) && error("$obs could not be found in `block.classes`: $(block.classes).")
-    return DataAugmentation.onehot(enc.T, idx, length(block.classes))
+function encode(::OneHot, _, block::Label, obs)
+    return Flux.onehot(obs, block.classes)
 end
 
 
@@ -110,5 +104,4 @@ end
     enc = OneHot()
     testencoding(enc, Label(1:10), 1)
     testencoding(enc, LabelMulti(1:10), [1])
-    testencoding(enc, Mask{2}(1:10), rand(1:10, 50, 50))
 end

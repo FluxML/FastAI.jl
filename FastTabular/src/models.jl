@@ -190,7 +190,7 @@ end
         tm = TabularModel(embeds, contback; outsize=4)
         @test size(tm(x)) == (4, 1)
 
-        tm2 = TabularModel(embeds, contback, Chain(Dense(100, 4), x->Tabular.sigmoidrange(x, 2, 5)))
+        tm2 = TabularModel(embeds, contback, Chain(Dense(100, 4), x->sigmoidrange(x, 2, 5)))
         y2 = tm2(x)
         @test all(y2.> 2) && all(y2.<5)
 

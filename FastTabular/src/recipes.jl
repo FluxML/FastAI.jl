@@ -1,3 +1,4 @@
+Datasets.loadfile(file::String, ::Val{:txt}) = DataFrame(CSV.File(file))
 
 """
     TableDatasetRecipe(tablefile; catcols, contcols, kwargs...])
@@ -16,7 +17,7 @@ end
 
 Datasets.recipeblocks(::Type{TableDatasetRecipe}) = TableRow
 
-function Datasets.loadrecipe(recipe::TableDatasetRecipe, path)
+function Datasets.Datasets.loadrecipe(recipe::TableDatasetRecipe, path)
     tablepath = joinpath(path, recipe.file)
     table = recipe.loadfn(tablepath)
     Tables.istable(table) || error("Expected `recipe.loadfn($(tablepath))` to return a table, instead got type $(typeof(table))")
@@ -49,8 +50,8 @@ end
 Datasets.recipeblocks(::Type{TableClassificationRecipe}) = (TableRow, Label)
 
 
-function Datasets.loadrecipe(recipe::TableClassificationRecipe, args...; kwargs...)
-    data, block::TableRow = loadrecipe(recipe.recipe, args...; kwargs...)
+function Datasets.Datasets.loadrecipe(recipe::TableClassificationRecipe, args...; kwargs...)
+    data, block::TableRow = Datasets.loadrecipe(recipe.recipe, args...; kwargs...)
     recipe.targetcol in block.catcols || error("Expected categorical column $(recipe.targetcol) to exist.")
 
     data = rows, labels = (data, Tables.getcolumn(data.table, recipe.targetcol))
@@ -71,8 +72,8 @@ end
 Datasets.recipeblocks(::Type{TableRegressionRecipe}) = (TableRow, Continuous)
 
 
-function Datasets.loadrecipe(recipe::TableRegressionRecipe, args...; kwargs...)
-    data, block::TableRow = loadrecipe(recipe.recipe, args...; kwargs...)
+function Datasets.Datasets.loadrecipe(recipe::TableRegressionRecipe, args...; kwargs...)
+    data, block::TableRow = Datasets.loadrecipe(recipe.recipe, args...; kwargs...)
     recipe.targetcol in block.contcols || error("Expected continuous column $(recipe.targetcol) to exist.")
 
     data = rows, labels = (data, Tables.getcolumn(data.table, recipe.targetcol))
@@ -128,27 +129,27 @@ end
 # ## Tests
 
 @testset "TableDatasetRecipe [recipe]" begin
-    path = datasetpath("adult_sample")
+    path = load(datasets()["adult_sample"])
     recipe = TableDatasetRecipe(file="adult.csv")
-    data, block = loadrecipe(recipe, path)
+    data, block = Datasets.loadrecipe(recipe, path)
     sample = getobs(data, 1)
     @test checkblock(block, sample)
 end
 
 
 @testset "TableClassificationRecipe [recipe]" begin
-    path = datasetpath("adult_sample")
+    path = load(datasets()["adult_sample"])
     recipe = TableClassificationRecipe(TableDatasetRecipe(file="adult.csv"), :salary)
-    data, block = loadrecipe(recipe, path)
+    data, block = Datasets.loadrecipe(recipe, path)
     sample = getobs(data, 1)
     @test checkblock(block, sample)
 end
 
 
 @testset "TableRegressionRecipe [recipe]" begin
-    path = datasetpath("adult_sample")
+    path = load(datasets()["adult_sample"])
     recipe = TableRegressionRecipe(TableDatasetRecipe(file="adult.csv"), :age)
-    data, block = loadrecipe(recipe, path)
+    data, block = Datasets.loadrecipe(recipe, path)
     sample = getobs(data, 1)
     @test checkblock(block, sample)
 end

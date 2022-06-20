@@ -9,12 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- (BREAKING) Now uses [MLUtils.jl](https://github.com/JuliaML/MLUtils.jl) to create and load datasets and data containers
+- (BREAKING): Now uses [MLUtils.jl](https://github.com/JuliaML/MLUtils.jl) to create and load datasets and data containers
     - Replaces dependencies MLDataPattern.jl, LearnBase.jl, and DataLoaders.jl
     - Data containers must now implement the `Base.getindex`/`MLUtils.getobs` and `Base.length`/`MLUtils.numobs` interfaces.
     - Previously exported `MLDataPattern.datasubset` has been replaced by `MLUtils.ObsView`
     - Documentation has been updated appropriately
-    
+- (BREAKING): `FastAI.Vision` now lives in a separate package `FastVision` that holds all computer vision-related functionality. 
+- (BREAKING): `FastAI.Tabular` now lives in a separate package `FastTabular` that holds all tabular data-related functionality. 
+
+### Removed
+
+- (BREAKING): `FastAI.Models` submodule. `Models` submodule of domain libraries, e.g. `FastVision.Models` should now be used.
 
 ## v0.4.3 (2022/05/14)
 

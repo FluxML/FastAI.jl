@@ -7,7 +7,7 @@ that each sample is made of.
 
 ## Examples
 
-For example implementations, see [`Vision.ImageFolders`](#).
+For example implementations, see [`FastVision.ImageFolders`](#).
 
 ## Extending
 

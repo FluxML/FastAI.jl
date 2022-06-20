@@ -1,28 +1,4 @@
 
-
-"""
-    loadfile(file)
-
-Load a file from disk into the appropriate format.
-"""
-function loadfile(file::String)
-    if isimagefile(file)
-        # faster image loading
-        return FileIO.load(file)
-    elseif endswith(file, ".csv")
-        return DataFrame(CSV.File(file))
-    elseif endswith(file, ".txt")
-        return read(file, String)
-    else
-        return FileIO.load(file)
-    end
-end
-
-loadfile(file::AbstractPath) = loadfile(string(file))
-
-
-#TableDataset
-
 struct TableDataset{T}
     table::T #Should implement Tables.jl interface
     TableDataset{T}(table::T) where {T} =
@@ -33,7 +9,7 @@ end
 TableDataset(table::T) where {T} = TableDataset{T}(table)
 TableDataset(path::AbstractPath) = TableDataset(DataFrame(CSV.File(path)))
 
-function Base.getindex(dataset::FastAI.Datasets.TableDataset, idx)
+function Base.getindex(dataset::TableDataset, idx)
     if Tables.rowaccess(dataset.table)
         row, _ = Iterators.peel(Iterators.drop(Tables.rows(dataset.table), idx - 1))
         return row

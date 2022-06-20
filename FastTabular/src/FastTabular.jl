@@ -1,8 +1,8 @@
-module Tabular
+module FastTabular
 
 
-using ..FastAI
-using ..FastAI:
+using FastAI
+using FastAI:
     # blocks
     Block, WrapperBlock, AbstractBlock, OneHotTensor, OneHotTensorMulti, Label,
     LabelMulti, wrapped, Continuous, getencodings, getblocks, encodetarget, encodeinput,
@@ -12,33 +12,33 @@ using ..FastAI:
     ShowText,
     # other
     Context, Training, Validation
-import ..FastAI: Datasets
-using ..FastAI.Datasets
+import FastAI: Datasets
+using FastAI.Datasets
 
 # for tests
-using ..FastAI: testencoding
+using FastAI: testencoding
 
 # extending
-import ..FastAI:
+import FastAI:
     Datasets,
     blockmodel, blockbackbone, blocklossfn, encode, decode, checkblock,
     encodedblock, decodedblock, showblock!, mockblock, setup
-using ..FastAI.Datasets
 
-
+import CSV
 import DataAugmentation
-import DataFrames: DataFrame
+import DataFrames: DataFrame, nrow
 import MLUtils: MLUtils, eachobs, getobs, numobs
 import Flux
 import Flux: Embedding, Chain, Dropout, Dense, Parallel, BatchNorm
 import PrettyTables
-import Requires: @require
 import ShowCases: ShowCase
 import Tables
 import Statistics
+using FilePathsBase
 
 using InlineTest
 
+include("container.jl")
 
 # Blocks
 include("blocks/tablerow.jl")
@@ -62,14 +62,8 @@ function __init__()
             push!(learningtasks(), t)
         end
     end
-    @require Makie="ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a" begin
-        import .Makie
-        import .Makie: @recipe, @lift
-        import .FastAI: ShowMakie
-        include("makie.jl")
-    end
 end
 
-export TableRow, TabularPreprocessing, TabularClassificationSingle, TabularRegression
+export TableRow, TabularPreprocessing, TabularClassificationSingle, TabularRegression, TableDataset
 
 end

@@ -78,7 +78,7 @@ Show all computer vision tasks:
 
 {cell}
 ```julia
-learningtasks(package=FastAI.Vision)
+learningtasks(package=FastVision)
 ```
 
 Show all classification tasks, i.e. where the target block is a [`Label`](#):

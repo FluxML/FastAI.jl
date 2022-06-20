@@ -63,5 +63,5 @@ blockbackbone(inblock::ImageTensor{2}) = Models.xresnet18(c_in = inblock.nchanne
 
 
 @testset "blockbackbone" begin
-    @test_nowarn FastAI.blockbackbone(Vision.ImageTensor{2}(3))
+    @test_nowarn FastAI.blockbackbone(ImageTensor{2}(3))
 end

@@ -8,8 +8,6 @@ import MLUtils
 using MLUtils: getobs, numobs, splitobs, eachobs, DataLoader
 using Flux
 
-import DataAugmentation
-import DataAugmentation: getbounds, Bounds
 using FilePathsBase
 using Flux
 using Flux.Optimise
@@ -20,10 +18,7 @@ using JLD2: jldsave, jldopen
 using Markdown
 using PrettyTables
 using Requires
-using StaticArrays
 using Setfield
-using ShowCases
-using Tables
 import Test
 import UnicodePlots
 using Statistics
@@ -97,32 +92,6 @@ include("Registries/Registries.jl")
 @reexport using .Registries
 
 
-# Domain-specific
-include("Vision/Vision.jl")
-@reexport using .Vision
-export Image
-export Vision
-
-include("Tabular/Tabular.jl")
-@reexport using .Tabular
-
-include("Textual/Textual.jl")
-@reexport using .Textual
-
-include("deprecations.jl")
-export
-    methodmodel,
-    methoddataset,
-    methoddataloaders,
-    methodlossfn,
-    BlockMethod,
-    describemethod,
-    findlearningmethods,
-    methodlearner,
-    savemethodmodel,
-    loadmethodmodel
-
-
 include("interpretation/makie/stub.jl")
 function __init__()
     @require Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a" begin
@@ -130,11 +99,6 @@ function __init__()
         include("interpretation/makie/showmakie.jl")
         include("interpretation/makie/lrfind.jl")
     end
-end
-
-module Models
-using ..FastAI.Tabular: TabularModel
-using ..FastAI.Vision.Models: xresnet18, xresnet50, UNetDynamic
 end
 
 
@@ -166,7 +130,6 @@ export
     Many,
     TableRow,
     Continuous,
-    Image,
     Paragraph,
 
     # encodings
@@ -176,8 +139,7 @@ export
     OneHot,
     Only,
     Named,
-    augs_projection, augs_lighting,
-    TabularPreprocessing, SupervisedTask,
+    SupervisedTask,
     BlockTask,
     describetask,
     checkblock,
@@ -202,9 +164,6 @@ export
 
     # learning tasks
     findlearningtasks,
-    TabularClassificationSingle,
-    TabularRegression,
-
 
     # training
     tasklearner,
@@ -217,10 +176,6 @@ export
     loadtaskmodel,
     accuracy_thresh, gpu,
     plot
-
-
-
-
 
 
 end  # module

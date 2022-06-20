@@ -111,12 +111,12 @@ are dependent on the dataset. `data` should be the training dataset. Additional
 
 ```julia
 (images, labels), blocks = loaddataset("imagenette2-160", (Image, Label))
-setup(ImagePreprocessing, Image{2}(), images; buffered = false)
+setup(FastVision.ImagePreprocessing, FastVision.Image{2}(), images; buffered = false)
 ```
 
 ```julia
 data, block = loaddataset("adult_sample", TableRow)
-setup(TabularPreprocessing, block, data)
+setup(FastTabular.TabularPreprocessing, block, data)
 ```
 """
 function setup end

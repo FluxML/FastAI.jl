@@ -40,7 +40,7 @@ struct TabularPreprocessing{T} <: Encoding
 	tfms::T
 end
 
-TabularPreprocessing(td::Datasets.TableDataset) = TabularPreprocessing(gettransforms(td))
+TabularPreprocessing(td::TableDataset) = TabularPreprocessing(gettransforms(td))
 
 function encodedblock(::TabularPreprocessing, block::TableRow)
     EncodedTableRow(block.catcols, block.contcols, block.categorydict)
@@ -157,7 +157,7 @@ end
 
 Returns the categorical and continuous columns present in a `TableDataset`.
 """
-function getcoltypes(td::Datasets.TableDataset)
+function getcoltypes(td::TableDataset)
     schema = Tables.schema(td.table)
 
     contcols = Tuple(name for (name, T) in zip(schema.names, schema.types)

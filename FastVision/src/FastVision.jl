@@ -1,5 +1,5 @@
 """
-    module Vision
+    module FastVision
 
 Data blocks, encodings and more for computer vision.
 
@@ -23,13 +23,14 @@ Encodings:
 
 
 """
-module Vision
+module FastVision
 
-using ..FastAI
-using ..FastAI:
+using FastAI
+using FastAI:
     # blocks
     Block, WrapperBlock, AbstractBlock, OneHotTensor, OneHotTensorMulti, Label,
     LabelMulti, wrapped, getencodings, getblocks, encodetarget, encodeinput,
+    testencoding,
     # encodings
     Encoding, StatefulEncoding, OneHot,
     # visualization
@@ -37,20 +38,17 @@ using ..FastAI:
     # other
     Context, Training, Validation, Inference,
     Datasets
-import Flux
-import MLUtils: getobs, numobs, mapobs, eachobs
-using ..FastAI.Datasets
-
-# for tests
-using ..FastAI: testencoding
+using FastAI.Datasets
 
 # extending
-import ..FastAI:
+import FastAI:
     blockmodel, blockbackbone, blocklossfn, encode, decode, checkblock,
     encodedblock, decodedblock, showblock!, mockblock, setup, encodestate,
     decodestate
 
 
+import Flux
+import MLUtils: getobs, numobs, mapobs, eachobs
 import Colors: colormaps_sequential, Colorant, Color, Gray, Normed, RGB,
     alphacolor, deuteranopic, distinguishable_colors
 using ColorVectorSpace
@@ -91,6 +89,7 @@ include("tasks/utils.jl")
 include("tasks/classification.jl")
 include("tasks/segmentation.jl")
 include("tasks/keypointregression.jl")
+include("datasets.jl")
 include("recipes.jl")
 
 include("tests.jl")

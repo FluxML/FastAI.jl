@@ -36,3 +36,9 @@ _maskimage(mask::AbstractArray{<:Gray{T}}, args...) where {T} =
     _maskimage(reinterpret(T, mask), args...)
 _maskimage(mask::AbstractArray{<:Normed{T}}, args...) where {T} =
     _maskimage(reinterpret(T, mask), args...)
+
+
+@testset "OneHot [encoding]" begin
+    enc = OneHot()
+    testencoding(enc, Mask{2}(1:10), rand(1:10, 50, 50))
+end

@@ -1,3 +1,9 @@
+Datasets.loadfile(file::String, ::Val{:txt}) = read(file, String)
+
+const RE_TEXTFILE = r".*\.(txt|csv|json|md|html?|xml|yaml|toml)$"i
+istextfile(f) = matches(RE_TEXTFILE, f)
+
+
 """
     TextFolders(textfile; labelfn = parentname, split = false)
 
@@ -55,5 +61,5 @@ end
 
 
 @testset "TextFolders [Recipe]" begin
-    @test length(finddatasets(name="imdb")) >= 1
+    @test length(datarecipes(id="imdb")) >= 1
 end

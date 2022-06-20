@@ -1,8 +1,8 @@
-module Textual
+module FastText
 
 
-using ..FastAI
-using ..FastAI:
+using FastAI
+using FastAI:
     Datasets,
     # blocks
     Block, WrapperBlock, AbstractBlock, OneHotTensor, OneHotTensorMulti, Label,
@@ -13,11 +13,9 @@ using ..FastAI:
     ShowText,
     # other
     Context, Training, Validation
-using ..FastAI.Datasets
 
-using ..FastAI.Datasets
+using FastAI.Datasets
 
-import Requires: @require
 
 using InlineTest
 using Random
