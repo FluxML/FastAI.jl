@@ -60,6 +60,8 @@ import DataAugmentation: apply, Identity, ToEltype, ImageToTensor, Normalize,
     ResizePadDivisible, itemdata
 import ImageInTerminal
 import IndirectArrays: IndirectArray
+import MakieCore as M
+import MakieCore.Observables: @map
 import ProgressMeter: Progress, next!
 import Requires: @require
 import StaticArrays: SVector
@@ -91,6 +93,7 @@ include("tasks/segmentation.jl")
 include("tasks/keypointregression.jl")
 include("datasets.jl")
 include("recipes.jl")
+include("makie.jl")
 
 include("tests.jl")
 
@@ -101,12 +104,6 @@ function __init__()
         if !haskey(FastAI.learningtasks(), t.id)
             push!(FastAI.learningtasks(), t)
         end
-    end
-    @require Makie="ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a" begin
-        import .Makie
-        import .Makie: @recipe, @lift
-        import .FastAI: ShowMakie
-        include("makie.jl")
     end
 end
 
