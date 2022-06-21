@@ -46,10 +46,13 @@ jobs:
             ${{ runner.os }}-test-${{ env.cache-name }}-
             ${{ runner.os }}-test-
             ${{ runner.os }}-
+      - name: Dev FastAI
+        run: |
+          julia --color=yes --project=./FastVision -e 'using Pkg; println(pwd()); Pkg.develop("./FastAI")'
       - uses: julia-actions/julia-buildpkg@latest
         with:
-          project: 'FastVision/'
+          project: './FastVision/'
       - uses: julia-actions/julia-runtest@latest
         with:
-          project: 'FastVision/'
+          project: './FastVision/'
         continue-on-error: ${{ matrix.version == 'nightly' }}
