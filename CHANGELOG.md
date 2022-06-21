@@ -5,7 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v0.4.3
+## v0.5 (unreleased)
+
+### Changed
+
+- (BREAKING) Now uses [MLUtils.jl](https://github.com/JuliaML/MLUtils.jl) to create and load datasets and data containers
+    - Replaces dependencies MLDataPattern.jl, LearnBase.jl, and DataLoaders.jl
+    - Data containers must now implement the `Base.getindex`/`MLUtils.getobs` and `Base.length`/`MLUtils.numobs` interfaces.
+    - Previously exported `MLDataPattern.datasubset` has been replaced by `MLUtils.ObsView`
+    - Documentation has been updated appropriately
+    
+
+## v0.4.3 (2022/05/14)
 
 ### Added 
 
@@ -17,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - the old APIs for registries have been removed and functionality for accessing them (`finddatasets`, `loaddataset`) has been deprecated. See the updated docs for how to find functionality using the new feature registries.
 
 
-## v0.4.2
+## v0.4.2 (2022/04/30)
 
 ### Added
 

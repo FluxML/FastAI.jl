@@ -9,7 +9,7 @@
 Transform data container `data` of samples into a data container
 of encoded samples.
 Maps `encodesample(task, context, sample)` over the observations in
-`data`. Also handles in-place `getobs!` through `encode!`.
+`data`. Also handles in-place `MLUtils.getobs!` through `encodesample!`.
 """
 struct TaskDataset{TData, TTask<:LearningTask, TContext<:Context}
     data::TData
@@ -17,13 +17,13 @@ struct TaskDataset{TData, TTask<:LearningTask, TContext<:Context}
     context::TContext
 end
 
-LearnBase.nobs(ds::TaskDataset) = nobs(ds.data)
+Base.length(ds::TaskDataset) = numobs(ds.data)
 
-function LearnBase.getobs(ds::TaskDataset, idx)
+function Base.getindex(ds::TaskDataset, idx)
     return encodesample(ds.task, ds.context, getobs(ds.data, idx))
 end
 
-function LearnBase.getobs!(buf, ds::TaskDataset, idx)
+function MLUtils.getobs!(buf, ds::TaskDataset, idx)
     return encodesample!(buf, ds.task, ds.context, getobs(ds.data, idx))
 end
 
@@ -87,11 +87,13 @@ function taskdataloaders(
         batchsize = 16;
         shuffle = true,
         validbsfactor = 2,
+        parallel = true,
+        collate = true,
         kwargs...)
-    traindata = shuffle ? shuffleobs(traindata) : traindata
     return (
-        DataLoader(taskdataset(traindata, task, Training()), batchsize; kwargs...),
-        DataLoader(taskdataset(validdata, task, Validation()), validbsfactor * batchsize; kwargs...),
+        DataLoader(taskdataset(traindata, task, Training()); batchsize, shuffle, collate, parallel, kwargs...),
+        DataLoader(taskdataset(validdata, task, Validation());
+                   batchsize = validbsfactor * batchsize, collate, parallel, kwargs...),
     )
 end
 
@@ -101,8 +103,7 @@ function taskdataloaders(
         task::LearningTask,
         batchsize = 16;
         pctgval = 0.2,
-        shuffle = true,
         kwargs...)
     traindata, validdata = splitobs(shuffleobs(data), at = 1-pctgval)
-    taskdataloaders(traindata, validdata, task, batchsize; shuffle = false, kwargs...)
+    taskdataloaders(traindata, validdata, task, batchsize; kwargs...)
 end

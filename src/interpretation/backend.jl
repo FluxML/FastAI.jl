@@ -92,7 +92,7 @@ Show a vector of observations `obss` of the same `block` type.
 
 ```julia
 data, blocks = loaddataset("imagenette2-160")
-samples = [getobs(data, i) for i in range(1:4)]
+samples = [data[i] for i in range(1:4)]
 showblocks(blocks, samples)
 ```
 

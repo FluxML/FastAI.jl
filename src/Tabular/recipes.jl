@@ -11,7 +11,7 @@ Base.@kwdef struct TableDatasetRecipe <: Datasets.DatasetRecipe
     file = ""
     catcols = nothing
     contcols = nothing
-    loadfn = loadfile
+    loadfn = Datasets.loadfile
 end
 
 Datasets.recipeblocks(::Type{TableDatasetRecipe}) = TableRow

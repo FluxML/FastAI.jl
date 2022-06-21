@@ -22,8 +22,8 @@ function loadfolderdata(
         splitfn = nothing,
         filterfn = nothing,
         loadfn = nothing)
-    data = FileDataset(dir, pattern)
-    if filterfn !== nothing
+    data = MLDatasets.FileDataset(identity, dir, pattern)
+    if filterfn !== nothing && !isempty(data)
         data = filterobs(filterfn, data)
     end
     if splitfn !== nothing
@@ -39,6 +39,8 @@ function loadfolderdata(
     return data
 end
 
+pathparent(p::String) = splitdir(p)[1]
+pathname(p::String) = splitdir(p)[2]
 parentname(f) = f |> pathparent |> pathname
 grandparentname(f) = f |> pathparent |> pathparent |> pathname
 matches(re::Regex) = f -> matches(re, f)

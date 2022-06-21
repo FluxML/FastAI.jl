@@ -6,12 +6,13 @@ Crayons.COLORS[:nothing] = 67
 ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 
 using FastAI, Flux, FluxTraining
-import DataAugmentation
+import DataAugmentation, MLUtils
 m = FastAI
 ms = [
     DataAugmentation,
     Flux,
     FluxTraining,
+    MLUtils,
     m,
 ]
 
