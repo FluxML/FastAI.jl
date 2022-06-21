@@ -48,7 +48,7 @@ jobs:
             ${{ runner.os }}-
       - name: Dev FastAI
         run: |
-          julia --color=yes --project=./FastVision -e 'using Pkg; println(pwd()); Pkg.develop("./FastAI")'
+          julia --color=yes --project=./FastVision -e 'using Pkg; println(pwd()); Pkg.develop(path="./FastAI")'
       - uses: julia-actions/julia-buildpkg@latest
         with:
           project: './FastVision/'
