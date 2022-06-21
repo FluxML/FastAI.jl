@@ -1,5 +1,4 @@
 
-
 """
     OneHotTensor{N, T}(classes) <: Block
 
@@ -16,15 +15,15 @@ end
 
 const OneHotLabel{T} = OneHotTensor{0, T}
 
-Base.summary(io::IO, ::OneHotLabel{T}) where T = print(io, "OneHotLabel{$T}")
+Base.summary(io::IO, ::OneHotLabel{T}) where {T} = print(io, "OneHotLabel{$T}")
 
 function checkblock(block::OneHotTensor{N}, a::AbstractArray{T, M}) where {M, N, T}
     return N + 1 == M && last(size(a)) == length(block.classes)
 end
 
-mockblock(block::OneHotTensor{0}) = encode(
-    OneHot(), Validation(), Label(block.classes), rand(block.classes))
-
+function mockblock(block::OneHotTensor{0})
+    encode(OneHot(), Validation(), Label(block.classes), rand(block.classes))
+end
 
 struct OneHotTensorMulti{N, T} <: Block
     classes::AbstractVector{T}
@@ -34,7 +33,7 @@ function checkblock(block::OneHotTensorMulti{N}, a::AbstractArray{T, M}) where {
     return N + 1 == M && last(size(a)) == length(block.classes)
 end
 
-function mockblock(block::OneHotTensorMulti{0}) where N
+function mockblock(block::OneHotTensorMulti{0}) where {N}
     labelblock = LabelMulti(block.classes)
     return encode(OneHot(), Validation(), labelblock, mockblock(labelblock))
 end
@@ -52,22 +51,20 @@ Encodes
         `Label{U}` -> `OneHotTensor{N, T}`
 ```
 """
-struct OneHot{TT<:Type} <: Encoding
+struct OneHot{TT <: Type} <: Encoding
     T::TT
     threshold::Float32
 end
 
 OneHot() = OneHot(Float32, 0.5f0)
 
-
 # ### `Label` implementation
-encodedblock(::OneHot, block::Label{T}) where T = OneHotTensor{0, T}(block.classes)
+encodedblock(::OneHot, block::Label{T}) where {T} = OneHotTensor{0, T}(block.classes)
 decodedblock(::OneHot, block::OneHotLabel) = Label(block.classes)
 
 function encode(::OneHot, _, block::Label, obs)
     return Flux.onehot(obs, block.classes)
 end
-
 
 function decode(::OneHot, context, block::OneHotLabel, obs)
     return block.classes[argmax(obs)]
@@ -75,7 +72,9 @@ end
 
 # ### `LabelMulti` implementation
 
-encodedblock(::OneHot, block::LabelMulti{T}) where T = OneHotTensorMulti{0, T}(block.classes)
+function encodedblock(::OneHot, block::LabelMulti{T}) where {T}
+    OneHotTensorMulti{0, T}(block.classes)
+end
 decodedblock(::OneHot, block::OneHotTensorMulti{0}) = LabelMulti(block.classes)
 
 function encode(enc::OneHot, _, block::LabelMulti, obs)
@@ -86,7 +85,6 @@ function decode(enc::OneHot, _, block::OneHotTensorMulti{0}, obs)
     return block.classes[softmax(obs) .> enc.threshold]
 end
 
-
 function blocklossfn(outblock::OneHotTensor{0}, yblock::OneHotTensor{0})
     outblock.classes == yblock.classes || error("Classes of $outblock and $yblock differ!")
     return Flux.Losses.logitcrossentropy
@@ -96,7 +94,6 @@ function blocklossfn(outblock::OneHotTensorMulti{0}, yblock::OneHotTensorMulti{0
     outblock.classes == yblock.classes || error("Classes of $outblock and $yblock differ!")
     return Flux.Losses.logitbinarycrossentropy
 end
-
 
 # ## Tests
 

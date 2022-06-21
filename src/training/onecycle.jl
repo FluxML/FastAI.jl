@@ -13,23 +13,18 @@ to `lrmax` and then goes down to `lrmax/div_final` over the remaining duration.
 - `div = 25`: Starting learning rate is `lr_max/div`
 - `div_final = 1e5`: Ending learning rate is `lr_max/div_final`
 """
-function fitonecycle!(
-        learner::Learner, nepochs::Int, maxlr=0.1;
-        phases = (
-            TrainingPhase() => learner.data.training,
-            ValidationPhase() => learner.data.validation
-        ),
-        wd=0.,
-        kwargs...)
-
+function fitonecycle!(learner::Learner, nepochs::Int, maxlr = 0.1;
+                      phases = (TrainingPhase() => learner.data.training,
+                                ValidationPhase() => learner.data.validation),
+                      wd = 0.0,
+                      kwargs...)
     nsteps = length(phases[1][2])
-    scheduler = Scheduler(LearningRate => onecycle(
-        nepochs * nsteps,
-        maxlr;
-        kwargs...))
+    scheduler = Scheduler(LearningRate => onecycle(nepochs * nsteps,
+                                                   maxlr;
+                                                   kwargs...))
 
     wdoptim = wd > 0 ? decay_optim(learner.optimizer, wd) : learner.optimizer
-    withfields(learner, optimizer=wdoptim) do
+    withfields(learner, optimizer = wdoptim) do
         withcallbacks(learner, scheduler) do
             for _ in 1:nepochs
                 for (phase, data) in phases
@@ -39,7 +34,6 @@ function fitonecycle!(
         end
     end
 end
-
 
 """
     decay_optim(optim, wd)
@@ -53,10 +47,9 @@ function decay_optim(optim::Optimiser, wd)
     if isnothing(i)
         return Optimiser(WeightDecay(wd), optim.os...)
     else
-        return Optimiser(WeightDecay(wd), optim.os[1:i - 1]..., optim.os[i + 1:end]...)
+        return Optimiser(WeightDecay(wd), optim.os[1:(i - 1)]..., optim.os[(i + 1):end]...)
     end
 end
-
 
 # ## Tests
 
@@ -65,7 +58,7 @@ end
     @test decay_optim(optim, 0.1) isa Optimiser
     @test decay_optim(Optimiser(ADAM(), ADAM()), 0.1) isa Optimiser
     @test decay_optim(optim, 0.1).os[1] isa WeightDecay
-    o = decay_optim(Optimiser(ADAM(), WeightDecay(.5)), .1)
+    o = decay_optim(Optimiser(ADAM(), WeightDecay(0.5)), 0.1)
     @test o.os[1] isa WeightDecay
     @test o.os[2] isa ADAM
 end

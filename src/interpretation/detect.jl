@@ -9,10 +9,11 @@ default_showbackend() = SHOW_BACKEND[]
 
 const SHOW_BACKEND = Ref{ShowBackend}(ShowText())
 
-
 showblock(block, obs) = showblock(default_showbackend(), block, obs)
 showblocks(block, obss) = showblocks(default_showbackend(), block, obss)
-showblockinterpretable(encodings, block, obs) =
+function showblockinterpretable(encodings, block, obs)
     showblockinterpretable(default_showbackend(), encodings, block, obs)
-showblocksinterpretable(encodings, block, obs) =
+end
+function showblocksinterpretable(encodings, block, obs)
     showblocksinterpretable(default_showbackend(), encodings, block, obs)
+end

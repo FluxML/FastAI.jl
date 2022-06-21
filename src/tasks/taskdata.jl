@@ -11,7 +11,7 @@ of encoded samples.
 Maps `encodesample(task, context, sample)` over the observations in
 `data`. Also handles in-place `MLUtils.getobs!` through `encodesample!`.
 """
-struct TaskDataset{TData, TTask<:LearningTask, TContext<:Context}
+struct TaskDataset{TData, TTask <: LearningTask, TContext <: Context}
     data::TData
     task::TTask
     context::TContext
@@ -27,7 +27,6 @@ function MLUtils.getobs!(buf, ds::TaskDataset, idx)
     return encodesample!(buf, ds.task, ds.context, getobs(ds.data, idx))
 end
 
-
 """
     taskdataset(data, task, context)
 
@@ -36,9 +35,7 @@ Maps `encodesample(task, context, sample)` over the observations in `data`.
 """
 const taskdataset = TaskDataset
 
-
 # ## Data iterator
-
 
 """
     taskdataloaders(data, task[, batchsize])
@@ -80,30 +77,26 @@ Customizing the [`DataLoader`](#)
 traindl, validdl = taskdataloaders(data, task, parallel=false, buffered=false)
 ```
 """
-function taskdataloaders(
-        traindata,
-        validdata,
-        task::LearningTask,
-        batchsize = 16;
-        shuffle = true,
-        validbsfactor = 2,
-        parallel = true,
-        collate = true,
-        kwargs...)
-    return (
-        DataLoader(taskdataset(traindata, task, Training()); batchsize, shuffle, collate, parallel, kwargs...),
-        DataLoader(taskdataset(validdata, task, Validation());
-                   batchsize = validbsfactor * batchsize, collate, parallel, kwargs...),
-    )
+function taskdataloaders(traindata,
+                         validdata,
+                         task::LearningTask,
+                         batchsize = 16;
+                         shuffle = true,
+                         validbsfactor = 2,
+                         parallel = true,
+                         collate = true,
+                         kwargs...)
+    return (DataLoader(taskdataset(traindata, task, Training()); batchsize, shuffle,
+                       collate, parallel, kwargs...),
+            DataLoader(taskdataset(validdata, task, Validation());
+                       batchsize = validbsfactor * batchsize, collate, parallel, kwargs...))
 end
 
-
-function taskdataloaders(
-        data,
-        task::LearningTask,
-        batchsize = 16;
-        pctgval = 0.2,
-        kwargs...)
-    traindata, validdata = splitobs(shuffleobs(data), at = 1-pctgval)
+function taskdataloaders(data,
+                         task::LearningTask,
+                         batchsize = 16;
+                         pctgval = 0.2,
+                         kwargs...)
+    traindata, validdata = splitobs(shuffleobs(data), at = 1 - pctgval)
     taskdataloaders(traindata, validdata, task, batchsize; kwargs...)
 end

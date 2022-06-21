@@ -11,12 +11,11 @@ samples. The blocks `(Image{2}(), BoundingBox{2}()` imply that there is exactly
 one bounding box for every image, which is not the case. Instead you
 would want to use `(Image{2}(), Many(BoundingBox{2}())`.
 """
-struct Many{B<:AbstractBlock} <: WrapperBlock
+struct Many{B <: AbstractBlock} <: WrapperBlock
     block::B
 end
 
-FastAI.checkblock(many::Many, obss) =
-    all(checkblock(wrapped(many), obs) for obs in obss)
+FastAI.checkblock(many::Many, obss) = all(checkblock(wrapped(many), obs) for obs in obss)
 FastAI.mockblock(many::Many) = [mockblock(wrapped(many)) for _ in 1:rand(1:3)]
 
 function FastAI.encode(enc::Encoding, ctx, many::Many, obss)
@@ -30,7 +29,6 @@ function FastAI.decode(enc::Encoding, ctx, many::Many, obss)
         decode(enc, ctx, wrapped(many), obs)
     end
 end
-
 
 # ## Tests
 

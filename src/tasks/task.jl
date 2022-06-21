@@ -31,7 +31,6 @@ higher-level features of the library.
 """
 abstract type LearningTask end
 
-
 # ## Encoding contexts
 
 """
@@ -68,7 +67,6 @@ struct Validation <: Context end
 
 struct Inference <: Context end
 
-
 # ## Encoding interface
 
 function encodesample end
@@ -90,7 +88,6 @@ decodeypred!(buf, task, ctx, ypred) = decodeypred(task, ctx, ypred)
 const decodeŷ! = decodeypred!
 decodey!(args...; kwargs...) = decodeypred!(args...; kwargs...)
 
-
 # ## Training interface
 
 """
@@ -100,7 +97,6 @@ Default loss function to use when training models for `task`.
 """
 function tasklossfn end
 
-
 """
     taskmodel(task, backbone)
 
@@ -108,7 +104,6 @@ Construct a model for `task` from a backbone architecture, for example
 by attaching a task-specific head model.
 """
 function taskmodel end
-
 
 # ## Testing interface
 
@@ -141,8 +136,6 @@ Generate a `model` compatible with `task` for testing.
 function mockmodel end
 
 # ## Batching interface
-
-
 
 """
     shouldbatch(::LearningTask)

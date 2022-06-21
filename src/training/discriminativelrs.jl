@@ -25,15 +25,14 @@ o = Optimiser(dlro, Descent(0.1))
 """
 struct DiscriminativeLRs <: Flux.Optimise.AbstractOptimiser
     pg::ParamGroups
-    factorfn
+    factorfn::Any
 end
 
 function DiscriminativeLRs(pg::ParamGroups, factors::Dict)
     return DiscriminativeLRs(pg, group -> get(factors, group, 1))
 end
 
-
-function apply!(o::DiscriminativeLRs, x, Δ::AbstractArray{T}) where T
+function apply!(o::DiscriminativeLRs, x, Δ::AbstractArray{T}) where {T}
     factor = convert(T, o.factorfn(getgroup(o.pg, x)))
 
     if factor == one(T)
@@ -43,21 +42,17 @@ function apply!(o::DiscriminativeLRs, x, Δ::AbstractArray{T}) where T
     end
 end
 
-
 function FluxTraining.setlearningrate!(optimizer::Optimiser, value)
     FluxTraining.setlearningrate!(optimizer.os[end], value)
 end
-
 
 # ## Tests
 
 @testset "DiscriminativeLRs" begin
     model = Chain(Dense(3, 5), Dense(5, 3))
     pg = FastAI.ParamGroups(FastAI.IndexGrouper([1, 2]), model)
-    o = Optimiser(
-        FastAI.DiscriminativeLRs(pg, Dict(1 => 0., 2 => 1.)),
-        Descent(0.1)
-    )
+    o = Optimiser(FastAI.DiscriminativeLRs(pg, Dict(1 => 0.0, 2 => 1.0)),
+                  Descent(0.1))
     x1 = model[1].weight
     x2 = model[2].weight
     # Weight of layer 1 has zeroed gradient

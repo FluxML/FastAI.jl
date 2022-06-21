@@ -1,5 +1,4 @@
 
-
 """
     ShowMakie([; kwargs...]) <: ShowBackend
 
@@ -25,7 +24,7 @@ an axis cleaned of all decorations. To customize it, implement
 `FastMakie.axiskwargs(block::B)`. See the docstring of [`getaxis`](#) for available options.
 """
 struct ShowMakie <: ShowBackend
-    size::Tuple{Int,Int}
+    size::Tuple{Int, Int}
     kwargs::Any
 end
 ShowMakie(sz = (500, 500); kwargs...) = ShowMakie(sz, kwargs)

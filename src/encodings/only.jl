@@ -5,18 +5,16 @@
 Wrapper `Block` to attach a name to a block. Can be used in conjunction
 with [`Only`](#) to apply encodings to specific blocks only.
 """
-struct Named{Name,B<:AbstractBlock} <: WrapperBlock
+struct Named{Name, B <: AbstractBlock} <: WrapperBlock
     block::B
 end
-Named(name::Symbol, block::B) where {B<:AbstractBlock} = Named{name,B}(block)
+Named(name::Symbol, block::B) where {B <: AbstractBlock} = Named{name, B}(block)
 
-setwrapped(named::Named{name}, block) where name = Named(name, block)
-
+setwrapped(named::Named{name}, block) where {name} = Named(name, block)
 
 # The name is preserved through encodings and decodings, which is the
 # behavior of `propagatewrapper(::W) = PropagateAlways()` so it does
 # not need to be overwritten
-
 
 """
     Only(fn, encoding)
@@ -27,7 +25,7 @@ Wrapper that applies the wrapped `encoding` to a `block` if
 `fn(block) === true`. Instead of a function you can also pass in
 a type of block `BlockType` or the `name` of a `Named` block.
 """
-struct Only{E<:Encoding} <: StatefulEncoding
+struct Only{E <: Encoding} <: StatefulEncoding
     fn::Any
     encoding::E
 end
@@ -40,13 +38,15 @@ function Only(B::Type{<:AbstractBlock}, encoding::Encoding)
     return Only(block -> block isa B, encoding)
 end
 
-
-encodedblock(only::Only, block::Block) =
+function encodedblock(only::Only, block::Block)
     only.fn(block) ? encodedblock(only.encoding, block) : nothing
-encodedblock(only::Only, block::WrapperBlock) =
+end
+function encodedblock(only::Only, block::WrapperBlock)
     only.fn(block) ? encodedblock(only.encoding, block) : nothing
-encodedblock(only::Only, block::Named) =
+end
+function encodedblock(only::Only, block::Named)
     only.fn(block) ? encodedblock(only.encoding, block) : nothing
+end
 
 function decodedblock(only::Only, block::Block)
     inblock = decodedblock(only.encoding, block)
@@ -66,7 +66,6 @@ end
 
 encodestate(only::Only, args...) = encodestate(only.encoding, args...)
 decodestate(only::Only, args...) = decodestate(only.encoding, args...)
-
 
 function encode(only::Only, ctx, block::Block, obs; kwargs...)
     _encode(only, ctx, block, obs; kwargs...)

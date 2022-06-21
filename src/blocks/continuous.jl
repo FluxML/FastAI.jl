@@ -15,7 +15,6 @@ end
 
 mockblock(block::Continuous) = rand(block.size)
 
-
 function blocklossfn(outblock::Continuous, yblock::Continuous)
     outblock.size == yblock.size || error("Sizes of $outblock and $yblock differ!")
     return Flux.Losses.mse

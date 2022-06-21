@@ -4,7 +4,7 @@ using ..FastAI
 using ..FastAI: typify
 
 import MLUtils: MLUtils, getobs, numobs, filterobs, groupobs, mapobs,
-    shuffleobs, groupobs, eachobs, ObsView
+                shuffleobs, groupobs, eachobs, ObsView
 import MLDatasets
 using MLUtils: mapobs, groupobs
 using DataDeps
@@ -25,20 +25,19 @@ function __init__()
 end
 
 export
-    # primitive containers
-    mapobs, eachobs, groupobs, shuffleobs, ObsView,
+# primitive containers
+      mapobs, eachobs, groupobs, shuffleobs, ObsView,
 
-    # utilities
-    matches,
-    loadfile,
-    pathname,
-    pathparent,
-    parentname,
-    grandparentname,
+# utilities
+      matches,
+      loadfile,
+      pathname,
+      pathparent,
+      parentname,
+      grandparentname,
 
-    # datasets
-    loadfolderdata,
-    datasetpath
-
+# datasets
+      loadfolderdata,
+      datasetpath
 
 end  # module

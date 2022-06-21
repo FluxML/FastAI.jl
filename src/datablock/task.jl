@@ -1,5 +1,4 @@
 
-
 """
     abstract type AbstractBlockTask <: LearningTask
 
@@ -135,8 +134,7 @@ end
 mocksample(task::AbstractBlockTask) = mockblock(task, :sample)
 mockblock(task::AbstractBlockTask, name::Symbol) = mockblock(getblocks(task)[name])
 
-mockmodel(task::AbstractBlockTask) =
-    mockmodel(getblocks(task).x, getblocks(task).ŷ)
+mockmodel(task::AbstractBlockTask) = mockmodel(getblocks(task).x, getblocks(task).ŷ)
 
 """
     mockmodel(xblock, ŷblock)
@@ -161,14 +159,15 @@ end
 Create an [`AbstractBlockTask`](#) directly, passing in a named tuple `blocks`
 and `encodings`. See [`SupervisedTask`](#) for supervised training tasks.
 """
-struct BlockTask{B<:NamedTuple,E} <: AbstractBlockTask
+struct BlockTask{B <: NamedTuple, E} <: AbstractBlockTask
     blocks::B
     encodings::E
 end
 
-Base.show(io::IO, task::BlockTask) = print(io,
-    "BlockTask(blocks=", keys(getblocks(task)), ")")
-
+function Base.show(io::IO, task::BlockTask)
+    print(io,
+          "BlockTask(blocks=", keys(getblocks(task)), ")")
+end
 
 # ## Supervised learning task
 
@@ -199,13 +198,12 @@ A `SupervisedTask` also enables some additional functionality:
 - [`encodetarget`](#)
 - [`showprediction`](#), [`showpredictions`](#)
 """
-struct SupervisedTask{B<:NamedTuple,E} <: AbstractBlockTask
+struct SupervisedTask{B <: NamedTuple, E} <: AbstractBlockTask
     blocks::B
     encodings::E
 end
 
-
-function SupervisedTask(blocks::Tuple{Any,Any}, encodings; ŷblock = nothing)
+function SupervisedTask(blocks::Tuple{Any, Any}, encodings; ŷblock = nothing)
     sample = input, target = blocks
     x, y = encodedsample = encodedblockfilled(encodings, sample)
     ŷ = isnothing(ŷblock) ? y : ŷblock
@@ -214,19 +212,17 @@ function SupervisedTask(blocks::Tuple{Any,Any}, encodings; ŷblock = nothing)
     SupervisedTask(blocks, encodings)
 end
 
-
 function Base.show(io::IO, task::SupervisedTask)
-    print(
-        io,
-        "SupervisedTask(",
-        summary(getblocks(task).input),
-        " -> ",
-        summary(getblocks(task).target),
-        ")",
-    )
+    print(io,
+          "SupervisedTask(",
+          summary(getblocks(task).input),
+          " -> ",
+          summary(getblocks(task).target),
+          ")")
 end
-
 
 # ## Deprecations
 
-Base.@deprecate BlockTask(blocks::Tuple{Any, Any}, encodings; kwargs...) SupervisedTask(blocks, encodings; kwargs...)
+Base.@deprecate BlockTask(blocks::Tuple{Any, Any}, encodings; kwargs...) SupervisedTask(blocks,
+                                                                                        encodings;
+                                                                                        kwargs...)

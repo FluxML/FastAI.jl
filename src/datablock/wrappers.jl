@@ -49,8 +49,9 @@ struct PropagateNever <: PropagateWrapper end
 
 propagatewrapper(::WrapperBlock) = PropagateAlways()
 
-encodedblock(enc::Encoding, wrapper::WrapperBlock) =
+function encodedblock(enc::Encoding, wrapper::WrapperBlock)
     encodedblock(enc, wrapper, propagatewrapper(wrapper))
+end
 
 function encodedblock(enc::Encoding, wrapper::WrapperBlock, ::PropagateAlways)
     inner = encodedblock(enc, wrapped(wrapper))
@@ -67,8 +68,9 @@ function encodedblock(enc::Encoding, wrapper::WrapperBlock, ::PropagateSameBlock
     return inner
 end
 
-decodedblock(enc::Encoding, wrapper::WrapperBlock) =
+function decodedblock(enc::Encoding, wrapper::WrapperBlock)
     decodedblock(enc, wrapper, propagatewrapper(wrapper))
+end
 
 function decodedblock(enc::Encoding, wrapper::WrapperBlock, ::PropagateAlways)
     inner = decodedblock(enc, wrapped(wrapper))
@@ -85,7 +87,6 @@ function decodedblock(enc::Encoding, wrapper::WrapperBlock, ::PropagateSameBlock
     return inner
 end
 
-
 # Encoding and decoding, if not overwritten for specific wrapper, are fowarded
 # to wrapped block.
 
@@ -96,7 +97,6 @@ end
 function decode(enc::Encoding, ctx, wrapper::WrapperBlock, obs; kwargs...)
     return decode(enc, ctx, wrapped(wrapper), obs; kwargs...)
 end
-
 
 # ### Training interface
 #

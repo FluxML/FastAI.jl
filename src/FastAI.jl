@@ -1,6 +1,5 @@
 module FastAI
 
-
 using Base: NamedTuple
 using Reexport
 @reexport using FluxTraining
@@ -24,7 +23,6 @@ import UnicodePlots
 using Statistics
 using InlineTest
 
-
 # ## Learning task API (previously DLPipelines.jl)
 include("tasks/task.jl")
 include("tasks/taskdata.jl")
@@ -37,7 +35,6 @@ include("datablock/encoding.jl")
 include("datablock/task.jl")
 include("datablock/describe.jl")
 include("datablock/wrappers.jl")
-
 
 # ## Blocks
 # ### Wrapper blocks
@@ -54,11 +51,9 @@ include("encodings/only.jl")
 # ### Other
 include("encodings/onehot.jl")
 
-
 # Training interface
 include("datablock/models.jl")
 include("datablock/loss.jl")
-
 
 # Interpretation
 include("interpretation/backend.jl")
@@ -68,7 +63,6 @@ include("interpretation/task.jl")
 include("interpretation/showinterpretable.jl")
 include("interpretation/learner.jl")
 include("interpretation/detect.jl")
-
 
 # Training
 include("learner.jl")
@@ -82,91 +76,86 @@ include("training/metrics.jl")
 
 include("serialization.jl")
 
-
-
 # submodules
 include("datasets/Datasets.jl")
 @reexport using .Datasets
 
-
 include("Registries/Registries.jl")
 @reexport using .Registries
 
-
 export
-    # submodules
-    Datasets,
-    Models,
-    datasetpath,
-    getobs,
-    numobs,
-    mapobs, eachobs, groupobs, shuffleobs, splitobs, ObsView,
+# submodules
+      Datasets,
+      Models,
+      datasetpath,
+      getobs,
+      numobs,
+      mapobs, eachobs, groupobs, shuffleobs, splitobs, ObsView,
 
-    # task API
-    taskmodel,
-    taskdataset,
-    taskdataloaders,
-    tasklossfn,
-    encodesample,
-    predict,
-    predictbatch,
-    Training,
-    Validation,
-    Inference,
-    Context,
+# task API
+      taskmodel,
+      taskdataset,
+      taskdataloaders,
+      tasklossfn,
+      encodesample,
+      predict,
+      predictbatch,
+      Training,
+      Validation,
+      Inference,
+      Context,
 
-    # blocks
-    Label,
-    LabelMulti,
-    Many,
-    TableRow,
-    Continuous,
-    Paragraph,
+# blocks
+      Label,
+      LabelMulti,
+      Many,
+      TableRow,
+      Continuous,
+      Paragraph,
 
-    # encodings
-    encode,
-    decode,
-    setup,
-    OneHot,
-    Only,
-    Named,
-    SupervisedTask,
-    BlockTask,
-    describetask,
-    checkblock,
-    makebatch,
-    getbatch,
+# encodings
+      encode,
+      decode,
+      setup,
+      OneHot,
+      Only,
+      Named,
+      SupervisedTask,
+      BlockTask,
+      describetask,
+      checkblock,
+      makebatch,
+      getbatch,
 
-    # interpretation
-    ShowText,
-    ShowMakie,
-    showblock,
-    showblocks,
-    showsample,
-    showsamples,
-    showoutput,
-    showoutputs,
-    showoutputbatch,
-    showencodedsample,
-    showencodedsamples,
-    showbatch,
-    showprediction,
-    showpredictions,
+# interpretation
+      ShowText,
+      ShowMakie,
+      showblock,
+      showblocks,
+      showsample,
+      showsamples,
+      showoutput,
+      showoutputs,
+      showoutputbatch,
+      showencodedsample,
+      showencodedsamples,
+      showbatch,
+      showprediction,
+      showpredictions,
 
-    # learning tasks
-    findlearningtasks,
+# learning tasks
+      findlearningtasks,
 
-    # training
-    tasklearner,
-    Learner,
-    fit!,
-    fitonecycle!,
-    finetune!,
-    lrfind,
-    savetaskmodel,
-    loadtaskmodel,
-    accuracy_thresh, gpu,
-    plot
-
+# training
+      tasklearner,
+      Learner,
+      fit!,
+      fitonecycle!,
+      finetune!,
+      lrfind,
+      savetaskmodel,
+      loadtaskmodel,
+      accuracy_thresh, gpu,
+      plot
 
 end  # module

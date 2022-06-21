@@ -1,5 +1,4 @@
 
-
 """
     finddatasets(name=nothing, blocks=Any)
 
@@ -78,7 +77,6 @@ List the dataset sources registered in `registry` (defaults to
 `FastAI.defaultdataregistry()`).
 """
 listdatasources() = getfield(datasets(), :data).id
-
 
 """
     datasetpath(name)
