@@ -18,11 +18,9 @@ function checkblock(::EncodedTableRow{M, N}, x::Tuple{Vector, Vector}) where {M,
     length(x[1]) == M && length(x[2]) == N
 end
 
-
 function showblock!(io, ::ShowText, block::EncodedTableRow, obs)
     print(io, "EncodedTableRow(...)")
 end
-
 
 # ## Encoding
 
@@ -37,7 +35,7 @@ Encodes a `TableRow` by applying the following preprocessing steps:
 or a sequence of these transformations.
 """
 struct TabularPreprocessing{T} <: Encoding
-	tfms::T
+    tfms::T
 end
 
 TabularPreprocessing(td::TableDataset) = TabularPreprocessing(gettransforms(td))
@@ -48,28 +46,20 @@ end
 
 function encode(tt::TabularPreprocessing, _, block::TableRow, row)
     columns = Tables.columnnames(row)
-    usedrow = NamedTuple(filter(
-            x -> x[1] ∈ block.catcols || x[1] ∈ block.contcols,
-            collect(zip(columns, row))
-        ))
-    tfmrow = DataAugmentation.apply(
-        tt.tfms,
-        DataAugmentation.TabularItem(usedrow, keys(usedrow))
-    ).data
+    usedrow = NamedTuple(filter(x -> x[1] ∈ block.catcols || x[1] ∈ block.contcols,
+                                collect(zip(columns, row))))
+    tfmrow = DataAugmentation.apply(tt.tfms,
+                                    DataAugmentation.TabularItem(usedrow, keys(usedrow))).data
     catvals = collect(map(col -> tfmrow[col], block.catcols))
     contvals = collect(map(col -> tfmrow[col], block.contcols))
     (catvals, contvals)
 end
 
-
 function setup(::Type{TabularPreprocessing}, block::TableRow, data::TableDataset)
     return TabularPreprocessing(gettransforms(data, block.catcols, block.contcols))
 end
 
-
-
 # ## `blockmodel`
-
 
 """
     blockmodel(inblock::TableRow{M, N}, outblock::Union{Continuous, OneHotTensor{0}}, backbone=nothing) where {M, N}
@@ -86,13 +76,10 @@ Create a model for tabular classification. `backbone` should be named tuple
 `(categorical = ..., continuous = ...)`. See [`TabularModel`](#) for more info.
 """
 function blockmodel(inblock::EncodedTableRow, outblock::OneHotTensor{0}, backbone)
-    TabularModel(
-        backbone.categorical,
-        backbone.continuous,
-        Dense(100, length(outblock.classes))
-    )
+    TabularModel(backbone.categorical,
+                 backbone.continuous,
+                 Dense(100, length(outblock.classes)))
 end
-
 
 """
     blockmodel(::EncodedTableRow, ::Continuous[, backbone])
@@ -101,21 +88,18 @@ Create a model for tabular regression. `backbone` should be named tuple
 `(categorical = ..., continuous = ...)`. See [`TabularModel`](#) for more info.
 """
 function blockmodel(inblock::EncodedTableRow, outblock::Continuous, backbone)
-    TabularModel(
-        backbone.categorical,
-        backbone.continuous,
-        Dense(100, outblock.size)
-    )
+    TabularModel(backbone.categorical,
+                 backbone.continuous,
+                 Dense(100, outblock.size))
 end
 
-
 function blockbackbone(inblock::EncodedTableRow{M, N}) where {M, N}
-    embedszs = _get_emb_sz(collect(map(col->length(inblock.categorydict[col]), inblock.catcols)))
+    embedszs = _get_emb_sz(collect(map(col -> length(inblock.categorydict[col]),
+                                       inblock.catcols)))
     catback = tabular_embedding_backbone(embedszs)
     contback = tabular_continuous_backbone(N)
     return (categorical = catback, continuous = contback)
 end
-
 
 # ## Utilities
 
@@ -160,8 +144,9 @@ Returns the categorical and continuous columns present in a `TableDataset`.
 function getcoltypes(td::TableDataset)
     schema = Tables.schema(td.table)
 
-    contcols = Tuple(name for (name, T) in zip(schema.names, schema.types)
-        if T <: Union{<:Number, <:Union{Missing, <:Number}})
+    contcols = Tuple(name
+                     for (name, T) in zip(schema.names, schema.types)
+                     if T <: Union{<:Number, <:Union{Missing, <:Number}})
 
     catcols = Tuple(name for name in schema.names if !(name in contcols))
     catcols, contcols
@@ -184,9 +169,7 @@ function gettransforms(td::TableDataset, catcols, contcols)
     return fm |> normalize |> categorify
 end
 
-
 gettransforms(td::TableDataset) = gettransforms(td, getcoltypes(td)...)
-
 
 # ## Tests
 
@@ -202,27 +185,24 @@ gettransforms(td::TableDataset) = gettransforms(td, getcoltypes(td)...)
     col2_mean, col2_std = 100, 10
     col3_mean, col3_std = 15, 1
 
-    normdict = Dict(
-        :col1 => (col1_mean, col1_std),
-        :col2 => (col2_mean, col2_std),
-        :col3 => (col3_mean, col3_std)
-    )
+    normdict = Dict(:col1 => (col1_mean, col1_std),
+                    :col2 => (col2_mean, col2_std),
+                    :col3 => (col3_mean, col3_std))
 
-    tfm = TabularPreprocessing(
-        DataAugmentation.NormalizeRow(normdict, contcols)
-    )
+    tfm = TabularPreprocessing(DataAugmentation.NormalizeRow(normdict, contcols))
 
-    block = TableRow(
-        catcols,
-        contcols,
-        Dict(:col4=>["a", "b"], :col5=>["x", "y", "z"])
-    )
+    block = TableRow(catcols,
+                     contcols,
+                     Dict(:col4 => ["a", "b"], :col5 => ["x", "y", "z"]))
 
     testencoding(tfm, block, row)
-    testencoding(setup(TabularPreprocessing, block, TableDataset(DataFrame([row, row]))), block, row)
+    testencoding(setup(TabularPreprocessing, block, TableDataset(DataFrame([row, row]))),
+                 block, row)
 end
 
-
-@testset "blockbackbone" begin
-    @test_nowarn FastAI.blockbackbone(EncodedTableRow((:x,), (:y,), Dict(:x => [1, 2])))
-end
+@testset "blockbackbone" begin @test_nowarn FastAI.blockbackbone(EncodedTableRow((:x,),
+                                                                                 (:y,),
+                                                                                 Dict(:x => [
+                                                                                          1,
+                                                                                          2,
+                                                                                      ]))) end

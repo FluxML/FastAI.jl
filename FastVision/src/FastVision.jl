@@ -26,38 +26,38 @@ Encodings:
 module FastVision
 
 using FastAI
-using FastAI:
-    # blocks
-    Block, WrapperBlock, AbstractBlock, OneHotTensor, OneHotTensorMulti, Label,
-    LabelMulti, wrapped, getencodings, getblocks, encodetarget, encodeinput,
-    testencoding,
-    # encodings
-    Encoding, StatefulEncoding, OneHot,
-    # visualization
-    ShowText,
-    # other
-    Context, Training, Validation, Inference,
-    Datasets
+using FastAI: # blocks
+              Block, WrapperBlock, AbstractBlock, OneHotTensor, OneHotTensorMulti, Label,
+              LabelMulti, wrapped, getencodings, getblocks, encodetarget, encodeinput,
+              testencoding,
+# encodings
+              Encoding, StatefulEncoding, OneHot,
+# visualization
+              ShowText,
+# other
+              Context, Training, Validation, Inference,
+              Datasets
 using FastAI.Datasets
 
 # extending
 import FastAI:
-    blockmodel, blockbackbone, blocklossfn, encode, decode, checkblock,
-    encodedblock, decodedblock, showblock!, mockblock, setup, encodestate,
-    decodestate
-
+               blockmodel, blockbackbone, blocklossfn, encode, decode, checkblock,
+               encodedblock, decodedblock, showblock!, mockblock, setup, encodestate,
+               decodestate
 
 import Flux
 import MLUtils: getobs, numobs, mapobs, eachobs
 import Colors: colormaps_sequential, Colorant, Color, Gray, Normed, RGB,
-    alphacolor, deuteranopic, distinguishable_colors
+               alphacolor, deuteranopic, distinguishable_colors
 using ColorVectorSpace
 import FixedPointNumbers: N0f8
 import DataAugmentation
 import DataAugmentation: apply, Identity, ToEltype, ImageToTensor, Normalize,
-    BufferedThreadsafe, ScaleKeepAspect, PinOrigin, RandomCrop, CenterResizeCrop,
-    AdjustBrightness, AdjustContrast, Maybe, FlipX, FlipY, WarpAffine, Rotate, Zoom,
-    ResizePadDivisible, itemdata
+                         BufferedThreadsafe, ScaleKeepAspect, PinOrigin, RandomCrop,
+                         CenterResizeCrop,
+                         AdjustBrightness, AdjustContrast, Maybe, FlipX, FlipY, WarpAffine,
+                         Rotate, Zoom,
+                         ResizePadDivisible, itemdata
 import ImageInTerminal
 import IndirectArrays: IndirectArray
 import MakieCore
@@ -70,7 +70,6 @@ import UnicodePlots
 
 using InlineTest
 using ShowCases
-
 
 # Blocks
 include("blocks/bounded.jl")
@@ -97,7 +96,6 @@ include("makie.jl")
 
 include("tests.jl")
 
-
 function __init__()
     _registerrecipes()
     foreach(values(_tasks)) do t
@@ -108,12 +106,12 @@ function __init__()
 end
 
 export Image, Mask, Keypoints, Bounded,
-    # encodings
-    ImagePreprocessing, KeypointPreprocessing, ProjectiveTransforms,
-    # learning tasks
-    ImageClassificationSingle, ImageClassificationMulti,
-    ImageKeypointRegression, ImageSegmentation,
-    # helpers
-    augs_projection, augs_lighting
+# encodings
+       ImagePreprocessing, KeypointPreprocessing, ProjectiveTransforms,
+# learning tasks
+       ImageClassificationSingle, ImageClassificationMulti,
+       ImageKeypointRegression, ImageSegmentation,
+# helpers
+       augs_projection, augs_lighting
 
 end

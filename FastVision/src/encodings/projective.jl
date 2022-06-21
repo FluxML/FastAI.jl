@@ -43,34 +43,28 @@ are 2D only so `augs_projection` cannot be used for 3D data.
     in a sample
 
 """
-struct ProjectiveTransforms{N,T} <: StatefulEncoding
-    sz::NTuple{N,Int}
+struct ProjectiveTransforms{N, T} <: StatefulEncoding
+    sz::NTuple{N, Int}
     buffered::Bool
     augmentations::Any
     tfms::T
     sharestate::Bool
 end
 
-
-
-function ProjectiveTransforms(
-    sz;
-    augmentations = Identity(),
-    inferencefactor = 8,
-    buffered = true,
-    sharestate = true,
-)
+function ProjectiveTransforms(sz;
+                              augmentations = Identity(),
+                              inferencefactor = 8,
+                              buffered = true,
+                              sharestate = true)
     traintfm = ScaleKeepAspect(sz) |> augmentations |> RandomCrop(sz) |> PinOrigin()
     validtfm = CenterResizeCrop(sz)
     tfms = (;
-        training = buffered ? BufferedThreadsafe(traintfm) : traintfm,
-        validation = buffered ? BufferedThreadsafe(validtfm) : validtfm,
-        inference = ResizePadDivisible(sz, inferencefactor),
-    )
+            training = buffered ? BufferedThreadsafe(traintfm) : traintfm,
+            validation = buffered ? BufferedThreadsafe(validtfm) : validtfm,
+            inference = ResizePadDivisible(sz, inferencefactor))
 
     return ProjectiveTransforms(sz, buffered, augmentations, tfms, sharestate)
 end
-
 
 function encodestate(enc::ProjectiveTransforms{N}, context, blocks, obss) where {N}
     bounds = getsamplebounds(blocks, obss, N)
@@ -87,20 +81,17 @@ function encodedblock(enc::ProjectiveTransforms{N}, block::Block) where {N}
     return isnothing(blockitemtype(block, N)) ? nothing : Bounded(block, enc.sz)
 end
 
-
-function encode(
-    enc::ProjectiveTransforms{N},
-    context,
-    block::Block,
-    obs;
-    state = nothing,
-) where {N}
+function encode(enc::ProjectiveTransforms{N},
+                context,
+                block::Block,
+                obs;
+                state = nothing) where {N}
     ItemType = blockitemtype(block, N)
     isnothing(ItemType) && return obs
     # only init state if block is encoded
-    bounds, randstate =
-        (isnothing(state) || !enc.sharestate) ? encodestate(enc, context, block, obs) :
-        state
+    bounds, randstate = (isnothing(state) || !enc.sharestate) ?
+                        encodestate(enc, context, block, obs) :
+                        state
     # don't encode if bounds have wrong dimensionality
     bounds isa DataAugmentation.Bounds{N} || return obs
 
@@ -111,7 +102,6 @@ function encode(
 end
 
 # ProjectiveTransforms is not invertible, hence no `decode` method!
-
 
 # Conversion of `Block` to `DataAugmentation.Item`
 
@@ -138,10 +128,10 @@ function blockitemtype(block::Mask{N}, n::Int) where {N}
         nothing
     end
 end
-blockitemtype(block::Keypoints{N}, n::Int) where {N} =
+function blockitemtype(block::Keypoints{N}, n::Int) where {N}
     N == n ? DataAugmentation.Keypoints : nothing
+end
 blockitemtype(block::WrapperBlock, n::Int) = blockitemtype(wrapped(block), n)
-
 
 """
     grabbounds(blocks, obss, N)
@@ -156,12 +146,13 @@ function grabbounds(blocks::Tuple, obss::Tuple, N::Int)
     end
 end
 
-grabbounds(block::Image{N}, a, n) where {N} =
+function grabbounds(block::Image{N}, a, n) where {N}
     N == n ? DataAugmentation.Bounds(size(a)) : nothing
-grabbounds(block::Mask{N}, a, n) where {N} =
+end
+function grabbounds(block::Mask{N}, a, n) where {N}
     N == n ? DataAugmentation.Bounds(size(a)) : nothing
+end
 grabbounds(block::WrapperBlock, a, n) = grabbounds(wrapped(block), a, n)
-
 
 function getsamplebounds(blocks, obss, N::Int)
     bounds = grabbounds(blocks, obss, N)
@@ -189,12 +180,11 @@ and keypoint data. Similar to fastai's
 - `max_warp = 0.05`: Intensity of corner warp. Set to `0.` to disable. See [`WarpAffine`](#).
 """
 function augs_projection(;
-    flipx = true,
-    flipy = false,
-    max_zoom = 1.5,
-    max_rotate = 10.0,
-    max_warp = 0.05,
-)
+                         flipx = true,
+                         flipy = false,
+                         max_zoom = 1.5,
+                         max_rotate = 10.0,
+                         max_warp = 0.05)
     tfms = []
 
     flipx && push!(tfms, Maybe(FlipX()))
@@ -205,20 +195,15 @@ function augs_projection(;
     return DataAugmentation.compose(tfms...)
 end
 
-
-
 # Pretty-printing
 
 function Base.show(io::IO, p::ProjectiveTransforms)
     show(io, ShowTypeOf(p))
-    fields = (
-        sz = ShowLimit(p.sz, limit = 80),
-        buffered = ShowLimit(p.buffered, limit = 80),
-        augmentations = ShowLimit(p.augmentations, limit = 80),
-    )
+    fields = (sz = ShowLimit(p.sz, limit = 80),
+              buffered = ShowLimit(p.buffered, limit = 80),
+              augmentations = ShowLimit(p.augmentations, limit = 80))
     show(io, ShowProps(fields, new_lines = true))
 end
-
 
 # ## Tests
 
@@ -267,7 +252,6 @@ end
         @test_nowarn encode(encoding, Inference(), blocks, (image, ks))
     end
 
-
     @testset "custom tests" begin
         enc = ProjectiveTransforms((32, 32), buffered = false)
         block = Image{2}()
@@ -286,12 +270,9 @@ end
 
         @testset "3D" begin
 
-            testencoding(
-                ProjectiveTransforms((16, 16, 16)),
-                Image{3}(),
-                rand(RGB{N0f8}, 32, 24, 24),
-            )
-        end
+        testencoding(ProjectiveTransforms((16, 16, 16)),
+                     Image{3}(),
+                     rand(RGB{N0f8}, 32, 24, 24)) end
     end
 
     #= depends on buffered interface

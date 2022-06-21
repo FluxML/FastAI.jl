@@ -1,9 +1,10 @@
 
 struct TableDataset{T}
     table::T #Should implement Tables.jl interface
-    TableDataset{T}(table::T) where {T} =
+    function TableDataset{T}(table::T) where {T}
         Tables.istable(table) ? new{T}(table) :
         error("Object doesn't implement Tables.jl interface")
+    end
 end
 
 TableDataset(table::T) where {T} = TableDataset{T}(table)
@@ -15,12 +16,10 @@ function Base.getindex(dataset::TableDataset, idx)
         return row
     elseif Tables.columnaccess(dataset.table)
         colnames = Tables.columnnames(dataset.table)
-        rowvals = [Tables.getcolumn(dataset.table, i)[idx] for i = 1:length(colnames)]
+        rowvals = [Tables.getcolumn(dataset.table, i)[idx] for i in 1:length(colnames)]
         return (; zip(colnames, rowvals)...)
     else
-        error(
-            "The Tables.jl implementation used should have either rowaccess or columnaccess.",
-        )
+        error("The Tables.jl implementation used should have either rowaccess or columnaccess.")
     end
 end
 
@@ -30,9 +29,7 @@ function Base.length(dataset::TableDataset)
     elseif Tables.rowaccess(dataset.table)
         return length(Tables.rows(dataset.table)) # length might not be defined, but has to be for this to work.
     else
-        error(
-            "The Tables.jl implementation used should have either rowaccess or columnaccess.",
-        )
+        error("The Tables.jl implementation used should have either rowaccess or columnaccess.")
     end
 end
 
@@ -41,7 +38,6 @@ Base.length(dataset::TableDataset{<:DataFrame}) = nrow(dataset.table)
 
 Base.getindex(dataset::TableDataset{<:CSV.File}, idx) = dataset.table[idx]
 Base.length(dataset::TableDataset{<:CSV.File}) = length(dataset.table)
-
 
 # ## Tests
 
@@ -71,14 +67,12 @@ Base.length(dataset::TableDataset{<:CSV.File}) = length(dataset.table)
     end
 
     @testset "TableDataset from DataFrames" begin
-        testtable = DataFrame(
-            col1 = [1, 2, 3, 4, 5],
-            col2 = ["a", "b", "c", "d", "e"],
-            col3 = [10, 20, 30, 40, 50],
-            col4 = ["A", "B", "C", "D", "E"],
-            col5 = [100.0, 200.0, 300.0, 400.0, 500.0],
-            split = ["train", "train", "train", "valid", "valid"],
-        )
+        testtable = DataFrame(col1 = [1, 2, 3, 4, 5],
+                              col2 = ["a", "b", "c", "d", "e"],
+                              col3 = [10, 20, 30, 40, 50],
+                              col4 = ["A", "B", "C", "D", "E"],
+                              col5 = [100.0, 200.0, 300.0, 400.0, 500.0],
+                              split = ["train", "train", "train", "valid", "valid"])
         td = TableDataset(testtable)
         @test td isa TableDataset{<:DataFrame}
 

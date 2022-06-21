@@ -21,14 +21,13 @@ end
 
 convert_lowercase(t) = string("xxbos ", lowercase(t))
 
-
 ## Tests
-
 
 @testset "Text Transforms" begin
     str1 = "Hello WORLD CAPITAL Sentence Case"
 
     @test replace_all_caps(str1) == "Hello xxup world xxup capital Sentence Case"
-    @test replace_sentence_case(str1) == "xxmaj hello WORLD CAPITAL xxmaj sentence xxmaj case"
+    @test replace_sentence_case(str1) ==
+          "xxmaj hello WORLD CAPITAL xxmaj sentence xxmaj case"
     @test convert_lowercase(str1) == "xxbos hello world capital sentence case"
 end

@@ -1,17 +1,16 @@
 module FastTabular
 
-
 using FastAI
-using FastAI:
-    # blocks
-    Block, WrapperBlock, AbstractBlock, OneHotTensor, OneHotTensorMulti, Label,
-    LabelMulti, wrapped, Continuous, getencodings, getblocks, encodetarget, encodeinput,
-    # encodings
-    Encoding, StatefulEncoding, OneHot,
-    # visualization
-    ShowText,
-    # other
-    Context, Training, Validation
+using FastAI: # blocks
+              Block, WrapperBlock, AbstractBlock, OneHotTensor, OneHotTensorMulti, Label,
+              LabelMulti, wrapped, Continuous, getencodings, getblocks, encodetarget,
+              encodeinput,
+# encodings
+              Encoding, StatefulEncoding, OneHot,
+# visualization
+              ShowText,
+# other
+              Context, Training, Validation
 import FastAI: Datasets
 using FastAI.Datasets
 
@@ -20,9 +19,9 @@ using FastAI: testencoding
 
 # extending
 import FastAI:
-    Datasets,
-    blockmodel, blockbackbone, blocklossfn, encode, decode, checkblock,
-    encodedblock, decodedblock, showblock!, mockblock, setup
+               Datasets,
+               blockmodel, blockbackbone, blocklossfn, encode, decode, checkblock,
+               encodedblock, decodedblock, showblock!, mockblock, setup
 
 import CSV
 import DataAugmentation
@@ -46,14 +45,12 @@ include("blocks/tablerow.jl")
 # Encodings
 include("encodings/tabularpreprocessing.jl")
 
-
 include("models.jl")
 
 const _tasks = Dict{String, Any}()
 include("tasks/classification.jl")
 include("tasks/regression.jl")
 include("recipes.jl")
-
 
 function __init__()
     _registerrecipes()
@@ -64,6 +61,7 @@ function __init__()
     end
 end
 
-export TableRow, TabularPreprocessing, TabularClassificationSingle, TabularRegression, TableDataset
+export TableRow, TabularPreprocessing, TabularClassificationSingle, TabularRegression,
+       TableDataset
 
 end

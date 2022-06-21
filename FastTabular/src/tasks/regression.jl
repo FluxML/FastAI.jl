@@ -1,14 +1,12 @@
 
-function TabularRegression(
-        blocks::Tuple{<:TableRow, <:Continuous},
-        data)
+function TabularRegression(blocks::Tuple{<:TableRow, <:Continuous},
+                           data)
     tabledata, targetdata = data
-    tabledata isa TableDataset || error("`data` needs to be a tuple of a `TableDataset` and targets")
-    return SupervisedTask(
-        blocks,
-        (setup(TabularPreprocessing, blocks[1], tabledata),),
-        ŷblock=blocks[2],
-    )
+    tabledata isa TableDataset ||
+        error("`data` needs to be a tuple of a `TableDataset` and targets")
+    return SupervisedTask(blocks,
+                          (setup(TabularPreprocessing, blocks[1], tabledata),),
+                          ŷblock = blocks[2])
 end
 
 """
@@ -25,31 +23,25 @@ Construct learning task with `classes` to classify into and a `TableDataset`
 `tabledata`. The column names can be passed in or guessed from the data. The
 regression target is a vector of `n` values.
 """
-function TabularRegression(
-        n::Int,
-        tabledata::TableDataset;
-        catcols = nothing,
-        contcols = nothing)
-    blocks = (
-        setup(TableRow, tabledata; catcols=catcols, contcols=contcols),
-        Continuous(n)
-    )
+function TabularRegression(n::Int,
+                           tabledata::TableDataset;
+                           catcols = nothing,
+                           contcols = nothing)
+    blocks = (setup(TableRow, tabledata; catcols = catcols, contcols = contcols),
+              Continuous(n))
     return TabularRegression(blocks, (tabledata, nothing))
 end
 
-
-_tasks["tabularregression"] = (
-    id = "tabular/regression",
-    name = "Tabular regression",
-    constructor = TabularClassificationSingle,
-    blocks = (TableRow, Continuous),
-    category = "supervised",
-    description = """
-        Task where a number of continuous variables are regressed from a table row
-        with categorical and continuous variables.
-        """,
-    package=@__MODULE__,
-)
+_tasks["tabularregression"] = (id = "tabular/regression",
+                               name = "Tabular regression",
+                               constructor = TabularClassificationSingle,
+                               blocks = (TableRow, Continuous),
+                               category = "supervised",
+                               description = """
+                                   Task where a number of continuous variables are regressed from a table row
+                                   with categorical and continuous variables.
+                                   """,
+                               package = @__MODULE__)
 
 # ## Tests
 
@@ -57,7 +49,7 @@ _tasks["tabularregression"] = (
     df = DataFrame(A = 1:4, B = ["M", "F", "F", "M"], C = 10:13)
     td = TableDataset(df)
     targets = [rand(2) for _ in 1:4]
-    task = TabularRegression(2, td; catcols=(:B,), contcols=(:A,))
+    task = TabularRegression(2, td; catcols = (:B,), contcols = (:A,))
     testencoding(getencodings(task), getblocks(task).sample)
     FastAI.checktask_core(task)
     @test_nowarn tasklossfn(task)

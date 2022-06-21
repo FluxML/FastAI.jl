@@ -5,12 +5,10 @@ function checksize(targetsz::Tuple, sz::Tuple)
     return all(map(_checksizedim, targetsz, sz))
 end
 
-
 _checksizedim(l1::Int, l2::Int) = l1 == l2
 _checksizedim(l1::Colon, l2::Int) = true
 
 mockarray(T, sz) = rand(T, map(l -> l isa Colon ? rand(8:16) : l, sz))
-
 
 @testset "checksize" begin
     @test checksize((10, 1), (10, 1))
@@ -20,7 +18,6 @@ mockarray(T, sz) = rand(T, map(l -> l isa Colon ? rand(8:16) : l, sz))
     @test checksize((10, :, 1), (10, 20, 1))
     @test !checksize((10, :, 2), (10, 20, 1))
 end
-
 
 """
     Bounded(block, size) <: WrapperBlock
@@ -56,19 +53,17 @@ Bounded(Bounded(block, (16, 16)), (8, 8)) == Bounded(block, (8, 8))
 
 
 """
-struct Bounded{N, B<:AbstractBlock} <: WrapperBlock
+struct Bounded{N, B <: AbstractBlock} <: WrapperBlock
     block::B
     size::NTuple{N, DimSize}
 end
-
 
 function Bounded(bounded::Bounded{M}, size::NTuple{N, DimSize}) where {N, M}
     N == M || error("Cannot rewrap a `Bounded` with different dimensionalities $N and $M")
     Bounded(wrapped(bounded), size)
 end
 
-
-function checkblock(bounded::Bounded{N}, a::AbstractArray{N}) where N
+function checkblock(bounded::Bounded{N}, a::AbstractArray{N}) where {N}
     return checksize(bounded.size, size(a)) && checkblock(parent(bounded), a)
 end
 

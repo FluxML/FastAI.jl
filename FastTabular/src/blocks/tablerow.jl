@@ -1,5 +1,4 @@
 
-
 # TableRow
 
 """
@@ -10,28 +9,23 @@ is valid if it satisfies the `AbstractRow` interface in Tables.jl, values
 present in indices for categorical and continuous columns are consistent,
 and `data` is indexable by the elements of `catcols` and `contcols`.
 """
-struct TableRow{M,N,T} <: Block
+struct TableRow{M, N, T} <: Block
     catcols::NTuple{M}
     contcols::NTuple{N}
     categorydict::T
 end
 
 function TableRow(catcols, contcols, categorydict)
-    TableRow{length(catcols),length(contcols)}(catcols, contcols, categorydict)
+    TableRow{length(catcols), length(contcols)}(catcols, contcols, categorydict)
 end
 
 function checkblock(block::TableRow, x)
     columns = Tables.columnnames(x)
-    (
-        all(col -> col ∈ columns, (block.catcols..., block.contcols...)) &&
-        all(
-            col ->
-                haskey(block.categorydict, col) &&
-                    (ismissing(x[col]) || x[col] ∈ block.categorydict[col]),
-            block.catcols,
-        ) &&
-        all(col -> ismissing(x[col]) || x[col] isa Number, block.contcols)
-    )
+    (all(col -> col ∈ columns, (block.catcols..., block.contcols...)) &&
+     all(col -> haskey(block.categorydict, col) &&
+             (ismissing(x[col]) || x[col] ∈ block.categorydict[col]),
+         block.catcols) &&
+     all(col -> ismissing(x[col]) || x[col] isa Number, block.contcols))
 end
 
 function mockblock(block::TableRow)
@@ -54,30 +48,26 @@ function setup(::Type{TableRow}, data; catcols = nothing, contcols = nothing)
     catcols = isnothing(catcols) ? catcols_ : catcols
     contcols = isnothing(contcols) ? contcols_ : contcols
 
-    return TableRow(
-        catcols,
-        contcols,
-        gettransformdict(data, DataAugmentation.Categorify, catcols),
-    )
+    return TableRow(catcols,
+                    contcols,
+                    gettransformdict(data, DataAugmentation.Categorify, catcols))
 end
 
 function Base.show(io::IO, block::TableRow)
     print(io, ShowCase(block, (:catcols, :contcols), show_params = false, new_lines = true))
 end
 
-
 # ## Interpretation
 
 function showblock!(io, ::ShowText, block::TableRow, obs)
-    rowdata = vcat(
-        [obs[col] for col in block.catcols],
-        [obs[col] for col in block.contcols],
-    )
+    rowdata = vcat([obs[col] for col in block.catcols],
+                   [obs[col] for col in block.contcols])
     rownames = [block.catcols..., block.contcols...]
     tabledata = hcat(rownames, rowdata)
-    PrettyTables.pretty_table(
-        io, tabledata;
-        alignment=[:r, :l],
-        highlighters=PrettyTables.Highlighter((obs, i, j) -> (j == 2), bold=true),
-        noheader=true, tf=PrettyTables.tf_borderless,)
+    PrettyTables.pretty_table(io, tabledata;
+                              alignment = [:r, :l],
+                              highlighters = PrettyTables.Highlighter((obs, i, j) -> (j ==
+                                                                                      2),
+                                                                      bold = true),
+                              noheader = true, tf = PrettyTables.tf_borderless)
 end

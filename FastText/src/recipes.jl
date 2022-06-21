@@ -3,7 +3,6 @@ Datasets.loadfile(file::String, ::Val{:txt}) = read(file, String)
 const RE_TEXTFILE = r".*\.(txt|csv|json|md|html?|xml|yaml|toml)$"i
 istextfile(f) = matches(RE_TEXTFILE, f)
 
-
 """
     TextFolders(textfile; labelfn = parentname, split = false)
 
@@ -16,50 +15,45 @@ Base.@kwdef struct TextFolders <: Datasets.DatasetRecipe
     filefilterfn = _ -> true
 end
 
-Datasets.recipeblocks(::Type{TextFolders}) = Tuple{Paragraph,Label}
+Datasets.recipeblocks(::Type{TextFolders}) = Tuple{Paragraph, Label}
 
 function Datasets.loadrecipe(recipe::TextFolders, path)
     isdir(path) || error("$path is not a directory")
-    data = loadfolderdata(
-        path,
-        filterfn=f -> istextfile(f) && recipe.filefilterfn(f),
-        loadfn=(loadfile, recipe.labelfn),
-        splitfn=recipe.split ? grandparentname : nothing)
+    data = loadfolderdata(path,
+                          filterfn = f -> istextfile(f) && recipe.filefilterfn(f),
+                          loadfn = (loadfile, recipe.labelfn),
+                          splitfn = recipe.split ? grandparentname : nothing)
 
-    (recipe.split ? length(data) > 0 : numobs(data) > 0) || error("No text files found in $path")
+    (recipe.split ? length(data) > 0 : numobs(data) > 0) ||
+        error("No text files found in $path")
 
     labels = recipe.split ? first(values(data))[2] : data[2]
     blocks = (Paragraph(), Label(unique(eachobs(labels))))
-    length(blocks[2].classes) > 1 || error("Expected multiple different labels, got: $(blocks[2].classes))")
+    length(blocks[2].classes) > 1 ||
+        error("Expected multiple different labels, got: $(blocks[2].classes))")
     return data, blocks
 end
 
 # Registering recipes
 
-const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
-    "imdb" => [TextFolders(
-        filefilterfn=f -> !occursin(r"tmp_clas|tmp_lm|unsup", f)
-    )],
-)
+const RECIPES = Dict{String, Vector{Datasets.DatasetRecipe}}("imdb" => [
+                                                                 TextFolders(filefilterfn = f -> !occursin(r"tmp_clas|tmp_lm|unsup",
+                                                                                                           f)),
+                                                             ])
 
 function _registerrecipes()
     for (name, recipes) in RECIPES, recipe in recipes
         if !haskey(datarecipes(), name)
-            push!(datarecipes(), (
-                id = name,
-                datasetid = name,
-                blocks = Datasets.recipeblocks(recipe),
-                package = @__MODULE__,
-                recipe = recipe,
-            ))
+            push!(datarecipes(),
+                  (id = name,
+                   datasetid = name,
+                   blocks = Datasets.recipeblocks(recipe),
+                   package = @__MODULE__,
+                   recipe = recipe))
         end
     end
 end
 
-
 ## Tests
 
-
-@testset "TextFolders [Recipe]" begin
-    @test length(datarecipes(id="imdb")) >= 1
-end
+@testset "TextFolders [Recipe]" begin @test length(datarecipes(id = "imdb")) >= 1 end
