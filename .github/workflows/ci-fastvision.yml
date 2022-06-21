@@ -47,13 +47,15 @@ jobs:
       - name: Dev FastAI
         run: |
           julia --color=yes --project=./FastVision -e 'using Pkg; pkg"dev ."'
-      - name: Dev test dependenceis
+        shell: bash
+      - name: Dev test dependencies
         run: |
           julia --color=yes --project=./FastVision/test -e 'using Pkg; pkg"dev . ./FastMakie"'
+        shell: bash
       - uses: julia-actions/julia-buildpkg@latest
         with:
           project: './FastVision/'
-      - uses: julia-actions/julia-runtest@latest
-        with:
-          project: './FastVision/'
+      - name: Run tests
+        run: |
+          julia --color=yes --depwarn=yes --project=./FastVision/test -e 'include("FastVision/test/runtests.jl")'
         continue-on-error: ${{ matrix.version == 'nightly' }}

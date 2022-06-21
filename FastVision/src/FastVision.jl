@@ -63,7 +63,6 @@ import IndirectArrays: IndirectArray
 import MakieCore as M
 import MakieCore.Observables: @map
 import ProgressMeter: Progress, next!
-import Requires: @require
 import StaticArrays: SVector
 import Statistics: mean, std
 import UnicodePlots
