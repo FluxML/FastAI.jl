@@ -5,7 +5,7 @@ Return the default [`ShowBackend`](#) to use. If a Makie.jl backend
 is loaded (i.e. `Makie.current_backend[] !== missing`), return [`ShowMakie`](#).
 Else, return [`ShowText`](#).
 """
-default_showbackend() = SHOW_BACKEND
+default_showbackend() = SHOW_BACKEND[]
 
 const SHOW_BACKEND = Ref{ShowBackend}(ShowText())
 
