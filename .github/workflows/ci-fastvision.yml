@@ -46,10 +46,10 @@ jobs:
             ${{ runner.os }}-
       - name: Dev FastAI
         run: |
-          julia --color=yes --project=./FastVision -e 'using Pkg; Pkg.develop(path="./")'
+          julia --color=yes --project=./FastVision -e 'using Pkg; pkg"dev ."'
       - name: Dev test dependenceis
         run: |
-          julia --color=yes --project=./FastVision/test -e 'using Pkg; Pkg.develop(path="./"); Pkg.develop(path="./FastMakie/")'
+          julia --color=yes --project=./FastVision/test -e 'using Pkg; pkg"dev . ./FastMakie"'
       - uses: julia-actions/julia-buildpkg@latest
         with:
           project: './FastVision/'
