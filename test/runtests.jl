@@ -14,9 +14,7 @@ using InlineTest
 using ..FastAI
 import ..FastAI: Block, Encoding, encodedblock, decodedblock, encode, decode,
     testencoding, test_task_show, checkblock
-using ..FastAI.Tabular: EncodedTableRow
 using Flux.Optimise: Optimiser, ADAM, apply!
-import Makie
 
 ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 include("testdata.jl")
@@ -25,7 +23,7 @@ include("testdata.jl")
 include("encodingapi.jl")
 include("training.jl")
 
-include("makie.jl")
+#include("makie.jl")
 
 end
 
