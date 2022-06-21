@@ -1,10 +1,9 @@
-name: CI
+name: CI - FastVision
 on:
   push:
     paths-ignore:
       - 'docs/**'
       - 'FastMakie/**'
-      - 'FastVision/**'
       - 'FastTabular/**'
       - 'FastText/**'
       - '*.md'
@@ -12,7 +11,6 @@ on:
     paths-ignore:
       - 'docs/**'
       - 'FastMakie/**'
-      - 'FastVision/**'
       - 'FastTabular/**'
       - 'FastText/**'
       - '*.md'
@@ -49,5 +47,9 @@ jobs:
             ${{ runner.os }}-test-
             ${{ runner.os }}-
       - uses: julia-actions/julia-buildpkg@latest
+        with:
+          project: 'FastVision/'
       - uses: julia-actions/julia-runtest@latest
+        with:
+          project: 'FastVision/'
         continue-on-error: ${{ matrix.version == 'nightly' }}
