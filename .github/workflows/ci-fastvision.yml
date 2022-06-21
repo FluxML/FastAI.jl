@@ -50,7 +50,7 @@ jobs:
         shell: bash
       - name: Dev test dependencies
         run: |
-          julia --color=yes --project=./FastVision/test -e 'using Pkg; pkg"dev . ./FastMakie"'
+          julia --color=yes --project=./FastVision/test -e 'using Pkg; pkg"dev . ./FastVision ./FastMakie"'
         shell: bash
       - uses: julia-actions/julia-buildpkg@latest
         with:
