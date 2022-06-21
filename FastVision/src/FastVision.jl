@@ -61,6 +61,7 @@ import DataAugmentation: apply, Identity, ToEltype, ImageToTensor, Normalize,
 import ImageInTerminal
 import IndirectArrays: IndirectArray
 import MakieCore
+import MakieCore: @recipe
 import MakieCore.Observables: @map
 import ProgressMeter: Progress, next!
 import StaticArrays: SVector

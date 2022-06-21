@@ -27,7 +27,7 @@ end
 # ## Helpers
 
 
-MakieCore.@recipe(PlotImage, image) do scene
+@recipe(PlotImage, image) do scene
     MakieCore.Attributes(
         alpha = 1,
         interpolate = false,
@@ -42,7 +42,7 @@ function MakieCore.plot!(plot::PlotImage)
 end
 
 
-MakieCore.@recipe(PlotMask, mask, classes) do scene
+@recipe(PlotMask, mask, classes) do scene
     MakieCore.Attributes()
 end
 
