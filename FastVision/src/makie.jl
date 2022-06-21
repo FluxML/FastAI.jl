@@ -13,40 +13,40 @@ end
 function showblock!(ax, ::ShowMakie, block::Keypoints{2}, obs)
     h = maximum(first.(obs))
     ks = [SVector(x, h-y) for (y, x) in obs]
-    M.scatter!(ax, ks)
+    MakieCore.scatter!(ax, ks)
 end
 
 function showblock!(ax, ::ShowMakie, block::Bounded{2, <:Keypoints{2}}, obs)
     h, w = block.size
     ks = [SVector(x, h-y) for (y, x) in obs]
-    M.xlims!(ax, 0, w)
-    M.ylims!(ax, 0, h)
-    M.scatter!(ax, ks)
+    MakieCore.xlims!(ax, 0, w)
+    MakieCore.ylims!(ax, 0, h)
+    MakieCore.scatter!(ax, ks)
 end
 
 # ## Helpers
 
 
-M.@recipe(PlotImage, image) do scene
-    M.Attributes(
+MakieCore.@recipe(PlotImage, image) do scene
+    MakieCore.Attributes(
         alpha = 1,
         interpolate = false,
     )
 end
 
-function M.plot!(plot::PlotImage)
+function MakieCore.plot!(plot::PlotImage)
     im = plot[:image]
     rim = @map alphacolor.(copy(rotr90(&im)), &(plot.attributes[:alpha]))
-    M.image!(plot, rim; plot.attributes...)
+    MakieCore.image!(plot, rim; plot.attributes...)
     return plot
 end
 
 
-M.@recipe(PlotMask, mask, classes) do scene
-    M.Attributes()
+MakieCore.@recipe(PlotMask, mask, classes) do scene
+    MakieCore.Attributes()
 end
 
-function M.plot!(plot::PlotMask; kwargs...)
+function MakieCore.plot!(plot::PlotMask; kwargs...)
     mask = plot[:mask]
     classes = try
         classes = plot[:classes]
