@@ -35,5 +35,5 @@ matches(re::Regex, f) = !isnothing(match(re, f))
 Load a file from disk into the appropriate format.
 """
 loadfile(file::AbstractPath) = loadfile(string(file))
-loadfile(file::String) = loadfile(file, Val(Symbol(split("test.txt", '.')[end])))
+loadfile(file::String) = loadfile(file, Val(Symbol(split(file, '.')[end])))
 loadfile(file::String, ::Val) = FileIO.load(file)

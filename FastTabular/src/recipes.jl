@@ -1,4 +1,4 @@
-Datasets.loadfile(file::String, ::Val{:txt}) = DataFrame(CSV.File(file))
+Datasets.loadfile(file::String, ::Val{:csv}) = DataFrame(CSV.File(file))
 
 """
     TableDatasetRecipe(tablefile; catcols, contcols, kwargs...])
