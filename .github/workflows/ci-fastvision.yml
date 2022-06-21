@@ -59,3 +59,4 @@ jobs:
         run: |
           julia --color=yes --depwarn=yes --project=./FastVision/test -e 'include("FastVision/test/runtests.jl")'
         continue-on-error: ${{ matrix.version == 'nightly' }}
+        shell: bash
