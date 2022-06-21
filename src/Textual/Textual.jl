@@ -21,10 +21,16 @@ using Random
 include("recipes.jl")
 include("blocks/text.jl")
 include("transform.jl")
+include("tasks/classification.jl")
+
 
 function __init__()
     _registerrecipes()
 end
 
-export Paragraph
+export Paragraph,
+# learning tasks
+TextClassficationSingle
+# encodings
+replace_all_caps, replace_sentence_case, convert_lowercase
 end
