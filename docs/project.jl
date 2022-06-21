@@ -1,11 +1,10 @@
 using Pollen
 using Pkg
-using Crayons
 using ImageShow
-Crayons.COLORS[:nothing] = 67
+
 ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 
-using FastAI, Flux, FluxTraining
+using FastAI, FastVision, FastMakie, FastTabular, Flux, FluxTraining
 import DataAugmentation, MLUtils
 m = FastAI
 ms = [
@@ -14,6 +13,9 @@ ms = [
     FluxTraining,
     MLUtils,
     m,
+    FastVision,
+    FastTabular,
+    FastMakie,
 ]
 
 project = Project(
