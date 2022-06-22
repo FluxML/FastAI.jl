@@ -7,7 +7,7 @@ Recipe for loading a time series dataset stored in a .ts file
 Base.@kwdef struct TimeSeriesDatasetRecipe <: Datasets.DatasetRecipe
     train_file
     test_file = nothing
-    loadfn = loadfile
+    loadfn = Datasets.loadfile
 end
 
 Datasets.recipeblocks(::Type{TimeSeriesDatasetRecipe}) = Tuple{TimeSeriesRow, Label} 
@@ -54,10 +54,10 @@ end
 
 # ## Tests
 
-@testset "TimeSeriesDataset [recipe]" begin
-    path = datasetpath("ecg5000")
-    recipe = TimeSeriesDatasetRecipe(train_file="ECG5000_TRAIN.ts", test_file="ECG5000_TEST.ts")
-    data, block = loadrecipe(recipe, path)
-    sample = getobs(data, 1)
-    @test checkblock(block, sample)
-end
+# @testset "TimeSeriesDataset [recipe]" begin
+#     path = datasetpath("ecg5000")
+#     recipe = TimeSeriesDatasetRecipe(train_file="ECG5000_TRAIN.ts", test_file="ECG5000_TEST.ts")
+#     data, block = loadrecipe(recipe, path)
+#     sample = getobs(data, 1)
+#     @test checkblock(block, sample)
+# end

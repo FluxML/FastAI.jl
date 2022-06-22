@@ -12,7 +12,8 @@ using ..FastAI:
     ShowText,
     # other
     Context, Training, Validation
-    
+import ..FastAI: Datasets
+using ..FastAI.Datasets
 # for tests
 using ..FastAI: testencoding
 
@@ -21,6 +22,7 @@ import ..FastAI:
     blockmodel, blockbackbone, blocklossfn, encode, decode, checkblock,
     encodedblock, decodedblock, showblock!, mockblock, setup
 
+import MLUtils: MLUtils, eachobs, getobs, numobs
 import Requires: @require
 
 using FilePathsBase

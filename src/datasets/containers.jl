@@ -287,14 +287,13 @@ struct TimeSeriesDataset{T<:AbstractArray}
     table::T
 end
 
-function LearnBase.getobs(dataset::TimeSeriesDataset, idx)
+function Base.getindex(dataset::TimeSeriesDataset, idx)
     dataset.table[idx,:,:]
 end
 
-function LearnBase.nobs(dataset::TimeSeriesDataset)
-    size(dataset.table)[1]
+function Base.length(dataset::TimeSeriesDataset)
+    size(dataset.table)[1] 
 end
-
 
 # ## Tests
 
