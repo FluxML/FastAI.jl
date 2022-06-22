@@ -4,7 +4,7 @@
 
 ## Introduction
 
-In the [quickstart](../notebooks/quickstart.ipynb) section, you have already come in contact with data containers. The following code was used to load a data container for image classification:
+In the [quickstart](./notebooks/quickstart.ipynb) section, you have already come in contact with data containers. The following code was used to load a data container for image classification:
 
 {cell=main, resultshow=false, outputshow=false show=false}
 ```julia

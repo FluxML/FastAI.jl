@@ -37,7 +37,6 @@ export
       grandparentname,
 
 # datasets
-      loadfolderdata,
-      datasetpath
+      loadfolderdata
 
 end  # module

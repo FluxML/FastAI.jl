@@ -19,9 +19,9 @@ implement
 FastAI.showblock!(ax::Makie.Axis, ::ShowMakie, block::B, obs)
 ```
 
-The axis is created by [`FastMakie.getaxis`](#). The default options will result in
+The axis is created by [`FastMakie.makeaxis`](#). The default options will result in
 an axis cleaned of all decorations. To customize it, implement
-`FastMakie.axiskwargs(block::B)`. See the docstring of [`getaxis`](#) for available options.
+`FastMakie.axiskwargs(block::B)`. See the docstring of [`makeaxis`](#) for available options.
 """
 struct ShowMakie <: ShowBackend
     size::Tuple{Int, Int}

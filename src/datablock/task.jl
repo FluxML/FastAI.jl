@@ -16,7 +16,7 @@ learning task where each sample consists of an input and a target.
 
 {cell=main}
 ```julia
-using FastAI
+using FastAI, FastVision
 task = SupervisedTask(
     (Image{2}(), Label(["cat", "dog"])),
     (ImagePreprocessing(), OneHot(),)

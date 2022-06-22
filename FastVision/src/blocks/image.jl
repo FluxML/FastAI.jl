@@ -32,7 +32,7 @@ You can create a random observation using [`mockblock`](#):
 
 {cell=main}
 ```julia
-using FastAI
+using FastAI, FastVision
 FastAI.mockblock(Image{2}())
 ```
 

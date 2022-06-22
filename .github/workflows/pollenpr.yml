@@ -18,7 +18,7 @@ jobs:
           version: '1.7'
       - name: "Install package and docs dependencies"
         run: |
-          julia --color=yes --project=./docs -e 'using Pkg; Pkg.add([Pkg.PackageSpec(path="."), Pkg.PackageSpec(url="https://github.com/c42f/JuliaSyntax.jl"), Pkg.PackageSpec(url="https://github.com/lorenzoh/ModuleInfo.jl"), Pkg.PackageSpec(url="https://github.com/lorenzoh/Pollen.jl", rev="main")]); Pkg.instantiate();'
+          julia --color=yes --project=./docs -e 'using Pkg; pkg"dev . ./FastVision ./FastMakie ./FastTabular https://github.com/c42f/JuliaSyntax.jl https://github.com/lorenzoh/ModuleInfo.jl https://github.com/lorenzoh/Pollen.jl"; Pkg.instantiate();'
       - name: Build
         run: |
           julia --color=yes --project=./docs ./docs/make.jl ./pollen/dev/

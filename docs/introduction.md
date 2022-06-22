@@ -8,7 +8,7 @@ using FastAI, FastVision
 ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 ```
 
-On the [quickstart page](../notebooks/quickstart.ipynb), we showed how to train models on common tasks in a few lines of code like these:
+On the [quickstart page](./notebooks/quickstart.ipynb), we showed how to train models on common tasks in a few lines of code like these:
 
 ```julia
 using FastAI

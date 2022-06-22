@@ -110,7 +110,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New interfaces
     - `blockbackbone` creates a default backbone for an input block
 - Support for tabular data along with recipes and learning methods:
-    - [Tabular classification tutorial](https://fluxml.ai/FastAI.jl/dev/notebooks/tabularclassification.ipynb.html)
+    - [Tabular classification tutorial](https://fluxml.ai/FastAI.jl/dev/docs/notebooks/tabularclassification.ipynb.html)
     - [`TabularPreprocessing`](https://fluxml.ai/FastAI.jl/dev/REFERENCE/FastAI.TabularPreprocessing.html), [`TableRow`](https://fluxml.ai/FastAI.jl/dev/REFERENCE/FastAI.TableRow.html), [`TableDataset`](https://fluxml.ai/FastAI.jl/dev/REFERENCE/FastAI.Datasets.TableDataset.html), [`TabularClassificiationSingle`](https://fluxml.ai/FastAI.jl/dev/REFERENCE/FastAI.TabularClassificationSingle.html), [`TabularRegression`](https://fluxml.ai/FastAI.jl/dev/REFERENCE/FastAI.TabularRegression.html)
 
 
@@ -120,7 +120,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - [README](https://fluxml.ai/FastAI.jl/dev/README.md.html)
     - [Introduction](https://fluxml.ai/FastAI.jl/dev/docs/introduction.md.html)
     - [Data containers](https://fluxml.ai/FastAI.jl/dev/docs/data_containers.md.html)
-    - Combined how-tos on training [into a single page](https://fluxml.ai/FastAI.jl/dev/notebooks/training.ipynb.html)
+    - Combined how-tos on training [into a single page](https://fluxml.ai/FastAI.jl/dev/docs/notebooks/training.ipynb.html)
 - Breaking changes to [`methodlearner`](https://fluxml.ai/FastAI.jl/dev/REFERENCE/FastAI.methodlearner.html):
     - now accepts `callbacks` as kwarg
     - `validdata` no longer keyword

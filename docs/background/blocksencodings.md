@@ -40,7 +40,7 @@ Where do we draw the line between model and data processing? In general, the enc
     {cell=main}
     ```julia
     using FastAI, FastVision
-    using FastVision: ImageTensor
+    using FastVision: ImageTensor, RGB
     enc = ImagePreprocessing()
     data = rand(RGB, 100, 100)
     @show summary(data)

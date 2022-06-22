@@ -61,7 +61,7 @@ Show all available learning tasks:
 
 {cell}
 ```julia
-using FastAI
+using FastAI, FastVision
 learningtasks()
 ```
 

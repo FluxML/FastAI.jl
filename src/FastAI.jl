@@ -87,7 +87,6 @@ export
 # submodules
       Datasets,
       Models,
-      datasetpath,
       getobs,
       numobs,
       mapobs, eachobs, groupobs, shuffleobs, splitobs, ObsView,
@@ -142,9 +141,6 @@ export
       showbatch,
       showprediction,
       showpredictions,
-
-# learning tasks
-      findlearningtasks,
 
 # training
       tasklearner,
