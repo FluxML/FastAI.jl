@@ -2,10 +2,10 @@
 
 *This tutorial explains the qickstart examples and some core abstractions FastAI.jl is built on.*
 
-{cell=main style="display:none;" result=false}
+{cell=main show=false outputshow=false resultshow=false}
 ```julia
-using FastAI
-import FastAI: Image
+using FastAI, FastVision
+ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 ```
 
 On the [quickstart page](../notebooks/quickstart.ipynb), we showed how to train models on common tasks in a few lines of code like these:
@@ -22,11 +22,6 @@ showoutputs(task, learner)
 Each of the five lines encapsulates one part of the deep learning pipeline to give a high-level API while still allowing customization. Let's have a closer look. 
 
 ## Dataset
-
-{cell=main, result=false, output=false style="display:none;"}
-```julia
-ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
-```
 
 {cell=main, output=false}
 ```julia

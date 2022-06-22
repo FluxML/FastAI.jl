@@ -1,12 +1,11 @@
-name: Documentation - Build
+name: Documentation - PR
 
 on:
-  push:
-    branches: ['master', 'main']
+  - pr
 
 jobs:
   pollen:
-    name: "Pollen - build documentation data"
+    name: "Pollen - test documentation build"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -31,3 +30,4 @@ jobs:
           git add .
           git commit -m "Build documentation data (Pollen.jl)"
           git push
+

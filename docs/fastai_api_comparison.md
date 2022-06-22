@@ -35,8 +35,7 @@ We can create a `BlockTask` (similar to `fastai.DataBlock`) and get information 
 
 {cell=main}
 ```julia
-using FastAI
-import FastAI: Image
+using FastAI, FastVision
 
 task = BlockTask(
     (Image{2}(), Mask{2}(["foreground", "background"])),
