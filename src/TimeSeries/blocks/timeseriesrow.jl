@@ -23,15 +23,20 @@ FastAI.mockblock(TimeSeriesRow{1,10}())
 
 """
 
-struct TimeSeriesRow{M,N} <: Block end
-
-function checkblock(::TimeSeriesRow{M,N}, obs::AbstractArray{T,2}) where {M,N,T<:Number}
-    size(obs) == (M,N)
+struct TimeSeriesRow <: Block 
+    nfeatures::Int
+    obslength::Union{Int, Colon}
 end
 
-mockblock(::TimeSeriesRow{M,N}) where {M,N} = rand(Float64, (M,N))  
+function checkblock(row::TimeSeriesRow, obs::AbstractArray{T,2}) where {T<:Number}
+    size(obs) == (row.nfeatures, row.obslength)
+end
+
+function mockblock(row::TimeSeriesRow)
+    rand(Float64, (row.nfeatures, row.obslength))
+end
 
 function setup(::Type{TimeSeriesRow}, data)
-    N, M = size(getobs(data, 1))
-    return TimeSeriesRow{N,M}()
+    nfeatures, obslength = size(getindex(data, 1))
+    return TimeSeriesRow(nfeatures, obslength)
 end

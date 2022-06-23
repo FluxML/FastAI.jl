@@ -16,7 +16,6 @@ struct TSClassificationDataset
     checksum
     datadepname
     size 
-    subfolder
 end
 
 const ROOT_URL_FastAI = "https://s3.amazonaws.com/fast-ai-"
@@ -37,9 +36,8 @@ function TSClassificationDataset(
         extension="zip",
         description="",
         datadepname="",
-        size="???",
-        subfolder="")
-    return TSClassificationDataset(name, extension, description, checksum, datadepname, size, subfolder)
+        size="???")
+    return TSClassificationDataset(name, extension, description, checksum, datadepname, size)
 end
 
 const DESCRIPTIONS = Dict(
@@ -133,7 +131,7 @@ const DATASETCONFIGS = [
 
 const DATASETS = [d.datadepname for d in DATASETCONFIGS]
 const DATASETS_IMAGECLASSIFICATION = vcat(
-    [d.datadepname for d in DATASETCONFIGS if d.subfolder == "imageclas"],
+    [d.datadepname for d in DATASETCONFIGS if ((typeof(d) == FastAIDataset) &&  d.subfolder == "imageclas")],
     ["mnist_sample", "mnist_tiny", "dogscats"],
 
 )
