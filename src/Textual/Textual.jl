@@ -17,6 +17,17 @@ using ..FastAI.Datasets
 
 using ..FastAI.Datasets
 
+# for tests
+using ..FastAI: testencoding
+
+# extending
+import ..FastAI:
+    blockmodel, blockbackbone, blocklossfn, encode, decode, checkblock,
+    encodedblock, decodedblock, showblock!, mockblock, setup, encodestate,
+    decodestate
+
+
+
 import Requires: @require
 
 using InlineTest
@@ -25,6 +36,9 @@ using Random
 include("recipes.jl")
 include("blocks/text.jl")
 include("transform.jl")
+include("encodings/textpreprocessing.jl")
+
+const _tasks = Dict{String, Any}()
 include("tasks/classification.jl")
 
 
@@ -34,7 +48,7 @@ end
 
 export Paragraph,
 # learning tasks
-TextClassficationSingle
+TextClassficationSingle, TextEncoding
 # encodings
 replace_all_caps, replace_sentence_case, convert_lowercase
 end
