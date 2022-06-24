@@ -287,6 +287,11 @@ struct TimeSeriesDataset{T<:AbstractArray}
     table::T
 end
 
+function TimeSeriesDataset(path::Union{AbstractPath, String})
+    data = loadfile(string(path))
+    TimeSeriesDataset(data[1])
+end
+
 function Base.getindex(dataset::TimeSeriesDataset, idx)
     dataset.table[idx,:,:]
 end
@@ -350,3 +355,14 @@ end
         rm("test.csv")
     end
 end
+
+#! How to include the file.
+# @testset "TimeSeriesDataset" begin
+#     @testset "TimeSeriesDataset from TS" begin
+#         # Size 159 KB
+#         tsd = TimeSeriesDataset("/Users/saksham/Downloads/AtrialFibrillation/AtrialFibrillation_TRAIN.ts") 
+#         @test tsd isa TimeSeriesDataset{}
+#         @test size(getindex(tsd, 10)) == (2, 640)
+#         @test length(tsd) ==15
+#     end
+# end
