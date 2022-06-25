@@ -32,6 +32,7 @@ import Requires: @require
 
 using InlineTest
 using Random
+using TextAnalysis
 
 include("recipes.jl")
 include("blocks/text.jl")

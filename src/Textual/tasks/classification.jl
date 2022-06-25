@@ -2,6 +2,7 @@ function TextClassficationSingle(blocks::Tuple{<:Paragraph, <:Label}, data=nothi
     return SupervisedTask(
         blocks,
         (
+            TextEncoding(),
             OneHot()
         )
     )

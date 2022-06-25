@@ -2,10 +2,25 @@ struct TextEncoding <: Encoding
     tfms
 end
 
+function TextEncoding()
+    base_tfms = [
+        replace_all_caps,
+        replace_sentence_case,
+        convert_lowercase,
+        remove_punctuations,
+        basic_preprocessing,
+        remove_extraspaces,
+    ]
+    return TextEncoding(base_tfms)
+end
+
 function encodedblock(p::TextEncoding, block::Paragraph)
     return block
 end
 
 function encode(p::TextEncoding, context, block::Paragraph, obs)
-    return map(p.tfms, obs)
+    for tfm in values(p.tfms)
+        obs = tfm(obs)
+    end
+    obs
 end

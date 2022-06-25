@@ -21,6 +21,25 @@ end
 
 convert_lowercase(t) = string("xxbos ", lowercase(t))
 
+function remove_punctuations(t)
+    return replace(t, r"[^\w\s]+" => " ")
+end
+
+function basic_preprocessing(t)
+    doc = StringDocument(t)
+    prepare!(doc, strip_stopwords)
+    prepare!(doc, strip_html_tags)
+    prepare!(doc, strip_non_letters)
+    prepare!(doc, strip_numbers)
+    return text(doc)
+
+end
+
+
+function remove_extraspaces(t)
+    return replace(t, r"\s+" => " ")
+end
+
 
 ## Tests
 

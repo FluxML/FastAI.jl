@@ -24,6 +24,7 @@ using StaticArrays
 using Setfield
 using ShowCases
 using Tables
+using TextAnalysis
 import Test
 import UnicodePlots
 using Statistics
