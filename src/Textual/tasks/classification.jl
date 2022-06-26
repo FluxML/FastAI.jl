@@ -1,3 +1,10 @@
+"""
+    ImageClassificationSingle(blocks[, data])
+
+Learning task for single-label text classification. Samples are
+preprocessed by applying various textual transforms and classified into one of `classes`.
+
+"""
 function TextClassficationSingle(blocks::Tuple{<:Paragraph, <:Label}, data=nothing)
     return SupervisedTask(
         blocks,

@@ -1,3 +1,13 @@
+"""
+    TextEncoding() <: Encoding
+
+Encodes `Paragraph`s by applying various textual transforms.
+
+
+Encodes
+- `Paragraph` -> `Paragraph`
+
+"""
 struct TextEncoding <: Encoding
     tfms
 end
