@@ -1,5 +1,5 @@
 """
-    ImageClassificationSingle(blocks[, data])
+    TextClassificationSingle(blocks[, data])
 
 Learning task for single-label text classification. Samples are
 preprocessed by applying various textual transforms and classified into one of `classes`.
