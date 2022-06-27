@@ -109,9 +109,9 @@ end
 # WrapperBlock handling
 
 function showblock!(handle, backend::ShowBackend, block::WrapperBlock, obs)
-    showblock!(handle, backend, wrapped(block), obs)
+    showblock!(handle, backend, parent(block), obs)
 end
 
 function isshowable(backend::ShowBackend, wrapper::WrapperBlock)
-    isshowable(backend, wrapped(wrapper))
+    isshowable(backend, parent(wrapper))
 end

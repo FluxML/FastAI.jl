@@ -123,4 +123,12 @@ typify(T::Type) = T
 typify(t::Tuple) = Tuple{map(typify, t)...}
 typify(block::FastAI.AbstractBlock) = typeof(block)
 
-# Continous
+
+"""
+    blockname(block)
+
+A short name describing a block that can be used in visualizations
+and other diagrams.
+"""
+blockname(block::Block) = string(nameof(typeof(block)))
+blockname(blocks::Tuple) = "(" * join(map(blockname, blocks), ", ") * ")"

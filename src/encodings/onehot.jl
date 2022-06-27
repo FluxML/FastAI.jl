@@ -14,6 +14,7 @@ struct OneHotTensor{N, T} <: Block
 end
 
 const OneHotLabel{T} = OneHotTensor{0, T}
+FastAI.blockname(::OneHotTensor{0}) = "OneHotVector"
 
 Base.summary(io::IO, ::OneHotLabel{T}) where {T} = print(io, "OneHotLabel{$T}")
 

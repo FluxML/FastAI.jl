@@ -60,7 +60,7 @@ end
 
 function Bounded(bounded::Bounded{M}, size::NTuple{N, DimSize}) where {N, M}
     N == M || error("Cannot rewrap a `Bounded` with different dimensionalities $N and $M")
-    Bounded(wrapped(bounded), size)
+    Bounded(parent(bounded), size)
 end
 
 function checkblock(bounded::Bounded{N}, a::AbstractArray{N}) where {N}

@@ -10,10 +10,11 @@ struct Named{Name, B <: AbstractBlock} <: WrapperBlock
 end
 Named(name::Symbol, block::B) where {B <: AbstractBlock} = Named{name, B}(block)
 
+# TODO: needed?
 setwrapped(named::Named{name}, block) where {name} = Named(name, block)
 
 # The name is preserved through encodings and decodings, which is the
-# behavior of `propagatewrapper(::W) = PropagateAlways()` so it does
+# behavior of `PropagateWrapper(::W) = PropagateAlways()` so it does
 # not need to be overwritten
 
 """
@@ -50,16 +51,19 @@ end
 
 function decodedblock(only::Only, block::Block)
     inblock = decodedblock(only.encoding, block)
+    isnothing(inblock) && return nothing
     only.fn(inblock) || return nothing
     return inblock
 end
 function decodedblock(only::Only, block::WrapperBlock)
     inblock = decodedblock(only.encoding, block)
+    isnothing(inblock) && return nothing
     only.fn(inblock) || return nothing
     return inblock
 end
 function decodedblock(only::Only, block::Named)
     inblock = decodedblock(only.encoding, block)
+    isnothing(inblock) && return nothing
     only.fn(inblock) || return nothing
     return inblock
 end

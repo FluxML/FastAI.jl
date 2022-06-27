@@ -66,7 +66,13 @@ function ProjectiveTransforms(sz;
     return ProjectiveTransforms(sz, buffered, augmentations, tfms, sharestate)
 end
 
-function encodestate(enc::ProjectiveTransforms{N}, context, blocks, obss) where {N}
+encodestate(enc::ProjectiveTransforms, context, blocks::Tuple, obss) =
+    _encodestate(enc, context, blocks, obss)
+encodestate(enc::ProjectiveTransforms, context, block::Block, obs) =
+    _encodestate(enc, context, block, obs)
+encodestate(enc::ProjectiveTransforms, context, block::WrapperBlock, obs) =
+    _encodestate(enc, context, block, obs)
+function _encodestate(enc::ProjectiveTransforms{N}, context, blocks, obss) where {N}
     bounds = getsamplebounds(blocks, obss, N)
     tfm = _gettfm(enc.tfms, context)
     randstate = DataAugmentation.getrandstate(tfm)
@@ -131,7 +137,7 @@ end
 function blockitemtype(block::Keypoints{N}, n::Int) where {N}
     N == n ? DataAugmentation.Keypoints : nothing
 end
-blockitemtype(block::WrapperBlock, n::Int) = blockitemtype(wrapped(block), n)
+blockitemtype(block::WrapperBlock, n::Int) = blockitemtype(parent(block), n)
 
 """
     grabbounds(blocks, obss, N)
@@ -152,7 +158,8 @@ end
 function grabbounds(block::Mask{N}, a, n) where {N}
     N == n ? DataAugmentation.Bounds(size(a)) : nothing
 end
-grabbounds(block::WrapperBlock, a, n) = grabbounds(wrapped(block), a, n)
+grabbounds(block::WrapperBlock, a, n) = grabbounds(parent(block), a, n)
+grabbounds(block::Bounded, _, _) = block.size
 
 function getsamplebounds(blocks, obss, N::Int)
     bounds = grabbounds(blocks, obss, N)

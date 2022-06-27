@@ -15,18 +15,18 @@ struct Many{B <: AbstractBlock} <: WrapperBlock
     block::B
 end
 
-FastAI.checkblock(many::Many, obss) = all(checkblock(wrapped(many), obs) for obs in obss)
-FastAI.mockblock(many::Many) = [mockblock(wrapped(many)) for _ in 1:rand(1:3)]
+FastAI.checkblock(many::Many, obss) = all(checkblock(parent(many), obs) for obs in obss)
+FastAI.mockblock(many::Many) = [mockblock(parent(many)) for _ in 1:rand(1:3)]
 
 function FastAI.encode(enc::Encoding, ctx, many::Many, obss)
     return map(obss) do obs
-        encode(enc, ctx, wrapped(many), obs)
+        encode(enc, ctx, parent(many), obs)
     end
 end
 
 function FastAI.decode(enc::Encoding, ctx, many::Many, obss)
     return map(obss) do obs
-        decode(enc, ctx, wrapped(many), obs)
+        decode(enc, ctx, parent(many), obs)
     end
 end
 
