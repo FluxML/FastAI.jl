@@ -20,6 +20,7 @@ function TextEncoding()
         remove_punctuations,
         basic_preprocessing,
         remove_extraspaces,
+        # tokenize
     ]
     return TextEncoding(base_tfms)
 end

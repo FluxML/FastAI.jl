@@ -33,13 +33,14 @@ import Requires: @require
 using InlineTest
 using Random
 using TextAnalysis
+using WordTokenizers: TokenBuffer, isdone, character, spaces, nltk_url1, nltk_url2, nltk_phonenumbers
 
 include("recipes.jl")
 include("blocks/text.jl")
 include("transform.jl")
 include("encodings/textpreprocessing.jl")
 
-const _tasks = Dict{String, Any}()
+const _tasks = Dict{String,Any}()
 include("tasks/classification.jl")
 
 
@@ -48,8 +49,8 @@ function __init__()
 end
 
 export Paragraph,
-# learning tasks
-TextClassficationSingle, TextEncoding
+    # learning tasks
+    TextClassficationSingle, TextEncoding
 # encodings
 replace_all_caps, replace_sentence_case, convert_lowercase
 end

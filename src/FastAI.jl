@@ -30,6 +30,10 @@ import UnicodePlots
 using Statistics
 using InlineTest
 
+using WordTokenizers: TokenBuffer, isdone, character, spaces, nltk_url1, nltk_url2, nltk_phonenumbers
+
+
+
 
 # ## Learning task API (previously DLPipelines.jl)
 include("tasks/task.jl")

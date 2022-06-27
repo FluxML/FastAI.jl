@@ -35,19 +35,33 @@ function basic_preprocessing(t)
 
 end
 
-
 function remove_extraspaces(t)
     return replace(t, r"\s+" => " ")
 end
 
+function tokenize(t)
+    urls(ts) = nltk_url1(ts) || nltk_url2(ts)
+
+    ts = TokenBuffer(t)
+    while !isdone(ts)
+        spaces(ts) && continue
+        urls(ts) ||
+            nltk_phonenumbers(ts) ||
+            character(ts)
+    end
+    return ts.tokens
+end
 
 ## Tests
 
 
 @testset "Text Transforms" begin
-    str1 = "Hello WORLD CAPITAL Sentence Case"
+    str1 = "Hello WORLD CAPITAL Sentence    Case."
 
-    @test replace_all_caps(str1) == "Hello xxup world xxup capital Sentence Case"
-    @test replace_sentence_case(str1) == "xxmaj hello WORLD CAPITAL xxmaj sentence xxmaj case"
-    @test convert_lowercase(str1) == "xxbos hello world capital sentence case"
+    @test replace_all_caps(str1) == "Hello xxup world xxup capital Sentence    Case."
+    @test replace_sentence_case(str1) == "xxmaj hello WORLD CAPITAL xxmaj sentence    xxmaj case."
+    @test convert_lowercase(str1) == "xxbos hello world capital sentence    case."
+    @test remove_punctuations(str1) == "Hello WORLD CAPITAL Sentence    Case "
+    @test remove_extraspaces(str1) == "Hello WORLD CAPITAL Sentence Case."
+    @test tokenize(str1) == ["Hello", "WORLD", "CAPITAL", "Sentence", "Case."]
 end
