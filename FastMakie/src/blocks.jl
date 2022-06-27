@@ -13,7 +13,8 @@ function showblock!(ax,
                     ::ShowMakie,
                     block::OneHotTensor{0},
                     obs)
-    # TODO: apply softmax
+    # if raw model output, softmax so they add to 1
+    obs = sum(obs) == 1 ? obs : softmax(obs)
     Makie.barplot!(ax, obs, direction = :x)
     Makie.hidespines!(ax)
 end
@@ -22,13 +23,25 @@ function showblock!(ax,
                     ::ShowMakie,
                     block::OneHotTensorMulti{0},
                     obs)
+    # if raw model output, scale to between 0 and 1
+    ax.subtitle = string(nameof(typeof(block)))
+    l, h = extrema(obs)
+    if l < 0 || h > 1
+        obs = sigmoid.(obs)
+    end
+    Makie.xlims!(ax, (0, 1))
+    obs = sum(obs) == 1 ? obs : softmax(obs)
     Makie.barplot!(ax, obs, direction = :x)
     Makie.hidespines!(ax)
 end
 
-function axiskwargs(block::Union{<:OneHotTensor{0}, <:OneHotTensorMulti{0}})
-    (; yticks = (1:length(block.classes), string.(block.classes)))
-end
+axiskwargs(block::Union{<:OneHotTensor{0}, <:OneHotTensorMulti{0}}) = (;
+        yticks = (1:length(block.classes), string.(block.classes)),
+        clean = false,
+        xlabel = "Confidence",
+        ylabel = "Label",
+        dataaspect=false
+)
 
 @testset "ShowMakie blocks" begin
     backend = ShowMakie()

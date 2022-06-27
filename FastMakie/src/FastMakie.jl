@@ -6,6 +6,7 @@ import FastAI: FastAI, createhandle, showblock!, AbstractBlock, OneHotTensor,
                showblocks!, showblocks
 using InlineTest
 import Makie
+import NNlib: softmax, sigmoid
 
 include("axis.jl")
 include("showmakie.jl")
