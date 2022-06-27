@@ -44,7 +44,7 @@ function showsamples(backend::ShowBackend, task::AbstractBlockTask, samples)
     showblocks(backend, "Sample" => getblocks(task).sample, samples)
 end
 function showsamples(task::AbstractBlockTask, samples)
-    showsamples(default_showbackend(), task, sample)
+    showsamples(default_showbackend(), task, samples)
 end
 
 """
@@ -55,7 +55,7 @@ Show an encoded sample `encsample` to `backend`.
 function showencodedsample(backend::ShowBackend, task::AbstractBlockTask, encsample)
     showblockinterpretable(backend,
                            getencodings(task),
-                           getblocks(task).encodedsample,
+                           "Encoded sample" => getblocks(task).encodedsample,
                            encsample)
 end
 function showencodedsample(task, encsample)
@@ -70,10 +70,9 @@ Show a vector of encoded samples `encsamples` to `backend`.
 function showencodedsamples(backend::ShowBackend,
                             task::AbstractBlockTask,
                             encsamples::AbstractVector)
-    xblock, yblock = encodedblockfilled(getencodings(task), getblocks(task).encodedsample)
     showblocksinterpretable(backend,
                             getencodings(task),
-                            ("x" => xblock, "y" => yblock),
+                            "Encoded samples" => getblocks(task).encodedsample,
                             encsamples)
 end
 

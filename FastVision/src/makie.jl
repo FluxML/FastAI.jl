@@ -15,8 +15,7 @@ end
 function showblock!(ax, ::ShowMakie, block::Bounded{2, <:Keypoints{2}}, obs)
     h, w = block.size
     ks = [SVector(x, h - y) for (y, x) in obs]
-    MakieCore.xlims!(ax, 0, w)
-    MakieCore.ylims!(ax, 0, h)
+    ax.limits[] = ((0, w), (0, h))
     MakieCore.scatter!(ax, ks)
 end
 

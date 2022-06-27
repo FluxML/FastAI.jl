@@ -30,7 +30,14 @@ function makeaxis(f; interactive = false, clean = true, dataaspect = true, kwarg
     return ax
 end
 
-blockaxis(f, block::AbstractBlock) = makeaxis(f; axiskwargs(block)...)
+function blockaxis(f, backend::ShowMakie, block::AbstractBlock)
+    ax = makeaxis(f; axiskwargs(block)...)
+    if get(backend.kwargs, :showblock, true)
+        ax.subtitle = FastAI.blockname(block)
+        ax.subtitlefont = "mono"
+    end
+    return ax
+end
 
 @testset "makeaxis" begin
     @test_nowarn makeaxis(Makie.Figure()[1, 1])
