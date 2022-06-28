@@ -44,7 +44,8 @@ const DESCRIPTIONS = Dict(
     "imagenette" => "A subset of 10 easily classified classes from Imagenet: tench, English springer, cassette player, chain saw, church, French horn, garbage truck, gas pump, golf ball, parachute",
     "imagewoof" => "A subset of 10 harder to classify classes from Imagenet (all dog breeds): Australian terrier, Border terrier, Samoyed, beagle, Shih-Tzu, English foxhound, Rhodesian ridgeback, dingo, golden retriever, Old English sheepdog",
     "food-101" => "101 food categories, with 101,000 images; 250 test images and 750 training images per class. The training images were not cleaned. All images were rescaled to have a maximum side length of 512 pixels.",
-    "ECG5000" => "The original dataset for \"ECG5000\" is a 20-hour long ECG downloaded from Physionet. The name is BIDMC Congestive Heart Failure Database(chfdb) and it is record \"chf07\"."
+    "ECG5000" => "The original dataset for \"ECG5000\" is a 20-hour long ECG downloaded from Physionet. The name is BIDMC Congestive Heart Failure Database(chfdb) and it is record \"chf07\".",
+    "AtrialFibrillation" => "This is a physionet dataset of two-channel ECG recordings has been created from data used in the Computers in Cardiology Challenge 2004, an open competition with the goal of developing automated methods for predicting spontaneous termination of atrial fibrillation (AF).",
 )
 
 const DATASETCONFIGS = [
@@ -127,6 +128,8 @@ const DATASETCONFIGS = [
 
     # timeseries
     TSClassificationDataset("ECG5000", "41f6de20ac895e9ce31753860995518951f1ed42a405d0e51c909d27e3b3c5a4", description = DESCRIPTIONS["ECG5000"] ,datadepname="ecg5000", size="10MB" ),
+    TSClassificationDataset("AtrialFibrillation", "218abad67d58190a6daa1a27f4bd58ace6e18f80fb59fb2c7385f0d2d4b411a2", description = DESCRIPTIONS["AtrialFibrillation"], datadepname = "atrial", size = "226KB"),
+    
 ]
 
 const DATASETS = [d.datadepname for d in DATASETCONFIGS]

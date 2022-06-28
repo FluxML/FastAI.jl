@@ -356,26 +356,13 @@ end
     end
 end
 
-#! How to include the file.
-# @testset "TimeSeriesDataset" begin
-#     @testset "TimeSeriesDataset from TS" begin
-#         # Size 159 KB
-#         tsd = TimeSeriesDataset("/Users/saksham/Downloads/AtrialFibrillation/AtrialFibrillation_TRAIN.ts") 
-#         @test tsd isa TimeSeriesDataset{}
-#         @test size(getindex(tsd, 10)) == (2, 640)
-#         @test length(tsd) ==15
-#     end
-# end
-
-# @testset "TimeSeriesDataset" begin
-#     @testset "TimeSeriesDataset from TS" begin
-#         temp = mktempdir()
-#         downpath = joinpath(temp, "temp.zip")
-#         path = Downloads.download("http://timeseriesclassification.com/Downloads/AtrialFibrillation.zip", downpath)
-#         InfoZIP.unzip(path, temp)
-#         tsd = TimeSeriesDataset(joinpath(temp, "AtrialFibrillation_TRAIN.ts"))
-#         @test tsd isa TimeSeriesDataset{}
-#         @test size(getindex(tsd, 10)) == (2, 640)
-#         @test length(tsd) ==15
-#     end
-# end
+@testset "TimeSeriesDataset" begin
+    @testset "TimeSeriesDataset from TS" begin
+        folderpath = datasetpath("atrial")
+        filepath = joinpath(folderpath, "AtrialFibrillation_TRAIN.ts")
+        tsd = TimeSeriesDataset(filepath)
+        @test tsd isa TimeSeriesDataset{}
+        @test size(getindex(tsd, 10)) == (2, 640)
+        @test length(tsd) == 15
+    end
+end
