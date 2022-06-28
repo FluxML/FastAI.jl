@@ -27,3 +27,11 @@ struct Paragraph <: Block end
 
 FastAI.checkblock(::Paragraph, ::String) = true
 FastAI.mockblock(::Paragraph) = randstring(" ABCEEFGHIJKLMNOPQESRUVWXYZ 1234567890 abcdefghijklmnopqrstynwxyz\n\t.,", rand(10:40))
+
+struct TokenVector <: Block end
+
+FastAI.checkblock(::TokenVector, ::Vector{String}) = true
+
+struct NumberVector <: Block end
+
+FastAI.checkblock(::TokenVector, ::Vector{Inf64}) = true

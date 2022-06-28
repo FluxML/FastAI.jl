@@ -33,6 +33,8 @@ import Requires: @require
 using InlineTest
 using Random
 using TextAnalysis
+using DataStructures
+
 using WordTokenizers: TokenBuffer, isdone, character, spaces, nltk_url1, nltk_url2, nltk_phonenumbers
 
 include("recipes.jl")
@@ -46,11 +48,12 @@ include("tasks/classification.jl")
 
 function __init__()
     _registerrecipes()
+    foreach(values(_tasks)) do t
+        if !haskey(FastAI.learningtasks(), t.id)
+            push!(FastAI.learningtasks(), t)
+        end
+    end
 end
 
-export Paragraph,
-    # learning tasks
-    TextClassficationSingle, TextEncoding
-# encodings
-replace_all_caps, replace_sentence_case, convert_lowercase
+export Paragraph, TokenVector, TextClassficationSingle, Sanitize, Tokenize, replace_all_caps, replace_sentence_case, convert_lowercase
 end
