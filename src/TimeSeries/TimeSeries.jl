@@ -31,12 +31,22 @@ using InlineTest
 # Blocks
 include("blocks/timeseriesrow.jl")
 
+include("encodings/timeseriespreprocessing.jl");
+
+const _tasks = Dict{String, Any}()
+include("tasks/classification.jl")
+
 include("recipes.jl")
 
 function __init__()
     _registerrecipes()
+    foreach(values(_tasks)) do t
+        if !haskey(FastAI.learningtasks(), t.id)
+            push!(FastAI.learningtasks(), t)
+        end
+    end
 end
 
-export TimeSeriesRow
-
+export 
+    TimeSeriesRow, TSClassificationSingle, TimeSeriesPreprocessing
 end
