@@ -10,6 +10,7 @@ function TSClassificationSingle(
     return SupervisedTask(
         blocks,
         (
+            setup(TSPreprocessing, blocks[1], data),
             OneHot()
         )
     )

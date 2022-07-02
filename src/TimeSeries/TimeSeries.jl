@@ -27,6 +27,7 @@ import Requires: @require
 
 using FilePathsBase
 using InlineTest
+using  Statistics
 
 # Blocks
 include("blocks/timeseriesrow.jl")
@@ -48,5 +49,5 @@ function __init__()
 end
 
 export 
-    TimeSeriesRow, TSClassificationSingle, TimeSeriesPreprocessing
+    TimeSeriesRow, TSClassificationSingle, TSPreprocessing
 end
