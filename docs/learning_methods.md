@@ -18,11 +18,11 @@ Before we get started, let's load up a [data container](data_containers.md) that
 
 {cell=main}
 ```julia
-using FastAI, FastAI.DataAugmentation, Colors
-import FastAI: Image
+using FastAI, FastVision, Colors
+import FastVision.DataAugmentation
 data = Datasets.loadfolderdata(
     load(datasets()["imagenette2-160"]),
-    filterfn=isimagefile,
+    filterfn=FastVision.isimagefile,
     loadfn=(loadfile, parentname))
 ```
 
@@ -78,12 +78,12 @@ We implement [`encodeinput`](#) using [DataAugmentation.jl](https://github.com/l
 
 {cell=main}
 ```julia
-using FastAI.Vision: IMAGENET_MEANS, IMAGENET_STDS  # color statistics for normalization
+using FastVision: IMAGENET_MEANS, IMAGENET_STDS  # color statistics for normalization
 
 # Helper for crop based on context
 getresizecrop(context::Training, sz) = DataAugmentation.RandomResizeCrop(sz)
-getresizecrop(context::Validation, sz) = CenterResizeCrop(sz)
-getresizecrop(context::Inference, sz) = ResizePadDivisible(sz, 32)
+getresizecrop(context::Validation, sz) = DataAugmentation.CenterResizeCrop(sz)
+getresizecrop(context::Inference, sz) = DataAugmentation.ResizePadDivisible(sz, 32)
 
 function FastAI.encodeinput(
         task::ImageClassification,
@@ -91,11 +91,11 @@ function FastAI.encodeinput(
         image)
     tfm = DataAugmentation.compose(
         getresizecrop(context, task.size),
-        ToEltype(RGB{Float32}),
-        ImageToTensor(),
-        Normalize(IMAGENET_MEANS, IMAGENET_STDS);
+        DataAugmentation.ToEltype(RGB{Float32}),
+        DataAugmentation.ImageToTensor(),
+        DataAugmentation.Normalize(IMAGENET_MEANS, IMAGENET_STDS);
     )
-    return apply(tfm, DataAugmentation.Image(image)) |> itemdata
+    return DataAugmentation.apply(tfm, DataAugmentation.Image(image)) |> DataAugmentation.itemdata
 end
 ```
 
@@ -169,17 +169,17 @@ Now, with a makeshift model, an optimizer and a loss function we can create a [`
 using FastAI, Flux
 
 model = Chain(
-    Models.xresnet18(),
+    FastVision.Models.xresnet18(),
     Chain(
             AdaptiveMeanPool((1,1)),
             Flux.flatten,
             Dense(512, length(task.classes)),
     )
 )
-opt = ADAM()
+optimizer = ADAM()
 lossfn = Flux.Losses.logitcrossentropy
 
-learner = Learner(model, (traindl, valdl), opt, lossfn)
+learner = Learner(model, lossfn; data = (traindl, valdl), optimizer)
 ```
 
 From here, you're free to start training using  [`fit!`](#) or [`fitonecycle!`](#).

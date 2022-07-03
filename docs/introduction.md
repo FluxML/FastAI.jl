@@ -2,13 +2,13 @@
 
 *This tutorial explains the qickstart examples and some core abstractions FastAI.jl is built on.*
 
-{cell=main style="display:none;" result=false}
+{cell=main show=false outputshow=false resultshow=false}
 ```julia
-using FastAI
-import FastAI: Image
+using FastAI, FastVision
+ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 ```
 
-On the [quickstart page](../notebooks/quickstart.ipynb), we showed how to train models on common tasks in a few lines of code like these:
+On the [quickstart page](./notebooks/quickstart.ipynb), we showed how to train models on common tasks in a few lines of code like these:
 
 ```julia
 using FastAI
@@ -23,17 +23,12 @@ Each of the five lines encapsulates one part of the deep learning pipeline to gi
 
 ## Dataset
 
-{cell=main, result=false, output=false style="display:none;"}
-```julia
-ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
-```
-
 {cell=main, output=false}
 ```julia
 data, blocks = load(datarecipes()["imagenette2-160"])
 ```
 
-This line downloads and loads the [ImageNette](https://github.com/fastai/imagenette) image classification dataset, a small subset of ImageNet with 10 different classes. `data` is a [data container](data_containers.md) that can be used to load individual observations, here of images and the corresponding labels. We can use `getobs(data, i)` to load the `i`-th observation and `nobs` to find out how many observations there are.
+This line downloads and loads the [ImageNette](https://github.com/fastai/imagenette) image classification dataset, a small subset of ImageNet with 10 different classes. `data` is a [data container](data_containers.md) that can be used to load individual observations, here of images and the corresponding labels. We can use `getobs(data, i)` to load the `i`-th observation and `numobs` to find out how many observations there are.
 
 {cell=main }
 ```julia

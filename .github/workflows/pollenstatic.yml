@@ -1,4 +1,4 @@
-name: pollenstatic
+name: Documentation - Deploy
 
 on:
   push:

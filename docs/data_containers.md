@@ -4,19 +4,19 @@
 
 ## Introduction
 
-In the [quickstart](quickstart.md) section, you have already come in contact with data containers. The following code was used to load a data container for image classification:
+In the [quickstart](./notebooks/quickstart.ipynb) section, you have already come in contact with data containers. The following code was used to load a data container for image classification:
 
-{cell=main, result=false, output=false style="display:none;"}
+{cell=main, resultshow=false, outputshow=false show=false}
 ```julia
 ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 ```
 {cell=main, output=false}
 ```julia
-using FastAI
+using FastAI, FastVision
 data, _ = load(findfirst(datarecipes(datasetid="imagenette2-160")))
 ```
 
-A data container is any type that holds observations of data and allows us to load them with `getobs` and query the number of observations with `nobs`. In this case, each observation is a tuple of an image and the corresponding class; after all, we want to use it for image classification. 
+A data container is any type that holds observations of data and allows us to load them with `getobs` and query the number of observations with `numobs`. In this case, each observation is a tuple of an image and the corresponding class; after all, we want to use it for image classification. 
 
 {cell=main}
 ```julia
@@ -27,7 +27,7 @@ image
 
 {cell=main}
 ```julia
-nobs(data)
+numobs(data)
 ```
 
 `load(`[`datasets`](#)`[id])` makes it easy to a load a data container that is compatible with some block types, but to get a better feel for what it does, let's look under the hood by creating the same data container using some mid-level APIs.
@@ -41,11 +41,11 @@ Before we recreate the data container, we'll download the dataset and get the pa
 dir = load(datasets()["imagenette2-160"])
 ```
 
-Now we'll start with [`FileDataset`](#) which creates a data container (here a `Vector`) of files given a path. We'll use the path of the downloaded dataset:
+Now we'll start with `loadfolderdata` which creates a data container (here a `Vector`) of files given a path. We'll use the path of the downloaded dataset:
 
 {cell=main}
 ```julia
-files = FileDataset(dir)
+files = loadfolderdata(dir)
 ```
 
 `files` is a data container where each observation is a path to a file. We'll confirm that using `getobs`:

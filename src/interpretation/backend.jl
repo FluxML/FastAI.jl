@@ -1,5 +1,4 @@
 
-
 """
     abstract type ShowBackend
 
@@ -17,7 +16,6 @@ For a `ShowBackend` `Backend`, you should implement the following methods:
 """
 abstract type ShowBackend end
 
-
 """
     createhandle(backend::ShowBackend)
 
@@ -34,8 +32,6 @@ showblock(backend, block, obs)
 ```
 """
 function createhandle end
-
-
 
 """
     showblock!(handle, backend, block, obs)
@@ -63,9 +59,9 @@ Optionally, you can also implement
 """
 function showblock! end
 
-showblock!(handle, backend, (title, block)::Pair, obs) =
+function showblock!(handle, backend, (title, block)::Pair, obs)
     showblock!(handle, backend, block, obs)
-
+end
 
 """
     showblock([backend], block, obs)
@@ -80,7 +76,6 @@ function showblock(backend::ShowBackend, block, obs)
     handle = createhandle(backend)
     showblock!(handle, backend, block, obs)
 end
-
 
 """
     showblocks([backend], block, obss)
@@ -106,16 +101,17 @@ and `showblocks!` will show multiple rows.
 """
 function showblocks! end
 
-
 Base.@doc (Base.@doc showblocks!)
-showblocks(backend::ShowBackend, block, obss) =
+function showblocks(backend::ShowBackend, block, obss)
     showblocks!(createhandle(backend), backend, block, obss)
-
+end
 
 # WrapperBlock handling
 
-showblock!(handle, backend::ShowBackend, block::WrapperBlock, obs) =
-    showblock!(handle, backend, wrapped(block), obs)
+function showblock!(handle, backend::ShowBackend, block::WrapperBlock, obs)
+    showblock!(handle, backend, parent(block), obs)
+end
 
-isshowable(backend::ShowBackend, wrapper::WrapperBlock) =
-    isshowable(backend, wrapped(wrapper))
+function isshowable(backend::ShowBackend, wrapper::WrapperBlock)
+    isshowable(backend, parent(wrapper))
+end

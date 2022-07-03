@@ -1,6 +1,6 @@
 
 struct ConstGrouper <: FastAI.ParamGrouper
-    g
+    g::Any
 end
 FastAI.group(cg::ConstGrouper, m) = Dict(cg.g => m)
 

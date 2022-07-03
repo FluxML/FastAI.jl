@@ -19,9 +19,7 @@ function makeavailable end
 function isavailable end
 function loaddata end
 
-
 # ## Loader for `DataDep`s
-
 
 """
     struct DataDepLoader(datadep) <: DatasetLoader
@@ -40,8 +38,9 @@ struct DataDepLoader <: DatasetLoader
     end
 end
 
-
-isavailable(loader::DataDepLoader) = !isnothing(DataDeps.try_determine_load_path(loader.datadep, @__FILE__))
+function isavailable(loader::DataDepLoader)
+    !isnothing(DataDeps.try_determine_load_path(loader.datadep, @__FILE__))
+end
 
 function makeavailable(loader::DataDepLoader)
     return DataDeps.resolve(loader.datadep, @__FILE__)

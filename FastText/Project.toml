@@ -1,0 +1,16 @@
+name = "FastText"
+uuid = "725e3cb1-7ae6-4f0e-8fd9-a205a02b40e9"
+authors = ["Lorenz Ohly", "FluxML Community"]
+version = "0.1.0"
+
+[deps]
+FastAI = "5d0beca9-ade8-49ae-ad0b-a3cf890e669f"
+InlineTest = "bd334432-b1e7-49c7-a2dc-dd9149e4ebd6"
+MLUtils = "f1d291b0-491e-4a28-83b9-f70985020b54"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+
+[compat]
+FastAI = "0.5"
+InlineTest = "0.2"
+MLUtils = "0.2"
+julia = "1"

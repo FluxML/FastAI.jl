@@ -1,5 +1,4 @@
 
-
 """
     Label(classes) <: Block
     setup(LabelMulti, data)
@@ -35,8 +34,6 @@ checkblock(label::Label{T}, obs::T) where {T} = obs ∈ label.classes
 mockblock(label::Label{T}) where {T} = rand(label.classes)::T
 
 setup(::Type{Label}, data) = Label(unique(eachobs(data)))
-
-Base.summary(io::IO, ::Label{T}) where {T} = print(io, "Label{", T, "}")
 
 
 function invariant_checkblock(block::Label; blockvar = "block", obsvar = "obs")

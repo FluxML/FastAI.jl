@@ -10,8 +10,7 @@ To find a dataset with compatible samples, we can pass the types of these blocks
 
 {cell=main}
 ```julia
-using FastAI
-import FastAI: Image
+using FastAI, FastVision
 datarecipes(blocks=(Image, Mask))
 ```
 

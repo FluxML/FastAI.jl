@@ -16,33 +16,30 @@ Behaves like the fastai implementation
 
 Any additional keyword arguments are passed to [`fitonecycle!`](#).
 """
-function finetune!(
-        learner,
-        nepochs,
-        base_lr=0.002;
-        freezeepochs=1,
-        grouper=defaultgrouper(learner.model),
-        backbone_factor=0.1,
-        div=5,
-        kwargs...)
+function finetune!(learner,
+                   nepochs,
+                   base_lr = 0.002;
+                   freezeepochs = 1,
+                   grouper = defaultgrouper(learner.model),
+                   backbone_factor = 0.1,
+                   div = 5,
+                   kwargs...)
 
     # Freeze backbone and train head
     foptim = frozen_optimizer(learner.optimizer, grouper, learner.model)
-    withfields(learner, optimizer=foptim) do
-        fitonecycle!(learner, freezeepochs, base_lr, pct_start=0.99; kwargs...)
+    withfields(learner, optimizer = foptim) do
+        fitonecycle!(learner, freezeepochs, base_lr, pct_start = 0.99; kwargs...)
     end
 
     # Use discriminative learning rates on backbone and train some more
     doptim = discrlr_optimizer(learner.optimizer, grouper, learner.model, backbone_factor)
-    withfields(learner, optimizer=doptim) do
-        fitonecycle!(
-            learner, nepochs, base_lr / 2;
-            div=div, kwargs...)
+    withfields(learner, optimizer = doptim) do
+        fitonecycle!(learner, nepochs, base_lr / 2;
+                     div = div, kwargs...)
     end
 
     return learner
 end
-
 
 """
     frozen_optimizer(optim, grouper, model)
@@ -50,8 +47,7 @@ end
 Create an optimizer that only updates parameters which [`ParamGrouper`](#)
 puts into group `2`.
 """
-frozen_optimizer(optim, grouper, model) = discrlr_optimizer(optim, grouper, model, 0.)
-
+frozen_optimizer(optim, grouper, model) = discrlr_optimizer(optim, grouper, model, 0.0)
 
 """
     frozen_optimizer(optim, grouper, model, factor)
@@ -61,21 +57,17 @@ puts into group `1` by `factor`.
 """
 function discrlr_optimizer(optim, grouper, model, factor)
     paramgroups = ParamGroups(grouper, model)
-    return Optimiser(
-        DiscriminativeLRs(paramgroups, Dict(1 => factor, 2 => 1.)),
-        optim,
-    )
+    return Optimiser(DiscriminativeLRs(paramgroups, Dict(1 => factor, 2 => 1.0)),
+                     optim)
 end
-
 
 function defaultgrouper(model)
     if !((model isa Chain) && length(model) == 2)
-        error(
-            "Cannot freeze `learner.model` automatically since it is not a `Chain`.
-            Please provide a `ParamGrouper` with the `grouper` keyword argument.
-            The `grouper` should assign groups `1` (backbone) and `2` (head).
-            ")
+        error("Cannot freeze `learner.model` automatically since it is not a `Chain`.
+              Please provide a `ParamGrouper` with the `grouper` keyword argument.
+              The `grouper` should assign groups `1` (backbone) and `2` (head).
+              ")
     else
-        return IndexGrouper([1:length(model) - 1, length(model)])
+        return IndexGrouper([1:(length(model) - 1), length(model)])
     end
 end

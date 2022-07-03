@@ -26,7 +26,6 @@ function setschedules!(learner, phase, schedules::Vararg{Pair})
     return oldscheduler
 end
 
-
 """
     withfields(f, x; kwargs...)
 
@@ -66,7 +65,6 @@ function withfields(f, x; kwargs...)
     end
 end
 
-
 """
     withcallbacks(f, learner, callbacks...)
 
@@ -89,7 +87,6 @@ function withcallbacks(f, learner, callbacks...)
         end
     end
 end
-
 
 """
     makebatch(task, data, [idxs; context]) -> (xs, ys)
