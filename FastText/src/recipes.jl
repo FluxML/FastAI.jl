@@ -36,23 +36,10 @@ end
 
 # Registering recipes
 
-const RECIPES = Dict{String, Vector{Datasets.DatasetRecipe}}("imdb" => [
+const RECIPES = Dict{String, Vector}("imdb" => [
                                                                  TextFolders(filefilterfn = f -> !occursin(r"tmp_clas|tmp_lm|unsup",
                                                                                                            f)),
                                                              ])
-
-function _registerrecipes()
-    for (name, recipes) in RECIPES, recipe in recipes
-        if !haskey(datarecipes(), name)
-            push!(datarecipes(),
-                  (id = name,
-                   datasetid = name,
-                   blocks = Datasets.recipeblocks(recipe),
-                   package = @__MODULE__,
-                   recipe = recipe))
-        end
-    end
-end
 
 ## Tests
 

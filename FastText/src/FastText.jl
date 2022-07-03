@@ -24,7 +24,7 @@ include("blocks/text.jl")
 include("transform.jl")
 
 function __init__()
-    _registerrecipes()
+    FastAI.Registries.registerrecipes(@__MODULE__, RECIPES)
 end
 
 export Paragraph

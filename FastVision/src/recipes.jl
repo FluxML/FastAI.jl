@@ -118,7 +118,7 @@ Datasets.recipeblocks(::Type{ImageTableMultiLabel}) = Tuple{Image{2}, LabelMulti
 
 # ## Registering recipes for fastai datasets
 
-const RECIPES = Dict{String, Vector{Datasets.DatasetRecipe}}([name => [ImageFolders()]
+const RECIPES = Dict{String, Vector}([name => [ImageFolders()]
                                                               for name in ("imagenette",
                                                                            "imagenette-160",
                                                                            "imagenette-320",
@@ -162,19 +162,6 @@ const RECIPES = Dict{String, Vector{Datasets.DatasetRecipe}}([name => [ImageFold
                                                                  ImageFolders(filefilterfn = f -> !occursin("test",
                                                                                                             f)),
                                                              ])
-
-function _registerrecipes()
-    for (name, recipes) in RECIPES, recipe in recipes
-        if !haskey(datarecipes(), name)
-            push!(datarecipes(),
-                  (id = name,
-                   datasetid = name,
-                   blocks = Datasets.recipeblocks(recipe),
-                   package = @__MODULE__,
-                   recipe = recipe))
-        end
-    end
-end
 
 # ## Tests
 

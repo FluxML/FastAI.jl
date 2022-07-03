@@ -53,7 +53,7 @@ include("tasks/regression.jl")
 include("recipes.jl")
 
 function __init__()
-    _registerrecipes()
+    FastAI.Registries.registerrecipes(@__MODULE__, RECIPES)
     foreach(values(_tasks)) do t
         if !haskey(learningtasks(), t.id)
             push!(learningtasks(), t)

@@ -97,7 +97,7 @@ include("makie.jl")
 include("tests.jl")
 
 function __init__()
-    _registerrecipes()
+    FastAI.Registries.registerrecipes(@__MODULE__, RECIPES)
     foreach(values(_tasks)) do t
         if !haskey(FastAI.learningtasks(), t.id)
             push!(FastAI.learningtasks(), t)

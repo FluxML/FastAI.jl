@@ -86,31 +86,18 @@ end
 
 # Registering recipes
 
-const RECIPES = Dict{String, Vector{Datasets.DatasetRecipe}}("adult_sample" => [
+const RECIPES = Dict{String, Vector}("adult_sample" => [
                                                                  TableDatasetRecipe(file = "adult.csv"),
-                                                                 TableClassificationRecipe(TableDatasetRecipe(file = "adult.csv"),
+                                                                 "clf_salary" => TableClassificationRecipe(TableDatasetRecipe(file = "adult.csv"),
                                                                                            :salary),
-                                                                 TableRegressionRecipe(TableDatasetRecipe(file = "adult.csv"),
+                                                                 "reg_age" => TableRegressionRecipe(TableDatasetRecipe(file = "adult.csv"),
                                                                                        :age),
                                                              ],
                                                              "imdb_sample" => [
                                                                  TableDatasetRecipe(file = "texts.csv"),
-                                                                 TableClassificationRecipe(TableDatasetRecipe(file = "texts.csv"),
+                                                                "clf" => TableClassificationRecipe(TableDatasetRecipe(file = "texts.csv"),
                                                                                            :label),
                                                              ])
-
-function _registerrecipes()
-    for (name, recipes) in RECIPES, recipe in recipes
-        if !haskey(datarecipes(), name)
-            push!(datarecipes(),
-                  (id = name,
-                   datasetid = name,
-                   blocks = Datasets.recipeblocks(recipe),
-                   package = @__MODULE__,
-                   recipe = recipe))
-        end
-    end
-end
 
 # ## Tests
 

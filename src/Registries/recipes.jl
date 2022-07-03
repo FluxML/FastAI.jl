@@ -99,3 +99,25 @@ info(datarecipes())
 ```
 """
 datarecipes(; kwargs...) = isempty(kwargs) ? DATARECIPES : filter(DATARECIPES; kwargs...)
+
+
+registerrecipes(m::Module, recipes) = registerrecipes(DATARECIPES, m, recipes)
+
+function registerrecipes(reg::Registry, m::Module, recipes::Dict)
+    for (datasetid, rs) in recipes, recipe in rs
+        recipeid, recipe = if recipe isa Pair
+            joinpath(datasetid, recipe[1]), recipe[2]
+        else
+            datasetid, recipe
+        end
+
+        if !haskey(reg, recipeid)
+            push!(reg,
+                (id = recipeid,
+                datasetid = datasetid,
+                blocks = Datasets.recipeblocks(recipe),
+                package = m,
+                recipe = recipe))
+        end
+    end
+end
