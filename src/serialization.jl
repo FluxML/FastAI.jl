@@ -15,9 +15,8 @@ function savetaskmodel(path, task::LearningTask, model; force = false)
     if !force && isfile(path)
         error("$path already exists. Use `force = true` to overwrite.")
     end
-    jldsave(string(path); model=cpu(model), task=task)
+    jldsave(string(path); model = cpu(model), task = task)
 end
-
 
 """
     loadtaskmodel(path) -> (task, model)

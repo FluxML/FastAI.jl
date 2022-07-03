@@ -1,0 +1,4 @@
+[deps]
+FastAI = "5d0beca9-ade8-49ae-ad0b-a3cf890e669f"
+FastMakie = "ca994201-3d74-4fad-8816-f8bc5449c7c3"
+ReTest = "e0db7c4e-2690-44b9-bad6-7687da720f89"

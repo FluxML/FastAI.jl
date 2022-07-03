@@ -10,5 +10,4 @@ For example for `block = OneHotLabel(classes)` (i.e. an encoded
 """
 function blocklossfn end
 
-
 blocklossfn(predblock) = blocklossfn(predblock, predblock)

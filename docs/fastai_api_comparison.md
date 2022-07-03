@@ -18,7 +18,7 @@ FastAI.jl also has support for tabular data.
 
 ### Deployment
 
-Through FastAI.jl's [`LearningTask`](#) interface, the data processing logic is decoupled from the dataset creation and training and can be easily serialized and loaded to make predictions. See the tutorial on [saving and loading models](../notebooks/serialization.ipynb).
+Through FastAI.jl's [`LearningTask`](#) interface, the data processing logic is decoupled from the dataset creation and training and can be easily serialized and loaded to make predictions. See the tutorial on [saving and loading models](./notebooks/serialization.ipynb).
 
 
 ---
@@ -35,8 +35,7 @@ We can create a `BlockTask` (similar to `fastai.DataBlock`) and get information 
 
 {cell=main}
 ```julia
-using FastAI
-import FastAI: Image
+using FastAI, FastVision
 
 task = BlockTask(
     (Image{2}(), Mask{2}(["foreground", "background"])),
@@ -63,7 +62,7 @@ Together with a [data container](data_container) `data`, we can quickly create a
 learner = tasklearner(task, data)
 ```
 
-High-level training protocols like the [one-cycle learning rate schedule](../notebooks/fitonecycle.ipynb), [fine-tuning](../notebooks/finetune.ipynb) and the [learning rate finder](../notebooks/lrfind.ipynb) are then available to us:
+High-level training protocols like the [one-cycle learning rate schedule](./notebooks/fitonecycle.ipynb), [fine-tuning](./notebooks/finetune.ipynb) and the [learning rate finder](./notebooks/lrfind.ipynb) are then available to us:
 
 ```julia
 fit!(learner, 10)                  # Basic training for 10 epochs

@@ -1,0 +1,57 @@
+name: CI - FastText
+on:
+  push:
+    paths-ignore:
+      - 'docs/**'
+      - 'FastMakie/**'
+      - 'FastTabular/**'
+      - 'FastVision/**'
+      - '*.md'
+jobs:
+  test:
+    name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - '1.6'
+        os:
+          - ubuntu-latest
+          - macOS-latest
+          - windows-latest
+        arch:
+          - x64
+        
+    steps:
+      - uses: actions/checkout@v2
+      - uses: julia-actions/setup-julia@v1
+        with:
+          version: ${{ matrix.version }}
+          arch: ${{ matrix.arch }}
+      - uses: actions/cache@v1
+        env:
+          cache-name: cache-artifacts
+        with:
+          path: ~/.julia/artifacts
+          key: ${{ runner.os }}-test-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-test-${{ env.cache-name }}-
+            ${{ runner.os }}-test-
+            ${{ runner.os }}-
+      - name: Dev FastAI
+        run: |
+          julia --color=yes --project=./FastText -e 'using Pkg; pkg"dev ."'
+        shell: bash
+      - name: Dev test dependencies
+        run: |
+          julia --color=yes --project=./FastText/test -e 'using Pkg; pkg"dev . ./FastText "'
+        shell: bash
+      - uses: julia-actions/julia-buildpkg@latest
+        with:
+          project: './FastText/'
+      - name: Run tests
+        run: |
+          julia --color=yes --depwarn=yes --project=./FastText/test -e 'include("FastText/test/runtests.jl")'
+        continue-on-error: ${{ matrix.version == 'nightly' }}
+        shell: bash

@@ -9,12 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- (BREAKING) Now uses [MLUtils.jl](https://github.com/JuliaML/MLUtils.jl) to create and load datasets and data containers
+- (BREAKING): Now uses [MLUtils.jl](https://github.com/JuliaML/MLUtils.jl) to create and load datasets and data containers
     - Replaces dependencies MLDataPattern.jl, LearnBase.jl, and DataLoaders.jl
     - Data containers must now implement the `Base.getindex`/`MLUtils.getobs` and `Base.length`/`MLUtils.numobs` interfaces.
     - Previously exported `MLDataPattern.datasubset` has been replaced by `MLUtils.ObsView`
     - Documentation has been updated appropriately
-    
+- (BREAKING): `FastAI.Vision` now lives in a separate package `FastVision` that holds all computer vision-related functionality. 
+- (BREAKING): `FastAI.Tabular` now lives in a separate package `FastTabular` that holds all tabular data-related functionality. 
+
+### Removed
+
+- (BREAKING): `FastAI.Models` submodule. `Models` submodule of domain libraries, e.g. `FastVision.Models` should now be used.
 
 ## v0.4.3 (2022/05/14)
 
@@ -105,7 +110,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New interfaces
     - `blockbackbone` creates a default backbone for an input block
 - Support for tabular data along with recipes and learning methods:
-    - [Tabular classification tutorial](https://fluxml.ai/FastAI.jl/dev/notebooks/tabularclassification.ipynb.html)
+    - [Tabular classification tutorial](https://fluxml.ai/FastAI.jl/dev/docs/notebooks/tabularclassification.ipynb.html)
     - [`TabularPreprocessing`](https://fluxml.ai/FastAI.jl/dev/REFERENCE/FastAI.TabularPreprocessing.html), [`TableRow`](https://fluxml.ai/FastAI.jl/dev/REFERENCE/FastAI.TableRow.html), [`TableDataset`](https://fluxml.ai/FastAI.jl/dev/REFERENCE/FastAI.Datasets.TableDataset.html), [`TabularClassificiationSingle`](https://fluxml.ai/FastAI.jl/dev/REFERENCE/FastAI.TabularClassificationSingle.html), [`TabularRegression`](https://fluxml.ai/FastAI.jl/dev/REFERENCE/FastAI.TabularRegression.html)
 
 
@@ -115,7 +120,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - [README](https://fluxml.ai/FastAI.jl/dev/README.md.html)
     - [Introduction](https://fluxml.ai/FastAI.jl/dev/docs/introduction.md.html)
     - [Data containers](https://fluxml.ai/FastAI.jl/dev/docs/data_containers.md.html)
-    - Combined how-tos on training [into a single page](https://fluxml.ai/FastAI.jl/dev/notebooks/training.ipynb.html)
+    - Combined how-tos on training [into a single page](https://fluxml.ai/FastAI.jl/dev/docs/notebooks/training.ipynb.html)
 - Breaking changes to [`methodlearner`](https://fluxml.ai/FastAI.jl/dev/REFERENCE/FastAI.methodlearner.html):
     - now accepts `callbacks` as kwarg
     - `validdata` no longer keyword

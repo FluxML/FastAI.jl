@@ -6,7 +6,6 @@ but instead from [`Block`](#) or [`WrapperBlock`](#).
 """
 abstract type AbstractBlock end
 
-
 """
     abstract type Block
 
@@ -45,7 +44,6 @@ of each function for more info about how to implement it.
 """
 abstract type Block <: AbstractBlock end
 
-
 """
     checkblock(block, obs)
     checkblock(blocks, obss)
@@ -78,7 +76,6 @@ function checkblock(blocks::Tuple, obss::Tuple)
     return all(checkblock(block, obs) for (block, obs) in zip(blocks, obss))
 end
 
-
 """
     mockblock(block)
     mockblock(blocks)
@@ -87,7 +84,6 @@ Randomly generate an instance of `block`. It always holds that
 `checkblock(block, mockblock(block)) === true`.
 """
 mockblock(blocks::Tuple) = map(mockblock, blocks)
-
 
 """
     setup(Block, data)
@@ -111,16 +107,15 @@ are dependent on the dataset. `data` should be the training dataset. Additional
 
 ```julia
 (images, labels), blocks = loaddataset("imagenette2-160", (Image, Label))
-setup(ImagePreprocessing, Image{2}(), images; buffered = false)
+setup(FastVision.ImagePreprocessing, FastVision.Image{2}(), images; buffered = false)
 ```
 
 ```julia
 data, block = loaddataset("adult_sample", TableRow)
-setup(TabularPreprocessing, block, data)
+setup(FastTabular.TabularPreprocessing, block, data)
 ```
 """
 function setup end
-
 
 # ## Utilities
 
@@ -128,5 +123,11 @@ typify(T::Type) = T
 typify(t::Tuple) = Tuple{map(typify, t)...}
 typify(block::FastAI.AbstractBlock) = typeof(block)
 
+"""
+    blockname(block)
 
-# Continous
+A short name describing a block that can be used in visualizations
+and other diagrams.
+"""
+blockname(block::Block) = string(nameof(typeof(block)))
+blockname(blocks::Tuple) = "(" * join(map(blockname, blocks), ", ") * ")"

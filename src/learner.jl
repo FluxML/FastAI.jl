@@ -43,19 +43,17 @@ learner = tasklearner(task, data; callbacks=[
 ])
 ```
 """
-function tasklearner(
-        task::LearningTask,
-        traindata,
-        validdata;
-        backbone=nothing,
-        model=nothing,
-        callbacks=[],
-        pctgval=0.2,
-        batchsize=16,
-        optimizer=ADAM(),
-        lossfn=tasklossfn(task),
-        kwargs...,
-    )
+function tasklearner(task::LearningTask,
+                     traindata,
+                     validdata;
+                     backbone = nothing,
+                     model = nothing,
+                     callbacks = [],
+                     pctgval = 0.2,
+                     batchsize = 16,
+                     optimizer = ADAM(),
+                     lossfn = tasklossfn(task),
+                     kwargs...)
     if isnothing(model)
         model = isnothing(backbone) ? taskmodel(task) : taskmodel(task, backbone)
     end
@@ -63,11 +61,10 @@ function tasklearner(
     return Learner(model, dls, optimizer, lossfn, callbacks...)
 end
 
-function tasklearner(task, data; pctgval=0.2, kwargs...)
-    traindata, validdata = splitobs(data, at=1 - pctgval)
+function tasklearner(task, data; pctgval = 0.2, kwargs...)
+    traindata, validdata = splitobs(data, at = 1 - pctgval)
     return tasklearner(task, traindata, validdata; kwargs...)
 end
-
 
 """
     getbatch(learner[; validation = false, n = nothing])
@@ -90,35 +87,33 @@ end
 @testset "getbatch" begin
     batch = rand(1, 10), rand(1, 10)
     learner = Learner(identity, ([batch], [batch]), nothing, nothing)
-    @test size.(getbatch(learner)) == ((1,10), (1, 10))
-    @test size.(getbatch(learner, n=4)) == ((1,4), (1,4))
+    @test size.(getbatch(learner)) == ((1, 10), (1, 10))
+    @test size.(getbatch(learner, n = 4)) == ((1, 4), (1, 4))
 end
-
 
 @testset "tasklearner" begin
     task = SupervisedTask((Label(1:2), Label(1:2)), (OneHot(),))
     data = (rand(1:2, 1000), rand(1:2, 1000))
-    @test_nowarn learner = tasklearner(task, data, model=identity)
+    @test_nowarn learner = tasklearner(task, data, model = identity)
 
     @testset "batch sizes" begin
-        learner = tasklearner(task, data, model=identity, batchsize=100)
+        learner = tasklearner(task, data, model = identity, batchsize = 100)
         @test length(learner.data.training) == 8
         @test length(learner.data.validation) == 1
 
-        learner = tasklearner(task, data, model=identity, pctgval=0.4, batchsize=100)
+        learner = tasklearner(task, data, model = identity, pctgval = 0.4, batchsize = 100)
         @test length(learner.data.training) == 6
         @test length(learner.data.validation) == 2
 
-        learner = tasklearner(task, data, model=identity, batchsize=100, validbsfactor=1)
+        learner = tasklearner(task, data, model = identity, batchsize = 100,
+                              validbsfactor = 1)
         @test length(learner.data.training) == 8
         @test length(learner.data.validation) == 2
     end
 
     @testset "callbacks" begin
-        learner = tasklearner(
-            task, data, model=identity,
-            callbacks=[ToGPU(), Checkpointer(mktempdir())])
+        learner = tasklearner(task, data, model = identity,
+                              callbacks = [ToGPU(), Checkpointer(mktempdir())])
         @test !isnothing(FluxTraining.getcallback(learner, Checkpointer))
-
     end
 end

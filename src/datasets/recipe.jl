@@ -7,7 +7,7 @@ that each sample is made of.
 
 ## Examples
 
-For example implementations, see [`Vision.ImageFolders`](#).
+For example implementations, see [`FastVision.ImageFolders`](#).
 
 ## Extending
 
@@ -37,7 +37,6 @@ the following must hold:
 """
 abstract type DatasetRecipe end
 
-
 """
     loadrecipe(recipe, path)
 
@@ -45,7 +44,6 @@ Load a recipe from a path. Return a data container `data` and concrete
 `blocks`.
 """
 function loadrecipe end
-
 
 """
     recipeblocks(TRecipe) -> TBlocks
@@ -63,7 +61,6 @@ recipeblocks(ImageFolders) == Tuple{Image{2}, Label}
 ```
 """
 recipeblocks(::R) where {R <: DatasetRecipe} = recipeblocks(R)
-
 
 function testrecipe(recipe::Datasets.DatasetRecipe, path::AbstractPath)
     data, blocks = loadrecipe(recipe, path)

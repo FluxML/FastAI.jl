@@ -6,12 +6,11 @@ Result of the learning rate finder [`lrfind`](#). Use `plot`
 to visualize.
 """
 struct LRFinderResult
-    losses
-    lrs
-    estimators
-    estimates
+    losses::Any
+    lrs::Any
+    estimators::Any
+    estimates::Any
 end
-
 
 """
     lrfind(learner[, dataiter; kwargs...]) -> LRFinderResult
@@ -29,30 +28,26 @@ rate. Return a [`LRFinderResult`](#).
     this factor
 - `estimators = [Steepest(), MinDivByTen()]`: list of [`LREstimator`](#)s
 """
-function lrfind(
-        learner,
-        dataiter = learner.data.training;
-        nsteps = 100,
-        startlr = 1e-7,
-        endlr = 10,
-        divergefactor = 4,
-        estimators = [Steepest(), MinDivByTen()])
+function lrfind(learner,
+                dataiter = learner.data.training;
+                nsteps = 100,
+                startlr = 1e-7,
+                endlr = 10,
+                divergefactor = 4,
+                estimators = [Steepest(), MinDivByTen()])
     losses = Float64[]
     lrs = Float64[]
     bestloss = Inf
     scheduler = FluxTraining.removecallback!(learner, Scheduler)  # remove current `Scheduler` so it does not interfere
     modelcheckpoint = deepcopy(cpu(learner.model))
 
-    withfields(
-        learner,
-        model = modelcheckpoint,
-        params = Flux.params(modelcheckpoint),
-        optimizer = deepcopy(learner.optimizer)
-        ) do
-
+    withfields(learner,
+               model = modelcheckpoint,
+               params = Flux.params(modelcheckpoint),
+               optimizer = deepcopy(learner.optimizer)) do
         FluxTraining.runepoch(learner, TrainingPhase()) do _
             for (i, batch) in zip(1:nsteps, dataiter)
-                lr = startlr * (endlr / startlr) ^ (i / nsteps)
+                lr = startlr * (endlr / startlr)^(i / nsteps)
                 learner.optimizer.eta = lr
 
                 state = step!(learner, TrainingPhase(), batch)
@@ -98,13 +93,13 @@ Estimate the optimal learning rate to be where the gradient of the loss
 is the steepest, i.e. the decrease is largest.
 """
 struct Steepest <: LREstimator
-    beta
+    beta::Any
 end
 Steepest() = Steepest(0.98)
 
 function estimatelr(est::Steepest, losses, lrs)
     slosses = smoothvalues(losses, est.beta)
-    grads = (slosses[2:end] .- slosses[1:end-1]) ./ log.(lrs[2:end] .- lrs[1:end-1])
+    grads = (slosses[2:end] .- slosses[1:(end - 1)]) ./ log.(lrs[2:end] .- lrs[1:(end - 1)])
     i = length(lrs) ÷ 3
     lr = lrs[i:end][argmax(grads[i:end])]
     return lr
@@ -116,7 +111,7 @@ end
 Estimate the optimal learning rate to be value at the minimum loss divided by 10.
 """
 struct MinDivByTen <: LREstimator
-    beta
+    beta::Any
 end
 MinDivByTen() = MinDivByTen(0.98)
 
@@ -126,14 +121,13 @@ function estimatelr(est::MinDivByTen, losses, lrs)
     return lr
 end
 
-
 LRFinderResult(losses, lrs) = LRFinderResult(losses, lrs, [Steepest(), MinDivByTen()])
-LRFinderResult(losses, lrs, estimators) = LRFinderResult(
-    losses,
-    lrs,
-    estimators,
-    [estimatelr(est, losses, lrs) for est in estimators]
-)
+function LRFinderResult(losses, lrs, estimators)
+    LRFinderResult(losses,
+                   lrs,
+                   estimators,
+                   [estimatelr(est, losses, lrs) for est in estimators])
+end
 
 # Printing and plotting
 
@@ -143,34 +137,32 @@ function Base.show(io::IO, result::LRFinderResult)
     names = [typeof(est).name.name for est in result.estimators]
     println(io)
     println(io)
-    pretty_table(
-        io,
-        hcat(names, result.estimates),
-        header=["Estimator", "Suggestion"], tf=tf_borderless,
-        alignment=[:r, :l])
+    pretty_table(io,
+                 hcat(names, result.estimates),
+                 header = ["Estimator", "Suggestion"], tf = tf_borderless,
+                 alignment = [:r, :l])
 end
 
 lrfindtextplot(result::LRFinderResult) = lrfindtextplot!(stdout, result)
 function lrfindtextplot!(io, result::LRFinderResult)
-    p = UnicodePlots.lineplot(
-        result.lrs, result.losses,
-        height=10, xscale=:log10, width=displaysize(io)[2]-15)
+    p = UnicodePlots.lineplot(result.lrs, result.losses,
+                              height = 10, xscale = :log10, width = displaysize(io)[2] - 15)
     UnicodePlots.title!(p, "Learning rate finder result")
 
     for (i, estimate) in enumerate(result.estimates)
-        UnicodePlots.lines!(p, estimate, maximum(result.losses), estimate, minimum(result.losses), :red)
-        UnicodePlots.annotate!(p, estimate, maximum(result.losses), string(round(estimate; sigdigits=4)))
+        UnicodePlots.lines!(p, estimate, maximum(result.losses), estimate,
+                            minimum(result.losses), :red)
+        UnicodePlots.annotate!(p, estimate, maximum(result.losses),
+                               string(round(estimate; sigdigits = 4)))
     end
     show(io, p)
     return p
 end
 
 InlineTest.@testset "LRFinderResult" begin
-    res = LRFinderResult(100.:-1:1, 1:100.)
+    res = LRFinderResult(100.0:-1:1, 1:100.0)
     InlineTest.@test_nowarn show(Base.DevNull(), res)
 end
-
-
 
 # Utilities
 
@@ -184,7 +176,7 @@ function smoothvalues(xs, β)
     val = 0
     for (i, x) in enumerate(xs)
         val = (val * β) + (x * (1 - β))
-        res[i] = val/((1)-β^i)
+        res[i] = val / ((1) - β^i)
     end
     res
 end
