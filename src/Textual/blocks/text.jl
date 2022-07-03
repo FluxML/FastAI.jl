@@ -2,7 +2,7 @@
     Paragraph() <: Block
 
 [`Block`](#) for a text paragraph containing one or more
-sentences (basically, a single observation in the textual dataset). 
+sentences (basically, a single observation in the textual dataset).
 `data` is valid for `Paragraph` if it is of type string.
 
 Example valid Paragraphs:
@@ -28,10 +28,10 @@ struct Paragraph <: Block end
 FastAI.checkblock(::Paragraph, ::String) = true
 FastAI.mockblock(::Paragraph) = randstring(" ABCEEFGHIJKLMNOPQESRUVWXYZ 1234567890 abcdefghijklmnopqrstynwxyz\n\t.,", rand(10:40))
 
-struct TokenVector <: Block end
+struct Tokens <: Block end
 
-FastAI.checkblock(::TokenVector, ::Vector{String}) = true
+FastAI.checkblock(::Tokens, ::Vector{String}) = true
 
 struct NumberVector <: Block end
 
-FastAI.checkblock(::TokenVector, ::Vector{Inf64}) = true
+FastAI.checkblock(::NumberVector, ::Vector{Int64}) = true

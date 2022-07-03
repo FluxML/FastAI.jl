@@ -12,21 +12,10 @@ struct Sanitize <: Encoding
     tfms
 end
 
-function Sanitize()
-    base_tfms = [
-        replace_all_caps,
-        replace_sentence_case,
-        convert_lowercase,
-        remove_punctuations,
-        basic_preprocessing,
-        remove_extraspaces,
-    ]
-    return Sanitize(base_tfms)
-end
+Sanitize() = Sanitize(DEFAULT_SANITIZERS)
 
-function encodedblock(p::Sanitize, block::Paragraph)
-    return block
-end
+
+encodedblock(::Sanitize, block::Paragraph) = block
 
 function encode(p::Sanitize, context, block::Paragraph, obs)
     for tfm in values(p.tfms)
@@ -39,15 +28,10 @@ struct Tokenize <: Encoding
     tfms
 end
 
-function Tokenize()
-    base_tfms = [
-        tokenize,
-    ]
-    return Tokenize(base_tfms)
-end
+Tokenize() = Tokenize(DEFAULT_TOKENIZERS)
 
 function encodedblock(p::Tokenize, block::Paragraph)
-    return TokenVector()
+    return Tokens()
 end
 
 function encode(p::Tokenize, context, block::Paragraph, obs)
@@ -58,13 +42,13 @@ function encode(p::Tokenize, context, block::Paragraph, obs)
 end
 
 function computevocabulary(data)
-    lookup_table = Dict()
+    lookup_table = Dict{String, Int}()
 
     enc1 = Sanitize()
-    sanitized_Data = mapobs((i) -> encode(enc1, Training(), Paragraph(), getobs(data, i)[1]), 1:25000)
+    sanitized_Data = map(i -> encode(enc1, Training(), Paragraph(), getobs(data, i)[1]), 1:numobs(data))
 
     enc2 = Tokenize()
-    tokenized_data = mapobs((i) -> encode(enc2, Training(), Paragraph(), getobs(sanitized_Data, i)), 1:25000)
+    tokenized_data = map(i -> encode(enc2, Training(), Paragraph(), getobs(sanitized_Data, i)), 1:numobs(data))
 
     vocab = []
     for sample in tokenized_data
@@ -85,40 +69,40 @@ end
 
 function setup(::Type{EmbedVocabulary}, data)
     vocab = computevocabulary(data)
-    return EmbedVocabulary(vocab)
+    return EmbedVocabulary(vocab = vocab)
 end
 
-function encodedblock(p::EmbedVocabulary, block::TokenVector)
+function encodedblock(p::EmbedVocabulary, block::Tokens)
     return NumberVector()
 end
 
-function encode(p::EmbedVocabulary, context, block::TokenVector, obs)
+function encode(p::EmbedVocabulary, context, block::Tokens, obs)
     vocabulary = p.vocab
 
-    return_vect = []
-
-    for token in obs
-        push!(return_vect, getindex(vocabulary, token))
-    end
-    return return_vect
+    return [vocabulary[token] for token in obs]
 end
 
 
+# ## Tests
 
-# function encode(p::Numericalize, context, block::Paragraph, obs)
-#     ordered_dict = OrderedDict(p.vocab)
+@testset "TextPreprocessing [Encoding]" begin
+    sample_input = "Unsanintized text, this has to be sanitized. Then it should be tokenized. Finally it has to be numericalized"
+    block = Paragraph()
+    enc1 = Sanitize()
+    testencoding(enc1, block, sample_input)
 
-#     p = TextEncoding()
-#     # tokenized_sample = encode(enc, Training(), Paragraph(), obs)
-#     for tfm in values(p.tfms)
-#         obs = tfm(obs)
-#     end
-#     tokenized_text = obs
+    # sample_input_sanitized = "xxbos xxmaj unsanintized text sanitized xxmaj tokenized xxmaj finally numericalized"
+    sample_input_sanitized = encode(enc1, Training(), block, sample_input)
+    block = Paragraph()
+    enc2 = Tokenize()
+    testencoding(enc2, block, sample_input_sanitized)
 
-#     return_vect = []
+    # tokenized_input = ["xxbos", "xxmaj", "unsanintized", "text", "sanitized", "tokenized", "finally", "numericalized"]
+    tokenized_input = encode(enc2, Training(), block, sample_input_sanitized)
+    block = Tokens()
+    vocab = setup(EmbedVocabulary, [[sample_input]])
+    enc3 = EmbedVocabulary(vocab = vocab.vocab)
+    testencoding(enc3, block, tokenized_input)
 
-#     for token in tokenized_sample
-#         push!(return_vect, getindex(ordered_dict, token))
-#     end
-#     return_vect
-# end
+
+end

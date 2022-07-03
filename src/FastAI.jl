@@ -24,12 +24,14 @@ using StaticArrays
 using Setfield
 using ShowCases
 using Tables
-using TextAnalysis
+using TextAnalysis:
+    StringDocument, prepare!, strip_stopwords,
+    strip_html_tags, strip_non_letters, strip_numbers
 import Test
 import UnicodePlots
 using Statistics
 using InlineTest
-using DataStructures
+using DataStructures: OrderedDict
 
 using WordTokenizers: TokenBuffer, isdone, character, spaces, nltk_url1, nltk_url2, nltk_phonenumbers
 

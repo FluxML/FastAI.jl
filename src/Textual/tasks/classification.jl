@@ -5,7 +5,7 @@ Learning task for single-label text classification. Samples are
 preprocessed by applying various textual transforms and classified into one of `classes`.
 
 """
-function TextClassficationSingle(blocks::Tuple{<:Paragraph,<:Label}, data)
+function TextClassificationSingle(blocks::Tuple{<:Paragraph,<:Label}, data)
     return SupervisedTask(
         blocks,
         (
@@ -21,7 +21,7 @@ end
 _tasks["textclfsingle"] = (
     id="textual/textclfsingle",
     name="Text classification (single-label)",
-    constructor=TextClassficationSingle,
+    constructor=TextClassificationSingle,
     blocks=(Paragraph, Label),
     category="supervised",
     description="""
@@ -33,24 +33,21 @@ _tasks["textclfsingle"] = (
 
 # ## Tests
 
-# @testset "TextClassificationSingle [task]" begin
-#     task = TextClassificationSingle((Paragraph(), Label{String}(["neg", "pos"])))
-#     testencoding(getencodings(task), getblocks(task).sample)
-#     FastAI.checktask_core(task)
+@testset "TextClassificationSingle [task]" begin
+    task = TextClassificationSingle((Paragraph(), Label{String}(["neg", "pos"])), [("A good review", "pos")])
+    testencoding(getencodings(task), getblocks(task).sample, ("A good review", "pos"))
+    FastAI.checktask_core(task, sample = ("A good review", "pos"))
 
-#     @testset "`encodeinput`" begin
-#         paragraph = "A sample paragraph."
+    @testset "`encodeinput`" begin
+        paragraph = "A good review"
 
-#         xtrain = encodeinput(task, Training(), paragraph)
-#         @test contains(xtrain, "xxbos")
-#         @test lowercase(xtrain) == xtrain
-#         @test length(xtrain) == 28
-#         @test eltype(xtrain) == Char
-#     end
+        xtrain = encodeinput(task, Training(), paragraph)
+        @test eltype(xtrain) == Int64
+    end
 
-#     @testset "`encodetarget`" begin
-#         category = "neg"
-#         y = encodetarget(task, Training(), category)
-#         @test y ≈ [1, 0]
-#     end
-# end
+    @testset "`encodetarget`" begin
+        category = "pos"
+        y = encodetarget(task, Training(), category)
+        @test y ≈ [0, 1]
+    end
+end

@@ -32,8 +32,10 @@ import Requires: @require
 
 using InlineTest
 using Random
-using TextAnalysis
-using DataStructures
+using TextAnalysis:
+    StringDocument, prepare!, strip_stopwords, text,
+    strip_html_tags, strip_non_letters, strip_numbers
+using DataStructures: OrderedDict
 
 using WordTokenizers: TokenBuffer, isdone, character, spaces, nltk_url1, nltk_url2, nltk_phonenumbers
 
@@ -45,6 +47,17 @@ include("encodings/textpreprocessing.jl")
 const _tasks = Dict{String,Any}()
 include("tasks/classification.jl")
 
+const DEFAULT_SANITIZERS = [
+    replace_all_caps,
+    replace_sentence_case,
+    convert_lowercase,
+    remove_punctuations,
+    basic_preprocessing,
+    remove_extraspaces
+]
+
+const DEFAULT_TOKENIZERS = [tokenize]
+
 
 function __init__()
     _registerrecipes()
@@ -55,5 +68,5 @@ function __init__()
     end
 end
 
-export Paragraph, TokenVector, TextClassficationSingle, Sanitize, Tokenize, replace_all_caps, replace_sentence_case, convert_lowercase
+export Paragraph, TextClassificationSingle, Sanitize, Tokenize
 end
