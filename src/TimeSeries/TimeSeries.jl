@@ -32,11 +32,11 @@ using  Statistics
 # Blocks
 include("blocks/timeseriesrow.jl")
 
-include("encodings/timeseriespreprocessing.jl");
+# Encodings
+include("encodings/tspreprocessing.jl")
 
 const _tasks = Dict{String, Any}()
 include("tasks/classification.jl")
-
 include("recipes.jl")
 
 function __init__()
@@ -49,5 +49,5 @@ function __init__()
 end
 
 export 
-    TimeSeriesRow, TSClassificationSingle, TSPreprocessing
+    TimeSeriesRow, TSClassificationSingle, TSPreprocessing, tsdatasetstats, encodedblock, setup, encode
 end

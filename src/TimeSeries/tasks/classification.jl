@@ -1,19 +1,18 @@
 """
     TSClassificationSingle(blocks[, data])
-Learning task for single-label time-series classification. Samples are normalized and 
-classified into of the 'classes'.
+
+Learning task for single-label time-series classification. Samples are standardized 
+and classified into one of `classes`.
 """
-function TSClassificationSingle(
-    blocks::Tuple{<:TimeSeriesRow, <:Label},
-    data
-)
+
+function TSClassificationSingle(blocks::Tuple{<:TimeSeriesRow,<:Label}, data)
     return SupervisedTask(
         blocks,
         (
-            setup(TSPreprocessing, blocks[1], data),
-            OneHot()
+            OneHot(),
+            setup(TSPreprocessing, blocks[1], data[1].table)
         )
-    )
+    )    
 end
 
 _tasks["tsclfsingle"] = (
