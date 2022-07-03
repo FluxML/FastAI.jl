@@ -100,7 +100,6 @@ info(datarecipes())
 """
 datarecipes(; kwargs...) = isempty(kwargs) ? DATARECIPES : filter(DATARECIPES; kwargs...)
 
-
 registerrecipes(m::Module, recipes) = registerrecipes(DATARECIPES, m, recipes)
 
 function registerrecipes(reg::Registry, m::Module, recipes::Dict)
@@ -113,11 +112,11 @@ function registerrecipes(reg::Registry, m::Module, recipes::Dict)
 
         if !haskey(reg, recipeid)
             push!(reg,
-                (id = recipeid,
-                datasetid = datasetid,
-                blocks = Datasets.recipeblocks(recipe),
-                package = m,
-                recipe = recipe))
+                  (id = recipeid,
+                   datasetid = datasetid,
+                   blocks = Datasets.recipeblocks(recipe),
+                   package = m,
+                   recipe = recipe))
         end
     end
 end

@@ -49,7 +49,7 @@ struct Image{N} <: Block end
 
 checkblock(::Image{N}, ::AbstractArray{T, N}) where {T <: Union{Colorant, Number}, N} = true
 mockblock(::Image{N}) where {N} = rand(RGB{N0f8}, ntuple(_ -> 16, N))
-FastAI.blockname(::Image{N}) where N = "Image{$N}"
+FastAI.blockname(::Image{N}) where {N} = "Image{$N}"
 
 setup(::Type{Image}, data) = Image{ndims(getobs(data, 1))}()
 

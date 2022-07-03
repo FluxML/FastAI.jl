@@ -66,7 +66,6 @@ _notitles(t::Tuple) = map(_notitles, t)
 _notitles(b::AbstractBlock) = b
 _notitles((_, block)::Pair) = _notitles(block)
 
-
 @testset "ShowMakie" begin
     backend = ShowMakie()
     fig = createhandle(backend)

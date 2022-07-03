@@ -87,17 +87,17 @@ end
 # Registering recipes
 
 const RECIPES = Dict{String, Vector}("adult_sample" => [
-                                                                 TableDatasetRecipe(file = "adult.csv"),
-                                                                 "clf_salary" => TableClassificationRecipe(TableDatasetRecipe(file = "adult.csv"),
-                                                                                           :salary),
-                                                                 "reg_age" => TableRegressionRecipe(TableDatasetRecipe(file = "adult.csv"),
-                                                                                       :age),
-                                                             ],
-                                                             "imdb_sample" => [
-                                                                 TableDatasetRecipe(file = "texts.csv"),
-                                                                "clf" => TableClassificationRecipe(TableDatasetRecipe(file = "texts.csv"),
-                                                                                           :label),
-                                                             ])
+                                         TableDatasetRecipe(file = "adult.csv"),
+                                         "clf_salary" => TableClassificationRecipe(TableDatasetRecipe(file = "adult.csv"),
+                                                                                   :salary),
+                                         "reg_age" => TableRegressionRecipe(TableDatasetRecipe(file = "adult.csv"),
+                                                                            :age),
+                                     ],
+                                     "imdb_sample" => [
+                                         TableDatasetRecipe(file = "texts.csv"),
+                                         "clf" => TableClassificationRecipe(TableDatasetRecipe(file = "texts.csv"),
+                                                                            :label),
+                                     ])
 
 # ## Tests
 

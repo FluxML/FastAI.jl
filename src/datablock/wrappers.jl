@@ -18,7 +18,6 @@ function blockname(wrapper::WrapperBlock)
     return "$w($b)"
 end
 
-
 # If not overwritten, encodings are applied to the wrapped block
 """
     abstract type PropagateWrapper
@@ -82,10 +81,12 @@ ignoring any wrappers.
 See [`propagate`](#) for more information.
 """
 struct PropagateSameBlock <: PropagateWrapper end
-propagate(::PropagateSameBlock, encoding, block) =
+function propagate(::PropagateSameBlock, encoding, block)
     wrapped(encodedblock(encoding, block)) == wrapped(block)
-propagatedecode(::PropagateSameBlock, encoding, block) =
+end
+function propagatedecode(::PropagateSameBlock, encoding, block)
     wrapped(decodedblock(encoding, block)) == wrapped(block)
+end
 
 """
     struct PropagateSameWrapper <: PropagateWrapper end
@@ -96,31 +97,30 @@ including any wrappers.
 See [`propagate`](#) for more information.
 """
 struct PropagateSameWrapper <: PropagateWrapper end
-propagate(::PropagateSameWrapper, encoding, block) =
-    encodedblock(encoding, block) == block
-propagatedecode(::PropagateSameWrapper, encoding, block) =
+propagate(::PropagateSameWrapper, encoding, block) = encodedblock(encoding, block) == block
+function propagatedecode(::PropagateSameWrapper, encoding, block)
     decodedblock(encoding, block) == block
-
+end
 
 PropagateWrapper(::WrapperBlock) = PropagateAlways()
-
 
 """
     propagate(wrapper::WrapperBlock, encoding::Encoding) -> true|false
 
 Whether the wrapper type should be kept after encoding the wrapped block with `encoding`.
 """
-propagate(wrapper::WrapperBlock, encoding::Encoding) =
+function propagate(wrapper::WrapperBlock, encoding::Encoding)
     propagate(PropagateWrapper(wrapper), encoding, parent(wrapper))
+end
 
 """
     propagatedecode(wrapper::WrapperBlock, encoding::Encoding) -> true|false
 
 Whether the wrapper type should be kept after decoding the wrapped block with `encoding`.
 """
-propagatedecode(wrapper::WrapperBlock, encoding::Encoding) =
+function propagatedecode(wrapper::WrapperBlock, encoding::Encoding)
     propagatedecode(PropagateWrapper(wrapper), encoding, parent(wrapper))
-
+end
 
 function encodedblock(encoding::Encoding, wrapper::WrapperBlock)
     encblock = encodedblock(encoding, parent(wrapper))
@@ -185,8 +185,7 @@ blockmodel(in::Block, out::WrapperBlock, args...) = blockmodel(in, wrapped(out),
 blocklossfn(wrapper::WrapperBlock, out) = blocklossfn(wrapped(wrapper), out)
 blocklossfn(in::Block, out::WrapperBlock) = blocklossfn(in, wrapped(out))
 
-
-struct TestWrapper{B<:AbstractBlock, P<:PropagateWrapper} <: WrapperBlock
+struct TestWrapper{B <: AbstractBlock, P <: PropagateWrapper} <: WrapperBlock
     block::B
     propagation::P
 end

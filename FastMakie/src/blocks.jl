@@ -35,13 +35,14 @@ function showblock!(ax,
     Makie.hidespines!(ax)
 end
 
-axiskwargs(block::Union{<:OneHotTensor{0}, <:OneHotTensorMulti{0}}) = (;
-        yticks = (1:length(block.classes), string.(block.classes)),
-        clean = false,
-        xlabel = "Confidence",
-        ylabel = "Label",
-        dataaspect=false
-)
+function axiskwargs(block::Union{<:OneHotTensor{0}, <:OneHotTensorMulti{0}})
+    (;
+     yticks = (1:length(block.classes), string.(block.classes)),
+     clean = false,
+     xlabel = "Confidence",
+     ylabel = "Label",
+     dataaspect = false)
+end
 
 @testset "ShowMakie blocks" begin
     backend = ShowMakie()

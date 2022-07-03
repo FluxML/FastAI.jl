@@ -1,4 +1,5 @@
-using CUDA, Flux, FluxTraining, Metalhead, MLUtils, FastAI, FastVision, FastTabular, FastMakie, FastText, ReTest
+using CUDA, Flux, FluxTraining, Metalhead, MLUtils, FastAI, FastVision, FastTabular,
+      FastMakie, FastText, ReTest
 
 FastAI.runtests()
 FastVision.runtests()

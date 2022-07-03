@@ -123,7 +123,6 @@ typify(T::Type) = T
 typify(t::Tuple) = Tuple{map(typify, t)...}
 typify(block::FastAI.AbstractBlock) = typeof(block)
 
-
 """
     blockname(block)
 

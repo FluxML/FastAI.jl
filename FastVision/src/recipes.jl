@@ -119,49 +119,49 @@ Datasets.recipeblocks(::Type{ImageTableMultiLabel}) = Tuple{Image{2}, LabelMulti
 # ## Registering recipes for fastai datasets
 
 const RECIPES = Dict{String, Vector}([name => [ImageFolders()]
-                                                              for name in ("imagenette",
-                                                                           "imagenette-160",
-                                                                           "imagenette-320",
-                                                                           "imagenette2",
-                                                                           "imagenette2-160",
-                                                                           "imagenette2-320",
-                                                                           "imagewoof",
-                                                                           "imagewoof-160",
-                                                                           "imagewoof-320",
-                                                                           "imagewoof2",
-                                                                           "imagewoof2-160",
-                                                                           "imagewoof2-320",
-                                                                           "cifar10",
-                                                                           "cifar100",
-                                                                           "caltech_101",
-                                                                           "mnist_png",
-                                                                           "mnist_sample",
-                                                                           "CUB_200_2011",
-                                                                           "food-101")]...,
-                                                             [name => [
-                                                                  ImageFolders(filefilterfn = f -> !(occursin("unsup",
-                                                                                                              f))),
-                                                              ]
-                                                              for name in ("imagewang-160",
-                                                                           "imagewang-320",
-                                                                           "imagewang")]...,
-                                                             "camvid" => [
-                                                                 ImageSegmentationFolders(),
-                                                             ],
-                                                             "camvid_tiny" => [
-                                                                 ImageSegmentationFolders(),
-                                                             ],
-                                                             "pascal_2007" => [
-                                                                 ImageTableMultiLabel(),
-                                                             ],
-                                                             "mnist_tiny" => [
-                                                                 ImageFolders(filefilterfn = f -> !occursin("test",
-                                                                                                            f)),
-                                                             ],
-                                                             "mnist_var_size_tiny" => [
-                                                                 ImageFolders(filefilterfn = f -> !occursin("test",
-                                                                                                            f)),
-                                                             ])
+                                      for name in ("imagenette",
+                                                   "imagenette-160",
+                                                   "imagenette-320",
+                                                   "imagenette2",
+                                                   "imagenette2-160",
+                                                   "imagenette2-320",
+                                                   "imagewoof",
+                                                   "imagewoof-160",
+                                                   "imagewoof-320",
+                                                   "imagewoof2",
+                                                   "imagewoof2-160",
+                                                   "imagewoof2-320",
+                                                   "cifar10",
+                                                   "cifar100",
+                                                   "caltech_101",
+                                                   "mnist_png",
+                                                   "mnist_sample",
+                                                   "CUB_200_2011",
+                                                   "food-101")]...,
+                                     [name => [
+                                          ImageFolders(filefilterfn = f -> !(occursin("unsup",
+                                                                                      f))),
+                                      ]
+                                      for name in ("imagewang-160",
+                                                   "imagewang-320",
+                                                   "imagewang")]...,
+                                     "camvid" => [
+                                         ImageSegmentationFolders(),
+                                     ],
+                                     "camvid_tiny" => [
+                                         ImageSegmentationFolders(),
+                                     ],
+                                     "pascal_2007" => [
+                                         ImageTableMultiLabel(),
+                                     ],
+                                     "mnist_tiny" => [
+                                         ImageFolders(filefilterfn = f -> !occursin("test",
+                                                                                    f)),
+                                     ],
+                                     "mnist_var_size_tiny" => [
+                                         ImageFolders(filefilterfn = f -> !occursin("test",
+                                                                                    f)),
+                                     ])
 
 # ## Tests
 

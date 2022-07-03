@@ -18,16 +18,12 @@ ms = [
     FastMakie,
 ]
 
-project = Project(
-    Pollen.Rewriter[
-        DocumentFolder(Pkg.pkgdir(m), prefix = "documents"),
-        ParseCode(),
-        ExecuteCode(),
-        PackageDocumentation(ms),
-        StaticResources(),
-        DocumentGraph(),
-        SearchIndex(),
-        SaveAttributes((:title,), useoutputs=false),
-        LoadFrontendConfig(Pkg.pkgdir(m))
-    ],
-)
+project = Project(Pollen.Rewriter[DocumentFolder(Pkg.pkgdir(m), prefix = "documents"),
+                                  ParseCode(),
+                                  ExecuteCode(),
+                                  PackageDocumentation(ms),
+                                  StaticResources(),
+                                  DocumentGraph(),
+                                  SearchIndex(),
+                                  SaveAttributes((:title,), useoutputs = false),
+                                  LoadFrontendConfig(Pkg.pkgdir(m))])

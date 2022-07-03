@@ -1,17 +1,15 @@
 struct ABlock <: Block end
-    checkblock(::ABlock, ::Int) = true
+checkblock(::ABlock, ::Int) = true
 
-    struct BBlock <: Block end
-    checkblock(::BBlock, ::String) = true
+struct BBlock <: Block end
+checkblock(::BBlock, ::String) = true
 
-    struct AtoB <: Encoding end
+struct AtoB <: Encoding end
 
-    encode(::AtoB, _, ::ABlock, data) = string(data)
-    decode(::AtoB, _, ::BBlock, data) = parse(Int, data)
-    encodedblock(::AtoB, ::ABlock) = BBlock()
-    decodedblock(::AtoB, ::BBlock) = ABlock()
-
-
+encode(::AtoB, _, ::ABlock, data) = string(data)
+decode(::AtoB, _, ::BBlock, data) = parse(Int, data)
+encodedblock(::AtoB, ::ABlock) = BBlock()
+decodedblock(::AtoB, ::BBlock) = ABlock()
 
 @testset "Encoding API" begin
     enc = AtoB()

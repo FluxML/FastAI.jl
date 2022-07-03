@@ -66,12 +66,15 @@ function ProjectiveTransforms(sz;
     return ProjectiveTransforms(sz, buffered, augmentations, tfms, sharestate)
 end
 
-encodestate(enc::ProjectiveTransforms, context, blocks::Tuple, obss) =
+function encodestate(enc::ProjectiveTransforms, context, blocks::Tuple, obss)
     _encodestate(enc, context, blocks, obss)
-encodestate(enc::ProjectiveTransforms, context, block::Block, obs) =
+end
+function encodestate(enc::ProjectiveTransforms, context, block::Block, obs)
     _encodestate(enc, context, block, obs)
-encodestate(enc::ProjectiveTransforms, context, block::WrapperBlock, obs) =
+end
+function encodestate(enc::ProjectiveTransforms, context, block::WrapperBlock, obs)
     _encodestate(enc, context, block, obs)
+end
 function _encodestate(enc::ProjectiveTransforms{N}, context, blocks, obss) where {N}
     bounds = getsamplebounds(blocks, obss, N)
     tfm = _gettfm(enc.tfms, context)
