@@ -40,7 +40,7 @@ PrettyTables = "1.2"
 Reexport = "1.0"
 Requires = "1"
 Setfield = "0.7, 0.8"
-UnicodePlots = "2"
+UnicodePlots = "2, 3"
 julia = "1.6"
 
 [extras]
