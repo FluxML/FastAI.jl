@@ -49,5 +49,5 @@ function __init__()
 end
 
 export 
-    TimeSeriesRow, TSClassificationSingle, TSPreprocessing, tsdatasetstats, encodedblock, setup, encode
+    TimeSeriesRow, TSClassificationSingle, TSPreprocessing
 end

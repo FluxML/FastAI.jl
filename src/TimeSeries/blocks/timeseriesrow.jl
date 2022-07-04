@@ -28,9 +28,7 @@ struct TimeSeriesRow <: Block
     obslength::Union{Int, Colon}
 end
 
-function checkblock(row::TimeSeriesRow, obs::AbstractArray{T,2}) where {T<:Number}
-    size(obs) == (row.nfeatures, row.obslength)
-end
+checkblock(row::TimeSeriesRow, obs::AbstractMatrix{<:Number}) = size(obs) == (row.nfeatures, row.obslength)
 
 function mockblock(row::TimeSeriesRow)
     rand(Float64, (row.nfeatures, row.obslength))
