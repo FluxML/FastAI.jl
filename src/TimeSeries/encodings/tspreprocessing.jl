@@ -18,13 +18,8 @@ function tsdatasetstats(
     data;
     by_var
 )
-    drop_axes = []
-    if (by_var)
-        append!(drop_axes,2)
-    else
-        append!(drop_axes,3)
-    end 
-    axes = [ax for ax in [1, 2, 3] if !(ax in drop_axes)]
+    drop_axis = by_var ? 2 : 3
+    axes = filter(!=(drop_axis), 1:3)
     means = Statistics.mean(data, dims=axes)
     stds  = Statistics.std(data, dims=axes)
     means = reshape(means, ( size( means)[2:3] ))
