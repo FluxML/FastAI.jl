@@ -147,10 +147,10 @@ function invariant_checkblock end
 # If `invariant_checkblock` is not implemented for a block, default to
 # checking that `checkblock` returns `true`.
 
-function invariant_checkblock(block::AbstractBlock; obsvar = "obs", blockvar = "block")
-    return invariant(__inv_checkblock_title(block, blockvar, obsvar),) do obs
+function invariant_checkblock(block::AbstractBlock; obsvar = "obs", blockvar = "block", kwargs...)
+    return invariant(__inv_checkblock_title(block, blockvar, obsvar); kwargs...) do obs
         if !checkblock(block, obs)
-            """Expected `$obsvar` to be a valid observation for block `$(nameof(block))`,
+            """Expected `$obsvar` to be a valid observation for block `$(blockname(block))`,
             but `checkblock($blockvar, $obsvar)` returned `false`.
             This probably means that `$obsvar` is not a valid instance of the
             block. Check `?$(__typename_qualified(block))` for more information on
@@ -161,12 +161,13 @@ function invariant_checkblock(block::AbstractBlock; obsvar = "obs", blockvar = "
 end
 
 __typename_qualified(::T) where T = "$(string(parentmodule(T))).$(nameof(T))"
-__inv_checkblock_title(b, bname, oname) = "`$oname` is a valid observation for `$(bname) <: $(nameof(b))`"
+__inv_checkblock_title(b, bname, oname) = "`$oname` is a valid observation for `$(bname) <: $(blockname(b))`"
 # For tuples of blocks, the invariant is composed of the individuals' blocks
 # invariants, passing only if all the child invariants pass.
 
-function invariant_checkblock(blocks::Tuple; obsvar = "obss", blockvar = "blocks")
+function invariant_checkblock(blocks::Tuple; obsvar = "obss", blockvar = "blocks", kwargs...)
     return invariant(
+        "`$obsvar` are valid instances of blocks `$blockvar`",
         [
             invariant(
                 invariant_checkblock(
@@ -177,13 +178,16 @@ function invariant_checkblock(blocks::Tuple; obsvar = "obss", blockvar = "blocks
                 inputfn = obss -> obss[i]
             ) for (i, block) in enumerate(blocks)
         ],
-        "`$obsvar` are valid instances of blocks `$blockvar`",
         description = md("""The given observations `obss` should be valid instances of the
             blocks `$blockvar`. Since `$blockvar` is a tuple of blocks, each observation
             `$obsvar[i]` should be a valid instance of the block `$blockvar[i]`.
-            See `?Block` for more background on blocks.""")
+            See `?Block` for more background on blocks.""");
+        kwargs...
     )
 end
+
+invariant_checkblock((title, block)::Pair; kwargs...) = invariant_checkblock(block; kwargs...)
+
 """
     blockname(block)
 
@@ -192,3 +196,13 @@ and other diagrams.
 """
 blockname(block::Block) = string(nameof(typeof(block)))
 blockname(blocks::Tuple) = "(" * join(map(blockname, blocks), ", ") * ")"
+
+
+@testset "block invariants" begin
+    @testset "is_block" begin
+        @test is_block(Bool, Label(1:10), 1)
+        @test !is_block(Bool, Label(1:10), 0)
+        @test is_block(Bool, OneHotLabel{Float32}([1, 2]), [0, 1])
+        @test is_block(Bool, (Label([1]), Label([2])), (1, 2))
+    end
+end

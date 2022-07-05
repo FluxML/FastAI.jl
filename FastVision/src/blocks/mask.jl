@@ -17,8 +17,10 @@ end
 
 mockblock(mask::Mask{N, T}) where {N, T} = rand(mask.classes, ntuple(_ -> 16, N))::AbstractArray{T, N}
 
-function FastAI.invariant_checkblock(block::Mask{N}; blockvar = "block", obsvar = "obs") where N
-    return invariant([
+function FastAI.invariant_checkblock(block::Mask{N}; blockvar = "block", obsvar = "obs", kwargs...) where N
+    return invariant(
+        FastAI.__inv_checkblock_title(block, blockvar, obsvar),
+        [
             invariant("`$obsvar` is an `AbstractArray`",
                 description = md("`$obsvar` should be of type `AbstractArray`.")) do obs
                 if !(obs isa AbstractArray)
@@ -42,9 +44,8 @@ function FastAI.invariant_checkblock(block::Mask{N}; blockvar = "block", obsvar 
                     `$(sprint(show, block.classes, context=:limit => true))`""")
                 end
             end,
-        ],
-        FastAI.__inv_checkblock_title(block, blockvar, obsvar),
-        :seq
+        ];
+        kwargs...
     )
 end
 

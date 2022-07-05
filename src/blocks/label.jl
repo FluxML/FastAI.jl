@@ -36,16 +36,18 @@ mockblock(label::Label{T}) where {T} = rand(label.classes)::T
 setup(::Type{Label}, data) = Label(unique(eachobs(data)))
 
 
-function invariant_checkblock(block::Label; blockvar = "block", obsvar = "obs")
-    return invariant(
-            __inv_checkblock_title(block, blockvar, obsvar),
-            description=md("""`$obsvar` should be a valid label, i.e. one of
-                `$(sprint(show, block.classes, context=:limit => true))`."""),
+function invariant_checkblock(block::Label; blockvar = "block", obsvar = "obs", kwargs...)
+    inv = invariant(
+            __inv_checkblock_title(block, blockvar, obsvar)
     ) do obs
         if !(obs ∈ block.classes)
-            return md("Instead, got invalid value `$(sprint(show, obs))`.")
+            return "\n" * ("""`$obsvar` should be a valid label, i.e. one of
+                `$blockvar.classes = $(sprint(show, block.classes, context=:limit => true))`.
+                Instead, got invalid value `$(sprint(show, obs))`.
+            """ |> Invariants.md)
         end
     end
+    invariant(inv; kwargs...)
 end
 
 
@@ -99,12 +101,14 @@ Base.summary(io::IO, ::LabelMulti{T}) where {T} = print(io, "LabelMulti{", T, "}
 
 
 
-function invariant_checkblock(block::LabelMulti; blockvar = "block", obsvar = "obs")
-    return invariant([
+function invariant_checkblock(block::LabelMulti; blockvar = "block", obsvar = "obs", kwargs...)
+    return invariant(
+        __inv_checkblock_title(block, blockvar, obsvar),
+        [
             invariant("`$obsvar` is an `AbstractVector`",
                 description = md("`$obsvar` should be of type `AbstractVector`.")) do obs
                 if !(obs isa AbstractVector)
-                    return md("Instead, got invalid type `$(nameof(typeof(obs)))`.")
+                    return md("Instead, got invalid type `$(typeof(obs))`.")
                 end
             end,
             invariant("All elements are valid labels") do obs
@@ -119,9 +123,7 @@ function invariant_checkblock(block::LabelMulti; blockvar = "block", obsvar = "o
                     `$(sprint(show, block.classes, context=:limit => true))`""")
                 end
             end
-        ],
-        __inv_checkblock_title(block, blockvar, obsvar),
-        :seq
+        ]; kwargs...
     )
 end
 
@@ -153,7 +155,7 @@ end
     @test block.classes == ["cat", "dog"]
 
     inv = invariant_checkblock(block)
-    @test check(Bool,  inv, ["cat", "dog"])
+    @test_nowarn check(Exception,  inv, ["cat", "dog"])
     @test check(Bool, inv, [])
     @test !(check(Bool, inv, "cat"))
     @test !(check(Bool, inv, ["mouse"]))

@@ -21,7 +21,19 @@ function checkblock(block::ImageTensor{N}, a::AbstractArray{T, M}) where {M, N, 
     return (N + 1 == M) && (size(a, M) == block.nchannels)
 end
 
-Base.summary(io::IO, ::ImageTensor{N}) where {N} = print(io, "ImageTensor{$N}")
+FastAI.blockname(io::IO, ::ImageTensor{N}) where {N} = "ImageTensor{$N}"
+
+function FastAI.mockblock(block::ImageTensor{N}) where {N}
+    return randn(Float32, ntuple(n -> n == N+1 ? block.nchannels : 16, N + 1))
+end
+
+function FastAI.invariant_checkblock(block::ImageTensor{N}; blockvar = "block", obsvar = "obs", kwargs...) where N
+    return invariant(
+        Invariants.hastype_invariant(AbstractArray{<:Number, N+1}),
+        title = FastAI.__inv_checkblock_title(block, blockvar, obsvar);
+        kwargs...
+    )
+end
 
 """
     ImagePreprocessing([; kwargs...]) <: Encoding

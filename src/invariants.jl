@@ -106,45 +106,47 @@ is_data(::Type{Bool}, args...; kwargs...) = convert(Bool, is_data(args...; kwarg
 
 
 function invariant_datacontainer(; var = :data)
-    invariant([
-        __invariant_numobs(; var),
-        invariant("`$var` contains at least one observation") do data
-            n = numobs(data)
-            if n <= 0
-                return "Instead, got a data container with $n observations."
-            end
-        end,
-        __invariant_getobs(; var),
-    ],
-    "`$var` implements the data container interface",
-    :seq;
-    description="""A data container stores observations and allows (1) getting
-        the number of observation and (2) loading an observation.
-        See [the tutorial](/documents/docs/tutorials/data_containers.md) for more
-        information.""" |> md)
+    invariant(
+        "`$var` implements the data container interface",
+        [
+            __invariant_numobs(; var),
+            invariant("`$var` contains at least one observation") do data
+                n = numobs(data)
+                if n <= 0
+                    return "Instead, got a data container with $n observations."
+                end
+            end,
+            __invariant_getobs(; var),
+        ],
+        all;
+        description="""A data container stores observations and allows (1) getting
+            the number of observation and (2) loading an observation.
+            See [the tutorial](/documents/docs/tutorials/data_containers.md) for more
+            information.""" |> md)
 end
 
 function invariant_datacontainer_block(block;
                                        datavar = "data", blockvar = "data", obsvar = "obs")
-    return invariant([
-        invariant_datacontainer(; var = datavar),
-        invariant(
-            invariant_checkblock(block; blockvar = blockvar, obsvar = obsvar);
-            inputfn = data -> getobs(data, 1)
-        )
+    return invariant(
+        "`$datavar` is a data container with valid observations for block `$(blockname(block))`",
+        [
+
+            invariant_datacontainer(; var = datavar),
+            invariant(
+                invariant_checkblock(block; blockvar = blockvar, obsvar = obsvar);
+                inputfn = data -> getobs(data, 1)
+            )
         ],
-        "`$datavar` is a data container with valid observations for block `$(nameof(block))`",
-        :seq)
-
-
+        all)
 end
 
-__invariant_getobs(; var = :data) = invariant([
+__invariant_getobs(; var = :data) = invariant(
+    "`$var` implements the `getobs` interface",
+    [
         Invariants.hasmethod_invariant(Base.getindex, :data, :idx => 1)
         Invariants.hasmethod_invariant(MLUtils.getobs, :data, :idx => 1)
     ],
-    "`$var` implements the `getobs` interface",
-    :any;
+    any;
     description=Invariants.md("""
         `$var` must provide a way load an observation by implementing **either**
         (1) `Base.getindex($var, idx::Int)` (preferred) or (2) `MLUtils.getobs($var, idx::Int)`
@@ -153,15 +155,32 @@ __invariant_getobs(; var = :data) = invariant([
     inputfn=data -> (; data),
 )
 
-__invariant_numobs(; var = :data) = invariant([
+__invariant_numobs(; var = :data) = invariant(
+    "`$var` implements the `numobs` interface",
+    [
         Invariants.hasmethod_invariant(Base.length, :data)
         Invariants.hasmethod_invariant(MLUtils.numobs, :data)
     ],
-    "`$var` implements the `numobs` interface",
-    :any;
+    any;
     description=Invariants.md("""
         `$var` must provide a way get the number of observations it contains implementing either
         `Base.length($var)` (preferred) or `MLUtils.numobs($var, idx::Int)`
         """),
     inputfn=data -> (; data),
 )
+
+
+@testset "data container invariants" begin
+    @testset "is_data" begin
+        @test is_data(Bool, 1:10)
+        @test !is_data(Bool, nothing)
+        @test is_data(Bool, [1])
+        @test !is_data(Bool, [])
+
+        @test is_data(Bool, 1:10, Label(1:10))
+        @test !is_data(Bool, 0:10, Label(1:10))
+        @test is_data(Bool, [[0, 1]], OneHotLabel{Float32}([1, 2]))
+
+        @test is_data(Bool, [(1, 2)], (Label([1]), Label([2])))
+    end
+end

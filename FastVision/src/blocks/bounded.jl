@@ -65,12 +65,13 @@ function checkblock(bounded::Bounded{N}, a::AbstractArray{N}) where {N}
 end
 
 
-function FastAI.invariant_checkblock(block::Bounded{N}; blockvar = "block", obsvar = "obs") where N
-    return invariant([
-            FastAI.invariant_checkblock(parent(block)),
-        ],
+function FastAI.invariant_checkblock(block::Bounded{N}; blockvar = "block", obsvar = "obs", kwargs...) where N
+    return invariant(
         FastAI.__inv_checkblock_title(block, blockvar, obsvar),
-        :seq
+        [
+            FastAI.invariant_checkblock(parent(block)),
+        ];
+        kwargs...
     )
 end
 

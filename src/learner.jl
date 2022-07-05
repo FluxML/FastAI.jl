@@ -52,11 +52,12 @@ function tasklearner(task::LearningTask,
                      batchsize = 16,
                      optimizer = ADAM(),
                      lossfn = tasklossfn(task),
+                     usedefaultcallbacks = true,
                      kwargs...)
     if isnothing(model)
         model = isnothing(backbone) ? taskmodel(task) : taskmodel(task, backbone)
     end
-    dls = methoddataloaders(traindata, validdata, method, batchsize; kwargs...)
+    dls = taskdataloaders(traindata, validdata, task, batchsize; kwargs...)
     return Learner(model, dls, optimizer, lossfn, callbacks...; usedefaultcallbacks)
 end
 

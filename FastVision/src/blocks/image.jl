@@ -61,8 +61,10 @@ showblock!(io, ::ShowText, block::Image{2}, obs::AbstractMatrix{<:Real}) =
     ImageInTerminal.imshow(io, colorview(Gray, obs))
 
 
-function FastAI.invariant_checkblock(block::Image{N}; blockvar = "block", obsvar = "obs") where N
-    return invariant([
+function FastAI.invariant_checkblock(block::Image{N}; blockvar = "block", obsvar = "obs", kwargs...) where N
+    return invariant(
+        FastAI.__inv_checkblock_title(block, blockvar, obsvar),
+        [
             invariant("`$obsvar` is an `AbstractArray`",
                 description = md("`$obsvar` should be of type `AbstractArray`.")) do obs
                 if !(obs isa AbstractArray)
@@ -79,9 +81,8 @@ function FastAI.invariant_checkblock(block::Image{N}; blockvar = "block", obsvar
                     return "Instead, got invalid element type `$(eltype(obs))`." |> md
                 end
             end,
-        ],
-        FastAI.__inv_checkblock_title(block, blockvar, obsvar),
-        :seq
+        ];
+        kwargs...
     )
 end
 

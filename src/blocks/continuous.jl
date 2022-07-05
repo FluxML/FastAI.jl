@@ -21,31 +21,24 @@ function blocklossfn(outblock::Continuous, yblock::Continuous)
 end
 
 
-function invariant_checkblock(block::Continuous; blockvar = "block", obsvar = "obs")
-    return SequenceInvariant(
+function invariant_checkblock(block::Continuous; blockvar = "block", obsvar = "obs", kwargs...)
+    return invariant(
+        __inv_checkblock_title(block, blockvar, obsvar),
         [
-            BooleanInvariant(
-                obs -> obs isa AbstractVector,
-                name = "`$obsvar` should be an `AbstractVector`",
-                messagefn = obs -> """`$obsvar` should be an `AbstractVector`, instead
-                got type `$(typeof(obs))`.
-                """
+            Invariants.hastype_invariant(AbstractVector; var = obsvar),
+            invariant("length(`$obsvar`) should be $(block.size)") do obs
+                if !(length(obs) == block.size)
+                    return """`$obsvar` should have `$(block.size)` features, instead
+                    found a vector with `$(length(obs))` features.""" |> md
+                end
+            end,
+            Invariants.hastype_invariant(
+                Number,
+                title = "`eltype($obsvar)` should be a subtype of number",
+                inputfn = eltype,
             ),
-            BooleanInvariant(
-                obs -> length(obs) == block.size,
-                name = "length(`$obsvar`) should be $(block.size)",
-                messagefn = obs -> """`$obsvar` should have $(block.size) features, instead
-                found a vector with $(length(obs)) features.
-                """
-            ),
-            BooleanInvariant(
-                obs -> eltype(obs) <: Number,
-                name = "`eltype($obsvar)` should be a subtype of `Number`",
-                messagefn = obs -> """Found a non-numerical element type $(eltype(obs))"""
-            ),
-        ],
-        "`$obsvar` should be a valid `$(summary(block))`",
-        "",
+        ];
+        kwargs...
     )
 end
 
@@ -53,8 +46,8 @@ end
 @testset "Continuous [block]" begin
     inv = invariant_checkblock(Continuous(5))
 
-    @test check(inv, zeros(5))
-    @test !(check(inv, "hi"))
-    @test !(check(inv, ["hi"]))
-    @test !(check(inv, [5]))
+    @test check(Bool, inv, zeros(5))
+    @test !check(Bool, inv, "hi")
+    @test !check(Bool, inv, ["hi"])
+    @test !check(Bool, inv, [5])
 end
