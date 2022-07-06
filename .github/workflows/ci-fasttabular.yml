@@ -6,6 +6,7 @@ on:
       - 'FastMakie/**'
       - 'FastText/**'
       - 'FastVision/**'
+      - 'FastTimeSeries/**'
       - '*.md'
 jobs:
   test:
