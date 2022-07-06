@@ -21,6 +21,12 @@ using FastAI
 FastAI.mockblock(TimeSeriesRow{1,10}())
 ```
 
+To visualize a time-series sample.
+
+```julia
+showblock(TimeSeriesRow(1,10), rand(Float32, (1,10)))
+```
+
 """
 
 struct TimeSeriesRow <: Block 
@@ -37,4 +43,14 @@ end
 function setup(::Type{TimeSeriesRow}, data)
     nfeatures, obslength = size(getindex(data, 1))
     return TimeSeriesRow(nfeatures, obslength)
+end
+
+# visualization
+
+function showblock!(io, ::ShowText, block::TimeSeriesRow, obs)
+    plot = UnicodePlots.lineplot(obs[1,:])
+    for j=2:size(obs,1)
+        UnicodePlots.lineplot!(plot, obs[j,:])
+    end
+    print(io, plot)
 end

@@ -46,6 +46,15 @@ function encode(tsp::TSPreprocessing, context, block::TimeSeriesRow,  obs)
     return ( (obs .- means) ./ stds )
 end
 
+decodedblock(p::TSPreprocessing, block::TimeSeriesRow) = block
+
+function decode(tsp::TSPreprocessing, context, block::TimeSeriesRow,  obs)
+    means = tsp.means
+    stds  = tsp.stds
+    #! Check size again or not.
+    return ( (obs .* stds) .+ means )
+end
+
 ## Tests
 
 @testset "TimeSeriesPreprocessing [encoding]" begin

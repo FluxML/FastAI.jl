@@ -27,7 +27,8 @@ import Requires: @require
 
 using FilePathsBase
 using InlineTest
-using  Statistics
+using Statistics
+using UnicodePlots
 
 # Blocks
 include("blocks/timeseriesrow.jl")
