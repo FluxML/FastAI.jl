@@ -39,8 +39,8 @@ Where do we draw the line between model and data processing? In general, the enc
 - What an encoding does depends on what block is passed in. Most encodings only transform specific blocks. For example, the [`ImagePreprocessing`](#) encoding maps blocks `Image{N} -> ImageTensor{N}`, but leaves other blocks unchanged. Encodings are called with `encode` and `decode` which take in the block and the data. The actual encoding and decoding takes in an additional context argument which can be specialized on to implement different behavior for e.g. training and validation.
     {cell=main}
     ```julia
-    using FastAI, Colors
-    using FastAI.Vision: ImageTensor
+    using FastAI, FastVision
+    using FastVision: ImageTensor, RGB
     enc = ImagePreprocessing()
     data = rand(RGB, 100, 100)
     @show summary(data)

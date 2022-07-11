@@ -4,3 +4,4 @@ docs/Manifest.toml
 development/**
 Manifest.toml
 **/*.jld2
+*.so

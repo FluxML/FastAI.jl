@@ -20,9 +20,9 @@ function showsample(backend::ShowBackend, task::AbstractBlockTask, sample)
     blocks = ("Input" => getblocks(task)[1], "Target" => getblocks(task)[2])
     showblock(backend, blocks, sample)
 end
-showsample(task::AbstractBlockTask, sample) =
+function showsample(task::AbstractBlockTask, sample)
     showsample(default_showbackend(), task, sample)
-
+end
 
 """
     showsample([backend], task, sample)
@@ -43,8 +43,9 @@ showsamples(ShowText(), task, samples)
 function showsamples(backend::ShowBackend, task::AbstractBlockTask, samples)
     showblocks(backend, "Sample" => getblocks(task).sample, samples)
 end
-showsamples(task::AbstractBlockTask, samples) =
-    showsamples(default_showbackend(), task, sample)
+function showsamples(task::AbstractBlockTask, samples)
+    showsamples(default_showbackend(), task, samples)
+end
 
 """
     showencodedsample([backend], task, encsample)
@@ -52,33 +53,27 @@ showsamples(task::AbstractBlockTask, samples) =
 Show an encoded sample `encsample` to `backend`.
 """
 function showencodedsample(backend::ShowBackend, task::AbstractBlockTask, encsample)
-    showblockinterpretable(
-        backend,
-        getencodings(task),
-        getblocks(task).encodedsample,
-        encsample,
-    )
+    showblockinterpretable(backend,
+                           getencodings(task),
+                           "Encoded sample" => getblocks(task).encodedsample,
+                           encsample)
 end
-showencodedsample(task, encsample) =
+function showencodedsample(task, encsample)
     showencodedsample(default_showbackend(), task, encsample)
+end
 
 """
     showencodedsamples([backend], task, encsamples)
 
 Show a vector of encoded samples `encsamples` to `backend`.
 """
-function showencodedsamples(
-    backend::ShowBackend,
-    task::AbstractBlockTask,
-    encsamples::AbstractVector,
-)
-    xblock, yblock = encodedblockfilled(getencodings(task), getblocks(task).encodedsample)
-    showblocksinterpretable(
-        backend,
-        getencodings(task),
-        ("x" => xblock, "y" => yblock),
-        encsamples,
-    )
+function showencodedsamples(backend::ShowBackend,
+                            task::AbstractBlockTask,
+                            encsamples::AbstractVector)
+    showblocksinterpretable(backend,
+                            getencodings(task),
+                            "Encoded samples" => getblocks(task).encodedsample,
+                            encsamples)
 end
 
 """
@@ -104,16 +99,14 @@ end
 
 function showprediction(backend::ShowBackend, task::AbstractBlockTask, sample, pred)
     blocks = getblocks(task)
-    showblock(
-        backend,
-        ("Sample" => blocks.sample, "Prediction" => blocks.pred),
-        (sample, pred),
-    )
+    showblock(backend,
+              ("Sample" => blocks.sample, "Prediction" => blocks.pred),
+              (sample, pred))
 end
 
-
-showprediction(task::AbstractBlockTask, args...) =
+function showprediction(task::AbstractBlockTask, args...)
     showprediction(default_showbackend(), task, args...)
+end
 
 """
     showpredictions([backend], task, preds)
@@ -129,15 +122,14 @@ end
 
 function showpredictions(backend::ShowBackend, task::AbstractBlockTask, samples, preds)
     predblock = decodedblockfilled(getencodings(task), getblocks(task).ŷ)
-    showblocks(
-        backend,
-        ("Sample" => getblocks(task), "Prediction" => predblock),
-        collect(zip(samples, preds)),
-    )
+    showblocks(backend,
+               ("Sample" => getblocks(task), "Prediction" => predblock),
+               collect(zip(samples, preds)))
 end
 
-showpredictions(task::AbstractBlockTask, args...) =
+function showpredictions(task::AbstractBlockTask, args...)
     showpredictions(default_showbackend(), task, args...)
+end
 
 """
     showoutput([backend], task, output)
@@ -147,24 +139,22 @@ Show a model output to `backend`. If an encoded sample `encsample` is also
 given, show it next to the output.
 """
 function showoutput(backend::ShowBackend, task::AbstractBlockTask, output)
-    showblockinterpretable(
-        backend,
-        getencodings(task),
-        "Output" => getblocks(task).ŷ,
-        output,
-    )
+    showblockinterpretable(backend,
+                           getencodings(task),
+                           "Output" => getblocks(task).ŷ,
+                           output)
 end
 function showoutput(backend::ShowBackend, task::AbstractBlockTask, encsample, output)
     blocks = getblocks(task)
-    showblockinterpretable(
-        backend,
-        getencodings(task),
-        ("Encoded sample" => blocks.encodedsample, "Output" => blocks.ŷ),
-        (encsample, output),
-    )
+    showblockinterpretable(backend,
+                           getencodings(task),
+                           ("Encoded sample" => blocks.encodedsample,
+                            "Output" => blocks.ŷ),
+                           (encsample, output))
 end
-showoutput(task::AbstractBlockTask, args...) =
+function showoutput(task::AbstractBlockTask, args...)
     showoutput(default_showbackend(), task, args...)
+end
 
 """
     showoutputs([backend], task, outputs)
@@ -175,26 +165,23 @@ given, show them next to the outputs. Use [`showoutputbatch`](#) to show collate
 batches of outputs.
 """
 function showoutputs(backend::ShowBackend, task::AbstractBlockTask, outputs)
-    showblocksinterpretable(
-        backend,
-        getencodings(task),
-        "Output" => getblocks(task).ŷ,
-        outputs,
-    )
+    showblocksinterpretable(backend,
+                            getencodings(task),
+                            "Output" => getblocks(task).ŷ,
+                            outputs)
 end
 function showoutputs(backend::ShowBackend, task::AbstractBlockTask, encsamples, outputs)
     blocks = getblocks(task)
-    showblocksinterpretable(
-        backend,
-        getencodings(task),
-        ("Encoded sample" => blocks.encodedsample, "Output" => blocks.ŷ),
-        collect(zip(encsamples, outputs)),
-    )
+    showblocksinterpretable(backend,
+                            getencodings(task),
+                            ("Encoded sample" => blocks.encodedsample,
+                             "Output" => blocks.ŷ),
+                            collect(zip(encsamples, outputs)))
 end
 
-showoutputs(task::AbstractBlockTask, args...) =
+function showoutputs(task::AbstractBlockTask, args...)
     showoutputs(default_showbackend(), task, args...)
-
+end
 
 """
     showoutputbatch([backend], task, outputbatch)
@@ -207,17 +194,17 @@ have vectors of outputs and not collated batches.
 function showoutputbatch(backend::ShowBackend, task::AbstractBlockTask, outputbatch)
     return showoutputs(backend, task, Datasets.unbatch(outputbatch))
 end
-function showoutputbatch(
-    backend::ShowBackend,
-    task::AbstractBlockTask,
-    batch,
-    outputbatch,
-)
-    return showoutputs(backend, task, Datasets.unbatch(batch), Datasets.unbatch(outputbatch))
+function showoutputbatch(backend::ShowBackend,
+                         task::AbstractBlockTask,
+                         batch,
+                         outputbatch)
+    return showoutputs(backend, task, Datasets.unbatch(batch),
+                       Datasets.unbatch(outputbatch))
 end
 
-showoutputbatch(task::AbstractBlockTask, args...) =
+function showoutputbatch(task::AbstractBlockTask, args...)
     showoutputbatch(default_showbackend(), task, args...)
+end
 
 # Testing helper
 
@@ -232,14 +219,11 @@ work for `backend`
 - `sample = mockblock(getblocks(task))`: Sample data to use for tests.
 - `output = mockblock(getblocks(task).ŷ)`: Model output data to use for tests.
 """
-function test_task_show(
-    task::LearningTask,
-    backend::ShowBackend;
-    sample = mockblock(getblocks(task).sample),
-    output = mockblock(getblocks(task).ŷ),
-    context = Training(),
-)
-
+function test_task_show(task::LearningTask,
+                        backend::ShowBackend;
+                        sample = mockblock(getblocks(task).sample),
+                        output = mockblock(getblocks(task).ŷ),
+                        context = Training())
     encsample = encodesample(task, context, sample)
     pred = decodeypred(task, context, output)
 

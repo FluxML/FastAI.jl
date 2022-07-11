@@ -38,11 +38,10 @@ function assigngroups!(pg::ParamGroups, grouper, m)
     end
 end
 
-
 abstract type ParamGrouper end
 
 struct IndexGrouper <: ParamGrouper
-    idxs
+    idxs::Any
 end
 
 group(grouper::IndexGrouper, m) = Dict(i => m[is] for (i, is) in enumerate(grouper.idxs))
@@ -52,7 +51,6 @@ function ParamGroups(grouper::ParamGrouper, m)
     assigngroups!(pg, grouper, m)
     return pg
 end
-
 
 # ## Tests
 

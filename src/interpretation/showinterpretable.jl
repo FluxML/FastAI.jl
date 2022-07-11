@@ -1,5 +1,4 @@
 
-
 """
     showblockinterpretable(backend, encodings, block, obs)
 
@@ -22,41 +21,38 @@ showblockinterpretable(ShowText(), encodings, block, x)  # will decode to an `Im
 
 """
 function showblockinterpretable(backend::ShowBackend, encodings, block, obs)
-    res = decodewhile(
-        block -> !isshowable(backend, block),
-        encodings,
-        Validation(),
-        block,
-        obs)
+    res = decodewhile(block -> !isshowable(backend, block),
+                      encodings,
+                      Validation(),
+                      block,
+                      obs)
     isnothing(res) && error("Could not decode to an interpretable block representation!")
     block_, obs_ = res
     showblock(backend, block_, obs_)
 end
-
 
 """
     showblocksinterpretable(backend, encodings, block, obss)
 
 Multi-sample version [`showblockinterpretable`](#).
 """
-function showblocksinterpretable(backend::ShowBackend, encodings, block, obss::AbstractVector)
-    blockobss = [decodewhile(
-        block -> !isshowable(backend, block),
-        encodings,
-        Validation(),
-        block,
-        obs) for obs in obss]
-    any(isnothing, blockobss) && error("Could not decode to an interpretable block representation!")
+function showblocksinterpretable(backend::ShowBackend, encodings, block,
+                                 obss::AbstractVector)
+    blockobss = [decodewhile(block -> !isshowable(backend, block),
+                             encodings,
+                             Validation(),
+                             block,
+                             obs) for obs in obss]
+    any(isnothing, blockobss) &&
+        error("Could not decode to an interpretable block representation!")
     block_ = first(first(blockobss))
     obss_ = last.(blockobss)
     showblocks(backend, block_, obss_)
 end
 
-
 # Helpers
 
-
-function isshowable(backend::S, block::B) where {S<:ShowBackend, B<:AbstractBlock}
+function isshowable(backend::S, block::B) where {S <: ShowBackend, B <: AbstractBlock}
     hasmethod(FastAI.showblock!, (Any, S, B, Any))
 end
 
@@ -69,29 +65,25 @@ reverse order until `f(block') == false`.
 function decodewhile(f, encodings, ctx, block::AbstractBlock, obs)
     if f(block)
         encodings === () && return nothing
-        return decodewhile(
-            f,
-            encodings[1:end-1],
-            ctx,
-            decodedblockfilled(encodings[end], block),
-            decode(encodings[end], ctx, block, obs),
-        )
+        return decodewhile(f,
+                           encodings[1:(end - 1)],
+                           ctx,
+                           decodedblockfilled(encodings[end], block),
+                           decode(encodings[end], ctx, block, obs))
     else
         return (block, obs)
     end
 end
 
-
 function decodewhile(f, encodings, ctx, blocks::Tuple, obss::Tuple)
     encodings === () && return nothing
     results = Tuple(decodewhile(f, encodings, ctx, block, obs)
-                for (block, obs) in zip(blocks, obss))
+                    for (block, obs) in zip(blocks, obss))
     any(isnothing, results) && return nothing
     blocks = first.(results)
     obss_ = last.(results)
     return blocks, obss_
 end
-
 
 function decodewhile(f, encodings, ctx, (title, block)::Pair, obs)
     encodings === () && return nothing

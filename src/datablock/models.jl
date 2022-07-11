@@ -1,6 +1,4 @@
 
-
-
 """
     blockmodel(inblock, outblock[, backbone = blockbackbone(inblock)])
 

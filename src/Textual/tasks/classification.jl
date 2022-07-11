@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 """
     TextClassificationSingle(blocks[, data])
 
@@ -51,3 +52,14 @@ _tasks["textclfsingle"] = (
         @test y ≈ [0, 1]
     end
 end
+=======
+function TextClassficationSingle(blocks::Tuple{<:Paragraph, <:Label}, data=nothing)
+    return SupervisedTask(
+        blocks,
+        (
+            
+            OneHot()
+        )
+    )
+end
+>>>>>>> master

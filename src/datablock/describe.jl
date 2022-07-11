@@ -1,5 +1,4 @@
 
-
 function listencodeblocks(encodings, blocks)
     filledblocks = Any[blocks]
     changedblocks = Any[tuplemap(_ -> false, blocks)]
@@ -26,13 +25,12 @@ tuplemap(f, args...) = f(args...)
 tuplemap(f, args::Vararg{Tuple}) = map((as...) -> tuplemap(f, as...), args...)
 
 function blockcolumn(encodings, block; decode = false)
-    blocks, changed =
-        decode ? listdecodeblocks(encodings, block) : listencodeblocks(encodings, block)
+    blocks, changed = decode ? listdecodeblocks(encodings, block) :
+                      listencodeblocks(encodings, block)
     n = length(blocks)
-    blockscol = [
-        tuplemap((b, c) -> _blockcell(b, c, i), bs, ch) for
-        (i, bs, ch) in zip(1:n, blocks, changed)
-    ]
+    blockscol = [tuplemap((b, c) -> _blockcell(b, c, i), bs, ch)
+                 for
+                 (i, bs, ch) in zip(1:n, blocks, changed)]
     if block isa Tuple
         blockscol = [join(row, ", ") for row in blockscol]
     end
@@ -49,50 +47,41 @@ function _blockcell(block, haschanged, i)
     end
 end
 
-encodingscolumn(encodings) =
+function encodingscolumn(encodings)
     reshape(["", ["`$(typeof(enc).name.name)`" for enc in encodings]...], :, 1)
-
-
-function describeencodings(
-    encodings,
-    blocks::Tuple;
-    inname = "Input",
-    outname = "Output",
-    blocknames = repeat([""], length(blocks)),
-    decode = false,
-    markdown = false,
-    tf = tf_markdown,
-)
-    namescol = reshape([inname, ["" for _ = 2:length(encodings)]..., outname], :, 1)
-
-    data = hcat(
-        encodingscolumn(decode ? reverse(encodings) : encodings),
-        namescol,
-        [blockcolumn(encodings, block; decode = decode) for block in blocks]...,
-    )
-
-    s = pretty_table(
-        String,
-        data,
-        header = [decode ? "Decoding" : "Encoding", "Name", blocknames...],
-        alignment = [:r, :r, [:l for _ = 1:length(blocknames)]...],
-        tf = tf,
-    )
-    return markdown ? Markdown.parse(s) : s
 end
 
+function describeencodings(encodings,
+                           blocks::Tuple;
+                           inname = "Input",
+                           outname = "Output",
+                           blocknames = repeat([""], length(blocks)),
+                           decode = false,
+                           markdown = false,
+                           tf = tf_markdown)
+    namescol = reshape([inname, ["" for _ in 2:length(encodings)]..., outname], :, 1)
+
+    data = hcat(encodingscolumn(decode ? reverse(encodings) : encodings),
+                namescol,
+                [blockcolumn(encodings, block; decode = decode) for block in blocks]...)
+
+    s = pretty_table(String,
+                     data,
+                     header = [decode ? "Decoding" : "Encoding", "Name", blocknames...],
+                     alignment = [:r, :r, [:l for _ in 1:length(blocknames)]...],
+                     tf = tf)
+    return markdown ? Markdown.parse(s) : s
+end
 
 function describetask(task::SupervisedTask)
     blocks = getblocks(task)
     input, target, x, ŷ = blocks.input, blocks.target, blocks.x, blocks.ŷ
 
-    encoding = describeencodings(
-        getencodings(task),
-        getblocks(task).sample,
-        blocknames = ["`blocks.input`", "`blocks.target`"],
-        inname = "`(input, target)`",
-        outname = "`(x, y)`",
-    )
+    encoding = describeencodings(getencodings(task),
+                                 getblocks(task).sample,
+                                 blocknames = ["`blocks.input`", "`blocks.target`"],
+                                 inname = "`(input, target)`",
+                                 outname = "`(x, y)`")
 
     s = """
     **`SupervisedTask` summary**
@@ -113,13 +102,11 @@ end
 function describetask(task::BlockTask)
     blocks = getblocks(task)
 
-    encoding = describeencodings(
-        getencodings(task),
-        (blocks.sample,),
-        blocknames = ["sample"],
-        inname = "`sample`",
-        outname = "`encodedsample`",
-    )
+    encoding = describeencodings(getencodings(task),
+                                 (blocks.sample,),
+                                 blocknames = ["sample"],
+                                 inname = "`sample`",
+                                 outname = "`encodedsample`")
 
     s = """
     **`BlockTask` summary**

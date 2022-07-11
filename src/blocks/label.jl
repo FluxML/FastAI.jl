@@ -1,5 +1,4 @@
 
-
 """
     Label(classes) <: Block
     setup(LabelMulti, data)
@@ -31,11 +30,10 @@ struct Label{T} <: Block
     classes::AbstractVector{T}
 end
 
-checkblock(label::Label{T}, obs::T) where T = obs ∈ label.classes
-mockblock(label::Label{T}) where T = rand(label.classes)::T
+checkblock(label::Label{T}, obs::T) where {T} = obs ∈ label.classes
+mockblock(label::Label{T}) where {T} = rand(label.classes)::T
 
 setup(::Type{Label}, data) = Label(unique(eachobs(data)))
-
 
 """
     LabelMulti(classes)
@@ -65,16 +63,15 @@ struct LabelMulti{T} <: Block
     classes::AbstractVector{T}
 end
 
-function checkblock(label::LabelMulti{T}, v::AbstractVector{T}) where T
+function checkblock(label::LabelMulti{T}, v::AbstractVector{T}) where {T}
     return all(map(x -> x ∈ label.classes, v))
 end
 
-mockblock(label::LabelMulti) =
+function mockblock(label::LabelMulti)
     unique([rand(label.classes) for _ in 1:rand(1:length(label.classes))])
-
+end
 
 setup(::Type{LabelMulti}, data) = LabelMulti(unique(eachobs(data)))
-
 
 InlineTest.@testset "Label [block]" begin
     block = Label(["cat", "dog"])
@@ -85,7 +82,6 @@ InlineTest.@testset "Label [block]" begin
     block = setup(Label, targets)
     InlineTest.@test block.classes == ["cat", "dog"]
 end
-
 
 InlineTest.@testset "LabelMulti [block]" begin
     block = LabelMulti(["cat", "dog"])

@@ -1,7 +1,21 @@
 name: CI
 on:
-  - push
-  - pull_request
+  push:
+    paths-ignore:
+      - 'docs/**'
+      - 'FastMakie/**'
+      - 'FastVision/**'
+      - 'FastTabular/**'
+      - 'FastText/**'
+      - '*.md'
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - 'FastMakie/**'
+      - 'FastVision/**'
+      - 'FastTabular/**'
+      - 'FastText/**'
+      - '*.md'
 jobs:
   test:
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }}

@@ -4,15 +4,15 @@
 
 ## Introduction
 
-In the [quickstart](quickstart.md) section, you have already come in contact with data containers. The following code was used to load a data container for image classification:
+In the [quickstart](./notebooks/quickstart.ipynb) section, you have already come in contact with data containers. The following code was used to load a data container for image classification:
 
-{cell=main, result=false, output=false style="display:none;"}
+{cell=main, resultshow=false, outputshow=false show=false}
 ```julia
 ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 ```
 {cell=main, output=false}
 ```julia
-using FastAI
+using FastAI, FastVision
 data, _ = load(findfirst(datarecipes(datasetid="imagenette2-160")))
 ```
 

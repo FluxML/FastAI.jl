@@ -3,7 +3,6 @@ module Textual
 
 using ..FastAI
 using ..FastAI:
-    Datasets,
     # blocks
     Block, WrapperBlock, AbstractBlock, OneHotTensor, OneHotTensorMulti, Label,
     LabelMulti, wrapped, Continuous, getencodings, getblocks, encodetarget, encodeinput,
@@ -13,9 +12,6 @@ using ..FastAI:
     ShowText,
     # other
     Context, Training, Validation
-using ..FastAI.Datasets
-
-using ..FastAI.Datasets
 
 # for tests
 using ..FastAI: testencoding
@@ -42,6 +38,7 @@ using WordTokenizers: TokenBuffer, isdone, character, spaces, nltk_url1, nltk_ur
 include("recipes.jl")
 include("blocks/text.jl")
 include("transform.jl")
+<<<<<<< HEAD
 include("encodings/textpreprocessing.jl")
 
 const _tasks = Dict{String,Any}()
@@ -58,6 +55,10 @@ const DEFAULT_SANITIZERS = [
 
 const DEFAULT_TOKENIZERS = [tokenize]
 
+=======
+include("tasks/classification.jl")
+
+>>>>>>> master
 
 function __init__()
     _registerrecipes()

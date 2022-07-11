@@ -1,5 +1,4 @@
 
-
 @testset "ShowMakie" begin
     @testset "ImageClassificationSingle" begin
         task = ImageClassificationSingle((16, 16), [1, 2])
