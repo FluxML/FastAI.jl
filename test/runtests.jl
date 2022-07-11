@@ -12,7 +12,7 @@ using InlineTest
 using ..FastAI
 import ..FastAI: Block, Encoding, encodedblock, decodedblock, encode, decode,
                  testencoding, test_task_show, checkblock
-using Flux.Optimise: Optimiser, ADAM, apply!
+using Flux.Optimise: Optimiser, Adam, apply!
 
 ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 include("testdata.jl")
