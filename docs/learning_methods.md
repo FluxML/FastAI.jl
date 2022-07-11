@@ -176,7 +176,7 @@ model = Chain(
             Dense(512, length(task.classes)),
     )
 )
-optimizer = ADAM()
+optimizer = Adam()
 lossfn = Flux.Losses.logitcrossentropy
 
 learner = Learner(model, lossfn; data = (traindl, valdl), optimizer)
