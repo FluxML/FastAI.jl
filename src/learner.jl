@@ -13,7 +13,7 @@ Create a [`Learner`](#) to train a model for learning task `task` using
 - `backbone = nothing`: Backbone model to construct task-specific model from using
    [`taskmodel`](#)`(task, backbone)`.
 - `model = nothing`: Complete model to use. If given, the `backbone` argument is ignored.
-- `optimizer = ADAM()`: Optimizer passed to `Learner`.
+- `optimizer = Adam()`: Optimizer passed to `Learner`.
 - `lossfn = `[`tasklossfn`](#)`(task)`: Loss function passed to `Learner`.
 
 Any other keyword arguments will be passed to [`taskdataloaders`](#).
@@ -51,7 +51,7 @@ function tasklearner(task::LearningTask,
                      callbacks = [],
                      pctgval = 0.2,
                      batchsize = 16,
-                     optimizer = ADAM(),
+                     optimizer = Adam(),
                      lossfn = tasklossfn(task),
                      kwargs...)
     if isnothing(model)

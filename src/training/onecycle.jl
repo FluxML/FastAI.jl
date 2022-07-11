@@ -54,11 +54,11 @@ end
 # ## Tests
 
 @testset "decay_optim" begin
-    optim = ADAM()
+    optim = Adam()
     @test decay_optim(optim, 0.1) isa Optimiser
-    @test decay_optim(Optimiser(ADAM(), ADAM()), 0.1) isa Optimiser
+    @test decay_optim(Optimiser(Adam(), Adam()), 0.1) isa Optimiser
     @test decay_optim(optim, 0.1).os[1] isa WeightDecay
-    o = decay_optim(Optimiser(ADAM(), WeightDecay(0.5)), 0.1)
+    o = decay_optim(Optimiser(Adam(), WeightDecay(0.5)), 0.1)
     @test o.os[1] isa WeightDecay
-    @test o.os[2] isa ADAM
+    @test o.os[2] isa Adam
 end
