@@ -16,13 +16,22 @@ using FastAI:
 
 using FastAI.Datasets
 
+using ..FastAI: testencoding
+
+# extending
+import ..FastAI:
+    blockmodel, blockbackbone, blocklossfn, encode, decode, checkblock,
+    encodedblock, decodedblock, showblock!, mockblock, setup, encodestate,
+    decodestate
+
 using InlineTest
 using Random
 using TextAnalysis:
-    StringDocument, prepare!, strip_stopwords,
+    StringDocument, prepare!, strip_stopwords, text,
     strip_html_tags, strip_non_letters, strip_numbers
-using Tables
-using ShowCases
+using DataStructures: OrderedDict
+
+using WordTokenizers: TokenBuffer, isdone, character, spaces, nltk_url1, nltk_url2, nltk_phonenumbers
 
 
 include("recipes.jl")
