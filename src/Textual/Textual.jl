@@ -30,6 +30,7 @@ import ..FastAI:
 
 import Requires: @require
 
+using Flux
 using InlineTest
 using Random
 using TextAnalysis:
@@ -43,6 +44,7 @@ include("recipes.jl")
 include("blocks/text.jl")
 include("transform.jl")
 include("encodings/textpreprocessing.jl")
+include("models/customlayers.jl")
 
 const _tasks = Dict{String,Any}()
 include("tasks/classification.jl")
