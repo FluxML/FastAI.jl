@@ -36,6 +36,9 @@ const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
     "ecg5000" => [
         TimeSeriesDatasetRecipe(train_file="ECG5000_TRAIN.ts", test_file="ECG5000_TEST.ts")
     ],
+    "atrial" => [
+        TimeSeriesDatasetRecipe(train_file="AtrialFibrillation_TRAIN.ts", test_file="AtrialFibrillation_TEST.ts")
+    ]
 )
 
 function _registerrecipes()
