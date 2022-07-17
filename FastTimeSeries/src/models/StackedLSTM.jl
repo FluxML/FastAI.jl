@@ -1,13 +1,9 @@
-using Flux
-using Zygote
-
 # StackedLSTM.jl
 #
 # Layers for stacked LSTM (referenced from https://github.com/sdobber/FluxArchitectures.jl)
 
-mutable struct StackedLSTMCell{A,S}
+mutable struct StackedLSTMCell{A}
 	chain::A
-	state::S
 end
 
 """
@@ -34,13 +30,12 @@ function StackedLSTM(in::Int, out::Integer, hiddensize::Integer, layers::Integer
 		end
 		chain = Chain(chain_vec..., LSTM(hiddensize, out; init=init))
 	end
-	return StackedLSTMCell(chain,  zeros(Float32, out))
+	return StackedLSTMCell(chain)
 end
 
-function (m::StackedLSTMCell)(x)
-	out = m.chain(x)
-	m.state = out
-	return out
+function (m::StackedLSTMCell)(X)
+	[m.chain(x) for x ∈ X[1:end-1]]
+	return m.chain(X[end])
 end
 
 Flux.@functor StackedLSTMCell 

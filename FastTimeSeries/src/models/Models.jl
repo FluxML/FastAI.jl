@@ -8,7 +8,8 @@ using DataDeps
 using InlineTest
 
 include("StackedLSTM.jl")
+include("RNN.jl")
 
-export 
+export StackedLSTM, RNNModel
 
 end
