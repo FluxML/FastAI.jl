@@ -50,6 +50,7 @@ include("models/custom_layers.jl")
 include("models/utils.jl")
 include("models/datadeps.jl")
 include("models/train_text_classifier.jl")
+include("models/data_loaders.jl")
 
 const _tasks = Dict{String,Any}()
 include("tasks/classification.jl")

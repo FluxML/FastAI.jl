@@ -179,9 +179,11 @@ end
 It contains main training loops for training a defined classifer for specified classes and data.
 Usage is discussed in the docs.
 """
-function train_classifier!(classifier::TextClassifier=TextClassifier(), classes::Integer=1, hidden_layer_size::Integer=50)
+function train_classifier!(classifier::TextClassifier=TextClassifier(), data = (loadrecipe()["imdb"]))
 
     # dala_loader = imdb_classifier_data
+    classes = 2
+    hidden_layer_size = 50
     stlr_cut_frac=0.1
     stlr_ratio=32
     stlr_η_max=0.01
@@ -199,8 +201,8 @@ function train_classifier!(classifier::TextClassifier=TextClassifier(), classes:
 
     for epoch=1:epochs
         println("Epoch: $epoch")
-        gen = imdb_classifier_data(16)
-        num_of_iters = take!(gen)
+        gen = data
+        num_of_iters = numobs(data)
         cut = num_of_iters * epochs * stlr_cut_frac
         for iter=1:num_of_iters
 
