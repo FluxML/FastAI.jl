@@ -4,11 +4,16 @@ authors = ["Lorenz Ohly", "FluxML Community"]
 version = "0.1.0"
 
 [deps]
+BSON = "fbb218c0-5317-5bc6-957e-2ee96dd4b1f0"
+DataDeps = "124859b0-ceae-595e-8997-d05f6a7a8dfe"
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
+DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 FastAI = "5d0beca9-ade8-49ae-ad0b-a3cf890e669f"
+Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
 InlineTest = "bd334432-b1e7-49c7-a2dc-dd9149e4ebd6"
 MLUtils = "f1d291b0-491e-4a28-83b9-f70985020b54"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 TextAnalysis = "a2db99b7-8b79-58f8-94bf-bbc811eef33d"
 WordTokenizers = "796a5d58-b03d-544a-977e-18100b691f6e"
 
