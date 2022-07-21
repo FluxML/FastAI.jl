@@ -38,6 +38,7 @@ using Flux
 using DataDeps
 using BSON
 using TextAnalysis
+using MLUtils
 
 
 include("recipes.jl")
@@ -45,12 +46,12 @@ include("blocks/text.jl")
 include("transform.jl")
 include("encodings/textpreprocessing.jl")
 
+
 include("models/pretrain_lm.jl")
 include("models/custom_layers.jl")
 include("models/utils.jl")
-include("models/datadeps.jl")
 include("models/train_text_classifier.jl")
-include("models/data_loaders.jl")
+include("models/dataloader.jl")
 
 const _tasks = Dict{String,Any}()
 include("tasks/classification.jl")
@@ -67,7 +68,7 @@ const DEFAULT_SANITIZERS = [
 const DEFAULT_TOKENIZERS = [tokenize]
 
 function __init__()
-    FastText.ulmfit_datadep_register()
+    # FastText.ulmfit_datadep_register()
     FastAI.Registries.registerrecipes(@__MODULE__, RECIPES)
     foreach(values(_tasks)) do t
         if !haskey(FastAI.learningtasks(), t.id)
@@ -76,6 +77,6 @@ function __init__()
     end
 end
 
-export Paragraph, TextClassificationSingle, Sanitize, Tokenize
+export Paragraph, TextClassificationSingle, Sanitize, Tokenize, LanguageModel
 
 end
