@@ -2,7 +2,7 @@
 #
 # Layers for stacked LSTM (referenced from https://github.com/sdobber/FluxArchitectures.jl)
 
-mutable struct StackedLSTMCell{A}
+struct StackedLSTMCell{A}
 	chain::A
 end
 
@@ -34,12 +34,13 @@ function StackedLSTM(in::Int, out::Integer, hiddensize::Integer, layers::Integer
 end
 
 function (m::StackedLSTMCell)(X)
+	Flux.reset!(m)
 	[m.chain(x) for x ∈ X[1:end-1]]
 	return m.chain(X[end])
 end
 
 Flux.@functor StackedLSTMCell 
-Flux.trainable(m::StackedLSTMCell) = (m.chain)
+# Flux.trainable(m::StackedLSTMCell) = (m.chain)
 
 # Initialize forget gate bias with 1
 function initialize_bias!(l::StackedLSTMCell)

@@ -42,8 +42,7 @@ _tasks["tsclfsingle"] = (
         row = FastAI.mockblock(task.blocks[1])
 
         xtrain = FastAI.encodeinput(task, Training(), row);
-        @test length(xtrain[1,:]) == task.blocks.input.obslength
-        @test length(xtrain[:,1]) == task.blocks.input.nfeatures
+        @test size(xtrain) == (task.blocks.input.nfeatures, task.blocks.input.obslength)
 
         @test eltype(xtrain[1,:]) <: Number
     end

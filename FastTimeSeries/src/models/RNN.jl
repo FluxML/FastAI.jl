@@ -1,3 +1,9 @@
+function tabular2rnn(X::AbstractArray{Float32, 3})
+    X = permutedims(X, (2, 1, 3))
+    X = [X[t, :, :] for t ∈ 1:size(X, 1)]
+    return X
+end
+
 """
     RNNModel(recbackbonem, outsize, recout[; kwargs...])
 
@@ -24,5 +30,5 @@ function RNNModel(recbackbone,
                   dropout_rate = 0.0)
     
     dropout = dropout_rate == 0 ? identity : Dropout(dropout_rate)
-    Chain(recbackbone, dropout, finalclassifier)
+    Chain(tabular2rnn, recbackbone, dropout, finalclassifier)
 end
