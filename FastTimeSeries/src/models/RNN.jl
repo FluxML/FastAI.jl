@@ -1,6 +1,7 @@
 function tabular2rnn(X::AbstractArray{Float32, 3})
     X = permutedims(X, (2, 1, 3))
-    X = [X[t, :, :] for t ∈ 1:size(X, 1)]
+    X = collect(eachslice(X; dims=1))
+    # X = [X[t, :, :] for t ∈ 1:size(X, 1)]
     return X
 end
 
