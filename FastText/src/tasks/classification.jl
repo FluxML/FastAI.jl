@@ -11,7 +11,7 @@ function TextClassificationSingle(blocks::Tuple{<:Paragraph,<:Label}, data)
         (
             Sanitize(),
             Tokenize(),
-            setup(EmbedVocabulary, data),
+            setup(EmbedVocabulary, data, vocab_size=10000),
             # EmbedVocabulary(),
             OneHot()
         )

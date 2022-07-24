@@ -41,7 +41,7 @@ function encode(p::Tokenize, context, block::Paragraph, obs)
     obs
 end
 
-function computevocabulary(data)
+function computevocabulary(data; vocab_size=40000)
     lookup_table = Dict{String, Int}()
 
     enc1 = Sanitize()
@@ -56,7 +56,19 @@ function computevocabulary(data)
             lookup_table[token] = get(lookup_table, token, 0) + 1
         end
     end
-    return OrderedDict(lookup_table)
+
+    ordered_dict = sort(OrderedDict(lookup_table), byvalue=true, rev=true)
+
+    vocab = []
+
+    for (key, value) in ordered_dict
+        if vocab_size >= length(vocab)
+            push!(vocab, key)
+        end
+    end
+
+    return vocab
+
 end
 
 struct EmbedVocabulary <: Encoding
@@ -67,8 +79,8 @@ function EmbedVocabulary(; vocab)
     return EmbedVocabulary(vocab)
 end
 
-function setup(::Type{EmbedVocabulary}, data)
-    vocab = computevocabulary(data)
+function setup(::Type{EmbedVocabulary}, data; vocab_size=238483)
+    vocab = computevocabulary(data, vocab_size=vocab_size)
     return EmbedVocabulary(vocab = vocab)
 end
 
@@ -79,7 +91,7 @@ end
 function encode(p::EmbedVocabulary, context, block::Tokens, obs)
     vocabulary = p.vocab
 
-    return [vocabulary[token] for token in obs]
+    return [indexin(vocabulary, obs) for token in obs]
 end
 
 
