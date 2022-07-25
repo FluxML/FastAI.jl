@@ -406,5 +406,5 @@ function get_trainable_params(layers)
             push!(p, l)
         end
     end
-    return params(p...)
+    return Flux.params(p...)
 end
