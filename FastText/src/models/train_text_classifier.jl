@@ -89,11 +89,11 @@ gen             : data loader, which will give 'X' of the mini-batch in one call
 tracked_steps   : This is the number of tracked time-steps for Truncated Backprop thorugh time,
                   these will be last time-steps for which gradients will be calculated.
 """
-function forward(tc::TextClassifier, gen::Channel, tracked_steps::Integer=32)
+function forward(tc::TextClassifier, batches, tracked_steps::Integer=32)
   	# swiching off tracking
     classifier = tc
-    X = take!(gen)
-    # println("X = $X")
+    # X = take!(gen)
+    X = batches[1][1]
     l = length(X)
     # Truncated Backprop through time
     println("l = $l")
@@ -101,9 +101,11 @@ function forward(tc::TextClassifier, gen::Channel, tracked_steps::Integer=32)
 	for i=1:ceil(l/tracked_steps)-1   # Tracking is swiched off inside this loop
         println("i = $i / $(ceil(l/tracked_steps)-1)")
 	    (i == 1 && l%tracked_steps != 0) ? (last_idx = l%tracked_steps) : (last_idx = tracked_steps)
-	    H = broadcast(x -> indices(x, classifier.vocab, "_unk_"), X[1:last_idx])
+	    # H = broadcast(x -> indices(x, classifier.vocab, "_unk_"), X[1:last_idx])
+        H = X[1:last_idx]
 	    H = classifier.rnn_layers.(H)
 	    X = X[last_idx+1:end]
+        println(length(X))
 	end
 
     println("Start shifting states")
@@ -125,7 +127,8 @@ function forward(tc::TextClassifier, gen::Channel, tracked_steps::Integer=32)
     end
     println("End shifting")
     # last part of the sequecnes in X - Tracking is swiched on
-    H = broadcast(x -> tc.rnn_layers[1](indices(x, classifier.vocab, "_unk_")), X)
+    # H = broadcast(x -> tc.rnn_layers[1](indices(x, classifier.vocab, "_unk_")), X)
+    H = classifier.rnn_layers[1](X[1])
     H = tc.rnn_layers[2:end].(H)
     H = tc.linear_layers(H)
     return H
@@ -144,20 +147,21 @@ classifier    : Instance of TextClassifier
 gen           : 'Channel' [data loader], to give a mini-batch
 tracked_steps : specifies the number of time-steps for which tracking is on
 """
-function loss(classifier::TextClassifier, gen::Channel, tracked_steps::Integer=32)
-    H = forward(classifier, gen, tracked_steps)
-    Y = gpu(take!(gen))
-    l = crossentropy(H, Y)
+function loss(classifier::TextClassifier, batches, tracked_steps::Integer=32)
+    H = forward(classifier, batches, tracked_steps)
+    # Y = gpu(take!(gen))
+    Y = batches[1][2]
+    l = Flux.Losses.crossentropy(H, Y)
     # reset!(classifier.rnn_layers)
     println("Loss = $l")
     return l
 end
 
-function discriminative_step!(layers, classifier::TextClassifier, gen::Channel, tracked_steps::Integer, ηL::Float64, opts::Vector)
+function discriminative_step!(layers, classifier::TextClassifier, batches, tracked_steps::Integer, ηL::Float64, opts::Vector)
     @assert length(opts) == length(layers)
     # Gradient calculation
     println("Start grads")
-    grads = Zygote.gradient(() -> loss(classifier, gen, tracked_steps), get_trainable_params(layers))
+    grads = Zygote.gradient(() -> loss(classifier, batches, tracked_steps), get_trainable_params(layers))
 
     println("Done grads")
     # discriminative step
@@ -179,9 +183,8 @@ end
 It contains main training loops for training a defined classifer for specified classes and data.
 Usage is discussed in the docs.
 """
-function train_classifier!(classifier::TextClassifier=TextClassifier(), data = (loadrecipe()["imdb"]))
+function train_classifier!(classifier::TextClassifier=TextClassifier(), batches=Nothing)
 
-    # dala_loader = imdb_classifier_data
     classes = 2
     hidden_layer_size = 50
     stlr_cut_frac=0.1
@@ -201,8 +204,8 @@ function train_classifier!(classifier::TextClassifier=TextClassifier(), data = (
 
     for epoch=1:epochs
         println("Epoch: $epoch")
-        gen = data
-        num_of_iters = numobs(data)
+        gen = batches
+        num_of_iters = length(batches)
         cut = num_of_iters * epochs * stlr_cut_frac
         for iter=1:num_of_iters
 
@@ -216,7 +219,7 @@ function train_classifier!(classifier::TextClassifier=TextClassifier(), data = (
             # Gradual-unfreezing Step with discriminative fine-tuning
             unfreezed_layers, cur_opts = (epoch < length(trainable)) ? (trainable[end-epoch+1:end], opts[end-epoch+1:end]) : (trainable, opts)
             println("start discriminative_step")
-            discriminative_step!(unfreezed_layers, classifier, gen, tracked_steps,ηL, cur_opts)
+            discriminative_step!(unfreezed_layers, classifier, batches, tracked_steps,ηL, cur_opts)
 
             println("End discriminative_step")
 

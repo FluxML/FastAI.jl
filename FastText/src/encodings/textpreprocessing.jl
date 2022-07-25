@@ -70,7 +70,7 @@ function computevocabulary(data; vocab_size=40000)
     counter = 3
 
     for (k, v) in ordered_dict
-        ordered_dict[k] = counter + 1
+        ordered_dict[k] = counter
         counter = counter + 1
     end
 

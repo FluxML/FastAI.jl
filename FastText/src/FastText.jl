@@ -39,6 +39,7 @@ using DataDeps
 using BSON
 using TextAnalysis
 using MLUtils
+using Zygote
 
 
 include("recipes.jl")
