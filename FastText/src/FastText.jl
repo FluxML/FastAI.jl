@@ -52,6 +52,7 @@ include("models/custom_layers.jl")
 include("models/utils.jl")
 include("models/train_text_classifier.jl")
 include("models/dataloader.jl")
+include("models/datadeps.jl")
 
 const _tasks = Dict{String,Any}()
 include("tasks/classification.jl")
@@ -68,7 +69,7 @@ const DEFAULT_SANITIZERS = [
 const DEFAULT_TOKENIZERS = [tokenize]
 
 function __init__()
-    # FastText.ulmfit_datadep_register()
+    FastText.ulmfit_datadep_register()
     FastAI.Registries.registerrecipes(@__MODULE__, RECIPES)
     foreach(values(_tasks)) do t
         if !haskey(FastAI.learningtasks(), t.id)

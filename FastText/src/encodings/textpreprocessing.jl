@@ -50,24 +50,35 @@ function computevocabulary(data; vocab_size=40000)
     enc2 = Tokenize()
     tokenized_data = map(i -> encode(enc2, Training(), Paragraph(), getobs(sanitized_Data, i)), 1:numobs(data))
 
-    vocab = []
     for sample in tokenized_data
         for token in sample
             lookup_table[token] = get(lookup_table, token, 0) + 1
         end
     end
 
-    ordered_dict = sort(OrderedDict(lookup_table), byvalue=true, rev=true)
+    ordered_dict = sort(OrderedDict(lookup_table), byvalue=true)
 
-    vocab = []
-
-    for (key, value) in ordered_dict
-        if vocab_size >= length(vocab)
-            push!(vocab, key)
+    for (k, v) in ordered_dict
+        if length(ordered_dict) > vocab_size
+            delete!(ordered_dict, k)
+        else
+            break
         end
     end
 
-    return vocab
+    ordered_dict = sort(OrderedDict(ordered_dict), byvalue=true, rev=true)
+    counter = 3
+
+    for (k, v) in ordered_dict
+        ordered_dict[k] = counter + 1
+        counter = counter + 1
+    end
+
+    ordered_dict["<unk>"] = 1
+    ordered_dict["<pad>"] = 2
+
+
+    return sort(ordered_dict, byvalue=true)
 
 end
 
@@ -91,7 +102,7 @@ end
 function encode(p::EmbedVocabulary, context, block::Tokens, obs)
     vocabulary = p.vocab
 
-    return [indexin(vocabulary, obs) for token in obs]
+    return [token in vocabulary.keys ? vocabulary[token] : vocabulary["<unk>"]  for token in obs]
 end
 
 

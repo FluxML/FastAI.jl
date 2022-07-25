@@ -5,13 +5,13 @@ Learning task for single-label text classification. Samples are
 preprocessed by applying various textual transforms and classified into one of `classes`.
 
 """
-function TextClassificationSingle(blocks::Tuple{<:Paragraph,<:Label}, data)
+function TextClassificationSingle(blocks::Tuple{<:Paragraph,<:Label}, data; vocab_size = 40000)
     return SupervisedTask(
         blocks,
         (
             Sanitize(),
             Tokenize(),
-            setup(EmbedVocabulary, data, vocab_size=10000),
+            setup(EmbedVocabulary, data, vocab_size=vocab_size),
             # EmbedVocabulary(),
             OneHot()
         )
