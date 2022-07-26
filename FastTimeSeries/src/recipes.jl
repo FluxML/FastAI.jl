@@ -38,7 +38,11 @@ const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
     ],
     "atrial" => [
         TimeSeriesDatasetRecipe(train_file="AtrialFibrillation_TRAIN.ts", test_file="AtrialFibrillation_TEST.ts")
-    ]
+    ],
+    #! TODO.
+    # "appliances_energy" => [
+    #     TimeSeriesDatasetRecipe(train_file="AppliancesEnergy_TRAIN.ts", test_file="AppliancesEnergy_TEST.ts")
+    # ]
 )
 
 function _registerrecipes()
