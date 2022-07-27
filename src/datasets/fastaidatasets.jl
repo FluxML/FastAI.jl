@@ -18,20 +18,8 @@ struct TSClassificationDataset
     size
 end
 
-struct MonashRegressionDataset
-    name
-    dset_id
-    extension
-    description
-    checksum
-    datadepname
-    splits
-    size
-end
-
 const ROOT_URL_FastAI = "https://s3.amazonaws.com/fast-ai-"
 const ROOT_URL_TSClassification = "http://www.timeseriesclassification.com/Downloads"
-const ROOT_URL_MonashRegression = "https://zenodo.org/record/"
 
 function FastAIDataset(name, subfolder, checksum = "";
                        extension = "tgz",
@@ -52,20 +40,12 @@ function TSClassificationDataset(
     return TSClassificationDataset(name, extension, description, checksum, datadepname, size)
 end
 
-function MonashRegressionDataset(
-        name, dset_id, checksum = "";
-        extension = "ts", description = "", splits = ["TRAIN", "TEST"],
-        datadepname="", size="???")
-    return MonashRegressionDataset(name, dset_id, extension, description, checksum, datadepname, splits, size)
-end
-
 const DESCRIPTIONS = Dict(
     "imagenette" => "A subset of 10 easily classified classes from Imagenet: tench, English springer, cassette player, chain saw, church, French horn, garbage truck, gas pump, golf ball, parachute",
     "imagewoof" => "A subset of 10 harder to classify classes from Imagenet (all dog breeds): Australian terrier, Border terrier, Samoyed, beagle, Shih-Tzu, English foxhound, Rhodesian ridgeback, dingo, golden retriever, Old English sheepdog",
     "food-101" => "101 food categories, with 101,000 images; 250 test images and 750 training images per class. The training images were not cleaned. All images were rescaled to have a maximum side length of 512 pixels.",
     "ECG5000" => "The original dataset for \"ECG5000\" is a 20-hour long ECG downloaded from Physionet. The name is BIDMC Congestive Heart Failure Database(chfdb) and it is record \"chf07\".",
     "AtrialFibrillation" => "This is a physionet dataset of two-channel ECG recordings has been created from data used in the Computers in Cardiology Challenge 2004, an open competition with the goal of developing automated methods for predicting spontaneous termination of atrial fibrillation (AF).",
-    "AppliancesEnergy" => "The goal of this dataset is to predict total energy usage in kWh of a house.",
 )
 
 const DATASETCONFIGS = [
@@ -223,13 +203,9 @@ const DATASETCONFIGS = [
     FastAIDataset("stuff_annotations_trainval2017", "coco", datadepname="coco-stuff_annotations_trainval2017", extension="zip"),
     FastAIDataset("panoptic_annotations_trainval2017", "coco", datadepname="coco-panoptic_annotations_trainval2017", extension="zip"),
 
-    # timeseries classification
+    # timeseries
     TSClassificationDataset("ECG5000", "41f6de20ac895e9ce31753860995518951f1ed42a405d0e51c909d27e3b3c5a4", description = DESCRIPTIONS["ECG5000"] ,datadepname="ecg5000", size="10MB" ),
     TSClassificationDataset("AtrialFibrillation", "218abad67d58190a6daa1a27f4bd58ace6e18f80fb59fb2c7385f0d2d4b411a2", description = DESCRIPTIONS["AtrialFibrillation"], datadepname = "atrial", size = "226KB"),
-
-    # monash regression datasets
-    MonashRegressionDataset("AppliancesEnergy", 3902637, ["bbc65fcfa5c01655bb0ec7d558335d44b9c81979d7246f485bbc95a9759a5bff", "0e73676156bdce593059cd03785db9fd5616c1620ba87893b0f0903ef80f2248"],
-    description = DESCRIPTIONS["AppliancesEnergy"], datadepname="appliances_energy", size = "15MB"),
 
 ]
 
@@ -277,22 +253,6 @@ function DataDeps.DataDep(d::TSClassificationDataset)
         post_fetch_method=function (f)
             DataDeps.unpack(f)
         end,
-    )
-end
-
-function DataDeps.DataDep(d::MonashRegressionDataset)
-    remote_paths = [ "https://zenodo.org/record/$(d.dset_id)/files/$(d.name)_$split.ts" for split in d.splits]
-    return DataDep(
-        "fastai-$(d.datadepname)",
-        """
-        "$(d.name)" from the Monash, UEA & UCR Time Series Extrinsic Regression Repository (http://tseregression.org)
-
-        $(d.description)
-
-        Download size: $(d.size)
-        """,
-        remote_paths,
-        d.checksum
     )
 end
 

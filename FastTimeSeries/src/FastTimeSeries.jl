@@ -34,10 +34,6 @@ include("blocks/timeseriesrow.jl")
 # Encodings
 include("encodings/tspreprocessing.jl")
 
-# Models
-include("models/Models.jl")
-include("models.jl")
-
 include("container.jl")
 include("recipes.jl")
 
