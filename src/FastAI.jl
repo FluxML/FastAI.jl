@@ -109,9 +109,7 @@ export
       Label,
       LabelMulti,
       Many,
-      TableRow,
       Continuous,
-      Paragraph,
 
 # encodings
       encode,

@@ -1,17 +1,12 @@
-name: CI - FastVision
+name: CI - FastTimeSeries
 on:
   push:
     paths-ignore:
       - 'docs/**'
+      - 'FastMakie/**'
       - 'FastTabular/**'
       - 'FastText/**'
-      - 'FastTimeSeries/**'
-      - '*.md'
-  pull_request:
-    paths-ignore:
-      - 'docs/**'
-      - 'FastTabular/**'
-      - 'FastText/**'
+      - 'FastVision/**'
       - '*.md'
 jobs:
   test:
@@ -25,6 +20,7 @@ jobs:
         os:
           - ubuntu-latest
           - macOS-latest
+          - windows-latest
         arch:
           - x64
         
@@ -46,17 +42,17 @@ jobs:
             ${{ runner.os }}-
       - name: Dev FastAI
         run: |
-          julia --color=yes --project=./FastVision -e 'using Pkg; pkg"dev ."'
+          julia --color=yes --project=./FastTimeSeries -e 'using Pkg; pkg"dev ."'
         shell: bash
       - name: Dev test dependencies
         run: |
-          julia --color=yes --project=./FastVision/test -e 'using Pkg; pkg"dev . ./FastVision ./FastMakie"'
+          julia --color=yes --project=./FastTimeSeries/test -e 'using Pkg; pkg"dev . ./FastTimeSeries "'
         shell: bash
       - uses: julia-actions/julia-buildpkg@latest
         with:
-          project: './FastVision/'
+          project: './FastTimeSeries/'
       - name: Run tests
         run: |
-          julia --color=yes --depwarn=yes --project=./FastVision/test -e 'include("FastVision/test/runtests.jl")'
+          julia --color=yes --depwarn=yes --project=./FastTimeSeries/test -e 'include("FastTimeSeries/test/runtests.jl")'
         continue-on-error: ${{ matrix.version == 'nightly' }}
         shell: bash
