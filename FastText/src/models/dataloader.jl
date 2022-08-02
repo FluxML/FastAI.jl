@@ -13,7 +13,9 @@ end
 
 
 function load_sample(batches; batch_index=1, sample_seq_index=1, sample_index=1)
+    # batches = list of (batchseq, y)
     seq = [i[sample_index] for i in batches[batch_index][sample_seq_index]]
 
-    return (seq, batches[batch_index][2][sample_seq_index])
+    # Return the numericalized sample along with it's label. batches[batch_index][2] is a OneHot Vector
+    return (seq, Int(batches[batch_index][2][1, sample_index]))
 end

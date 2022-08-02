@@ -21,13 +21,13 @@ of the layers of model checkout those arguments in the docs.
 
 julia> lm = LanguageModel()
 """
-mutable struct LanguageModel
+struct LanguageModel
     vocab :: Vector
     layers :: Flux.Chain
 end
 
-function LanguageModel(load_pretrained::Bool=false, task::Any = Nothing;embedding_size::Integer=400, hid_lstm_sz::Integer=1150, out_lstm_sz::Integer=embedding_size,
-    embed_drop_prob::Float64 = 0.05, in_drop_prob::Float64 = 0.4, hid_drop_prob::Float64 = 0.5, layer_drop_prob::Float64 = 0.3, final_drop_prob::Float64 = 0.3)
+function LanguageModel(load_pretrained::Bool=false, task::Any = Nothing; embedding_size::Integer=400, hid_lstm_sz::Integer=1150, out_lstm_sz::Integer=embedding_size,
+    embed_drop_prob = 0.05, in_drop_prob = 0.4, hid_drop_prob = 0.5, layer_drop_prob = 0.3, final_drop_prob = 0.3)
     vocab = task.encodings[3].vocab.keys
     de = DroppedEmbeddings(length(vocab), embedding_size, embed_drop_prob; init = (dims...) -> init_weights(0.1, dims...))
     lm = LanguageModel(

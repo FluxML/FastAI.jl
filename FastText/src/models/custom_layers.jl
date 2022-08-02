@@ -119,13 +119,14 @@ Resets the h, c parameters of the LSTM Cell.
 
 For more refer [`Flux.reset`](@ref https://fluxml.ai/Flux.jl/stable/models/layers/#Flux.reset!)
 """
-function reset!(m)
-    try		# to accomodate the definition in previously trained Language Model
-        (m.state = (m.cell.h, m.cell.c))
-    catch
-    	Flux.reset!(m)
+function reset!(layers)
+    for layer in layers
+        if typeof(layer) == FastText.AWD_LSTM
+            (layer.layer.state = (layer.layer.cell.h, layer.layer.cell.c))
+        else
+            Flux.reset!(layer)
+        end
     end
-    Flux.reset!(m)
 end
 
 
@@ -360,49 +361,4 @@ function (a::PooledDense)(x)
     meanpool = (sum(x, dims=3)/size(x, 3))[:, :, 1]
     hc = cat(x[:, :, 1], maxpool, meanpool, dims=1)
     σ.(W*hc .+ b)
-end
-
-####################################################################
-
-"""
-get_trainable_params(layers)
-
-This funciton works same as `params` function except for `AWD_LSTM` layer.
-While getting `Params` of the `AWD_LSTM` it does not include the `h` and `c` `params` of `AWD_LSTM`.
-This is useful while calculating gradients because calculating gradients for `h` and `c` fields
-in `AWD_LSTM` is unnecessary here.
-
-# Example:
-
-julia> layers = Chain(DroppedEmbeddings(4,5,0.2),
-                    AWD_LSTM(5, 3),
-                    Dense(3, 2),
-                    softmax
-                );
-julia> p1 = params(layers);
-julia> p2 = get_trainable_params(layers);
-
-julia> length(p1)
-8
-
-julia> length(p2)
-6
-
-`Params` from all the other layers are included in p2 except for `h` and `c`
-"""
-function get_trainable_params(layers)
-    p = []
-    function get_awd_params(awd::AWD_LSTM)
-        return [awd.layer.cell.Wi,
-        awd.layer.cell.Wh,
-        awd.layer.cell.b]
-    end
-    for layer in layers
-        layer isa Array || (layer = [layer])
-        for l in layer
-            l isa AWD_LSTM && (append!(p, get_awd_params(l)); continue)
-            push!(p, l)
-        end
-    end
-    return Flux.params(p...)
 end

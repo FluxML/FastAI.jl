@@ -34,7 +34,7 @@ Flux.@functor TextClassifier
 
 function loss(m, xs, y; k = 10)
     # forward steps
-    # Flux.reset!(m.rnn_layers)
+    reset!(m.rnn_layers)
     Zygote.ignore() do
         [m.rnn_layers(x) for x in xs[1:(end - k)]]
     end
