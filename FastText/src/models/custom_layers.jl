@@ -175,9 +175,7 @@ end
 
 AWD_LSTM(in::Integer, out::Integer, p::Float64=0.0; kw...) = AWD_LSTM(WeightDroppedLSTM(in, out, p; kw...), -1, [])
 
-Flux.@functor AWD_LSTM
-
-Flux.trainable(m::AWD_LSTM) = (m.layer,)
+Flux.@functor AWD_LSTM (layer,)
 
 (m::AWD_LSTM)(in) = m.layer(in)
 
