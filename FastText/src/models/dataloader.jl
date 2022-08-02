@@ -13,10 +13,7 @@ end
 
 
 function load_sample(batches; batch_index=1, sample_seq_index=1, sample_index=1)
-    seq = []
-    for i in batches[batch_index][sample_seq_index]
-        seq = push!(seq, i[sample_index])
-    end
+    seq = [i[sample_index] for i in batches[batch_index][sample_seq_index]]
 
     return (seq, batches[batch_index][2][sample_seq_index])
 end
