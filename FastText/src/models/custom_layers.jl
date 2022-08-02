@@ -308,7 +308,7 @@ end
 
 Flux.@functor DroppedEmbeddings
 
-Flux.trainable(m::DroppedEmbeddings) = (m.emb,)
+Flux.trainable(m::DroppedEmbeddings) = (; emb=m.emb)
 
 testmode!(m::DroppedEmbeddings, mode=true) =
   (m.active = (isnothing(mode) || mode == :auto) ? nothing : !mode; m)
