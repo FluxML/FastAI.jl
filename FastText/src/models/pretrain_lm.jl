@@ -41,7 +41,7 @@ function LanguageModel(load_pretrained::Bool=false, task::Any = Nothing;embeddin
             VarDrop(layer_drop_prob),
             AWD_LSTM(hid_lstm_sz, out_lstm_sz, hid_drop_prob; init = (dims...) -> init_weights(1/hid_lstm_sz, dims...)),
             VarDrop(final_drop_prob),
-            x -> de(x, true),
+            Base.Fix2(de, true),
             softmax
         )
     )
