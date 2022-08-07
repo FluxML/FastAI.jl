@@ -10,8 +10,7 @@ function blockmodel(inblock::TimeSeriesRow,
     data   = rand(Float32, inblock.nfeatures, 32, inblock.obslength)
     # data   = [rand(Float32, inblock.nfeatures, 32) for _ ∈ 1:inblock.obslength]
     output = backbone(data)
-    outs   = size(output)[1]
-    return Models.RNNModel(backbone, outsize = length(outblock.classes), recout = outs)
+    return Models.RNNModel(backbone, outsize = length(outblock.classes), recout = size(output, 1))
 end
 
 """

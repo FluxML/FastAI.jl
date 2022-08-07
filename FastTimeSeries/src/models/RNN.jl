@@ -26,7 +26,7 @@ function RNNModel(recbackbone;
                 outsize,
                 recout,
                 kwargs...)
-    return RNNModel{}(recbackbone, Dense(recout, outsize))
+    return RNNModel(recbackbone, Dense(recout, outsize))
 end
 
 function (m::RNNModel)(X)

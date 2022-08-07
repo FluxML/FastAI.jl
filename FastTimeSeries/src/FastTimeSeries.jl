@@ -54,5 +54,5 @@ function __init__()
 end
 
 export
-    TimeSeriesRow, TSClassificationSingle, TSPreprocessing
+    TimeSeriesRow, TSClassificationSingle, TSPreprocessing, _ts2df
 end

@@ -7,10 +7,18 @@ Recipe for loading a time series dataset stored in a .ts file
 Base.@kwdef struct TimeSeriesDatasetRecipe <: Datasets.DatasetRecipe
     train_file
     test_file = nothing
+    regression = false
     loadfn = Datasets.loadfile
 end
 
-Datasets.recipeblocks(::Type{TimeSeriesDatasetRecipe}) = Tuple{TimeSeriesRow, Label}
+function Datasets.recipeblocks(recipe::TimeSeriesDatasetRecipe)
+    if !recipe.regression
+        return Tuple{TimeSeriesRow, Label}
+    else
+        return Tuple{TimeSeriesRow, Continuous}
+    end
+end
+# Datasets.recipeblocks(::Type{TimeSeriesDatasetRecipe}) = Tuple{TimeSeriesRow, Label}
 
 #TODO: Add Check if test_file is nothing.
 function Datasets.loadrecipe(recipe::TimeSeriesDatasetRecipe, path)
@@ -23,10 +31,18 @@ function Datasets.loadrecipe(recipe::TimeSeriesDatasetRecipe, path)
     labels = [labels_train; labels_test]
     rows = TimeSeriesDataset(rows)
     data = rows, labels
-    blocks = (
-        setup(TimeSeriesRow,rows),
-        Label(unique(eachobs(labels))),
-    )
+    blocks = nothing
+    if !recipe.regression
+        blocks = (
+            setup(TimeSeriesRow,rows),
+            Label(unique(eachobs(labels))),
+        )
+    else
+        blocks = (
+            setup(TimeSeriesRow,rows),
+            Continuous(1)
+        )
+    end
     return data, blocks
 end
 
@@ -41,11 +57,11 @@ const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
     ],
     "natops" => [
         TimeSeriesDatasetRecipe(train_file="NATOPS_TEST.ts", test_file="NATOPS_TRAIN.ts")
-    ]
+    ],
     #! TODO.
-    # "appliances_energy" => [
-    #     TimeSeriesDatasetRecipe(train_file="AppliancesEnergy_TRAIN.ts", test_file="AppliancesEnergy_TEST.ts")
-    # ]
+    "appliances_energy" => [
+        TimeSeriesDatasetRecipe(train_file="AppliancesEnergy_TRAIN.ts", test_file="AppliancesEnergy_TEST.ts", regression = true)
+    ]
 )
 
 function _registerrecipes()
