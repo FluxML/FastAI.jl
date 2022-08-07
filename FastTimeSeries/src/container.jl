@@ -205,7 +205,7 @@ function _ts2df(
 
                                     char_num += 1
                                     num_this_dimension = 1
-                                    arr = Array{Float32, 2}(undef, num_dimensions, series_length)
+                                    arr = Array{Float64, 2}(undef, num_dimensions, series_length)
                                 
                                 else
 
@@ -333,7 +333,7 @@ function _ts2df(
         num_samples = length(instance_list)
         series_length = size(instance_list[1])[2]
 
-        data = Array{Float32, 3}(undef, num_samples, num_dimensions, series_length)
+        data = Array{Float64, 3}(undef, num_samples, num_dimensions, series_length)
 
         for sample in 1:num_samples
             data[sample, 1:end, 1:end] = instance_list[sample]

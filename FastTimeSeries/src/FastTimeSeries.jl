@@ -43,6 +43,7 @@ include("recipes.jl")
 
 const _tasks = Dict{String, Any}()
 include("tasks/classification.jl")
+include("tasks/regression.jl")
 
 function __init__()
     _registerrecipes()
@@ -54,5 +55,5 @@ function __init__()
 end
 
 export
-    TimeSeriesRow, TSClassificationSingle, TSPreprocessing, _ts2df
+    TimeSeriesRow, TSClassificationSingle, TSPreprocessing, TSRegression
 end

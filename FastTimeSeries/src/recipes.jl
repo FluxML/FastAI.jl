@@ -87,3 +87,11 @@ end
     sample = getobs(data, 1)
     @test checkblock(block, sample)
 end
+
+@testset "TimeSeriesDatasetRegression [recipe]" begin
+    path = load(datasets()["appliances_energy"])
+    recipe = TimeSeriesDatasetRecipe(train_file="AppliancesEnergy_TRAIN.ts", test_file="AppliancesEnergy_TEST.ts", regression = true);
+    data, block = Datasets.loadrecipe(recipe, path)
+    sample = getobs(data, 1)
+    @test checkblock(block, sample)
+end
