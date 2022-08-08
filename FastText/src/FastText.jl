@@ -54,6 +54,7 @@ include("models/utils.jl")
 include("models/train_text_classifier.jl")
 include("models/dataloader.jl")
 include("models/datadeps.jl")
+include("textlearner.jl")
 
 const _tasks = Dict{String,Any}()
 include("tasks/classification.jl")
