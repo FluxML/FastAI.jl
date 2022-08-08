@@ -3,8 +3,7 @@
 #     return blockmodel(getblocks(task).x, getblocks(task).ŷ, backbone, k = k)
 # end
 
-function model(input; k = 10, backbone = LanguageModel(false, input))
-    classifier = TextClassifier(backbone)
+function model(input; k = 10, classifier = Nothing)
 
     Zygote.ignore() do
         [classifier.rnn_layers(x) for x in input[1:(end - k)]]
@@ -18,5 +17,7 @@ function blockmodel(inblock::NumberVector,
                     outblock::OneHotTensor,
                     backbone; k = 10)
 
-    return (input) -> model(input, k = k, backbone = backbone)
+    classifier = TextClassifier(backbone)
+
+    return (input) -> model(input, k = k, classifier = classifier)
 end
