@@ -192,7 +192,7 @@ function _ts2df(
 
                                     class_val = strip(ln[char_num:end], ' ')
 
-                                    push!(class_val_list, parse(Float64, class_val))
+                                    push!(class_val_list, parse(Float32, class_val))
                                     push!(instance_list, arr)
 
                                     char_num = line_len
@@ -205,7 +205,7 @@ function _ts2df(
 
                                     char_num += 1
                                     num_this_dimension = 1
-                                    arr = Array{Float64, 2}(undef, num_dimensions, series_length)
+                                    arr = Array{Float32, 2}(undef, num_dimensions, series_length)
                                 
                                 else
 
@@ -244,7 +244,7 @@ function _ts2df(
                                     end
 
                                     value = tuple_data[last_comma_index+1:end]
-                                    value = parse(Float64, value)
+                                    value = parse(Float32, value)
 
                                     timestamp = tuple_data[1:last_comma_index-1]
 
@@ -333,7 +333,7 @@ function _ts2df(
         num_samples = length(instance_list)
         series_length = size(instance_list[1])[2]
 
-        data = Array{Float64, 3}(undef, num_samples, num_dimensions, series_length)
+        data = Array{Float32, 3}(undef, num_samples, num_dimensions, series_length)
 
         for sample in 1:num_samples
             data[sample, 1:end, 1:end] = instance_list[sample]
