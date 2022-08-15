@@ -7,6 +7,7 @@ Construct a model for time-series classification.
 function blockmodel(inblock::TimeSeriesRow,
                 outblock::OneHotTensor{0}, 
                 backbone)
+    #TODO: Use Flux.outputsize here.
     data   = rand(Float32, inblock.nfeatures, 32, inblock.obslength)
     # data   = [rand(Float32, inblock.nfeatures, 32) for _ ∈ 1:inblock.obslength]
     output = backbone(data)

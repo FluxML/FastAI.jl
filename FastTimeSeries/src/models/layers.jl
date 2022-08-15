@@ -35,7 +35,7 @@ function StackedLSTM(in::Int, out::Integer, hiddensize::Integer, layers::Integer
 	return chain
 end
 
-function Conv1d(ni, nf, ks; stride = 1, padding = "same", dilation = 1, bias = true)
+function Conv1d(ni, nf, ks; stride = 1, padding = Flux.SamePad, dilation = 1, bias = true)
     return Conv(
         (ks,),
         ni => nf,
