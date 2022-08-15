@@ -1,10 +1,3 @@
-struct InceptionModule
-    bottleneck::Any
-    convs::Any
-    maxconvpool::Any
-    bn::Any
-end
-
 function InceptionModule(ni::Int, nf::Int, ks::Int = 40, bottleneck::Bool = true)
     ks = [ks ÷ (2^i) for i in range(0, stop = 2)]
     ks = [ks[i] % 2 == 0 ? ks[i]-1 : ks[i] for i in range(1, stop=3)]  # ensure odd ks
@@ -12,35 +5,22 @@ function InceptionModule(ni::Int, nf::Int, ks::Int = 40, bottleneck::Bool = true
 
     bottleneck_block = bottleneck ? Conv1d(ni, nf, 1, bias = false) : identity
 
-    convs = [
+    convs_layers = [
         Conv1d(bottleneck ? nf : ni, nf, ks[i], bias = false)
         for i in range(1, stop=3)
     ]
-    
+
+    convs = Chain(bottleneck_block, Parallel(hcat, convs_layers...)) 
+
     maxconvpool = Chain(
         MaxPool((3,), pad = 1, stride = 1),
         Conv1d(ni, nf, 1, bias = false)
     )
 
-    bn = BatchNorm(nf * 4)
-
-    return InceptionModule(
-        bottleneck_block,
-        convs,
-        maxconvpool,
-        bn
+    return Chain(
+        Parallel(hcat, convs, maxconvpool),
+        BatchNorm(nf * 4, relu)
     )
-end
-Flux.@functor InceptionModule
-
-# Model Output
-function (m::InceptionModule)(x)
-    input = x
-    x = m.bottleneck(x)
-    out1 = [m.convs[i](x) for i in range(1,stop=3)]
-    out2 = m.maxconvpool(input)
-    x = cat(out1..., out2, dims = 2)
-    return Flux.relu(m.bn(x))
 end
 
 struct InceptionBlock
