@@ -54,6 +54,7 @@ mutable struct WeightDroppedLSTMCell{A, V, S, M}
     maskWi::M
     maskWh::M
     active::Bool
+    state0
 end
 
 function WeightDroppedLSTMCell(in::Integer, out::Integer, p::Float64=0.0;
@@ -68,7 +69,8 @@ function WeightDroppedLSTMCell(in::Integer, out::Integer, p::Float64=0.0;
         p,
         drop_mask((out*4, in), p),
         drop_mask((out*4, out), p),
-        true
+        true,
+        (Flux.zeros32(out, 1), Flux.zeros32(out, 1))
     )
     cell.b[gate(out, 2)] .= 1
     return cell
@@ -121,7 +123,7 @@ For more refer [`Flux.reset`](@ref https://fluxml.ai/Flux.jl/stable/models/layer
 """
 function reset!(layers)
     for layer in layers
-        if typeof(layer) == FastText.AWD_LSTM
+        if typeof(layer) == FastText.WeightDroppedLSTM
             (layer.layer.state = (layer.layer.cell.h, layer.layer.cell.c))
         else
             Flux.reset!(layer)
@@ -143,76 +145,6 @@ julia> reset_masks!(wd)
 function reset_masks!(wd::T) where T <: Flux.Recur{<:WeightDroppedLSTMCell}
     wd.cell.maskWi = drop_mask(wd.cell.Wi, wd.cell.p)
     wd.cell.maskWh = drop_mask(wd.cell.Wh, wd.cell.p)
-    return
-end
-####################################################################
-
-################## ASGD Weight-Dropped LSTM Layer ##################
-"""
-    AWD_LSTM(in::Integer, out::Integer, p::Float64=0.0)
-
-Average SGD Weight-Dropped LSTM
-
-This custom layer is used for training the Language model,
-instead of standard LSTM layer.
-This layer carries two addtional functionality:
-    Weight-dropping (DropConnect)
-    Averaging of weights
-
-AWD_LSTM is basically a wrapper aroung WeightDroppedLSTM layer,
-it has three fields:
-    layer : WeightDroppedLSTM layer
-    T     : Trigger iteration, to trigger averaging
-    accum : After triggring the accumlation of weights is saved here
-
-cite this paper to know more:
-https://arxiv.org/pdf/1708.02182.pdf
-"""
-mutable struct AWD_LSTM
-    layer::Flux.Recur
-    T::Integer
-    accum
-end
-
-AWD_LSTM(in::Integer, out::Integer, p::Float64=0.0; kw...) = AWD_LSTM(WeightDroppedLSTM(in, out, p; kw...), -1, [])
-
-Flux.@functor AWD_LSTM (layer,)
-
-(m::AWD_LSTM)(in) = m.layer(in)
-
-# To set the trigger point for the AWD_LSTM layer
-set_trigger!(t, m) = nothing
-set_trigger!(trigger_point::Integer, m::AWD_LSTM) = m.T = trigger_point;
-
-# resets mask of the WeightDroppedLSTM layer contained in AWD_LSTM
-reset_masks!(awd::AWD_LSTM) = reset_masks!(awd.layer)
-
-"""
-    asgd_step!(i::Integer, layer::AWD_LSTM)
-
-Averaged Stochastic Gradient Descent Step
-
-This funciton performs the Averaging step to the given AWD_LSTM layer,
-if the trigger point or trigger iteration is reached.
-Arguments:
-    i       : current iteration of the training loop
-    layer   : AWD_LSTM layer
-"""
-asgd_step!(i, l) = nothing
-
-function asgd_step!(iter::Integer, layer::AWD_LSTM)
-    if (iter >= layer.T) & (layer.T > 0)
-        p = get_trainable_params([layer])
-        avg_fact = 1/max(iter - layer.T + 1, 1)
-        if avg_fact != 1
-            layer.accum = layer.accum .+ p
-            for (ps, accum) in zip(p, layer.accum)
-                ps .= avg_fact*accum
-            end
-        else
-            layer.accum = deepcopy(p)   # Accumulator for ASGD
-        end
-    end
     return
 end
 ####################################################################

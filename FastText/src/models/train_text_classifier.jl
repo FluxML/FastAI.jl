@@ -20,7 +20,7 @@ function TextClassifier(lm::LanguageModel=LanguageModel(), clsfr_out_sz::Integer
         lm.vocab,
         lm.layers[1:8],
         Chain(
-            PooledDense(length(lm.layers[7].layer.cell.h), clsfr_hidden_sz),
+            PooledDense(length(lm.layers[7].cell.h), clsfr_hidden_sz),
             BatchNorm(clsfr_hidden_sz, relu),
             Dropout(clsfr_hidden_drop),
             Dense(clsfr_hidden_sz, clsfr_out_sz),
@@ -34,7 +34,7 @@ Flux.@functor TextClassifier
 
 function loss(m, xs, y; k = 10)
     # forward steps
-    # reset!(m.rnn_layers)
+    reset!(m.rnn_layers)
     Zygote.ignore() do
         [m.rnn_layers(x) for x in xs[1:(end - k)]]
     end

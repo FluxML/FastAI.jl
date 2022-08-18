@@ -35,11 +35,11 @@ function LanguageModel(load_pretrained::Bool=false, task::Any = Nothing; embeddi
         Chain(
             de,
             VarDrop(in_drop_prob),
-            AWD_LSTM(embedding_size, hid_lstm_sz, hid_drop_prob; init = (dims...) -> init_weights(1/hid_lstm_sz, dims...)),
+            WeightDroppedLSTM(embedding_size, hid_lstm_sz, hid_drop_prob; init = (dims...) -> init_weights(1/hid_lstm_sz, dims...)),
             VarDrop(layer_drop_prob),
-            AWD_LSTM(hid_lstm_sz, hid_lstm_sz, hid_drop_prob; init = (dims...) -> init_weights(1/hid_lstm_sz, dims...)),
+            WeightDroppedLSTM(hid_lstm_sz, hid_lstm_sz, hid_drop_prob; init = (dims...) -> init_weights(1/hid_lstm_sz, dims...)),
             VarDrop(layer_drop_prob),
-            AWD_LSTM(hid_lstm_sz, out_lstm_sz, hid_drop_prob; init = (dims...) -> init_weights(1/hid_lstm_sz, dims...)),
+            WeightDroppedLSTM(hid_lstm_sz, out_lstm_sz, hid_drop_prob; init = (dims...) -> init_weights(1/hid_lstm_sz, dims...)),
             VarDrop(final_drop_prob),
             Base.Fix2(de, true),
             softmax
