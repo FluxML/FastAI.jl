@@ -58,7 +58,6 @@ const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
     "natops" => [
         TimeSeriesDatasetRecipe(train_file="NATOPS_TEST.ts", test_file="NATOPS_TRAIN.ts")
     ],
-    #! TODO.
     "appliances_energy" => [
         TimeSeriesDatasetRecipe(train_file="AppliancesEnergy_TRAIN.ts", test_file="AppliancesEnergy_TEST.ts", regression = true)
     ]

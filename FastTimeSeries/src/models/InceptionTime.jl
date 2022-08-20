@@ -1,8 +1,3 @@
-"""
-    InceptionModule(ni::Int, nf::Int, ks::Int = 40, bottleneck::Bool = true)
-
-TBW
-"""
 function InceptionModule(ni::Int, nf::Int, ks::Int = 40, bottleneck::Bool = true)
     ks = [ks ÷ (2^i) for i in range(0, stop = 2)]
     ks = [ks[i] % 2 == 0 ? ks[i] - 1 : ks[i] for i in range(1, stop = 3)]  # ensure odd ks
@@ -40,7 +35,8 @@ function InceptionBlock(ni::Int, nf::Int = 32, residual::Bool = true, depth::Int
         if (residual && d % 3 == 2)
             n_in = d == 2 ? ni : nf * 4
             n_out = nf * 4
-            push!(shortcut, Chain(Conv1d(n_in, n_out, 1), BatchNorm(nf)))
+            block = n_in == n_out ? BatchNorm(n_out) : Chain(Conv1d(n_in, n_out, 1), BatchNorm(n_out))
+            push!(shortcut, block)
         end
     end
     return InceptionBlock(residual, depth, inception, shortcut)
@@ -53,8 +49,9 @@ function (m::InceptionBlock)(x)
     res = x
     for d in range(1, stop = m.depth)
         x = m.inception[d](x)
-        if m.residual && d%3 == 0
-            res = x = Flux.relu(x + m.shortcut[d÷3](res))
+        if m.residual && d % 3 == 0
+            x = Flux.relu(x + m.shortcut[d÷3](res))
+            res = x
         end
     end
     return x
