@@ -69,7 +69,7 @@ function WeightDroppedLSTMCell(in::Integer, out::Integer, p::Float64=0.0;
         p,
         drop_mask((out*4, in), p),
         drop_mask((out*4, out), p),
-        true,
+        :auto,
         (Flux.zeros32(out, 1), Flux.zeros32(out, 1))
     )
     cell.b[gate(out, 2)] .= 1
