@@ -231,7 +231,7 @@ function DroppedEmbeddings(in::Integer, embed_size::Integer, p::Float64=0.0;
             init(in, embed_size),
             p,
             drop_mask((in,), p),
-            true
+            :auto
         )
     return de
 end
