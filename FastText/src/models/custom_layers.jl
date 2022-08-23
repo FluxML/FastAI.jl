@@ -142,10 +142,12 @@ julia> wd = WeightDroppedLSTM()
 
 julia> reset_masks!(wd)
 """
-function reset_masks!(wd::T) where T <: Flux.Recur{<:WeightDroppedLSTMCell}
-    wd.cell.maskWi = drop_mask(wd.cell.Wi, wd.cell.p)
-    wd.cell.maskWh = drop_mask(wd.cell.Wh, wd.cell.p)
-    return
+function Flux.reset!(layer::Flux.Recur{<:WeightDroppedLSTMCell})
+    maskWi = drop_mask(layer.cell.Wi, layer.cell.p)
+    maskWh = drop_mask(layer.cell.Wh, layer.cell.p)
+    layer.state = (layer.cell.state0..., maskWi, maskWh)
+    
+    return nothing
 end
 ####################################################################
 
