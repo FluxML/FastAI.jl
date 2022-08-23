@@ -237,7 +237,7 @@ function DroppedEmbeddings(in::Integer, embed_size::Integer, p::Float64=0.0;
 end
 
 function (de::DroppedEmbeddings)(x::AbstractArray, tying::Bool=false)
-    dropped = de.active ? de.emb .* de.mask : de.emb
+    dropped = Flux._isactive(de) ? de.emb .* de.mask : de.emb
     return tying ? dropped * x : transpose(dropped[x, :])
 end
 
