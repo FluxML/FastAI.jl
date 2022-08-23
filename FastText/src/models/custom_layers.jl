@@ -284,7 +284,7 @@ end
 PooledDense(W, b) = PooledDense(W, b, identity)
 
 function PooledDense(hidden_sz::Integer, out::Integer, σ = identity;
-             initW = Flux.glorot_uniform, initb = (dims...) -> zeros(Float32, dims...))
+             initW = Flux.glorot_uniform, initb = Flux.zeros32)
 return PooledDense(initW(out, hidden_sz*3), initb(out), σ)
 end
 
