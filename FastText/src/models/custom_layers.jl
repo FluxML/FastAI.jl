@@ -275,7 +275,7 @@ Other two arguments are output size and activation function
 
 julia> pd = PooledDense(40, 20)    # if the output size of the RNN layer is 40 in this case
 """
-mutable struct PooledDense{F, S, T}
+struct PooledDense{F, S, T}
     W::S
     b::T
     σ::F
