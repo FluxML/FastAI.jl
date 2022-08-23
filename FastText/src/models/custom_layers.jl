@@ -78,8 +78,8 @@ end
 
 function (m::WeightDroppedLSTMCell)((h, c), x)
     b, o = m.b, size(h, 1)
-    Wi = m.active ? m.Wi .* m.maskWi : m.Wi
-    Wh = m.active ? m.Wh .* m.maskWh : m.Wh
+    Wi = Flux._isactive(m) ? m.Wi .* m.maskWi : m.Wi
+    Wh = Flux._isactive(m) ? m.Wh .* m.maskWh : m.Wh
     g = Wi*x .+ Wh*h .+ b
     input = σ.(gate(g, o, 1))
     forget = σ.(gate(g, o, 2))
