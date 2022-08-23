@@ -110,7 +110,9 @@ julia> wd = WeightDroppedLSTM(4, 5, 0.3);
 """
 function WeightDroppedLSTM(a...; kw...)
     cell = WeightDroppedLSTMCell(a...;kw...)
-    hidden = (cell.h, cell.c)
+    maskWi = drop_mask(cell.Wi, cell.p)
+    maskWh = drop_mask(cell.Wh, cell.p)
+    hidden = (cell.state0..., maskWi, maskWh)
     return Flux.Recur(cell, hidden)
 end
 
