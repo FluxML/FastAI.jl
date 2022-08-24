@@ -92,7 +92,7 @@ end
 
 Flux.@functor WeightDroppedLSTMCell
 
-Flux.trainable(m::WeightDroppedLSTMCell) = (m.Wi, m.Wh, m.b, m.h, m.c)
+Flux.trainable(m::WeightDroppedLSTMCell) = (Wi = m.Wi, Wh = m.Wh, b = m.b)
 
 testmode!(m::WeightDroppedLSTMCell, mode=true) =
   (m.active = (isnothing(mode) || mode == :auto) ? nothing : !mode; m)
