@@ -68,7 +68,7 @@ end
 TBW
 """
 function InceptionTime(c_in::Int, c_out::Int, seq_len = nothing, nf::Int = 32)
-    inceptionblock = InceptionBlock(c_in, nf, false)
+    inceptionblock = InceptionBlock(c_in, nf)
     gap = GAP1d(1)
     fc = Dense(nf * 4, c_out)
     return Chain(changedims, inceptionblock, gap, fc)
