@@ -13,23 +13,6 @@ import Flux: gate, testmode!, _dropout_kernel
 reset_masks!(entity) = nothing
 reset_probability!(entity) = nothing
 
-"""
-    drop_mask(x, p)
-
-Drop mask generator
-
-This function generates dropout mask for given 'x' with `p` probability
-    or
-It can be used to generate the mask by giving the shape of the desired mask and probaility
-"""
-function drop_mask(x, p)
-    y = similar(x, size(x))
-    Flux.rand!(y)
-    y .= Flux._dropout_kernel.(y, p, 1 - p)
-    return y
-end
-
-drop_mask(shape::Tuple, p; type = Float32) = (mask = rand(type, shape...);mask .= _dropout_kernel.(mask, p, 1 - p))
 
 #################### Weight-Dropped LSTM Cell ######################
 """
@@ -44,58 +27,57 @@ Moreover this also follows the Vartional DropOut citeria, that is,
 the drop mask is remains same for a whole training pass.
 This is done by saving the masks in 'maskWi' and 'maskWh' fields
 """
-mutable struct WeightDroppedLSTMCell{A, V, S, M}
+mutable struct WeightDroppedLSTMCell{A,V,S}
     Wi::A
     Wh::A
     b::V
     h::S
     c::S
     p::Float64
-    maskWi::M
-    maskWh::M
-    active::Bool
-    state0
+    active::Union{Bool,Nothing}
+    state0::Tuple{Matrix{Float32},Matrix{Float32}}
 end
 
-function WeightDroppedLSTMCell(in::Integer, out::Integer, p::Float64=0.0;
-    init = Flux.glorot_uniform)
+function WeightDroppedLSTMCell(in::Integer, out::Integer, p::Float64 = 0.0;
+    init = Flux.glorot_uniform, initb = Flux.zeros32, init_state = Flux.zeros32
+)
+
     @assert 0 ≤ p ≤ 1
     cell = WeightDroppedLSTMCell(
-        init(out*4, in),
-        init(out*4, out),
-        init(out*4),
+        init(out * 4, in),
+        init(out * 4, out),
+        initb(out * 4),
         reshape(zeros(Float32, out), out, 1),
         reshape(zeros(Float32, out), out, 1),
         p,
-        drop_mask((out*4, in), p),
-        drop_mask((out*4, out), p),
-        :auto,
-        (Flux.zeros32(out, 1), Flux.zeros32(out, 1))
+        nothing,
+        ((init_state(out, 1), init_state(out, 1)))
     )
     cell.b[gate(out, 2)] .= 1
     return cell
 end
 
-function (m::WeightDroppedLSTMCell)((h, c), x)
+function (m::WeightDroppedLSTMCell)((h, c, maskWi, maskWh), x)
     b, o = m.b, size(h, 1)
-    Wi = Flux._isactive(m) ? m.Wi .* m.maskWi : m.Wi
-    Wh = Flux._isactive(m) ? m.Wh .* m.maskWh : m.Wh
-    g = Wi*x .+ Wh*h .+ b
+    Wi = Flux._isactive(m) ? m.Wi .* maskWi : m.Wi
+    Wh = Flux._isactive(m) ? m.Wh .* maskWh : m.Wh
+
+    g = Wi * x .+ Wh * h .+ b
     input = σ.(gate(g, o, 1))
     forget = σ.(gate(g, o, 2))
     cell = tanh.(gate(g, o, 3))
     output = σ.(gate(g, o, 4))
     c = forget .* c .+ input .* cell
     h′ = output .* tanh.(c)
-    return (h′, c), h′
+
+    return (h′, c, maskWi, maskWh), h′
 end
 
 Flux.@functor WeightDroppedLSTMCell
 
 Flux.trainable(m::WeightDroppedLSTMCell) = (Wi = m.Wi, Wh = m.Wh, b = m.b)
 
-testmode!(m::WeightDroppedLSTMCell, mode=true) =
-  (m.active = (isnothing(mode) || mode == :auto) ? nothing : !mode; m)
+testmode!(m::WeightDroppedLSTMCell, mode = true) = (m.active = (isnothing(mode) || mode == :auto) ? nothing : !mode; m)
 
 """
     WeightDroppedLSTM(in::Integer, out::Integer, p::Float64=0.0)
@@ -109,46 +91,17 @@ Defining an instance:
 julia> wd = WeightDroppedLSTM(4, 5, 0.3);
 """
 function WeightDroppedLSTM(a...; kw...)
-    cell = WeightDroppedLSTMCell(a...;kw...)
-    maskWi = drop_mask(cell.Wi, cell.p)
-    maskWh = drop_mask(cell.Wh, cell.p)
+    cell = WeightDroppedLSTMCell(a...; kw...)
+    maskWi = Flux.dropout_mask(Flux.rng_from_array(), cell.Wi, cell.p)
+    maskWh = Flux.dropout_mask(Flux.rng_from_array(), cell.Wh, cell.p)
     hidden = (cell.state0..., maskWi, maskWh)
     return Flux.Recur(cell, hidden)
 end
 
-"""
-    reset!(m)
-
-Resets the h, c parameters of the LSTM Cell.
-
-For more refer [`Flux.reset`](@ref https://fluxml.ai/Flux.jl/stable/models/layers/#Flux.reset!)
-"""
-function reset!(layers)
-    for layer in layers
-        if typeof(layer) == FastText.WeightDroppedLSTM
-            (layer.layer.state = (layer.layer.cell.h, layer.layer.cell.c))
-        else
-            Flux.reset!(layer)
-        end
-    end
-end
-
-
-"""
-    reset_masks!(layer)
-
-This is an important funciton since it used to reset the masks
-which are saved in WeightDroppedLSTMCell after every pass.
-
-julia> wd = WeightDroppedLSTM()
-
-julia> reset_masks!(wd)
-"""
 function Flux.reset!(layer::Flux.Recur{<:WeightDroppedLSTMCell})
-    maskWi = drop_mask(layer.cell.Wi, layer.cell.p)
-    maskWh = drop_mask(layer.cell.Wh, layer.cell.p)
+    maskWi = Flux.dropout_mask(Flux.rng_from_array(), layer.cell.Wi, layer.cell.p)
+    maskWh = Flux.dropout_mask(Flux.rng_from_array(), layer.cell.Wh, layer.cell.p)
     layer.state = (layer.cell.state0..., maskWi, maskWh)
-    
     return nothing
 end
 ####################################################################
@@ -169,29 +122,32 @@ To reset mask:
 julia> reset_masks!(vd)
 """
 
-mutable struct VarDrop{F}
+mutable struct VarDropCell{F}
     p::F
-    mask
-    reset::Bool
-    active::Bool
+    active::Union{Bool,Nothing} # matches other norm layers
 end
+Flux.@functor VarDropCell
 
-VarDrop(p::Float64=0.0) = VarDrop(p, Array{Float32, 2}(UndefInitializer(), 0, 0), true, true)
+VarDropCell(p::Real = 0.0) = VarDropCell(p, nothing)
 
-function (vd::VarDrop)(x)
-    vd.active || return x
-    if vd.reset
-        vd.mask = drop_mask(x, vd.p)
-        vd.reset = false
+testmode!(m::VarDropCell, mode = true) =
+    (m.active = (isnothing(mode) || mode == :auto) ? nothing : !mode; m)
+
+
+function (vd::VarDropCell)((has_mask, mask), x)
+    if Flux._isactive(vd)
+        mask = has_mask ? mask : Flux.dropout_mask(Flux.rng_from_array(), x, vd.p)
+        return (true, mask), x .* mask
+    elseif !has_mask
+        return (has_mask, mask), x
+    else
+        error("Mask set but layer is in test mode. Call `reset!` to clear the mask.")
     end
-    return (x .* vd.mask)
 end
 
-testmode!(m::VarDrop, mode=true) =
-  (m.active = (isnothing(mode) || mode == :auto) ? nothing : !mode; m)
-
-# method for reseting mask of VarDrop
-reset_masks!(vd::VarDrop) = (vd.reset = true)
+# The single-element array keeps Recur happy.
+# Limitation: typeof(p) must == typeof(<inputs>)
+VarDrop(p::Real) = Flux.Recur(VarDropCell(p), (false, ones(typeof(p), 1, 1)))
 
 ######################################################################
 
@@ -218,38 +174,38 @@ To reset mask:
 
 julia> reset_masks!(de)
 """
-mutable struct DroppedEmbeddings{A, F}
+mutable struct DroppedEmbeddings{A,F}
     emb::A
     p::F
-    mask
-    active::Bool
+    mask::Vector{Float32}
+    active::Union{Bool,Nothing}
 end
 
-function DroppedEmbeddings(in::Integer, embed_size::Integer, p::Float64=0.0;
+function DroppedEmbeddings(in::Integer, embed_size::Integer, p::Float64 = 0.0;
     init = Flux.glorot_uniform)
-        de = DroppedEmbeddings{AbstractArray, typeof(p)}(
-            init(in, embed_size),
-            p,
-            drop_mask((in,), p),
-            :auto
-        )
+    de = DroppedEmbeddings{AbstractArray,typeof(p)}(
+        init(in, embed_size),
+        p,
+        Flux.dropout(Flux.rng_from_array(), rand(Float32, in), p),
+        nothing
+    )
     return de
 end
 
-function (de::DroppedEmbeddings)(x::AbstractArray, tying::Bool=false)
+function (de::DroppedEmbeddings)(x::AbstractArray, tying::Bool = false)
     dropped = Flux._isactive(de) ? de.emb .* de.mask : de.emb
     return tying ? dropped * x : transpose(dropped[x, :])
 end
 
 Flux.@functor DroppedEmbeddings
 
-Flux.trainable(m::DroppedEmbeddings) = (; emb=m.emb)
+Flux.trainable(m::DroppedEmbeddings) = (; emb = m.emb)
 
-testmode!(m::DroppedEmbeddings, mode=true) =
-  (m.active = (isnothing(mode) || mode == :auto) ? nothing : !mode; m)
+testmode!(m::DroppedEmbeddings, mode = true) =
+    (m.active = (isnothing(mode) || mode == :auto) ? nothing : !mode; m)
 
 function reset_masks!(de::DroppedEmbeddings)
-    de.mask = drop_mask(de.mask, de.p)
+    de.mask = Flux.dropout_mask(Flux.rng_from_array(), de.mask, de.p)
     return
 end
 ####################################################################
@@ -275,7 +231,7 @@ Other two arguments are output size and activation function
 
 julia> pd = PooledDense(40, 20)    # if the output size of the RNN layer is 40 in this case
 """
-struct PooledDense{F, S, T}
+struct PooledDense{F,S,T}
     W::S
     b::T
     σ::F
@@ -283,18 +239,23 @@ end
 
 PooledDense(W, b) = PooledDense(W, b, identity)
 
-function PooledDense(hidden_sz::Integer, out::Integer, σ = identity;
-             initW = Flux.glorot_uniform, initb = Flux.zeros32)
-return PooledDense(initW(out, hidden_sz*3), initb(out), σ)
+function PooledDense(
+    hidden_sz::Integer,
+    out::Integer,
+    σ = identity;
+    initW = Flux.glorot_uniform,
+    initb = Flux.zeros32
+)
+    return PooledDense(initW(out, hidden_sz * 3), initb(out), σ)
 end
 
 Flux.@functor PooledDense
 
 function (a::PooledDense)(x)
     W, b, σ = a.W, a.b, a.σ
-    x = cat(x..., dims=3)
-    maxpool = maximum(x, dims=3)[:, :, 1]
-    meanpool = (sum(x, dims=3)/size(x, 3))[:, :, 1]
-    hc = cat(x[:, :, 1], maxpool, meanpool, dims=1)
-    σ.(W*hc .+ b)
+    x = cat(x..., dims = 3)
+    maxpool = maximum(x, dims = 3)[:, :, 1]
+    meanpool = (sum(x, dims = 3) / size(x, 3))[:, :, 1]
+    hc = cat(x[:, :, 1], maxpool, meanpool, dims = 1)
+    σ.(W * hc .+ b)
 end
