@@ -122,32 +122,56 @@ To reset mask:
 julia> reset_masks!(vd)
 """
 
-mutable struct VarDropCell{F}
+# mutable struct VarDropCell{F}
+#     p::F
+#     active::Union{Bool,Nothing} # matches other norm layers
+# end
+# Flux.@functor VarDropCell
+
+# VarDropCell(p::Real = 0.0) = VarDropCell(p, nothing)
+
+# testmode!(m::VarDropCell, mode = true) =
+#     (m.active = (isnothing(mode) || mode == :auto) ? nothing : !mode; m)
+
+
+# function (vd::VarDropCell)((has_mask, mask), x)
+#     if Flux._isactive(vd)
+#         mask = has_mask ? mask : Flux.dropout_mask(Flux.rng_from_array(), x, vd.p)
+#         return (true, mask), x .* mask
+#     elseif !has_mask
+#         return (has_mask, mask), x
+#     else
+#         error("Mask set but layer is in test mode. Call `reset!` to clear the mask.")
+#     end
+# end
+
+# # The single-element array keeps Recur happy.
+# # Limitation: typeof(p) must == typeof(<inputs>)
+# VarDrop(p::Real) = Flux.Recur(VarDropCell(p), (false, ones(typeof(p), 1, 1)))
+
+mutable struct VarDrop{F}
     p::F
-    active::Union{Bool,Nothing} # matches other norm layers
+    mask::Any
+    reset::Bool
+    active::Bool
 end
-Flux.@functor VarDropCell
 
-VarDropCell(p::Real = 0.0) = VarDropCell(p, nothing)
+VarDrop(p::Float64 = 0.0) = VarDrop(p, Array{Float32,2}(UndefInitializer(), 0, 0), true, true)
 
-testmode!(m::VarDropCell, mode = true) =
+function (vd::VarDrop)(x)
+    vd.active || return x
+    if vd.reset
+        vd.mask = Flux.dropout_mask(Flux.rng_from_array(), x, vd.p)
+        vd.reset = false
+    end
+    return (x .* vd.mask)
+end
+
+testmode!(m::VarDrop, mode = true) =
     (m.active = (isnothing(mode) || mode == :auto) ? nothing : !mode; m)
 
-
-function (vd::VarDropCell)((has_mask, mask), x)
-    if Flux._isactive(vd)
-        mask = has_mask ? mask : Flux.dropout_mask(Flux.rng_from_array(), x, vd.p)
-        return (true, mask), x .* mask
-    elseif !has_mask
-        return (has_mask, mask), x
-    else
-        error("Mask set but layer is in test mode. Call `reset!` to clear the mask.")
-    end
-end
-
-# The single-element array keeps Recur happy.
-# Limitation: typeof(p) must == typeof(<inputs>)
-VarDrop(p::Real) = Flux.Recur(VarDropCell(p), (false, ones(typeof(p), 1, 1)))
+# method for reseting mask of VarDrop
+reset_masks!(vd::VarDrop) = (vd.reset = true)
 
 ######################################################################
 
