@@ -218,7 +218,7 @@ end
 
 function (de::DroppedEmbeddings)(x::AbstractArray, tying::Bool = false)
     dropped = Flux._isactive(de) ? de.emb .* de.mask : de.emb
-    return tying ? dropped * x : transpose(dropped[x, :])
+    return tying ? dropped * x : NNlib.gather(transpose(dropped), x)
 end
 
 Flux.@functor DroppedEmbeddings
