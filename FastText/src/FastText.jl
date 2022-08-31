@@ -2,17 +2,17 @@ module FastText
 
 using FastAI
 using FastAI:
-              Datasets,
-# blocks
-              Block, WrapperBlock, AbstractBlock, OneHotTensor, OneHotTensorMulti, Label,
-              LabelMulti, wrapped, Continuous, getencodings, getblocks, encodetarget,
-              encodeinput,
-# encodings
-              Encoding, StatefulEncoding, OneHot,
-# visualization
-              ShowText,
-# other
-              Context, Training, Validation
+    Datasets,
+    # blocks
+    Block, WrapperBlock, AbstractBlock, OneHotTensor, OneHotTensorMulti, Label,
+    LabelMulti, wrapped, Continuous, getencodings, getblocks, encodetarget,
+    encodeinput,
+    # encodings
+    Encoding, StatefulEncoding, OneHot,
+    # visualization
+    ShowText,
+    # other
+    Context, Training, Validation
 
 using FastAI.Datasets
 
@@ -35,6 +35,7 @@ using WordTokenizers: TokenBuffer, isdone, character, spaces, nltk_url1, nltk_ur
 
 # deoendencies
 using Flux
+using NNlib
 using DataDeps
 using BSON
 using TextAnalysis
