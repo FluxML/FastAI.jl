@@ -1,3 +1,8 @@
+"""
+    InceptionModule(ni::Int, nf::Int, ks::Int = 40, bottleneck::Bool = true)
+
+TBW
+"""
 function InceptionModule(ni::Int, nf::Int, ks::Int = 40, bottleneck::Bool = true)
     ks = [ks ÷ (2^i) for i in range(0, stop = 2)]
     ks = [ks[i] % 2 == 0 ? ks[i] - 1 : ks[i] for i in range(1, stop = 3)]  # ensure odd ks
@@ -15,13 +20,6 @@ function InceptionModule(ni::Int, nf::Int, ks::Int = 40, bottleneck::Bool = true
     return Chain(Parallel(hcat, convs, maxconvpool), BatchNorm(nf * 4, relu))
 end
 
-struct InceptionBlock
-    residual::Bool
-    depth::Int
-    inception::Any
-    shortcut::Any
-end
-
 """
     InceptionBlock(ni::Int, nf::Int = 32, residual::Bool = true, depth::Int = 6)
 
@@ -30,31 +28,41 @@ TBW
 function InceptionBlock(ni::Int, nf::Int = 32, residual::Bool = true, depth::Int = 6)
     inception = []
     shortcut = []
-    for d in range(0, stop = depth - 1)
-        push!(inception, InceptionModule(d == 0 ? ni : nf * 4, nf))
-        if (residual && d % 3 == 2)
-            n_in = d == 2 ? ni : nf * 4
-            n_out = nf * 4
-            block = n_in == n_out ? BatchNorm(n_out) : Chain(Conv1d(n_in, n_out, 1), BatchNorm(n_out))
-            push!(shortcut, block)
-        end
-    end
-    return InceptionBlock(residual, depth, inception, shortcut)
-end
-Flux.@functor InceptionBlock
-Flux.trainable(m::InceptionBlock) = (m.inception, m.shortcut)
 
-# Model Output
-function (m::InceptionBlock)(x)
-    res = x
-    for d in range(1, stop = m.depth)
-        x = m.inception[d](x)
-        if m.residual && d % 3 == 0
-            x = Flux.relu(x + m.shortcut[d÷3](res))
-            res = x
+    for d in range(1, stop = depth)
+        push!(inception, InceptionModule(d == 1 ? ni : nf * 4, nf))
+        if residual && d % 3 == 0
+            n_in = d == 3 ? ni : nf * 4
+            n_out = nf * 4
+            skip =
+                n_in == n_out ? BatchNorm(n_out) :
+                Chain(Conv1d(n_in, n_out, 1), BatchNorm(n_out))
+            push!(shortcut, skip)
         end
     end
-    return x
+
+    blocks = []
+    d = 1
+
+    while d <= depth
+        blk = []
+        while d <= depth
+            push!(blk, inception[d])
+            if d % 3 == 0
+                d += 1
+                break
+            end
+            d += 1
+        end
+        if residual && d ÷ 3 <= length(shortcut)
+            skp = shortcut[d÷3]
+            push!(blocks, Parallel(+, Chain(blk...), skp))
+        else
+            push!(blocks, Chain(blk...))
+        end
+    end
+    return Chain(blocks...)
+
 end
 
 function changedims(X)
