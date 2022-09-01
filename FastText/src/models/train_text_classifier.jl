@@ -33,6 +33,7 @@ function TextClassifier(lm::LanguageModel = LanguageModel(), clsfr_out_sz::Integ
 end
 
 Flux.@functor TextClassifier
+Flux.trainable(m::TextClassifier) = (rnn_layers = m.rnn_layers, linear_layers = m.linear_layers)
 
 function loss(m, xs, y; k = 10)
     # forward steps
