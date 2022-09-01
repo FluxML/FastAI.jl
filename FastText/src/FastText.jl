@@ -60,6 +60,7 @@ include("models.jl")
 
 const _tasks = Dict{String,Any}()
 include("tasks/classification.jl")
+include("tasks/generation.jl")
 
 const DEFAULT_SANITIZERS = [
     replace_all_caps,
@@ -82,6 +83,6 @@ function __init__()
     end
 end
 
-export Paragraph, TextClassificationSingle, Sanitize, Tokenize, LanguageModel
+export Paragraph, TextClassificationSingle, LanguageModel, TextGeneration
 
 end
