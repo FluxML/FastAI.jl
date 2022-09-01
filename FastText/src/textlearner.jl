@@ -6,6 +6,7 @@
 function model(input; k = 10, classifier = Nothing)
 
     Zygote.ignore() do
+        Flux.reset!(classifier.rnn_layers)
         [classifier.rnn_layers(x) for x in input[1:(end - k)]]
     end
 

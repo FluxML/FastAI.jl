@@ -33,12 +33,12 @@ mutable struct WeightDroppedLSTMCell{A,V,S}
     b::V
     h::S
     c::S
-    p::Float64
+    p::Float32
     active::Union{Bool,Nothing}
     state0::Tuple{Matrix{Float32},Matrix{Float32}}
 end
 
-function WeightDroppedLSTMCell(in::Integer, out::Integer, p::Float64 = 0.0;
+function WeightDroppedLSTMCell(in::Integer, out::Integer, p::Float32 = 0.0f0;
     init = Flux.glorot_uniform, initb = Flux.zeros32, init_state = Flux.zeros32
 )
 
@@ -122,56 +122,38 @@ To reset mask:
 julia> reset_masks!(vd)
 """
 
-# mutable struct VarDropCell{F}
-#     p::F
-#     active::Union{Bool,Nothing} # matches other norm layers
-# end
-# Flux.@functor VarDropCell
-
-# VarDropCell(p::Real = 0.0) = VarDropCell(p, nothing)
-
-# testmode!(m::VarDropCell, mode = true) =
-#     (m.active = (isnothing(mode) || mode == :auto) ? nothing : !mode; m)
-
-
-# function (vd::VarDropCell)((has_mask, mask), x)
-#     if Flux._isactive(vd)
-#         mask = has_mask ? mask : Flux.dropout_mask(Flux.rng_from_array(), x, vd.p)
-#         return (true, mask), x .* mask
-#     elseif !has_mask
-#         return (has_mask, mask), x
-#     else
-#         error("Mask set but layer is in test mode. Call `reset!` to clear the mask.")
-#     end
-# end
-
-# # The single-element array keeps Recur happy.
-# # Limitation: typeof(p) must == typeof(<inputs>)
-# VarDrop(p::Real) = Flux.Recur(VarDropCell(p), (false, ones(typeof(p), 1, 1)))
-
-mutable struct VarDrop{F}
+mutable struct VarDropCell{F}
     p::F
-    mask::Any
-    reset::Bool
-    active::Bool
+    active::Union{Bool,Nothing} # matches other norm layers
 end
+Flux.@functor VarDropCell
 
-VarDrop(p::Float64 = 0.0) = VarDrop(p, Array{Float32,2}(UndefInitializer(), 0, 0), true, true)
+VarDropCell(p::Real = 0.0) = VarDropCell(p, nothing)
 
-function (vd::VarDrop)(x)
-    vd.active || return x
-    if vd.reset
-        vd.mask = Flux.dropout_mask(Flux.rng_from_array(), x, vd.p)
-        vd.reset = false
-    end
-    return (x .* vd.mask)
-end
-
-testmode!(m::VarDrop, mode = true) =
+testmode!(m::VarDropCell, mode = true) =
     (m.active = (isnothing(mode) || mode == :auto) ? nothing : !mode; m)
 
-# method for reseting mask of VarDrop
-reset_masks!(vd::VarDrop) = (vd.reset = true)
+
+function (vd::VarDropCell)((has_mask, mask), x)
+    if Flux._isactive(vd)
+        mask = has_mask ? mask : Flux.dropout_mask(Flux.rng_from_array(), x, vd.p)
+        return (true, mask), x .* mask
+    elseif !has_mask
+        return (has_mask, mask), x
+    else
+        error("Mask set but layer is in test mode. Call `reset!` to clear the mask.")
+    end
+end
+
+# The single-element array keeps Recur happy.
+# Limitation: typeof(p) must == typeof(<inputs>)
+VarDrop(p::Real) = Flux.Recur(VarDropCell(p), (false, ones(typeof(p), 1, 1)))
+
+function Flux.reset!(m::Flux.Recur{<:VarDropCell})
+    m.state = (false, ones(typeof(m.cell.p), 1, 1))
+    return nothing
+end
+
 
 ######################################################################
 
@@ -205,9 +187,9 @@ mutable struct DroppedEmbeddings{A,F}
     active::Union{Bool,Nothing}
 end
 
-function DroppedEmbeddings(in::Integer, embed_size::Integer, p::Float64 = 0.0;
+function DroppedEmbeddings(in::Integer, embed_size::Integer, p::Float32 = 0.0f0;
     init = Flux.glorot_uniform)
-    de = DroppedEmbeddings{AbstractArray,typeof(p)}(
+    de = DroppedEmbeddings(
         init(in, embed_size),
         p,
         Flux.dropout(Flux.rng_from_array(), rand(Float32, in), p),

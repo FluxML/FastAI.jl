@@ -9,13 +9,15 @@ linear_layers   : contains Chain of two Dense layers [PooledDense and Dense] wit
 
 To train create and instance and give it as first argument to 'train_classifier!' function
 """
-mutable struct TextClassifier
-    vocab::Vector
-    rnn_layers::Flux.Chain
-    linear_layers::Flux.Chain
+mutable struct TextClassifier{A,F,Q}
+    vocab::A
+    rnn_layers::F
+    linear_layers::Q
 end
 
-function TextClassifier(lm::LanguageModel=LanguageModel(), clsfr_out_sz::Integer=2, clsfr_hidden_sz::Integer=50, clsfr_hidden_drop::Float64=0.4)
+function TextClassifier(lm::LanguageModel = LanguageModel(), clsfr_out_sz::Integer = 2, clsfr_hidden_sz::Integer = 50,
+    clsfr_hidden_drop::Float32 = 0.4f0
+)
     return TextClassifier(
         lm.vocab,
         lm.layers[1:8],

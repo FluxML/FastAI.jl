@@ -21,13 +21,14 @@ of the layers of model checkout those arguments in the docs.
 
 julia> lm = LanguageModel()
 """
-struct LanguageModel
-    vocab :: Vector
-    layers :: Flux.Chain
+struct LanguageModel{A,F}
+    vocab::A
+    layers::F
 end
 
-function LanguageModel(load_pretrained::Bool=false, task::Any = Nothing; embedding_size::Integer=400, hid_lstm_sz::Integer=1150, out_lstm_sz::Integer=embedding_size,
-    embed_drop_prob = 0.05, in_drop_prob = 0.4, hid_drop_prob = 0.5, layer_drop_prob = 0.3, final_drop_prob = 0.3)
+function LanguageModel(load_pretrained::Bool = false, task::Any = Nothing; embedding_size::Integer = 400, hid_lstm_sz::Integer = 1150,
+    out_lstm_sz::Integer = embedding_size, embed_drop_prob::Float32 = 0.05f0, in_drop_prob::Float32 = 0.4f0, hid_drop_prob::Float32 = 0.5f0,
+    layer_drop_prob::Float32 = 0.3f0, final_drop_prob::Float32 = 0.3f0)
     vocab = task.encodings[3].vocab.keys
     de = DroppedEmbeddings(length(vocab), embedding_size, embed_drop_prob; init = (dims...) -> init_weights(0.1, dims...))
     lm = LanguageModel(
@@ -35,11 +36,11 @@ function LanguageModel(load_pretrained::Bool=false, task::Any = Nothing; embeddi
         Chain(
             de,
             VarDrop(in_drop_prob),
-            WeightDroppedLSTM(embedding_size, hid_lstm_sz, hid_drop_prob; init = (dims...) -> init_weights(1/hid_lstm_sz, dims...)),
+            WeightDroppedLSTM(embedding_size, hid_lstm_sz, hid_drop_prob; init = (dims...) -> init_weights(1 / hid_lstm_sz, dims...)),
             VarDrop(layer_drop_prob),
-            WeightDroppedLSTM(hid_lstm_sz, hid_lstm_sz, hid_drop_prob; init = (dims...) -> init_weights(1/hid_lstm_sz, dims...)),
+            WeightDroppedLSTM(hid_lstm_sz, hid_lstm_sz, hid_drop_prob; init = (dims...) -> init_weights(1 / hid_lstm_sz, dims...)),
             VarDrop(layer_drop_prob),
-            WeightDroppedLSTM(hid_lstm_sz, out_lstm_sz, hid_drop_prob; init = (dims...) -> init_weights(1/hid_lstm_sz, dims...)),
+            WeightDroppedLSTM(hid_lstm_sz, out_lstm_sz, hid_drop_prob; init = (dims...) -> init_weights(1 / hid_lstm_sz, dims...)),
             VarDrop(final_drop_prob),
             Base.Fix2(de, true),
             softmax
