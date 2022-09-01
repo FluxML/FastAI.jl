@@ -9,7 +9,7 @@ linear_layers   : contains Chain of two Dense layers [PooledDense and Dense] wit
 
 To train create and instance and give it as first argument to 'train_classifier!' function
 """
-mutable struct TextClassifier{A,F,Q}
+struct TextClassifier{A,F,Q}
     vocab::A
     rnn_layers::F
     linear_layers::Q
