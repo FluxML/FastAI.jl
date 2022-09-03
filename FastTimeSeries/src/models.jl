@@ -9,7 +9,6 @@ function blockmodel(inblock::TimeSeriesRow,
                 backbone)
     #TODO: Use Flux.outputsize here.
     data   = rand(Float32, inblock.nfeatures, 32, inblock.obslength)
-    # data   = [rand(Float32, inblock.nfeatures, 32) for _ ∈ 1:inblock.obslength]
     output = backbone(data)
     return Models.RNNModel(backbone, outsize = length(outblock.classes), recout = size(output, 1))
 end
@@ -25,4 +24,6 @@ end
 
 # ## Tests
 
-@testset "blockbackbone" begin @test_nowarn FastAI.blockbackbone(TimeSeriesRow(1,140)) end
+@testset "blockbackbone" begin 
+    @test_nowarn FastAI.blockbackbone(TimeSeriesRow(1,140)) 
+end

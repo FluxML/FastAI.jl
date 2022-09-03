@@ -65,10 +65,7 @@ function InceptionBlock(ni::Int, nf::Int = 32, residual::Bool = true, depth::Int
 
 end
 
-function changedims(X)
-    X = permutedims(X, (2, 1, 3))
-    return X
-end
+changedims(X) = permutedims(X, (2, 1, 3))
 
 """
     InceptionTime(c_in::Int, c_out::Int, seq_len = nothing, nf::Int = 32)
