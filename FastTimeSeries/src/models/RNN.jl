@@ -28,10 +28,9 @@ end
 
 function (m::RNNModel)(X)
     X = tabular2rnn(X)
-    Flux.reset!(m.recbackbone)
-    # ChainRulesCore.ignore_derivatives() do
-    #     Flux.reset!(m.recbackbone)
-    # end
+    ChainRulesCore.ignore_derivatives() do
+        Flux.reset!(m.recbackbone)
+    end
     X = m.recbackbone(X)[:, :, end]
     return m.finalclassifier(X)
 end

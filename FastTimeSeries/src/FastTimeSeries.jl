@@ -33,6 +33,7 @@ include("blocks/timeseriesrow.jl")
 
 # Encodings
 include("encodings/tspreprocessing.jl")
+include("encodings/continuouspreprocessing.jl")
 
 # Models
 include("models/Models.jl")

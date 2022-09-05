@@ -6,6 +6,7 @@ using Flux
 using Zygote
 using DataDeps
 using InlineTest
+using ChainRulesCore
 
 # include("StackedLSTM.jl")
 include("layers.jl")

@@ -4,6 +4,7 @@ authors = ["FluxML Community"]
 version = "0.1.0"
 
 [deps]
+ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
 DataDeps = "124859b0-ceae-595e-8997-d05f6a7a8dfe"
 FastAI = "5d0beca9-ade8-49ae-ad0b-a3cf890e669f"
 FilePathsBase = "48062228-2e41-5def-b9a4-89aafe57970f"
