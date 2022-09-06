@@ -27,7 +27,7 @@ Moreover this also follows the Vartional DropOut citeria, that is,
 the drop mask is remains same for a whole training pass.
 This is done by saving the masks in 'maskWi' and 'maskWh' fields
 """
-mutable struct WeightDroppedLSTMCell{A,V,S}
+mutable struct WeightDroppedLSTMCell{A,V,S,T}
     Wi::A
     Wh::A
     b::V
@@ -35,7 +35,7 @@ mutable struct WeightDroppedLSTMCell{A,V,S}
     c::S
     p::Float32
     active::Union{Bool,Nothing}
-    state0::Tuple{Matrix{Float32},Matrix{Float32}}
+    state0::T
 end
 
 function WeightDroppedLSTMCell(in::Integer, out::Integer, p::Float32 = 0.0f0;
@@ -180,10 +180,10 @@ To reset mask:
 
 julia> reset_masks!(de)
 """
-mutable struct DroppedEmbeddings{A,F}
+mutable struct DroppedEmbeddings{A,F,M}
     emb::A
     p::F
-    mask::Vector{Float32}
+    mask::M
     active::Union{Bool,Nothing}
 end
 
