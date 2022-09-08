@@ -19,10 +19,7 @@ is passed through a dropout layer before a 'finalclassifier' block.
 - `dropout_rate`: Dropout probability for the dropout layer.
 """
 
-function RNNModel(recbackbone;
-                outsize,
-                recout,
-                kwargs...)
+function RNNModel(recbackbone; outsize, recout)
     return RNNModel(recbackbone, Dense(recout, outsize))
 end
 

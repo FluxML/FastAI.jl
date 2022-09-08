@@ -27,6 +27,7 @@ using FilePathsBase
 using InlineTest
 using Statistics
 using UnicodePlots
+using Flux
 
 # Blocks
 include("blocks/timeseriesrow.jl")
