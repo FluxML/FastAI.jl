@@ -99,8 +99,8 @@ function WeightDroppedLSTM(a...; kw...)
 end
 
 function Flux.reset!(layer::Flux.Recur{<:WeightDroppedLSTMCell})
-    maskWi = Flux.dropout_mask(Flux.rng_from_array(), layer.cell.Wi, layer.cell.p)
-    maskWh = Flux.dropout_mask(Flux.rng_from_array(), layer.cell.Wh, layer.cell.p)
+    maskWi = Flux.dropout_mask(Flux.rng_from_array(layer.cell.Wi), layer.cell.Wi, layer.cell.p)
+    maskWh = Flux.dropout_mask(Flux.rng_from_array(layer.cell.Wh), layer.cell.Wh, layer.cell.p)
     layer.state = (layer.cell.state0..., maskWi, maskWh)
     return nothing
 end
