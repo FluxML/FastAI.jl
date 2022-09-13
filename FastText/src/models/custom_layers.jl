@@ -27,7 +27,7 @@ Moreover this also follows the Vartional DropOut citeria, that is,
 the drop mask is remains same for a whole training pass.
 This is done by saving the masks in 'maskWi' and 'maskWh' fields
 """
-mutable struct WeightDroppedLSTMCell{A,V,S}
+mutable struct WeightDroppedLSTMCell{A,V,S,T}
     Wi::A
     Wh::A
     b::V
@@ -35,7 +35,7 @@ mutable struct WeightDroppedLSTMCell{A,V,S}
     c::S
     p::Float32
     active::Union{Bool,Nothing}
-    state0::Tuple{Matrix{Float32},Matrix{Float32}}
+    state0::T
 end
 
 function WeightDroppedLSTMCell(in::Integer, out::Integer, p::Float32 = 0.0f0;
@@ -92,15 +92,15 @@ julia> wd = WeightDroppedLSTM(4, 5, 0.3);
 """
 function WeightDroppedLSTM(a...; kw...)
     cell = WeightDroppedLSTMCell(a...; kw...)
-    maskWi = Flux.dropout_mask(Flux.rng_from_array(), cell.Wi, cell.p)
-    maskWh = Flux.dropout_mask(Flux.rng_from_array(), cell.Wh, cell.p)
+    maskWi = Flux.dropout_mask(Flux.rng_from_array(cell.Wi), cell.Wi, cell.p)
+    maskWh = Flux.dropout_mask(Flux.rng_from_array(cell.Wh), cell.Wh, cell.p)
     hidden = (cell.state0..., maskWi, maskWh)
     return Flux.Recur(cell, hidden)
 end
 
 function Flux.reset!(layer::Flux.Recur{<:WeightDroppedLSTMCell})
-    maskWi = Flux.dropout_mask(Flux.rng_from_array(), layer.cell.Wi, layer.cell.p)
-    maskWh = Flux.dropout_mask(Flux.rng_from_array(), layer.cell.Wh, layer.cell.p)
+    maskWi = Flux.dropout_mask(Flux.rng_from_array(layer.cell.Wi), layer.cell.Wi, layer.cell.p)
+    maskWh = Flux.dropout_mask(Flux.rng_from_array(layer.cell.Wh), layer.cell.Wh, layer.cell.p)
     layer.state = (layer.cell.state0..., maskWi, maskWh)
     return nothing
 end
@@ -136,7 +136,7 @@ testmode!(m::VarDropCell, mode = true) =
 
 function (vd::VarDropCell)((has_mask, mask), x)
     if Flux._isactive(vd)
-        mask = has_mask ? mask : Flux.dropout_mask(Flux.rng_from_array(), x, vd.p)
+        mask = has_mask ? mask : Flux.dropout_mask(Flux.rng_from_array(x), x, vd.p)
         return (true, mask), x .* mask
     elseif !has_mask
         return (has_mask, mask), x
@@ -180,10 +180,10 @@ To reset mask:
 
 julia> reset_masks!(de)
 """
-mutable struct DroppedEmbeddings{A,F}
+mutable struct DroppedEmbeddings{A,F,M}
     emb::A
     p::F
-    mask::Vector{Float32}
+    mask::M
     active::Union{Bool,Nothing}
 end
 
