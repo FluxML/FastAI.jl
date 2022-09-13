@@ -136,7 +136,7 @@ testmode!(m::VarDropCell, mode = true) =
 
 function (vd::VarDropCell)((has_mask, mask), x)
     if Flux._isactive(vd)
-        mask = has_mask ? mask : Flux.dropout_mask(Flux.rng_from_array(x), x, vd.p)
+        mask = has_mask ? mask : Flux.dropout_mask(Zygote.ignore(() -> Flux.rng_from_array(x)), x, vd.p)
         return (true, mask), x .* mask
     elseif !has_mask
         return (has_mask, mask), x
