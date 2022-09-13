@@ -192,7 +192,7 @@ function DroppedEmbeddings(in::Integer, embed_size::Integer, p::Float32 = 0.0f0;
     de = DroppedEmbeddings(
         init(in, embed_size),
         p,
-        Flux.dropout(Flux.rng_from_array(), rand(Float32, in), p),
+        Flux.dropout(Flux.rng_from_array(rand(Float32, in)), rand(Float32, in), p),
         nothing
     )
     return de
@@ -211,7 +211,7 @@ testmode!(m::DroppedEmbeddings, mode = true) =
     (m.active = (isnothing(mode) || mode == :auto) ? nothing : !mode; m)
 
 function reset_masks!(de::DroppedEmbeddings)
-    de.mask = Flux.dropout_mask(Flux.rng_from_array(), de.mask, de.p)
+    de.mask = Flux.dropout_mask(Flux.rng_from_array(de.mask), de.mask, de.p)
     return
 end
 ####################################################################
