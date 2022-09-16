@@ -54,6 +54,7 @@ function _ts2df(
 
     timestamps = false
     class_labels = false
+    target_labels = true
 
     open(full_file_path_and_name, "r") do file
         for ln in eachline(file)
@@ -109,6 +110,21 @@ function _ts2df(
 
                     series_length = parse(Int, tokens[2])
 
+                elseif startswith(ln, "@dimension")
+                    # Check that the associated value is valid
+                    tokens = split(ln, " ")
+                    
+                    num_dimensions = parse(Int, tokens[2])
+                
+                elseif startswith(ln, "@targetlabel")
+                    tokens = split(ln, " ")
+
+                    if tokens[2] == "true"
+                        target_labels = true
+                    else
+                        target_labels = false
+                    end
+
                 elseif startswith(ln, "@classlabel")
                     # Check that the associated value is valid
                     tokens = split(ln, " ")
@@ -150,7 +166,106 @@ function _ts2df(
                     # Check if we dealing with data that has timestamps
 
                     if timestamps
-                        #! Need To Add Code.
+                        
+                        has_another_value = false
+                        has_another_dimension = false
+
+                        timestamps_for_dimension = []
+                        values_for_dimension = []
+
+                        line_len = length(ln)
+                        char_num = 1
+                        num_this_dimension = 1
+                        arr = Array{Float32, 2}(undef, num_dimensions, series_length)
+
+                        while char_num <= line_len
+
+                            # Move through any spaces.
+                            while char_num <= line_len && isspace(ln[char_num])
+                                char_num += 1
+                            end
+
+                            if char_num <= line_len
+
+                                # Check if we have reached a class label
+                                if ln[char_num] != '(' && target_labels
+
+                                    class_val = strip(ln[char_num:end], ' ')
+
+                                    push!(class_val_list, parse(Float32, class_val))
+                                    push!(instance_list, arr)
+
+                                    char_num = line_len
+
+                                    has_another_value = false
+                                    has_another_dimension = false
+
+                                    timestamps_for_dimension = []
+                                    values_for_dimension = []
+
+                                    char_num += 1
+                                    num_this_dimension = 1
+                                    arr = Array{Float32, 2}(undef, num_dimensions, series_length)
+                                
+                                else
+
+                                    char_num += 1
+                                    tuple_data = ""
+
+                                    while (char_num <= line_len && ln[char_num] != ')')
+                                        tuple_data *= ln[char_num]
+                                        char_num += 1
+                                    end
+
+                                    char_num += 1
+
+                                    while char_num <= line_len && isspace(ln[char_num])
+                                        char_num += 1
+                                    end
+
+                                    # Check if there is another value or dimension to process after this tuple.
+                                    if char_num > line_len
+                                        has_another_value = false
+                                        has_another_dimension = false
+                                    elseif ln[char_num] == ','
+                                        has_another_value = true
+                                        has_another_dimension = false
+                                    elseif ln[char_num] == ':'
+                                        has_another_value = false
+                                        has_another_dimension = true
+                                    end
+
+                                    char_num += 1
+
+                                    last_comma_index = findlast(",", tuple_data)
+
+                                    if !isnothing(last_comma_index)
+                                        last_comma_index = last_comma_index[1]
+                                    end
+
+                                    value = tuple_data[last_comma_index+1:end]
+                                    value = parse(Float32, value)
+
+                                    timestamp = tuple_data[1:last_comma_index-1]
+
+                                    push!(values_for_dimension, value)
+
+                                    if !has_another_value
+
+                                        arr[num_this_dimension, 1:end] = values_for_dimension
+
+                                        values_for_dimension = []
+
+                                        num_this_dimension += 1
+                                    end
+                                    
+                                end
+
+                            end
+
+                        end
+
+
                     else
                         dimensions = split(ln, ':')
 
@@ -196,13 +311,9 @@ function _ts2df(
                                 data_series = split(dimension, ',')
                                 data_series = [parse(Float32, i) for i in data_series]
                                 arr[dim, 1:end] = data_series
-                                # println(data_series)
-                                # data_series = [parse(Float32, i) for i in data_series]
-                                # push!(instance_list[dim], data_series)
                             else
                                 tmp = Array{Float32, 1}(undef, 100)
                                 arr[dim, 1:end] = tmp
-                                # push!(instance_list[dim], [])
                             end
                         end
 
@@ -229,7 +340,7 @@ function _ts2df(
         end
 
         # Check if we should return any associated class labels separately
-        if class_labels
+        if class_labels || target_labels
             return data, class_val_list
         else
             return data

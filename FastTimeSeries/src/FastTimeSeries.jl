@@ -34,11 +34,16 @@ include("blocks/timeseriesrow.jl")
 # Encodings
 include("encodings/tspreprocessing.jl")
 
+# Models
+include("models/Models.jl")
+include("models.jl")
+
 include("container.jl")
 include("recipes.jl")
 
 const _tasks = Dict{String, Any}()
 include("tasks/classification.jl")
+include("tasks/regression.jl")
 
 function __init__()
     _registerrecipes()
@@ -50,5 +55,5 @@ function __init__()
 end
 
 export
-    TimeSeriesRow, TSClassificationSingle, TSPreprocessing
+    TimeSeriesRow, TSClassificationSingle, TSPreprocessing, TSRegression
 end
