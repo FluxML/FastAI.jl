@@ -1,10 +1,3 @@
-#= TODO: loadfile
-
-    elseif endswith(file, ".ts")
-        return _ts2df(file)
-
-=#
-
 Datasets.loadfile(file::String, ::Val{:ts}) = _ts2df(file)
 
 #TimeSeriesDataset

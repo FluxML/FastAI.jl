@@ -1,7 +1,8 @@
 """
     InceptionModule(ni::Int, nf::Int, ks::Int = 40, bottleneck::Bool = true)
 
-TBW
+An InceptionModule consists of an (optional) bottleneck, followed by
+3 conv1d layers.
 """
 function InceptionModule(ni::Int, nf::Int, kernel_size::Int = 40, bottleneck::Bool = true)
     ks = [kernel_size ÷ (2^i) for i in 0:2]
@@ -23,7 +24,8 @@ end
 """
     InceptionBlock(ni::Int, nf::Int = 32, residual::Bool = true, depth::Int = 6)
 
-TBW
+An InceptionBlock consists of variable number of InceptionModule depending on the depth.
+Optionally residual.
 """
 function InceptionBlock(ni::Int, nf::Int = 32, residual::Bool = true, depth::Int = 6)
     inception = []
@@ -69,9 +71,16 @@ changedims(X) = permutedims(X, (2, 1, 3))
 """
     InceptionTime(c_in::Int, c_out::Int, seq_len = nothing, nf::Int = 32)
 
-TBW
+A Julia Implemention of the InceptionTime model.
+From https://arxiv.org/abs/1909.04939
+
+## Arguments.
+
+- `c_in` : The number of input channels.
+- `c_out`: The number of output classes.
+- `nf`   : The number of "hidden channels" to use.
 """
-function InceptionTime(c_in::Int, c_out::Int, seq_len = nothing, nf::Int = 32)
+function InceptionTime(c_in::Int, c_out::Int, nf::Int = 32)
     inceptionblock = InceptionBlock(c_in, nf)
     gap = GAP1d(1)
     fc = Dense(nf * 4, c_out)
