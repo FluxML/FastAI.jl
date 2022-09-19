@@ -38,7 +38,7 @@ Base.@kwdef struct TextGenerationFolders <: Datasets.DatasetRecipe
     textgenerationfolder::String = "unsup"
     labelfn = Datasets.parentname
     split::Bool = false
-    filefilterfn = _ -> true
+    filefilterfn = f -> !occursin(r"tmp_clas|tmp_lm|test|rain", f)
 end
 
 Datasets.recipeblocks(::Type{TextGenerationFolders}) = Tuple{Paragraph}
@@ -49,10 +49,10 @@ function Datasets.loadrecipe(recipe::TextGenerationFolders, path)
     isdir(textpath) || error("$textpath is not a directory")
     data = loadfolderdata(textpath,
         filterfn = f -> istextfile(f) && recipe.filefilterfn(f),
-        loadfn = (loadfile, recipe.labelfn),
+        loadfn = (loadfile, loadfile),
         splitfn = recipe.split ? parentname : nothing)
     labels = recipe.split ? first(values(data))[2] : data[2]
-    blocks = (Paragraph(), Label(unique(eachobs(labels))))
+    blocks = (Paragraph(), Paragraph())
 
     (recipe.split ? length(data) > 0 : numobs(data) > 0) ||
         error("No text files found in $textpath")

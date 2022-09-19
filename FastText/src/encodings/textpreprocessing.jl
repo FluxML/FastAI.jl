@@ -9,7 +9,7 @@ Encodes
 
 """
 struct Sanitize <: Encoding
-    tfms
+    tfms::Any
 end
 
 Sanitize() = Sanitize(DEFAULT_SANITIZERS)
@@ -25,7 +25,7 @@ function encode(p::Sanitize, context, block::Paragraph, obs)
 end
 
 struct Tokenize <: Encoding
-    tfms
+    tfms::Any
 end
 
 Tokenize() = Tokenize(DEFAULT_TOKENIZERS)
@@ -41,8 +41,10 @@ function encode(p::Tokenize, context, block::Paragraph, obs)
     obs
 end
 
-function computevocabulary(data; vocab_size=40000)
-    lookup_table = Dict{String, Int}()
+
+# Building a vocabulary
+function computevocabulary(data; vocab_size = 40000)
+    lookup_table = Dict{String,Int}()
 
     enc1 = Sanitize()
     sanitized_Data = map(i -> encode(enc1, Training(), Paragraph(), getobs(data, i)[1]), 1:numobs(data))
@@ -56,7 +58,7 @@ function computevocabulary(data; vocab_size=40000)
         end
     end
 
-    ordered_dict = sort(OrderedDict(lookup_table), byvalue=true)
+    ordered_dict = sort(OrderedDict(lookup_table), byvalue = true)
 
     for (k, v) in ordered_dict
         if length(ordered_dict) > vocab_size
@@ -66,7 +68,7 @@ function computevocabulary(data; vocab_size=40000)
         end
     end
 
-    ordered_dict = sort(OrderedDict(ordered_dict), byvalue=true, rev=true)
+    ordered_dict = sort(OrderedDict(ordered_dict), byvalue = true, rev = true)
     counter = 3
 
     for (k, v) in ordered_dict
@@ -78,20 +80,20 @@ function computevocabulary(data; vocab_size=40000)
     ordered_dict["<pad>"] = 2
 
 
-    return sort(ordered_dict, byvalue=true)
+    return sort(ordered_dict, byvalue = true)
 
 end
 
 struct EmbedVocabulary <: Encoding
-    vocab
+    vocab::Any
 end
 
 function EmbedVocabulary(; vocab)
     return EmbedVocabulary(vocab)
 end
 
-function setup(::Type{EmbedVocabulary}, data; vocab_size=238483)
-    vocab = computevocabulary(data, vocab_size=vocab_size)
+function setup(::Type{EmbedVocabulary}, data; vocab_size = 40000)
+    vocab = computevocabulary(data, vocab_size = vocab_size)
     return EmbedVocabulary(vocab = vocab)
 end
 
@@ -101,8 +103,7 @@ end
 
 function encode(p::EmbedVocabulary, context, block::Tokens, obs)
     vocabulary = p.vocab
-
-    return [token in vocabulary.keys ? vocabulary[token] : vocabulary["<unk>"]  for token in obs]
+    return [token in vocabulary.keys ? vocabulary[token] : vocabulary["<unk>"] for token in obs]
 end
 
 
