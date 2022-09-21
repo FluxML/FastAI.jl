@@ -11,7 +11,7 @@ function load_batchseq(data, task; context = Training(), batch_size = 4, shuffle
     return map((xs, ys) -> (batchseq(xs, 2), ys), bv_x, bv_y)
 end
 
-function load_genseq(data, task; context = Training(), batch_size = 4, shuffle = true)
+function load_genseq(data, task; context = Training(), batch_size = 4, shuffle = false)
     # Create a task dataset from the data
     data = shuffle ? shuffleobs(data) : data
     td = taskdataset(data, task, context)
@@ -22,5 +22,11 @@ function load_genseq(data, task; context = Training(), batch_size = 4, shuffle =
     # bv_y = BatchView(y_out, batchsize = batch_size)
     bv_y = BatchView(y_out, batchsize = 4)
 
-    return map((xs, ys) -> (batchseq(xs, 2), batchseq(ys, 2)), bv_x, bv_y)
+    pad_onehot = Flux.onehot(2, 1:length(task.encodings[3].vocab))
+
+    return map((xs, ys) -> (batchseq(xs, 2), batchseq(ys, pad_onehot)), bv_x, bv_y)
+end
+
+function encode(::OneHot, _, block::NumberVector, obs)
+    return map(i -> Flux.onehotbatch(obs[i], 1:4424), 1:length(obs))
 end

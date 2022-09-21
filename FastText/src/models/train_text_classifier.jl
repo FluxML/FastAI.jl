@@ -35,7 +35,7 @@ end
 Flux.@functor TextClassifier
 Flux.trainable(m::TextClassifier) = (rnn_layers = m.rnn_layers, linear_layers = m.linear_layers)
 
-function loss(m, xs, y; k = 10)
+function loss(m::TextClassifier, xs, y; k = 10)
     # forward steps
     reset!(m.rnn_layers)
     Zygote.ignore() do

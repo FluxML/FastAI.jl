@@ -51,3 +51,29 @@ function LanguageModel(load_pretrained::Bool = false, task::Any = Nothing; embed
 end
 
 Flux.@functor LanguageModel
+Flux.trainable(m::LanguageModel) = (layers = m.layers)
+
+function loss(m::LanguageModel, xs, y; k = 10)
+    # forward steps
+    # reset!(m.layers)
+    # Zygote.ignore() do
+    #     [m.layers(x) for x in xs[1:(end - k)]]
+    # end
+    # bptt
+    ypreds = [m.layers(x) for x in xs]
+    l = sum(Flux.Losses.logitcrossentropy.(ypreds, y))
+    println("Loss: $loss")
+    return ypreds
+end
+
+function train_language_model(lm::LanguageModel = Nothing, batches = Nothing)
+    opt = Adam(1e-4)
+
+    for batch in batches
+        xs, y = batch
+        ps = Flux.params(lm)
+        gs = gradient(() -> loss(lm, batch...), ps)
+        Flux.Optimise.update!(opt, ps, gs)
+    end
+
+end
