@@ -18,9 +18,9 @@ function load_genseq(data, task; context = Training(), batch_size = 4, shuffle =
     x_inp = map(i -> td[i][1][1:(end - 1)], 1:length(td))
     y_out = map(i -> td[i][2][2:end], 1:length(td))
 
-    bv_x = BatchView(x_inp, batchsize = 4)
+    bv_x = BatchView(x_inp, batchsize = batch_size)
     # bv_y = BatchView(y_out, batchsize = batch_size)
-    bv_y = BatchView(y_out, batchsize = 4)
+    bv_y = BatchView(y_out, batchsize = batch_size)
 
     pad_onehot = Flux.onehot(2, 1:length(task.encodings[3].vocab))
 
