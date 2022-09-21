@@ -4,6 +4,9 @@ function blockmodel(inblock::NumberVector, outblock::OneHotTensor, backbone; k =
     return classifier
 end
 
+function blockmodel(inblock::NumberVector, outblock::NumberVector, backbone; k = 10)
+    return backbone
+end
 
 function (b::TextClassifier)(input)
     k = 10
@@ -14,4 +17,9 @@ function (b::TextClassifier)(input)
 
     # bptt
     model = b.linear_layers([b.rnn_layers(x) for x in input[(end - k + 1):end]])
+end
+
+function (b::LanguageModel)(input)
+    # bptt
+    model = [b.layers(x) for x in input[1:end]]
 end
