@@ -2,7 +2,7 @@ function load_batchseq(data, task; context = Training(), batch_size = 4, shuffle
     # Create a task dataset from the data
     data = shuffle ? shuffleobs(data) : data
     td = taskdataset(data, task, context)
-    x_inp = map(i -> td[i][1], 1:length(td))
+    x_inp = mapobs(i -> td[i][1], 1:numobs(td))
     y_out = mapreduce(i -> td[i][2], hcat, 1:length(td))
 
     bv_x = BatchView(x_inp, batchsize = batch_size)
@@ -11,12 +11,12 @@ function load_batchseq(data, task; context = Training(), batch_size = 4, shuffle
     return map((xs, ys) -> (batchseq(xs, 2), ys), bv_x, bv_y)
 end
 
-function load_genseq(data, task; context = Training(), batch_size = 4, shuffle = false)
+function load_genseq(data, task; context = Training(), batch_size = 4, shuffle = true)
     # Create a task dataset from the data
     data = shuffle ? shuffleobs(data) : data
     td = taskdataset(data, task, context)
-    x_inp = map(i -> td[i][1][1:(end - 1)], 1:length(td))
-    y_out = map(i -> td[i][2][2:end], 1:length(td))
+    x_inp = mapobs(i -> td[i][1][1:(end - 1)], 1:numobs(td))
+    y_out = mapobs(i -> td[i][2][2:end], 1:numobs(td))
 
     bv_x = BatchView(x_inp, batchsize = batch_size)
     # bv_y = BatchView(y_out, batchsize = batch_size)
