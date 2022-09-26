@@ -28,5 +28,5 @@ function load_genseq(data, task; context = Training(), batch_size = 4, shuffle =
 end
 
 function encode(::OneHot, _, block::NumberVector, obs)
-    return map(i -> Flux.onehotbatch(obs[i], 1:4424), 1:length(obs))
+    return mapobs(i -> Flux.onehotbatch(obs[i], block.classes), 1:numobs(obs))
 end

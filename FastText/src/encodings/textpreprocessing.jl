@@ -98,7 +98,7 @@ function setup(::Type{EmbedVocabulary}, data; vocab_size = 40000)
 end
 
 function encodedblock(p::EmbedVocabulary, block::Tokens)
-    return NumberVector()
+    return NumberVector(p.vocab.vals)
 end
 
 function encode(p::EmbedVocabulary, context, block::Tokens, obs)
