@@ -18,9 +18,7 @@ function Datasets.recipeblocks(recipe::TimeSeriesDatasetRecipe)
         return Tuple{TimeSeriesRow, Continuous}
     end
 end
-# Datasets.recipeblocks(::Type{TimeSeriesDatasetRecipe}) = Tuple{TimeSeriesRow, Label}
 
-#TODO: Add Check if test_file is nothing.
 function Datasets.loadrecipe(recipe::TimeSeriesDatasetRecipe, path)
     path = convert(String, path)
     datasetpath_train = joinpath(path, recipe.train_file)
@@ -47,7 +45,6 @@ function Datasets.loadrecipe(recipe::TimeSeriesDatasetRecipe, path)
 end
 
 # Registering recipes
-
 const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
     "ecg5000" => [
         TimeSeriesDatasetRecipe(train_file="ECG5000_TRAIN.ts", test_file="ECG5000_TEST.ts")
@@ -58,7 +55,6 @@ const RECIPES = Dict{String,Vector{Datasets.DatasetRecipe}}(
     "natops" => [
         TimeSeriesDatasetRecipe(train_file="NATOPS_TEST.ts", test_file="NATOPS_TRAIN.ts")
     ],
-    #! TODO.
     "appliances_energy" => [
         TimeSeriesDatasetRecipe(train_file="AppliancesEnergy_TRAIN.ts", test_file="AppliancesEnergy_TEST.ts", regression = true)
     ]

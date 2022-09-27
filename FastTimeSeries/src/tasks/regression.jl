@@ -8,8 +8,10 @@ function TSRegression(blocks::Tuple{<:TimeSeriesRow, <:Continuous}, data)
     return SupervisedTask(
         blocks,
         (
+            ContinuousPreprocessing(),
             setup(TSPreprocessing, blocks[1], data[1].table),
         ),
+        ŷblock = blocks[2]
     )    
 end
 

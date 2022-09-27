@@ -27,12 +27,14 @@ using FilePathsBase
 using InlineTest
 using Statistics
 using UnicodePlots
+using Flux
 
 # Blocks
 include("blocks/timeseriesrow.jl")
 
 # Encodings
 include("encodings/tspreprocessing.jl")
+include("encodings/continuouspreprocessing.jl")
 
 # Models
 include("models/Models.jl")

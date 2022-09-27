@@ -1,7 +1,4 @@
-function tabular2rnn(X::AbstractArray{Float32, 3})
-    X = permutedims(X, (1, 3, 2))
-    return X
-end
+tabular2rnn(X::AbstractArray{<:AbstractFloat, 3}) = permutedims(X, (1, 3, 2))
 
 struct RNNModel{A, B}
     recbackbone::A
@@ -22,16 +19,15 @@ is passed through a dropout layer before a 'finalclassifier' block.
 - `dropout_rate`: Dropout probability for the dropout layer.
 """
 
-function RNNModel(recbackbone;
-                outsize,
-                recout,
-                kwargs...)
+function RNNModel(recbackbone; outsize, recout)
     return RNNModel(recbackbone, Dense(recout, outsize))
 end
 
 function (m::RNNModel)(X)
     X = tabular2rnn(X)
-    Flux.reset!(m.recbackbone)
+    ChainRulesCore.ignore_derivatives() do
+        Flux.reset!(m.recbackbone)
+    end
     X = m.recbackbone(X)[:, :, end]
     return m.finalclassifier(X)
 end
