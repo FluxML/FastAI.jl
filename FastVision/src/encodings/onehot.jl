@@ -33,8 +33,14 @@ end
 # `logitcrossentropy(...; dims = 3)` doesn't work on GPU:
 
 function _segmentationloss(ypreds, ys; kwargs...)
-    sz = size(ypreds)
-    ypreds = reshape(ypreds, :, sz[end - 1], sz[end])
-    ys = reshape(ys, :, size(ys, 3), size(ys, 4))
+    sz_preds = size(ypreds)
+    ypreds = reshape(ypreds, :, sz_preds[end - 1], sz_preds[end])
+    sz = size(ys)
+    ys = reshape(ys, :, sz[end - 1], sz[end])
     Flux.Losses.logitcrossentropy(ypreds, ys; dims = 2, kwargs...)
+end
+
+@testset "segmentationloss" begin
+    @test _segmentationloss(zeros(10, 10, 3, 5), zeros(10, 10, 3, 5)) == 0
+    @test _segmentationloss(zeros(10, 10, 10, 3, 5), zeros(10, 10, 10, 3, 5)) == 0
 end
