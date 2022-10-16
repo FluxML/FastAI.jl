@@ -56,13 +56,14 @@ From this short definition, many things can be derived:
 - the loss function to use
 - how to visualize samples and predictions
 
-Together with a [data container](data_container) `data`, we can quickly create a `Learner` using [`tasklearner`](#) which, like in fastai, handles the training for us. There are no application-specific `Learner` constructors like `cnn_learner` or `unet_learner` in FastAI.jl.
+Together with a [data container](data_containers.md) `data`, we can quickly create a `Learner` using [`tasklearner`](#) which, like in fastai, handles the training for us. There are no application-specific `Learner` constructors like `cnn_learner` or `unet_learner` in FastAI.jl.
+
 
 ```julia
 learner = tasklearner(task, data)
 ```
 
-High-level training protocols like the [one-cycle learning rate schedule](./notebooks/fitonecycle.ipynb), [fine-tuning](./notebooks/finetune.ipynb) and the [learning rate finder](./notebooks/lrfind.ipynb) are then available to us:
+High-level training protocols like the [one-cycle learning rate schedule](./notebooks/training.ipynb), [fine-tuning](./notebooks/training.ipynb) and the [learning rate finder](./notebooks/training.ipynb) are then available to us:
 
 ```julia
 fit!(learner, 10)                  # Basic training for 10 epochs
