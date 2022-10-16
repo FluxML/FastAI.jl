@@ -3,7 +3,7 @@
 For some kinds of functionality, FastAI.jl provides feature registries that allow you to search for and use features. The following registries currently exist:
 
 - [`datasets`](#) to download and unpack datasets,
-- [`datarecipes`](#) to load datasets into [data containers](/documents/docs/data_containers.md) that are compatible with a learning task; and
+- [`datarecipes`](#) to load datasets into [data containers](/doc/docs/data_containers.md) that are compatible with a learning task; and
 - [`learningtasks`](#) to find learning tasks that are compatible with a dataset
 
 !!! note "Domain packages"

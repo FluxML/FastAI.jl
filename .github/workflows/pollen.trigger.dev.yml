@@ -1,0 +1,15 @@
+name: Pollen.jl build - dev
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  pollen:
+    name: "Pollen - Build documentation on push to main"
+    uses: "./.github/workflows/pollen.build.yml"
+    with:
+      tag: dev
+    secrets: inherit

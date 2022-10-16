@@ -1,43 +1,45 @@
 {
-    "Overview": "documents/README.md",
-    "Setup": "documents/docs/setup.md",
-    "Quickstart": "documents/docs/notebooks/quickstart.ipynb",
+    "Overview": "/doc/README.md",
+    "Setup": "/doc/docs/setup.md",
+    "Quickstart": "/doc/docs/notebooks/quickstart.ipynb",
     "Core": {
         "Tutorials": {
-            "Introduction": "documents/docs/introduction.md",
-            "Discovering functionality": "documents/docs/discovery.md",
+            "Introduction": "/doc/docs/introduction.md",
+            "Discovering functionality": "/doc/docs/discovery.md",
             "Intermediate": {
-                "Data containers": "documents/docs/data_containers.md"
+                "Data containers": "/doc/docs/data_containers.md"
             },
             "Advanced": {
-                "Unsupervised learning with VAEs": "documents/docs/notebooks/vae.ipynb"
+                "Unsupervised learning with VAEs": "/doc/docs/notebooks/vae.ipynb"
             }
         },
         "How-to": {
-            "Train a model": "documents/docs/notebooks/training.ipynb",
-            "Find functionality": "documents/docs/howto/findfunctionality.md",
-            "Load and save models": "documents/docs/notebooks/serialization.ipynb",
-            "Log to TensorBoard": "documents/docs/howto/logtensorboard.md"
+            "Train a model": "/doc/docs/notebooks/training.ipynb",
+            "Find functionality": "/doc/docs/howto/findfunctionality.md",
+            "Load and save models": "/doc/docs/notebooks/serialization.ipynb",
+            "Log to TensorBoard": "/doc/docs/howto/logtensorboard.md"
         },
         "Background": {
-            "Comparison to fast.ai": "documents/docs/fastai_api_comparison.md",
-            "Performant data pipelines": "documents/docs/background/datapipelines.md",
-            "Blocks and Encodings": "documents/docs/background/blocksencodings.md"
+            "Comparison to fast.ai": "/doc/docs/fastai_api_comparison.md",
+            "Performant data pipelines": "/doc/docs/background/datapipelines.md",
+            "Blocks and Encodings": "/doc/docs/background/blocksencodings.md"
         }
     },
     "Computer vision": {
         "Tasks": {
-            "Image segmentation": "documents/docs/notebooks/imagesegmentation.ipynb",
-            "Keypoint regression": "documents/docs/notebooks/keypointregression.ipynb"
+            "Image segmentation": "/doc/docs/notebooks/imagesegmentation.ipynb",
+            "Keypoint regression": "/doc/docs/notebooks/keypointregression.ipynb"
         },
         "How-To": {
-            "Use augmentations": "documents/docs/howto/augmentvision.md",
-            "Presize vision datasets": "documents/docs/notebooks/presizing.ipynb"
+            "Use augmentations": "/doc/docs/howto/augmentvision.md",
+            "Presize vision datasets": "/doc/docs/notebooks/presizing.ipynb"
         }
     },
     "Tabular data": {
         "Tasks": {
-            "Tabular classification": "documents/docs/notebooks/tabularclassification.ipynb"
+            "Tabular classification": "/doc/docs/notebooks/tabularclassification.ipynb"
         }
     }
 }
+
+

@@ -1,13 +1,13 @@
-name: Documentation - Deploy
+name: Pollen - Render website
 
 on:
-  push:
-    branches: ['pollen']
   workflow_run:
-    workflows: ['pollenbuild']
+    workflows: ['Pollen.jl build - dev', 'Pollen.jl build - PR preview', 'Pollen.jl build - Release']
     types:
       - completed
+  workflow_dispatch:
 
+# TODO: add concurrency limit
 jobs:
   pollen:
     name: "Pollen - Prerender static frontend and deploy"
@@ -40,10 +40,6 @@ jobs:
         run: |
           cd frontend
           npm run build
-      - name: Build search index
-        run: |
-          cd frontend
-          cat static/data/dev/documents.json | node buildindex.cjs > ../data/dev/searchindex.json
       - name: Deploy changes
         run: |
           ls -lt

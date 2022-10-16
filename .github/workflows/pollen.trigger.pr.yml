@@ -1,0 +1,24 @@
+name: Pollen.jl build - PR preview
+
+on:
+  - pull_request
+
+jobs:
+  pollen:
+    name: "Pollen - Build documentation on push to main"
+    uses: "./.github/workflows/pollen.build.yml"
+    with:
+      tag: pr-${{ github.event.number }}
+    secrets: inherit
+  commentonpr:
+    runs-on: ubuntu-latest
+    needs: pollen
+    name: "Comment on pull request"
+    steps:
+      - name: Comment PR
+        uses: unsplash/comment-on-pr@v1.3.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          msg: "A documentation preview has been successfully built, view it here: [Documentation preview PR-${{github.event.number}}](https://${{github.event.repository.owner.login}}.github.io/${{github.event.repository.name}}/pr-${{github.event.pull_request.number}})"
+          delete_prev_regex_msg: "ocumentation preview PR"

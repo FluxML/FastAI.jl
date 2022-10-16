@@ -1,0 +1,19 @@
+name: Pollen.jl build - Release
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  pollen:
+    name: "Pollen - Build documentation on push to main"
+    uses: "./.github/workflows/pollen.build.yml"
+    with:
+      tag: ${{github.event.release.name}}
+    secrets: inherit
+  pollenstable:
+    name: "Pollen - Build documentation on push to main"
+    uses: "./.github/workflows/pollen.build.yml"
+    with:
+      tag: stable
+    secrets: inherit
