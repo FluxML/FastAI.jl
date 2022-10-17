@@ -43,7 +43,7 @@ jobs:
       # Install the package to-be-documented and its dependencies. Also adds
       - name: "Install package and docs dependencies"
         run: |
-          julia --color=yes --project=./${{inputs.docdir}} -e 'using Pkg; Pkg.develop([Pkg.PackageSpec(path="."), Pkg.PackageSpec(path="./FastVision"), Pkg.PackageSpec(path="./FastMakie"), Pkg.PackageSpec(path="./FastTabular"), Pkg.PackageSpec(url="https://github.com/lorenzoh/Pollen.jl", rev="main")]); Pkg.instantiate();'
+          julia --color=yes --project=./${{inputs.docdir}} -e 'using Pkg; Pkg.develop([Pkg.PackageSpec(path="."), Pkg.PackageSpec(path="./FastVision"), Pkg.PackageSpec(path="./FastMakie"), Pkg.PackageSpec(path="./FastTabular"), Pkg.PackageSpec(url="https://github.com/lorenzoh/Pollen.jl")]); Pkg.instantiate();'
       # Build the documentation data and annotate it with the package tag
       - name: Build
         run: |
