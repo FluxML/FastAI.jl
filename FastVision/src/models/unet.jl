@@ -142,5 +142,5 @@ end
     @test Flux.outputsize(model, (128, 128, 3, 1)) == (64, 64, 4, 1)
 
     model = UNetDynamic(Models.xresnet18(ndim = 3), (128, 128, 128, 3, 1), 4)
-    @test Flux.outputsize(model, (128, 128, 3, 1)) == (128, 128, 128, 4, 1)
+    @test Flux.outputsize(model, (128, 128, 128, 3, 1)) == (128, 128, 128, 4, 1)
 end end
