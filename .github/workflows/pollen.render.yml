@@ -21,10 +21,6 @@ jobs:
         with:
           ref: "gh-pages"
           path: pages
-      - name: Set Swap Space
-        uses: pierotofy/set-swap-space@master
-        with:
-          swap-size-gb: 4
       - uses: actions/checkout@v3
         with:
           repository: lorenzoh/pollenjl-frontend
