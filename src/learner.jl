@@ -86,7 +86,7 @@ end
 
 @testset "getbatch" begin
     batch = rand(1, 10), rand(1, 10)
-    learner = Learner(identity, ([batch], [batch]), nothing, nothing)
+    learner = Learner(identity, Flux.mse; data = ([batch], [batch]))
     @test size.(getbatch(learner)) == ((1, 10), (1, 10))
     @test size.(getbatch(learner, n = 4)) == ((1, 4), (1, 4))
 end
