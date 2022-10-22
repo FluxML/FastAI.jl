@@ -15,7 +15,7 @@ See our [**documentation**](https://fluxml.ai/FastAI.jl) to find out more.
 As an example, here is how to train an image classification model:
 
 ```julia
-using FastAI
+using FastAI, FastVision
 data, blocks = load(datarecipes()["imagenette2-320"])
 task = ImageClassificationSingle(blocks)
 learner = tasklearner(task, data, callbacks=[ToGPU()])
@@ -25,11 +25,11 @@ showoutputs(task, learner)
 
 ## Setup
 
-To get started, install FastAI.jl using the Julia package manager: 
+To get started, install FastAI.jl and domain packages using the Julia package manager:
 
 ```julia
 using Pkg
-Pkg.add("FastAI")
+pkg"add FastAI FastVision"
 ```
 
 or try it out with this [Google Colab template](https://colab.research.google.com/gist/lorenzoh/2fdc91f9e42a15e633861c640c68e5e8).
