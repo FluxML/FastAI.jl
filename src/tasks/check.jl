@@ -2,10 +2,10 @@
 const CONTEXTS = (Training(), Validation(), Inference())
 
 """
-    checktask_core(task, sample, model; device = identity)
+    checktask_core(task; sample, model, device = identity)
     checktask_core(task; device = identity)
 
-Check if `task` conforms to the [core interface](docs/interfaces/core.md).
+Check if `task` conforms to the [`LearningTask`](#) interface.
 `sample` and `model` are used for testing. If you have implemented the testing
 interface and don't supply these as arguments, `mocksample(task)` and
 `mockmodel(task)` will be used.

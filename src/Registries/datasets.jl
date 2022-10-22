@@ -68,7 +68,7 @@ const DATASETS = _datasetregistry()
 Show a registry of available datasets. Pass in filters as keyword
 arguments to look at a subset.
 
-See also [finding functionality](/documents/docs/discovery.md), [`learningtasks`](#),
+See also [finding functionality](/doc/docs/discovery.md), [`learningtasks`](#),
 and [`datarecipes`](#). For more information on registries, see
 [FeatureRegistries.jl](https://github.com/lorenzoh/FeatureRegistries.jl).
 

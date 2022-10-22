@@ -2,7 +2,7 @@
 
 *This tutorial explains the low-level interface behind `BlockTask`s and how to use it to create your custom learning tasks without the data block interface.*
 
-In the [quickstart](quickstart.md) section, you've already seen a learning task in action: [`BlockTask`](#). The learning task abstraction powers FastAI.jl's high-level interface allowing you to make training models for a task simple. `BlockTask` is a particularly convenient and composable interface for creating learning tasks and should be preferred for most use cases.
+In the [quickstart](./notebooks/quickstart.ipynb) section, you've already seen a learning task in action: [`BlockTask`](#). The learning task abstraction powers FastAI.jl's high-level interface allowing you to make training models for a task simple. `BlockTask` is a particularly convenient and composable interface for creating learning tasks and should be preferred for most use cases.
 
 However, to get a look behind the scenes, in this tutorial we'll use the lower-level learning task interface to implement our own version of an image classification learning task. You're encouraged to follow along in a REPL or notebook. This tutorial can also serve as a template for implementing a custom learning task for your own project.
 

@@ -106,9 +106,9 @@ function _ts2df(
                 elseif startswith(ln, "@dimension")
                     # Check that the associated value is valid
                     tokens = split(ln, " ")
-                    
+
                     num_dimensions = parse(Int, tokens[2])
-                
+
                 elseif startswith(ln, "@targetlabel")
                     tokens = split(ln, " ")
 
@@ -159,7 +159,7 @@ function _ts2df(
                     # Check if we dealing with data that has timestamps
 
                     if timestamps
-                        
+
                         has_another_value = false
                         has_another_dimension = false
 
@@ -199,7 +199,7 @@ function _ts2df(
                                     char_num += 1
                                     num_this_dimension = 1
                                     arr = Array{Float32, 2}(undef, num_dimensions, series_length)
-                                
+
                                 else
 
                                     char_num += 1
@@ -251,7 +251,7 @@ function _ts2df(
 
                                         num_this_dimension += 1
                                     end
-                                    
+
                                 end
 
                             end
@@ -341,4 +341,16 @@ function _ts2df(
 
     end
 
+end
+
+
+@testset "TimeSeriesDataset" begin
+    @testset "TimeSeriesDataset from TS" begin
+        folderpath = load(datasets()["atrial"])
+        filepath = joinpath(folderpath, "AtrialFibrillation_TRAIN.ts")
+        tsd = TimeSeriesDataset(filepath)
+        @test tsd isa TimeSeriesDataset{}
+        @test size(getindex(tsd, 10)) == (2, 640)
+        @test length(tsd) == 15
+    end
 end

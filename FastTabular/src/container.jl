@@ -92,14 +92,3 @@ Base.length(dataset::TableDataset{<:CSV.File}) = length(dataset.table)
         rm("test.csv")
     end
 end
-
-@testset "TimeSeriesDataset" begin
-    @testset "TimeSeriesDataset from TS" begin
-        folderpath = datasetpath("atrial")
-        filepath = joinpath(folderpath, "AtrialFibrillation_TRAIN.ts")
-        tsd = TimeSeriesDataset(filepath)
-        @test tsd isa TimeSeriesDataset{}
-        @test size(getindex(tsd, 10)) == (2, 640)
-        @test length(tsd) == 15
-    end
-end

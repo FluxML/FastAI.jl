@@ -1,0 +1,58 @@
+on:
+  workflow_call:
+    inputs:
+      tag:
+        description: 'The version tag to associate with this documentation build, e.g. "dev", "stable", "pr-201"'
+        required: true
+        default: "dev"
+        type: string
+      docdir:
+        description: "Path of the subdirectory where Pollen's Project.toml, make.jl, and project.jl are stored."
+        required: false
+        default: "docs"
+        type: string
+      databranch:
+        description: "Branch where the generated documentation is stored"
+        required: false
+        default: "pollen"
+        type: string
+      juliaversion:
+        description: "Julia version to use when building the documentation"
+        required: false
+        default: "1.8"
+        type: string
+
+jobs:
+  pollen:
+    name: "Pollen - Build documentation data"
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the package directory at the branch that triggered
+      # the workflow
+      - uses: actions/checkout@v2
+      # Check out Pollen.jl's data branch, where the generated documentation
+      # data will be stored.
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{inputs.databranch}}
+          path: pollen
+      # Install Julia
+      - uses: julia-actions/setup-julia@latest
+        with:
+          version: ${{inputs.juliaversion}}
+      # Install the package to-be-documented and its dependencies. Also adds
+      - name: "Install package and docs dependencies"
+        run: |
+          julia --color=yes --project=./${{inputs.docdir}} -e 'using Pkg; Pkg.develop([Pkg.PackageSpec(path="."), Pkg.PackageSpec(path="./FastVision"), Pkg.PackageSpec(path="./FastMakie"), Pkg.PackageSpec(path="./FastTabular"), Pkg.PackageSpec(url="https://github.com/lorenzoh/Pollen.jl")]); Pkg.instantiate();'
+      # Build the documentation data and annotate it with the package tag
+      - name: Build
+        run: |
+          julia --color=yes --project=./${{inputs.docdir}} ./${{inputs.docdir}}/make.jl ./pollen/ ${{inputs.tag}}
+      - name: Deploy
+        run: |
+          cd pollen
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "Build documentation data (Pollen.jl)"
+          git push
