@@ -11,4 +11,7 @@ NNlib = "872c559c-99b0-510c-b3b7-b6c96a88d5cd"
 
 [compat]
 FastAI = "0.5"
+InlineTest = "0.2"
 Makie = "0.17"
+NNlib = "0.8"
+julia = "1.6"
