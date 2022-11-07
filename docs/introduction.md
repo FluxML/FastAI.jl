@@ -1,6 +1,6 @@
 # Introduction
 
-*This tutorial explains the qickstart examples and some core abstractions FastAI.jl is built on.*
+*This tutorial explains the quickstart examples and some core abstractions FastAI.jl is built on.*
 
 {cell=main show=false outputshow=false resultshow=false}
 ```julia
