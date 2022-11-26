@@ -87,7 +87,7 @@ function _modelregistry(; name = "Models", description = _MODELS_DESCRIPTION)
             name = "Variants",
             description = "Model variants suitable for different learning tasks",
             defaultfn = (row, key) -> Pair{String, ModelVariant}[],
-            formatfn = d -> join(collect(keys(d)), ", "),
+            formatfn = d -> join(first.(d), ", "),
         ),
         checkpoints = Field(
             Vector{String};
