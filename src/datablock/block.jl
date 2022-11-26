@@ -131,3 +131,39 @@ and other diagrams.
 """
 blockname(block::Block) = string(nameof(typeof(block)))
 blockname(blocks::Tuple) = "(" * join(map(blockname, blocks), ", ") * ")"
+
+const BlockLike = Union{<:AbstractBlock, Type{<:AbstractBlock}, <:Tuple, Type{Any}}
+
+"""
+    function issubblock(subblock, superblock)
+
+Predicate whether `subblock` is a subblock of `superblock`. This means that `subblock` is
+
+- a subtype of a type `superblock <: Type{AbstractBlock}`
+- an instance of a subtype of `superblock <: Type{AbstractBlock}`
+- equal to `superblock`
+
+Both arguments can also be tuples. In that case, each element of the tuple `subblock` is
+compared recursively against the elements of the tuple `superblock`.
+"""
+function issubblock end
+
+issubblock(_, _) = false
+issubblock(sub::BlockLike, super::Type{Any}) = true
+issubblock(sub::Tuple, super::Tuple) =
+    (length(sub) == length(super)) && all(map(issubblock, sub, super))
+issubblock(sub::Type{<:AbstractBlock}, super::Type{<:AbstractBlock}) = sub <: super
+issubblock(sub::AbstractBlock, super::Type{<:AbstractBlock}) = issubblock(typeof(sub), super)
+issubblock(sub::AbstractBlock, super::AbstractBlock) = sub == super
+
+@testset "issubblock" begin
+    @test issubblock(Label, Any)
+    @test issubblock((Label,), (Any,))
+    @test issubblock((Label,), Any)
+    @test !issubblock(Label, (Any,))
+    @test issubblock(Label{String}, Label)
+    @test !issubblock(Label, Label{String})
+    @test issubblock(Label{Int}(1:10), Label{Int})
+    @test issubblock(Label{Int}(1:10), Label{Int}(1:10))
+    @test !issubblock(Label{Int}, Label{Int}(1:10))
+end
