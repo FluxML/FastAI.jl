@@ -122,7 +122,7 @@ Load a model specified by `row` from a model registry.
 
 """
 function _loadmodel(row; input=Any, output=Any, variant = nothing, checkpoint = nothing, pretrained = !isnothing(checkpoint), kwargs...)
-    (; loadfn, checkpoints, variants) = row
+    loadfn, checkpoints, variants = row.loadfn, row.checkpoints, row.variants  # 1.6 support
 
     # Finding matching configuration
     checkpoint = _findcheckpoint(checkpoints; pretrained, name = checkpoint)
