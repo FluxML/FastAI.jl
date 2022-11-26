@@ -38,6 +38,7 @@ using FastAI: # blocks
               Context, Training, Validation, Inference,
               Datasets
 using FastAI.Datasets
+using FastAI.Registries: ModelVariant
 
 # extending
 import FastAI:
@@ -45,7 +46,7 @@ import FastAI:
                encodedblock, decodedblock, showblock!, mockblock, setup, encodestate,
                decodestate
 
-import Flux
+using Flux: Flux, Chain, Conv, Dense
 import MLUtils: getobs, numobs, mapobs, eachobs
 import Colors: colormaps_sequential, Colorant, Color, Gray, Normed, RGB,
                alphacolor, deuteranopic, distinguishable_colors
@@ -63,10 +64,13 @@ import IndirectArrays: IndirectArray
 import MakieCore
 import MakieCore: @recipe
 import MakieCore.Observables: @map
+import Metalhead: Metalhead
 import ProgressMeter: Progress, next!
+using Setfield: @set
 import StaticArrays: SVector
 import Statistics: mean, std
 import UnicodePlots
+using Random: Random
 
 using InlineTest
 using ShowCases
@@ -76,6 +80,7 @@ include("blocks/bounded.jl")
 include("blocks/image.jl")
 include("blocks/mask.jl")
 include("blocks/keypoints.jl")
+include("blocks/convfeatures.jl")
 
 include("encodings/onehot.jl")
 include("encodings/imagepreprocessing.jl")
@@ -93,6 +98,7 @@ include("tasks/keypointregression.jl")
 include("datasets.jl")
 include("recipes.jl")
 include("makie.jl")
+include("modelregistry.jl")
 
 include("tests.jl")
 
@@ -101,6 +107,11 @@ function __init__()
     foreach(values(_tasks)) do t
         if !haskey(FastAI.learningtasks(), t.id)
             push!(FastAI.learningtasks(), t)
+        end
+    end
+    foreach(values(_models)) do t
+        if !haskey(FastAI.models(), t.id)
+            push!(FastAI.models(), t)
         end
     end
 end
