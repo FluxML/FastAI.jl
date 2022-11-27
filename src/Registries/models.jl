@@ -1,4 +1,8 @@
+# # Model registry
+#
+# This file defines [`models`](#), a feature registry for models.
 
+# ## Registry definition
 
 const _MODELS_DESCRIPTION = """
 A `FeatureRegistry` for models. Allows you to find and load models for various learning
@@ -46,13 +50,23 @@ Loading a model variant for a specific task:
     available variants.
 """
 
-
 """
-    struct ModelVariant(; transform, input, output)
+    struct ModelVariant(; transform, xblock, yblock)
 
 A `ModelVariant` is a model transformation that changes a model so that its input and output
-are subblocks (see [`issubblock`](#)) of `blocks = (inblock, outblock)`.
+are subblocks (see [`issubblock`](#)) of `blocks = (xblock, yblock)`.
 
+The model transformation function `transform` takes a model and two concrete _instances_
+of the variant's compatible blocks, returning a transformed model.
+
+    `transform(model, xblock, yblock)`
+
+- `model` is the original model that is transformed
+- `xblock` is the [`Block`](#) of the data that is input to the model.
+- `yblock` is the [`Block`](#) of the data that the model outputs.
+
+If you're working with a [`SupervisedTask`](#) `task`, these blocks correspond to
+`inputblock = getblocks(task).x` and `outputblock = getblocks(task).y`
 """
 struct ModelVariant
     transformfn::Any  # callable
@@ -60,74 +74,63 @@ struct ModelVariant
     yblock::BlockLike
 end
 _default_transform(model, xblock, yblock; kwargs...) = model
-ModelVariant(; transform = _default_transform, input = Any, output = Any) =
-    ModelVariant(transform, input, output)
-
-
-# Registry definition
+function ModelVariant(; transform = _default_transform, xblock = Any, yblock = Any)
+    ModelVariant(transform, xblock, yblock)
+end
 
 function _modelregistry(; name = "Models", description = _MODELS_DESCRIPTION)
     fields = (;
-        id = Field(String; name = "ID", formatfn = FeatureRegistries.string_format),
-        description = Field(
-            String;
-            name = "Description",
-            optional = true,
-            description = "More information about the model",
-            formatfn = FeatureRegistries.md_format,
-        ),
-        backend = Field(
-            Symbol,
-            name = "Backend",
-            default = :flux,
-            description = "The backend deep learning framework that the model uses. The default is `:flux`.",
-        ),
-        variants = Field(
-            Vector{Pair{String,ModelVariant}},
-            name = "Variants",
-            description = "Model variants suitable for different learning tasks",
-            defaultfn = (row, key) -> Pair{String, ModelVariant}[],
-            formatfn = d -> join(first.(d), ", "),
-        ),
-        checkpoints = Field(
-            Vector{String};
-            name = "Checkpoints",
-            description = "Pretrained weight checkpoints that can be loaded for the model",
-            formatfn = cs -> join(cs, ", "),
-            defaultfn = (row, key) -> String[],
-        ),
-        loadfn = Field(
-            Any;
-            name = "Load function",
-            description = """
-                Function that loads the base version of the model, optionally with weights.
-                It is called with the name of the selected checkpoint fro `checkpoints`,
-                i.e. `loadfn(checkpoint)`. If no checkpoint is selected, it is called with
-                `nothing`, i.e.  loadfn(`nothing`).
+              id = Field(String; name = "ID", formatfn = FeatureRegistries.string_format),
+              description = Field(String;
+                                  name = "Description",
+                                  optional = true,
+                                  description = "More information about the model",
+                                  formatfn = FeatureRegistries.md_format),
+              backend = Field(Symbol,
+                              name = "Backend",
+                              default = :flux,
+                              description = "The backend deep learning framework that the model uses. The default is `:flux`."),
+              variants = Field(Vector{Pair{String, ModelVariant}},
+                               name = "Variants",
+                               optional = false,
+                               description = "Model variants suitable for different learning tasks. See `?ModelVariant` for more details.",
+                               formatfn = d -> join(first.(d), ", ")),
+              checkpoints = Field(Vector{String};
+                                  name = "Checkpoints",
+                                  description = """
+                                      Pretrained weight checkpoints that can be loaded for the model. Checkpoints are listed as a
+                                      `Vector{String}` and `loadfn` should take care of loading the selected checkpoint""",
+                                  formatfn = cs -> join(cs, ", "),
+                                  defaultfn = (row, key) -> String[]),
+              loadfn = Field(Any;
+                             name = "Load function",
+                             description = """
+                                 Function that loads the base version of the model, optionally with weights.
+                                 It is called with the name of the selected checkpoint fro `checkpoints`,
+                                 i.e. `loadfn(checkpoint)`. If no checkpoint is selected, it is called with
+                                 `nothing`, i.e.  loadfn(`nothing`).
 
-                Any unknown keyword arguments passed to `load`, i.e.
-                `load(registry[id]; kwargs...)` will be passed along to `loadfn`.
-                """,
-            optional = false,
-        )
-    )
-    return Registry(fields; name, loadfn = identity, description = description)
+                                 Any unknown keyword arguments passed to `load`, i.e.
+                                 `load(registry[id]; kwargs...)` will be passed along to `loadfn`.
+                                 """,
+                             optional = false))
+    return Registry(fields; name, loadfn = _loadmodel, description = description)
 end
 
 """
     _loadmodel(row)
 
 Load a model specified by `row` from a model registry.
-
-
 """
-function _loadmodel(row; input=Any, output=Any, variant = nothing, checkpoint = nothing, pretrained = !isnothing(checkpoint), kwargs...)
+function _loadmodel(row; input = Any, output = Any, variant = nothing, checkpoint = nothing,
+                    pretrained = !isnothing(checkpoint), kwargs...)
     loadfn, checkpoints, variants = row.loadfn, row.checkpoints, row.variants  # 1.6 support
 
     # Finding matching configuration
     checkpoint = _findcheckpoint(checkpoints; pretrained, name = checkpoint)
 
-    pretrained && isnothing(checkpoint) && throw(NoCheckpointFoundError(checkpoints, checkpoint))
+    pretrained && isnothing(checkpoint) &&
+        throw(NoCheckpointFoundError(checkpoints, checkpoint))
     variant = _findvariant(variants, variant, input, output)
     isnothing(variant) && throw(NoModelVariantFoundError(variants, input, output, variant))
 
@@ -138,6 +141,7 @@ function _loadmodel(row; input=Any, output=Any, variant = nothing, checkpoint = 
     return model
 end
 
+# ### Errors
 struct NoModelVariantFoundError <: Exception
     variants::Vector{Pair{String, ModelVariant}}
     input::BlockLike
@@ -150,10 +154,7 @@ struct NoCheckpointFoundError <: Exception
     checkpoint::Union{String, Nothing}
 end
 
-
-
 const MODELS = _modelregistry()
-
 
 """
     models()
@@ -161,8 +162,6 @@ const MODELS = _modelregistry()
 $_MODELS_DESCRIPTION
 """
 models(; kwargs...) = isempty(kwargs) ? MODELS : filter(MODELS; kwargs...)
-
-
 
 function _findcheckpoint(checkpoints::AbstractVector; pretrained = false, name = nothing)
     if isempty(checkpoints)
@@ -177,7 +176,8 @@ function _findcheckpoint(checkpoints::AbstractVector; pretrained = false, name =
     end
 end
 
-function _findvariant(variants::Vector{Pair{String,ModelVariant}}, variantname::Union{String, Nothing}, xblock, yblock)
+function _findvariant(variants::Vector{Pair{String, ModelVariant}},
+                      variantname::Union{String, Nothing}, xblock, yblock)
     if !isnothing(variantname)
         variants = filter(variants) do (name, _)
             name == variantname
@@ -189,28 +189,34 @@ function _findvariant(variants::Vector{Pair{String,ModelVariant}}, variantname::
     isnothing(i) ? nothing : variants[i][2]
 end
 
+# ## Tests
 
 @testset "Model registry" begin
     @testset "Basic" begin
         @test_nowarn _modelregistry()
         reg = _modelregistry()
         push!(reg, (;
-            id = "test",
-            loadfn = _ -> 1,
-        ))
+                    id = "test",
+                    loadfn = _ -> 1,
+                    variants = ["base" => ModelVariant()]))
+
+        @test load(reg["test"]) == 1
+        @test_throws NoCheckpointFoundError load(reg["test"], pretrained = true)
     end
 
     @testset "_loadmodel" begin
         reg = _modelregistry()
-        @test_nowarn push!(reg, (;
-            id = "test",
-            loadfn = (checkpoint; kwarg = 1) -> (checkpoint, kwarg),
-            checkpoints = ["checkpoint", "checkpoint2"],
-            variants = [
-                "base" => ModelVariant(),
-                "ext" => ModelVariant(((ch, k), i, o; kwargs...) -> (ch, k + 1), Any, Label),
-            ]
-        ))
+        @test_nowarn push!(reg,
+                           (;
+                            id = "test",
+                            loadfn = (checkpoint; kwarg = 1) -> (checkpoint, kwarg),
+                            checkpoints = ["checkpoint", "checkpoint2"],
+                            variants = [
+                                "base" => ModelVariant(),
+                                "ext" => ModelVariant(((ch, k), i, o; kwargs...) -> (ch,
+                                                                                     k + 1),
+                                                      Any, Label),
+                            ]))
         entry = reg["test"]
         @test _loadmodel(entry) == (nothing, 1)
         @test _loadmodel(entry; pretrained = true) == ("checkpoint", 1)
@@ -224,7 +230,10 @@ end
     end
 
     @testset "_findvariant" begin
-        vars = ["1" => ModelVariant(identity, Any, Any), "2" => ModelVariant(identity, Any, Label)]
+        vars = [
+            "1" => ModelVariant(identity, Any, Any),
+            "2" => ModelVariant(identity, Any, Label),
+        ]
         # no restrictions => select first variant
         @test _findvariant(vars, nothing, Any, Any) == vars[1][2]
         # name => select named variant
@@ -233,7 +242,7 @@ end
         @test _findvariant(vars, "3", Any, Any) === nothing
         # restrict block => select matching
         @test _findvariant(vars, nothing, Any, Label) == vars[2][2]
-         # restrict block not found => nothing
+        # restrict block not found => nothing
         @test _findvariant(vars, nothing, Any, LabelMulti) === nothing
     end
 
