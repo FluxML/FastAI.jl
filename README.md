@@ -38,9 +38,9 @@ or try it out with this [Google Colab template](https://colab.research.google.co
 
 To dive in, you may be interested in
 
-- an [overview of the high-level API](https://fluxml.ai/FastAI.jl/dev/documents%2Fdocs%2Fintroduction.md),
-- seeing some [example learning tasks](https://fluxml.ai/FastAI.jl/dev/documents/notebooks/quickstart.ipynb),
-- finding out [how you can search for and find datasets and other functionality](https://fluxml.ai/FastAI.jl/dev/documents%2Fdocs%2Fdiscovery.md); or
+- an [overview of the high-level API](https://fluxml.ai/FastAI.jl/dev/FastAI@dev/doc/docs/introduction.md.html),
+- seeing some [example learning tasks](https://fluxml.ai/FastAI.jl/dev/FastAI@dev/doc/docs/notebooks/quickstart.ipynb.html),
+- finding out [how you can search for and find datasets and other functionality](https://fluxml.ai/FastAI.jl/dev/FastAI@dev/doc/docs/discovery.md.html); or
 - [our contributor guide](CONTRIBUTING.md)
 
 ## Get in touch
