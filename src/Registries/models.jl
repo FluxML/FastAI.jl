@@ -50,33 +50,39 @@ Loading a model variant for a specific task:
     available variants.
 """
 
-"""
-    struct ModelVariant(; transform, xblock, yblock)
 
-A `ModelVariant` is a model transformation that changes a model so that its input and output
+# ## `ModelVariant` interface
+"""
+    abstract type ModelVariant
+
+A `ModelVariant` handles loading a model, optionally with pretrained weights and
+transforming it so that it can be used for specific learning tasks.
+
+
 are subblocks (see [`issubblock`](#)) of `blocks = (xblock, yblock)`.
 
-The model transformation function `transform` takes a model and two concrete _instances_
-of the variant's compatible blocks, returning a transformed model.
+## Interface
 
-    `transform(model, xblock, yblock)`
-
-- `model` is the original model that is transformed
-- `xblock` is the [`Block`](#) of the data that is input to the model.
-- `yblock` is the [`Block`](#) of the data that the model outputs.
-
-If you're working with a [`SupervisedTask`](#) `task`, these blocks correspond to
-`inputblock = getblocks(task).x` and `outputblock = getblocks(task).y`
+- [`compatibleblocks`](#)`(variant)` returns a tuple `(xblock, yblock)` of [`BlockLike`](#) that
+    are compatible with the model. This means that a variant can be used for a task with
+    input and output blocks `blocks`, if [`issubblock`](#)`(blocks, compatibleblocks(variant))`.
+- [`loadvariant`](#)`(::ModelVariant, xblock, yblock, checkpoint; kwargs...)` loads a model
+    compatible with block instances `xblock` and `yblock`, with (optionally) weights
+    from `checkpoint`.
 """
-struct ModelVariant
-    transformfn::Any  # callable
-    xblock::BlockLike
-    yblock::BlockLike
-end
-_default_transform(model, xblock, yblock; kwargs...) = model
-function ModelVariant(; transform = _default_transform, xblock = Any, yblock = Any)
-    ModelVariant(transform, xblock, yblock)
-end
+abstract type ModelVariant end
+
+"""
+    compatibleblocks(::ModelVariant)
+
+Indicate compatible input and output block for a model variant.
+"""
+function compatibleblocks end
+
+function loadvariant end
+
+
+# ## Model registry creation
 
 function _modelregistry(; name = "Models", description = _MODELS_DESCRIPTION)
     fields = (;
@@ -102,18 +108,7 @@ function _modelregistry(; name = "Models", description = _MODELS_DESCRIPTION)
                                       `Vector{String}` and `loadfn` should take care of loading the selected checkpoint""",
                                   formatfn = cs -> join(cs, ", "),
                                   defaultfn = (row, key) -> String[]),
-              loadfn = Field(Any;
-                             name = "Load function",
-                             description = """
-                                 Function that loads the base version of the model, optionally with weights.
-                                 It is called with the name of the selected checkpoint fro `checkpoints`,
-                                 i.e. `loadfn(checkpoint)`. If no checkpoint is selected, it is called with
-                                 `nothing`, i.e.  loadfn(`nothing`).
-
-                                 Any unknown keyword arguments passed to `load`, i.e.
-                                 `load(registry[id]; kwargs...)` will be passed along to `loadfn`.
-                                 """,
-                             optional = false))
+    )
     return Registry(fields; name, loadfn = _loadmodel, description = description)
 end
 
@@ -124,7 +119,7 @@ Load a model specified by `row` from a model registry.
 """
 function _loadmodel(row; input = Any, output = Any, variant = nothing, checkpoint = nothing,
                     pretrained = !isnothing(checkpoint), kwargs...)
-    loadfn, checkpoints, variants = row.loadfn, row.checkpoints, row.variants  # 1.6 support
+    checkpoints, variants = row.checkpoints, row.variants  # 1.6 support
 
     # Finding matching configuration
     checkpoint = _findcheckpoint(checkpoints; pretrained, name = checkpoint)
@@ -135,24 +130,26 @@ function _loadmodel(row; input = Any, output = Any, variant = nothing, checkpoin
     isnothing(variant) && throw(NoModelVariantFoundError(variants, input, output, variant))
 
     # Loading
-    basemodel = loadfn(checkpoint, kwargs...)
-    model = variant.transformfn(basemodel, input, output)
-
-    return model
+    return loadvariant(variant, input, output, checkpoint; kwargs...)
 end
 
 # ### Errors
+
+# TODO: Implement Base.showerror
 struct NoModelVariantFoundError <: Exception
-    variants::Vector{Pair{String, ModelVariant}}
+    variants::Vector
     input::BlockLike
     output::BlockLike
     variant::Union{String, Nothing}
 end
 
+# TODO: Implement Base.showerror
 struct NoCheckpointFoundError <: Exception
     checkpoints::Vector{String}
     checkpoint::Union{String, Nothing}
 end
+
+# ## Create the default registry instance
 
 const MODELS = _modelregistry()
 
@@ -162,6 +159,8 @@ const MODELS = _modelregistry()
 $_MODELS_DESCRIPTION
 """
 models(; kwargs...) = isempty(kwargs) ? MODELS : filter(MODELS; kwargs...)
+
+# ## Helpers
 
 function _findcheckpoint(checkpoints::AbstractVector; pretrained = false, name = nothing)
     if isempty(checkpoints)
@@ -176,7 +175,7 @@ function _findcheckpoint(checkpoints::AbstractVector; pretrained = false, name =
     end
 end
 
-function _findvariant(variants::Vector{Pair{String, ModelVariant}},
+function _findvariant(variants::Vector,
                       variantname::Union{String, Nothing}, xblock, yblock)
     if !isnothing(variantname)
         variants = filter(variants) do (name, _)
@@ -184,12 +183,21 @@ function _findvariant(variants::Vector{Pair{String, ModelVariant}},
         end
     end
     i = findfirst(variants) do (_, variant)
-        issubblock(variant.xblock, xblock) && issubblock(variant.yblock, yblock)
+        v_xblock, v_yblock = compatibleblocks(variant)
+        issubblock(v_xblock, xblock) && issubblock(v_yblock, yblock)
     end
     isnothing(i) ? nothing : variants[i][2]
 end
 
 # ## Tests
+
+struct MockVariant <: ModelVariant
+    model
+    blocks
+end
+
+compatibleblocks(variant::MockVariant) = variant.blocks
+loadvariant(variant::MockVariant, x, y, ch) = (ch, variant.model)
 
 @testset "Model registry" begin
     @testset "Basic" begin
@@ -197,10 +205,9 @@ end
         reg = _modelregistry()
         push!(reg, (;
                     id = "test",
-                    loadfn = _ -> 1,
-                    variants = ["base" => ModelVariant()]))
+                    variants = ["base" => MockVariant(1, (Any, Any))]))
 
-        @test load(reg["test"]) == 1
+        @test load(reg["test"]) == (nothing, 1)
         @test_throws NoCheckpointFoundError load(reg["test"], pretrained = true)
     end
 
@@ -212,10 +219,8 @@ end
                             loadfn = (checkpoint; kwarg = 1) -> (checkpoint, kwarg),
                             checkpoints = ["checkpoint", "checkpoint2"],
                             variants = [
-                                "base" => ModelVariant(),
-                                "ext" => ModelVariant(((ch, k), i, o; kwargs...) -> (ch,
-                                                                                     k + 1),
-                                                      Any, Label),
+                                "base" => MockVariant(1, (Any, Any)),
+                                "ext" => MockVariant(2, (Any, Label)),
                             ]))
         entry = reg["test"]
         @test _loadmodel(entry) == (nothing, 1)
@@ -231,8 +236,8 @@ end
 
     @testset "_findvariant" begin
         vars = [
-            "1" => ModelVariant(identity, Any, Any),
-            "2" => ModelVariant(identity, Any, Label),
+            "1" => MockVariant(1, (Any, Any)),
+            "2" => MockVariant(1, (Any, Label)),
         ]
         # no restrictions => select first variant
         @test _findvariant(vars, nothing, Any, Any) == vars[1][2]
