@@ -38,7 +38,7 @@ using FastAI: # blocks
               Context, Training, Validation, Inference,
               Datasets
 using FastAI.Datasets
-using FastAI.Registries: ModelVariant
+import FastAI.Registries: ModelVariant, compatibleblocks, loadvariant
 
 # extending
 import FastAI:
