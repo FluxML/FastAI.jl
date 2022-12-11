@@ -24,6 +24,7 @@ import UnicodePlots
 using Statistics
 using InlineTest
 
+
 # ## Learning task API (previously DLPipelines.jl)
 include("tasks/task.jl")
 include("tasks/taskdata.jl")
@@ -111,9 +112,7 @@ export
       Label,
       LabelMulti,
       Many,
-      TableRow,
       Continuous,
-      Paragraph,
 
 # encodings
       encode,

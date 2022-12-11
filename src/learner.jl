@@ -13,7 +13,7 @@ Create a [`Learner`](#) to train a model for learning task `task` using
 - `backbone = nothing`: Backbone model to construct task-specific model from using
    [`taskmodel`](#)`(task, backbone)`.
 - `model = nothing`: Complete model to use. If given, the `backbone` argument is ignored.
-- `optimizer = ADAM()`: Optimizer passed to `Learner`.
+- `optimizer = Adam()`: Optimizer passed to `Learner`.
 - `lossfn = `[`tasklossfn`](#)`(task)`: Loss function passed to `Learner`.
 
 Any other keyword arguments will be passed to [`taskdataloaders`](#).
@@ -50,7 +50,7 @@ function tasklearner(task::LearningTask,
                      model = nothing,
                      callbacks = [],
                      batchsize = 16,
-                     optimizer = ADAM(),
+                     optimizer = Adam(),
                      lossfn = tasklossfn(task),
                      usedefaultcallbacks = true,
                      kwargs...)
@@ -86,7 +86,7 @@ end
 
 @testset "getbatch" begin
     batch = rand(1, 10), rand(1, 10)
-    learner = Learner(identity, ([batch], [batch]), nothing, nothing)
+    learner = Learner(identity, Flux.mse; data = ([batch], [batch]))
     @test size.(getbatch(learner)) == ((1, 10), (1, 10))
     @test size.(getbatch(learner, n = 4)) == ((1, 4), (1, 4))
 end

@@ -51,7 +51,7 @@ const TASKS = _taskregistry()
 Show a registry of available learning tasks. Pass in filters as keyword
 arguments to look at a subset.
 
-See also [finding functionality](/documents/docs/discovery.md), [`datasets`](#),
+See also [finding functionality](/doc/docs/discovery.md), [`datasets`](#),
 and [`datarecipes`](#). For more information on registries, see
 [FeatureRegistries.jl](https://github.com/lorenzoh/FeatureRegistries.jl).
 

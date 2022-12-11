@@ -5,3 +5,4 @@ development/**
 Manifest.toml
 **/*.jld2
 *.so
+SysimagePreferences.toml

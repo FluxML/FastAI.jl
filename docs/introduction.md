@@ -90,7 +90,7 @@ The customizable, expanded version of the code looks like this:
 dls = taskdataloaders(data, task)
 model = taskmodel(task, Models.xresnet18())
 lossfn = tasklossfn(task)
-learner = Learner(model, dls, ADAM(), lossfn, ToGPU(), Metrics(accuracy))
+learner = Learner(model, dls, Adam(), lossfn, ToGPU(), Metrics(accuracy))
 ```
 
 At this step, we can also pass in any number of [callbacks](https://fluxml.ai/FluxTraining.jl/dev/docs/callbacks/reference.md.html) to customize the training. Here [`ToGPU`](#) ensures an available GPU is used, and [`Metrics`](#) adds additional metrics to track during training.

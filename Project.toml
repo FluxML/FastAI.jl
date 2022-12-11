@@ -1,7 +1,7 @@
 name = "FastAI"
 uuid = "5d0beca9-ade8-49ae-ad0b-a3cf890e669f"
 authors = ["Lorenz Ohly", "Julia Community"]
-version = "0.5.0-dev"
+version = "0.5.0"
 
 [deps]
 DataDeps = "124859b0-ceae-595e-8997-d05f6a7a8dfe"
@@ -24,6 +24,7 @@ Requires = "ae029012-a4dd-5104-9daa-d747884805df"
 Setfield = "efcf1570-3423-57d1-acb7-fd33fddbac46"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+TextAnalysis = "a2db99b7-8b79-58f8-94bf-bbc811eef33d"
 UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228"
 
 [compat]
@@ -36,12 +37,13 @@ FluxTraining = "0.2, 0.3"
 InlineTest = "0.2"
 JLD2 = "0.4"
 MLDatasets = "0.7"
-MLUtils = "0.2.6"
+MLUtils = "0.2.6, 0.3"
 Parameters = "0.12"
-PrettyTables = "1.2"
+PrettyTables = "1.2, 2"
 Reexport = "1.0"
 Requires = "1"
 Setfield = "0.7, 0.8"
+TextAnalysis = "0.7"
 UnicodePlots = "2, 3"
 julia = "1.6"
 

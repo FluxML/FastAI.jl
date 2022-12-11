@@ -5,6 +5,7 @@ on:
       - 'docs/**'
       - 'FastTabular/**'
       - 'FastText/**'
+      - 'FastTimeSeries/**'
       - '*.md'
   pull_request:
     paths-ignore:

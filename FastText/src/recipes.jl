@@ -37,7 +37,7 @@ end
 # Registering recipes
 
 const RECIPES = Dict{String, Vector}("imdb" => [
-                                         TextFolders(filefilterfn = f -> !occursin(r"tmp_clas|tmp_lm|unsup",
+                                         TextFolders(filefilterfn = f -> !occursin(r"tmp_clas|tmp_lm|unsup|test",
                                                                                    f)),
                                      ])
 
