@@ -58,8 +58,7 @@ import DataAugmentation: apply, Identity, ToEltype, ImageToTensor, Normalize,
                          AdjustBrightness, AdjustContrast, Maybe, FlipX, FlipY, WarpAffine,
                          Rotate, Zoom,
                          ResizePadDivisible, itemdata
-import Invariants: md
-import InvariantsCore: invariant, check
+import Invariants: Invariants, md, invariant, check
 import ImageInTerminal
 import IndirectArrays: IndirectArray
 import MakieCore

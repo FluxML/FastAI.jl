@@ -44,6 +44,7 @@ invertible(enc::Encoding, block::AbstractBlock) =
     !isnothing(decodedblock(enc, encodedblockfilled(enc, block)))
 
 encodingname(::E) where E<:Encoding = nameof(E)
+encodingname(t::Tuple) = map(encodingname, t)
 
 """
     fillblock(inblocks, outblocks)
