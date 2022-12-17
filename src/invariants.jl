@@ -80,9 +80,12 @@ end
 
 """
     is_data(data)
+    is_data(Bool, data)::Bool
 
 Check that `data` implements the data container interface and give detailed info on missing
 functionality if not.
+
+Pass `Bool` as a first argument to return a `Bool`.
 
 """
 function is_data(data; kwargs...)
@@ -93,9 +96,12 @@ end
 
 """
     is_data(data, block)
+    is_data(Bool, data, block)::Bool
 
 Check that `data` implements the data container interface and its observations are valid
 instances of `block`, giving detailed errors if not.
+
+Pass `Bool` as a first argument to return a `Bool`.
 """
 function is_data(data, block; kwargs...)
     inv = invariant_datacontainer_block(block; kwargs...)
