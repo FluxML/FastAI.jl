@@ -151,7 +151,7 @@ function lrfindtextplot!(io, result::LRFinderResult)
 
     for (i, estimate) in enumerate(result.estimates)
         UnicodePlots.lines!(p, estimate, maximum(result.losses), estimate,
-                            minimum(result.losses), :red)
+                            minimum(result.losses); color = :red)
         UnicodePlots.annotate!(p, estimate, maximum(result.losses),
                                string(round(estimate; sigdigits = 4)))
     end
