@@ -2,6 +2,7 @@
 test/Manifest.toml
 docs/Manifest.toml
 development/**
+**/.vscode/**
 Manifest.toml
 **/*.jld2
 *.so

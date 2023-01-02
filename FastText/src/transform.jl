@@ -27,7 +27,7 @@ end
 
 function basic_preprocessing(t)
     doc = StringDocument(t)
-    prepare!(doc, strip_stopwords)
+    # prepare!(doc, strip_stopwords)
     prepare!(doc, strip_html_tags)
     prepare!(doc, strip_non_letters)
     prepare!(doc, strip_numbers)

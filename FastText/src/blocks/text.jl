@@ -32,6 +32,9 @@ struct Tokens <: Block end
 
 FastAI.checkblock(::Tokens, ::Vector{String}) = true
 
-struct NumberVector <: Block end
+struct NumberVector <: Block
+    classes::AbstractVector{Int64}
+end
 
 FastAI.checkblock(::NumberVector, ::Vector{Int64}) = true
+setup(::Type{NumberVector}, data::OrderedDict{String,Int64}) = Label(unique(eachobs(data)))
