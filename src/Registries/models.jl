@@ -96,9 +96,14 @@ function _modelregistry(; name = "Models", description = _MODELS_DESCRIPTION)
                               name = "Backend",
                               default = :flux,
                               description = "The backend deep learning framework that the model uses. The default is `:flux`."),
+              loadfn = Field(Any,
+                             name = "Load function",
+                             optional = false,
+                             description = "A function `loadfn(checkpoint)` that loads a default version of the model, possibly with `checkpoint` weights.",
+                            ),
               variants = Field(Vector{Pair{String, ModelVariant}},
                                name = "Variants",
-                               optional = false,
+                               default = Pair{String, ModelVariant}[],
                                description = "Model variants suitable for different learning tasks. See `?ModelVariant` for more details.",
                                formatfn = d -> join(first.(d), ", ")),
               checkpoints = Field(Vector{String};
@@ -123,14 +128,22 @@ function _loadmodel(row; input = Any, output = Any, variant = nothing, checkpoin
 
     # Finding matching configuration
     checkpoint = _findcheckpoint(checkpoints; pretrained, name = checkpoint)
-
-    pretrained && isnothing(checkpoint) &&
+    if (pretrained && isnothing(checkpoint))
         throw(NoCheckpointFoundError(checkpoints, checkpoint))
-    variant = _findvariant(variants, variant, input, output)
-    isnothing(variant) && throw(NoModelVariantFoundError(variants, input, output, variant))
+    end
 
-    # Loading
-    return loadvariant(variant, input, output, checkpoint; kwargs...)
+    # If no variant is asked for, use the base model loading function that only takes
+    # care of the checkpoint.
+    if isnothing(variant) && input === Any && output === Any
+        return row.loadfn(checkpoint)
+    # If a variant is specified, either by name (through `variant`) or through block
+    # constraints `input` or `output`, try to find a matching variant.
+    # care of the checkpoint.
+    else
+        variant = _findvariant(variants, variant, input, output)
+        isnothing(variant) && throw(NoModelVariantFoundError(variants, input, output, variant))
+        return loadvariant(variant, input, output, checkpoint; kwargs...)
+    end
 end
 
 # ### Errors
@@ -197,17 +210,15 @@ struct MockVariant <: ModelVariant
 end
 
 compatibleblocks(variant::MockVariant) = variant.blocks
-loadvariant(variant::MockVariant, x, y, ch) = (ch, variant.model)
+loadvariant(variant::MockVariant, _, _, ch) = (ch, variant.model)
 
 @testset "Model registry" begin
     @testset "Basic" begin
         @test_nowarn _modelregistry()
         reg = _modelregistry()
-        push!(reg, (;
-                    id = "test",
-                    variants = ["base" => MockVariant(1, (Any, Any))]))
+        push!(reg, (; id = "test", loadfn = (checkpoint,) -> checkpoint))
 
-        @test load(reg["test"]) == (nothing, 1)
+        @test load(reg["test"]) === nothing
         @test_throws NoCheckpointFoundError load(reg["test"], pretrained = true)
     end
 
