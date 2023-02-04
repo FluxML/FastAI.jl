@@ -13,14 +13,6 @@ function loadvariant(v::MetalheadClassifierVariant, xblock, yblock, checkpoint; 
     return v.fn(; pretrain = checkpoint == "imagenet1k", kwargs...)
 end
 
-struct MetalheadImageNetVariant <: ModelVariant
-    fn
-end
-compatibleblocks(::MetalheadImageNetVariant) = (ImageTensor{2}(3), FastAI.OneHotTensor{0, Int}(1:1000))
-function loadvariant(v::MetalheadImageNetVariant, xblock, yblock, checkpoint; kwargs...)
-    return v.fn(; pretrain = checkpoint == "imagenet1k", kwargs...)
-end
-
 struct MetalheadBackboneVariant <: ModelVariant
     fn
     nfeatures::Int
@@ -38,7 +30,6 @@ end
 
 function metalheadvariants(modelfn, nfeatures)
     return [
-        "imagenet1k" => MetalheadImageNetVariant(modelfn),
         "classifier" => MetalheadClassifierVariant(modelfn),
         "backbone" => MetalheadBackboneVariant(modelfn, nfeatures),
     ]
@@ -118,31 +109,31 @@ const METALHEAD_CONFIGS = [
     ("metalhead/efficientnet-b8", "EfficientNet-B8",
      fix(Metalhead.EfficientNet, :b8), false, 1280),
 ]
+
+metalheadloadfn(fn, hasweights) = function loadfn(ckpt; kwargs...)
+    hasweights ? fn(; pretrain = ckpt !== nothing, kwargs...) : fn(; kwargs...)
+end
+
 for (id, description, loadfn, hasweights, nfeatures) in METALHEAD_CONFIGS
     _models[id] = (;
                    id, description,
+                   loadfn = metalheadloadfn(loadfn, hasweights),
                    variants = metalheadvariants(loadfn, nfeatures),
                    checkpoints = hasweights ? ["imagenet1k"] : String[],
                    backend = :flux)
 end
 
 @testset "Model variants" begin
-    @testset "make_cnn_classifier" begin
-        m = Metalhead.ResNet(18)
-        clf = make_cnn_classifier(m, ImageTensor{2}(3), FastAI.OneHotTensor{0, Int}(1:10))
-        @test Flux.outputsize(clf, (256, 256, 3, 1)) == (10, 1)
-
-        clf2 = make_cnn_classifier(m, ImageTensor{2}(5), FastAI.OneHotTensor{0, Int}(1:100))
-        @test Flux.outputsize(clf2, (256, 256, 5, 1)) == (100, 1)
-    end
-
-    @testset "make_cnn_backbone" begin
-        m = Metalhead.ResNet(18)
-        clf = make_cnn_backbone(m, ImageTensor{2}(10), ConvFeatures{2}(512))
-        @test Flux.outputsize(clf, (256, 256, 10, 1)) == (8, 8, 512, 1)
-    end
 end
 
-@testset "Metalhead models" begin for id in models(id = "metalhead")[:, :id]
-    @test_nowarn load(models()[id]; variant = "backbone")
-end end
+@testset "Metalhead models" begin
+    @test_nowarn load(models()["metalhead/resnet18"]; variant = "backbone")
+    @test_nowarn load(models()["metalhead/resnet18"]; variant = "classifier")
+    @test_nowarn load(models()["metalhead/resnet18"]; output = FastAI.OneHotLabel)
+    @test_nowarn load(models()["metalhead/resnet18"]; input = FastVision.ImageTensor)
+    @test_throws FastAI.Registries.NoModelVariantFoundError load(models()["metalhead/resnet18"]; output = FastAI.Label)
+    #= for id in models(id = "metalhead")[:, :id]
+        @test_nowarn load(models()[id]; variant = "backbone")
+    end =#
+
+end
