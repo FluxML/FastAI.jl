@@ -1,7 +1,7 @@
 name = "FastTabular"
 uuid = "d896c661-108c-409d-a26f-7fe446e2d3d3"
 authors = ["Lorenz Ohly", "FluxML Community"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"

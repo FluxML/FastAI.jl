@@ -1,7 +1,7 @@
 name = "FastAI"
 uuid = "5d0beca9-ade8-49ae-ad0b-a3cf890e669f"
 authors = ["Lorenz Ohly", "Julia Community"]
-version = "0.5.0"
+version = "0.5.1"
 
 [deps]
 DataDeps = "124859b0-ceae-595e-8997-d05f6a7a8dfe"

@@ -1,7 +1,7 @@
 name = "FastVision"
 uuid = "7bf02486-ff4c-4e73-b158-40c00866b54f"
 authors = ["Lorenz Ohly", "FluxML Community"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 ColorVectorSpace = "c3611d14-8923-5661-9e6a-0046d554d3a4"
