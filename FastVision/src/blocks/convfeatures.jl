@@ -7,7 +7,7 @@ Block representing features from a convolutional neural network backbone
 with `n` feature channels and `N` spatial dimensions.
 
 For example, a 2D ResNet's convolutional layers may produce a `h`x`w`x`ch` output
-that is passed
+that is passed further to the classifier head.
 
 ## Examples
 
