@@ -123,8 +123,6 @@ for (id, description, loadfn, hasweights, nfeatures) in METALHEAD_CONFIGS
                    backend = :flux)
 end
 
-@testset "Model variants" begin
-end
 
 @testset "Metalhead models" begin
     @test_nowarn load(models()["metalhead/resnet18"]; variant = "backbone")
@@ -132,8 +130,4 @@ end
     @test_nowarn load(models()["metalhead/resnet18"]; output = FastAI.OneHotLabel)
     @test_nowarn load(models()["metalhead/resnet18"]; input = FastVision.ImageTensor)
     @test_throws FastAI.Registries.NoModelVariantFoundError load(models()["metalhead/resnet18"]; output = FastAI.Label)
-    #= for id in models(id = "metalhead")[:, :id]
-        @test_nowarn load(models()[id]; variant = "backbone")
-    end =#
-
 end
