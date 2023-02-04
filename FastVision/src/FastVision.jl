@@ -66,11 +66,9 @@ import MakieCore: @recipe
 import MakieCore.Observables: @map
 import Metalhead: Metalhead
 import ProgressMeter: Progress, next!
-using Setfield: @set
 import StaticArrays: SVector
 import Statistics: mean, std
 import UnicodePlots
-using Random: Random
 
 using InlineTest
 using ShowCases
