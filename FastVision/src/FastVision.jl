@@ -114,7 +114,7 @@ function __init__()
     end
 end
 
-export Image, Mask, Keypoints, Bounded,
+export Image, Mask, Keypoints, Bounded, ConvFeatures,
 # encodings
        ImagePreprocessing, KeypointPreprocessing, ProjectiveTransforms,
 # learning tasks
