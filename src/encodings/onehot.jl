@@ -34,7 +34,7 @@ function checkblock(block::OneHotTensorMulti{N}, a::AbstractArray{T, M}) where {
     return N + 1 == M && last(size(a)) == length(block.classes)
 end
 
-function mockblock(block::OneHotTensorMulti{0}) where {N}
+function mockblock(block::OneHotTensorMulti{0})
     labelblock = LabelMulti(block.classes)
     return encode(OneHot(), Validation(), labelblock, mockblock(labelblock))
 end
