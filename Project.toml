@@ -1,7 +1,7 @@
 name = "FastAI"
 uuid = "5d0beca9-ade8-49ae-ad0b-a3cf890e669f"
 authors = ["Lorenz Ohly", "Julia Community"]
-version = "0.5.1"
+version = "0.5.2"
 
 [deps]
 DataDeps = "124859b0-ceae-595e-8997-d05f6a7a8dfe"
@@ -30,7 +30,7 @@ DataDeps = "0.7"
 FeatureRegistries = "0.1"
 FileIO = "1.7"
 FilePathsBase = "0.9"
-Flux = "0.12, 0.13"
+Flux = "0.12, 0.13, 0.14"
 FluxTraining = "0.2, 0.3"
 InlineTest = "0.2"
 JLD2 = "0.4"
