@@ -29,10 +29,10 @@ jobs:
     steps:
       # Check out the package directory at the branch that triggered
       # the workflow
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       # Check out Pollen.jl's data branch, where the generated documentation
       # data will be stored.
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           ref: ${{inputs.databranch}}
           path: pollen

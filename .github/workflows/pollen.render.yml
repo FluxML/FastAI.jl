@@ -13,15 +13,15 @@ jobs:
     name: "Pollen - Prerender static frontend and deploy"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: pollen
           path: data
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: "gh-pages"
           path: pages
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: lorenzoh/pollenjl-frontend
           path: frontend
