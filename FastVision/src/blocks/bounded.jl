@@ -49,9 +49,6 @@ will update the bounds:
 block = Image{2}()
 Bounded(Bounded(block, (16, 16)), (8, 8)) == Bounded(block, (8, 8))
 ```
-
-
-
 """
 struct Bounded{N, B <: AbstractBlock} <: WrapperBlock
     block::B
@@ -67,6 +64,18 @@ function checkblock(bounded::Bounded{N}, a::AbstractArray{N}) where {N}
     return checksize(bounded.size, size(a)) && checkblock(parent(bounded), a)
 end
 
+
+function FastAI.invariant_checkblock(block::Bounded{N}; blockvar = "block", obsvar = "obs", kwargs...) where N
+    return invariant(
+        FastAI.__inv_checkblock_title(block, blockvar, obsvar),
+        [
+            FastAI.invariant_checkblock(parent(block)),
+        ];
+        kwargs...
+    )
+end
+
+
 @testset "Bounded [block, wrapper]" begin
     @test_nowarn Bounded(Image{2}(), (16, 16))
     bounded = Bounded(Image{2}(), (16, 16))
@@ -74,4 +83,13 @@ end
 
     # composition
     @test Bounded(bounded, (16, 16)) == bounded
+end
+
+@testset "checksize" begin
+    @test checksize((10, 1), (10, 1))
+    @test !checksize((100, 1), (10, 1))
+    @test checksize((:, :, :), (1, 2, 3))
+    @test !checksize((:, :, :), (1, 2))
+    @test checksize((10, :, 1), (10, 20, 1))
+    @test !checksize((10, :, 2), (10, 20, 1))
 end

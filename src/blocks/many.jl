@@ -35,5 +35,6 @@ end
 @testset "Many [block]" begin
     enc = OneHot()
     block = Many(Label(1:10))
+    @test encodedblock(enc, block) isa Many{<:OneHotTensor}
     FastAI.testencoding(enc, block)
 end

@@ -72,6 +72,8 @@ _tasks["imagesegmentation"] = (id = "vision/imagesegmentation",
     @testset "taskdataloaders" begin
         data, blocks = load(datarecipes()["camvid_tiny"])
         traindl, _ = taskdataloaders(data, ImageSegmentation(blocks))
+        # Iterate once so that precompilation does not print when testing
+        for batch in traindl end
         @test_nowarn for batch in traindl
         end
     end

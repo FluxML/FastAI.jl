@@ -13,6 +13,7 @@ using Flux.Optimise
 import Flux.Optimise: apply!, Optimiser, WeightDecay
 using FluxTraining: Learner, handle
 using FluxTraining.Events
+import Invariants: Invariants, invariant, check, check_throw, md
 using JLD2: jldsave, jldopen
 using Markdown
 using PrettyTables
@@ -79,10 +80,12 @@ include("serialization.jl")
 
 # submodules
 include("datasets/Datasets.jl")
-@reexport using .Datasets
+using .Datasets
 
 include("Registries/Registries.jl")
 @reexport using .Registries
+
+include("invariants.jl")
 
 export
 # submodules

@@ -8,9 +8,13 @@ struct KeypointTensor{N, T, M} <: Block
     sz::NTuple{M, Int}
 end
 
-mockblock(block::KeypointTensor{N}) where {N} = rand(SVector{N, Float32}, block.sz)
-function checkblock(block::KeypointTensor{N, T}, obs::AbstractArray{T}) where {N, T}
-    return length(obs) == (prod(block.sz) * N)
+function mockblock(block::KeypointTensor{N}) where {N}
+    enc = KeypointPreprocessing((16, 16))
+    b = Keypoints{N}(block.sz)
+    return encode(enc, Validation(), b, mockblock(b))
+end
+function checkblock(block::KeypointTensor{N, T, M}, obs::AbstractArray{U, M}) where {N, T, U, M}
+    return length(obs) == prod(block.sz) * N
 end
 
 """

@@ -31,6 +31,8 @@ struct Only{E <: Encoding} <: StatefulEncoding
     encoding::E
 end
 
+encodingname(only::Only) = "Only{$(encodingname(only.encoding))}"
+
 function Only(name::Symbol, encoding::Encoding)
     return Only(Named{name}, encoding)
 end

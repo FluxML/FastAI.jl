@@ -49,16 +49,16 @@ function tasklearner(task::LearningTask,
                      backbone = nothing,
                      model = nothing,
                      callbacks = [],
-                     pctgval = 0.2,
                      batchsize = 16,
                      optimizer = Adam(),
                      lossfn = tasklossfn(task),
+                     usedefaultcallbacks = true,
                      kwargs...)
     if isnothing(model)
         model = isnothing(backbone) ? taskmodel(task) : taskmodel(task, backbone)
     end
     dls = taskdataloaders(traindata, validdata, task, batchsize; kwargs...)
-    return Learner(model, dls, optimizer, lossfn, callbacks...)
+    return Learner(model, dls, optimizer, lossfn, callbacks...; usedefaultcallbacks)
 end
 
 function tasklearner(task, data; pctgval = 0.2, kwargs...)

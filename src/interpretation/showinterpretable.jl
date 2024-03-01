@@ -21,6 +21,7 @@ showblockinterpretable(ShowText(), encodings, block, x)  # will decode to an `Im
 
 """
 function showblockinterpretable(backend::ShowBackend, encodings, block, obs)
+    invariant_checkblock(block)(Exception, obs)
     res = decodewhile(block -> !isshowable(backend, block),
                       encodings,
                       Validation(),
@@ -53,7 +54,7 @@ end
 # Helpers
 
 function isshowable(backend::S, block::B) where {S <: ShowBackend, B <: AbstractBlock}
-    hasmethod(FastAI.showblock!, (Any, S, B, Any))
+    hasmethod(FastAI.showblock!, (Any, S, B, typeof(mockblock(block))))
 end
 
 """

@@ -1,5 +1,14 @@
 # # Wrapper blocks
 
+"""
+    abstract type WrapperBlock
+
+Supertype for blocks that "wrap" an existing block, inheriting its
+functionality, allowing you to override just parts of its interface.
+
+For examples of `WrapperBlock`, see [`Bounded`](#)
+
+"""
 abstract type WrapperBlock <: AbstractBlock end
 
 Base.parent(w::WrapperBlock) = w.block
@@ -7,10 +16,11 @@ Base.parent(b::Block) = b
 wrapped(w::WrapperBlock) = wrapped(parent(w))
 wrapped(b::Block) = b
 function setwrapped(w::WrapperBlock, b)
+    # TODO: make recursive
     return Setfield.@set w.block = b
 end
-mockblock(w::WrapperBlock) = mockblock(wrapped(w))
-checkblock(w::WrapperBlock, obs) = checkblock(wrapped(w), obs)
+mockblock(w::WrapperBlock) = mockblock(parent(w))
+checkblock(w::WrapperBlock, obs) = checkblock(parent(w), obs)
 
 function blockname(wrapper::WrapperBlock)
     w = string(nameof(typeof(wrapper)))
@@ -72,6 +82,8 @@ struct PropagateNever <: PropagateWrapper end
 propagate(::PropagateNever, _, _) = false
 propagatedecode(::PropagateNever, _, _) = false
 
+# If not overwritten, encodings are applied to the wrapped block
+propagatewrapper(::WrapperBlock) = PropagateAlways()
 """
     struct PropagateSameBlock <: PropagateWrapper end
 

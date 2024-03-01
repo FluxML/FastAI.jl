@@ -58,11 +58,13 @@ import DataAugmentation: apply, Identity, ToEltype, ImageToTensor, Normalize,
                          AdjustBrightness, AdjustContrast, Maybe, FlipX, FlipY, WarpAffine,
                          Rotate, Zoom,
                          ResizePadDivisible, itemdata
+import Invariants: Invariants, md, invariant, check
 import ImageInTerminal
 import IndirectArrays: IndirectArray
 import MakieCore
 import MakieCore: @recipe
 import MakieCore.Observables: @map
+
 import ProgressMeter: Progress, next!
 import StaticArrays: SVector
 import Statistics: mean, std

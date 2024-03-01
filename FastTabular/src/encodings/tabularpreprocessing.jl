@@ -14,6 +14,13 @@ function EncodedTableRow(catcols, contcols, categorydict)
     EncodedTableRow{length(catcols), length(contcols)}(catcols, contcols, categorydict)
 end
 
+function mockblock(block::EncodedTableRow)
+    b = TableRow(block.catcols, block.contcols, block.categorydict)
+    obs = mockblock(b)
+    enc = setup(TabularPreprocessing, b, TableDataset(map(x -> [x], obs)))
+    return encode(enc, Validation(), b, obs)
+end
+
 function checkblock(::EncodedTableRow{M, N}, x::Tuple{Vector, Vector}) where {M, N}
     length(x[1]) == M && length(x[2]) == N
 end
