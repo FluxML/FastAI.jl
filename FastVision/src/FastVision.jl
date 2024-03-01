@@ -76,6 +76,7 @@ include("blocks/bounded.jl")
 include("blocks/image.jl")
 include("blocks/mask.jl")
 include("blocks/keypoints.jl")
+include("blocks/convfeatures.jl")
 
 include("encodings/onehot.jl")
 include("encodings/imagepreprocessing.jl")
