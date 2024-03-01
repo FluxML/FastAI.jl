@@ -1,6 +1,6 @@
 module Registries
 
-using ..FastAI
+using ..FastAI: FastAI, BlockLike, Label, LabelMulti, issubblock
 using ..FastAI.Datasets
 using ..FastAI.Datasets: DatasetLoader, DataDepLoader, isavailable, loaddata, typify
 
@@ -48,10 +48,12 @@ end
 include("datasets.jl")
 include("tasks.jl")
 include("recipes.jl")
+include("models.jl")
 
 export datasets,
        learningtasks,
        datarecipes,
+       models,
        find,
        info,
        load
